@@ -1,0 +1,6 @@
+/nbproject/private/
+
+/vendor/
+.phpunit.cache
+.env
+*.log

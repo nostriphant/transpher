@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model xlink:href="/your/path/to/phing-grammar.rng" type="application/xml" 
+                    schematypens="http://relaxng.org/ns/structure/1.0" ?>
+                    
+<project name="Radar" default="dist">
+
+    <!-- ============================================  -->
+    <!-- Target: prepare                               -->
+    <!-- ============================================  -->
+    <target name="prepare">
+        <echo msg="Making directory ./build" />
+        <mkdir dir="./build" />
+    </target>
+    
+    <target name="test" depends="prepare">
+        <exec executable="./vendor/bin/pest" passthru="true" checkreturn="true">
+            
+        </exec>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: build docker image                      -->
+    <!-- ============================================  -->
+    <target name="build" depends="test">
+        <property name="docker_tag" value="rikmeijer84/transpher:latest" override="true" />
+        
+        <echo msg="Building docker images ${docker_tag}..." />
+        <exec executable="/usr/local/bin/docker">
+            <arg line="build --platform linux/amd64,linux/arm64  -t ${docker_tag} ."/>
+        </exec>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- (DEFAULT)  Target: dist                       -->
+    <!-- ============================================  -->
+    <target name="run" depends="build">
+        <echo msg="Run container with image ${docker_tag}..." />
+        
+        <exec executable="/usr/local/bin/docker">
+            <arg line="run --rm -p 8000:80 ${docker_tag}"/>
+        </exec>
+    </target>
+    
+    <target name="dist" depends="build">
+        <echo msg="Pushing docker image ${docker_tag}..." />
+
+        <exec executable="/usr/local/bin/docker">
+            <arg line="push ${docker_tag}"/>
+        </exec>
+    </target>
+</project>

@@ -31,21 +31,22 @@ class Filters {
         return false;
     }
     
+    static function buildFilter(array $filters, string $filter_field, callable $event_test) : callable {
+        if (self::skipFilter($filters, $filter_field)) {
+            return fn() => false;
+        }
+        return $event_test;
+    }
+    
     static function scalar(string $filter_field, string $event_field) : callable {
         return function(array $filters) use ($filter_field, $event_field) : callable {
-            if (self::skipFilter($filters, $filter_field)) {
-                return fn() => false;
-            }
-            return fn(array $event) => in_array($event[$event_field], $filters[$filter_field]);
+            return self::buildFilter($filters, $filter_field, fn(array $event) => in_array($event[$event_field], $filters[$filter_field]));
         };
     }
     
     static function tag(string $filter_tag_identifier, string $event_tag_identifier) : callable {
         return function(array $filters) use ($filter_tag_identifier, $event_tag_identifier) : callable {
-            if (self::skipFilter($filters, $filter_tag_identifier)) {
-                return fn() => false;
-            }
-            return fn(array $event) => some($event['tags'], fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filters[$filter_tag_identifier]));
+            return self::buildFilter($filters, $filter_tag_identifier, fn(array $event) => some($event['tags'], fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filters[$filter_tag_identifier])));
         };
     }
 }

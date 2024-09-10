@@ -3,6 +3,7 @@ pcntl_async_signals(TRUE);
 
 require_once __DIR__ . '/bootstrap.php';
 
+use Transpher\Message;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -28,6 +29,9 @@ use Monolog\Level;
     $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
     $websocket->setLogger($log);
     $agent = new \Transpher\WebSocket\Client($websocket);
-    $agent->start();
+    $log->info('Sending Private Direct Message event');
+    $note = Message::event(1059, 'TODO', ['p', $_SERVER['argv'][2]]);
+    $agent->json($note(\Transpher\Key::generate()));
+    //$agent->start();
 });
 echo 'Done';

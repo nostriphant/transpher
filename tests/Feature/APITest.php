@@ -110,6 +110,23 @@ describe('relay', function () {
         $bob->start();
     });
 
+    it('sends events to all clients subscribed on p-tag', function () {
+        $alice = \TranspherTests\Client::generic_client();
+        $bob = \TranspherTests\Client::generic_client();
+
+        $note = \Transpher\Message::event(1, 'Hello world!', [['p', 'randomPTag']]);
+        $key = \Transpher\Key::generate();
+        $alice->sendSignedMessage($note($key));
+        $subscription = Transpher\Message::subscribe();
+
+        $bob->expectNostrEvent($subscription()[1], 'Hello world!');
+        $bob->expectNostrEose($subscription()[1]);
+
+        $request = Transpher\Message::filter($subscription, tags: ['#p' => ['randomPTag']])();
+        $bob->json($request);
+        $bob->start();
+    });
+    
     it('closes subscription and stop sending events to subscribers', function () {
         $alice = \TranspherTests\Client::generic_client();
         $bob = \TranspherTests\Client::generic_client();

@@ -34,6 +34,13 @@ class Client extends \Transpher\WebSocket\Client {
             expect($message[1]['content'])->toBe($content);
         }];
     }
+    public function expectNostrPrivateDirectMessage(string $subscriptionId, string $content) {
+        $this->expected_messages[] = ['EVENT', function(\WebSocket\Client $client, array $message) use ($subscriptionId, $content) {
+            expect($message[0])->toBe($subscriptionId);
+            expect($message[1]['kind'])->toBe(1059);
+        }];
+        $this->expectNostrEose($subscriptionId);
+    }
     public function expectNostrEose(string $subscriptionId) {
         $this->expected_messages[] = ['EOSE', function(\WebSocket\Client $client, array $message) use ($subscriptionId) {
             expect($message[0])->toBe($subscriptionId);

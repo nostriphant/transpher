@@ -40,11 +40,12 @@ class Filters {
         };
     }
     
-    static function buildScalarTest(string $event_field) {
+    static function buildScalarTest(string|int $event_field) {
         return fn(array $filter_values, array $event) => in_array($event[$event_field], $filter_values);
     }
     static function buildTagTest(string $event_tag_identifier) {
-        return fn(array $filter_values, array $event) => some($event['tags'], fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filter_values));
+        $tag_value_test = self::buildScalarTest(1);
+        return fn(array $filter_values, array $event) => some($event['tags'], fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && $tag_value_test($filter_values, $event_tag));
     }
     
     static function scalar(string $filter_field, string $event_field) : callable {

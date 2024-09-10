@@ -41,10 +41,10 @@ class Filters {
     }
     
     static function scalar(string $filter_field, string $event_field) : callable {
-        return self::buildFilter($filter_field, fn(array $filter, array $event) => in_array($event[$event_field], $filter));
+        return self::buildFilter($filter_field, fn(array $filter_values, array $event) => in_array($event[$event_field], $filter_values));
     }
     
     static function tag(string $filter_tag_identifier, string $event_tag_identifier) : callable {
-        return self::buildFilter($filter_tag_identifier, fn(array $filter, array $event) => some($event['tags'], fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filter)));
+        return self::buildFilter($filter_tag_identifier, fn(array $filter_values, array $event) => some($event['tags'], fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filter_values)));
     }
 }

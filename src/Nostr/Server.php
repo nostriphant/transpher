@@ -4,8 +4,6 @@ namespace Transpher\Nostr;
 
 use \Transpher\Nostr;
 use \Transpher\Filters;
-use Functional\Functional;
-use function \Functional\each, \Functional\partial_left;
 
 /**
  * Description of Server
@@ -13,6 +11,11 @@ use function \Functional\each, \Functional\partial_left;
  * @author Rik Meijer <rmeijer@wemanity.com>
  */
 class Server {
+    
+    static function boot(int $port, array $env, callable $running) : callable {
+        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'websocket.php', $port];
+        return \Transpher\Process::start('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Server is running'), $running);
+    }
     
     static function listen(array $message, callable $subscriptions) {
         $type = array_shift($message);

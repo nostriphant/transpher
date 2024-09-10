@@ -24,7 +24,6 @@ class Server {
     }
     
     public function start(array|\ArrayAccess $events, \Psr\Log\LoggerInterface $log) {
-        $this->server->setLogger($log);
         $this->server->onText(function (WSServer $server, Connection $from, \WebSocket\Message\Message $message) use (&$events, $log) {
             $log->info('Received message: ' . $message->getPayload());
 
@@ -47,7 +46,7 @@ class Server {
         $this->server->start();
     }
     
-    static function subscriptionEditor(array|ArrayAccess &$events, Connection $from) {
+    static function subscriptionEditor(array|\ArrayAccess &$events, Connection $from) {
         return function(string $subscriptionId, ?callable $subscription) use (&$events, $from) {
             $subscriptions = $from->getMeta('subscriptions')??[];
             if (is_null($subscription)) {
@@ -59,7 +58,8 @@ class Server {
             $from->setMeta('subscriptions', $subscriptions);
         };
     }
-    static function eventRelayer(array|ArrayAccess &$events, Connection $from, WSServer $server) {
+    
+    static function eventRelayer(array|\ArrayAccess &$events, Connection $from, WSServer $server) {
         $isOther = fn(Connection $client) => $client === $from;
         $others = reject($server->getConnections(), $isOther);
         return function(array $event) use (&$events, $others) : void {

@@ -1,0 +1,15 @@
+<?php
+
+namespace Transpher\Nostr\Server;
+
+/**
+ * Description of Agent
+ *
+ * @author Rik Meijer <hello@rikmeijer.nl>
+ */
+class Agent {
+    static function boot(int $port, string $pubkey, array $env, callable $running) {
+        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'agent.php', $port, $pubkey];
+        return \Transpher\Process::start('agent-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Listening'), $running);
+    }
+}

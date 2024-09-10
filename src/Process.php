@@ -20,7 +20,11 @@ class Process {
         ];
 
         $process = proc_open($cmd, $descriptorspec, $pipes, $cwd, $env);
-        sleep(1);
+        
+        while ($runtest(file_get_contents($cwd . "/logs/{$process_id}-output.log")) === false) {
+            // wait till process is ready
+        }
+        
         
         if ($process === false) {
             return fn() => [];

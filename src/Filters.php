@@ -22,7 +22,7 @@ class Filters {
         return fn(array $event) => $subscription_filters(fn($subscription_filter) => $subscription_filter($event));
     }
     
-    static function skipFilter(array $filters, string $filter_field) {
+    static function invalid(array $filters, string $filter_field) {
         if (array_key_exists($filter_field, $filters) === false) {
             return true;
         } elseif (is_array($filters[$filter_field]) === false) {
@@ -33,7 +33,7 @@ class Filters {
     
     static function make(string $filter_field, callable $event_test) : callable {
         return function(array $filters) use ($filter_field, $event_test) : callable {
-            if (self::skipFilter($filters, $filter_field)) {
+            if (self::invalid($filters, $filter_field)) {
                 return fn() => false;
             }
             return partial_left($event_test, $filters[$filter_field]);

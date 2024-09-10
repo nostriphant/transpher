@@ -22,11 +22,18 @@ class Filters {
         return fn(array $event) => $subscription_filters(fn($subscription_filter) => $subscription_filter($event));
     }
     
+    static function skipFilter(array $filters, string $filter_field) {
+        if (array_key_exists($filter_field, $filters) === false) {
+            return true;
+        } elseif (is_array($filters[$filter_field]) === false) {
+            return true;
+        }
+        return false;
+    }
+    
     static function scalar(string $filter_field, string $event_field) : callable {
         return function(array $filters) use ($filter_field, $event_field) : callable {
-            if (array_key_exists($filter_field, $filters) === false) {
-                return fn() => false;
-            } elseif (is_array($filters[$filter_field]) === false) {
+            if (self::skipFilter($filters, $filter_field)) {
                 return fn() => false;
             }
             return fn(array $event) => in_array($event[$event_field], $filters[$filter_field]);
@@ -35,9 +42,7 @@ class Filters {
     
     static function tag(string $filter_tag_identifier, string $event_tag_identifier) : callable {
         return function(array $filters) use ($filter_tag_identifier, $event_tag_identifier) : callable {
-            if (array_key_exists($filter_tag_identifier, $filters) === false) {
-                return fn() => false;
-            } elseif (is_array($filters[$filter_tag_identifier]) === false) {
+            if (self::skipFilter($filters, $filter_tag_identifier)) {
                 return fn() => false;
             }
             return fn(array $event) => some($event['tags'], fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filters[$filter_tag_identifier]));

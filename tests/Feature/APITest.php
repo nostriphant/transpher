@@ -114,7 +114,7 @@ describe('relay', function () {
         $alice = \TranspherTests\Client::generic_client();
         $bob = \TranspherTests\Client::generic_client();
 
-        $note = \Transpher\Message::event(1, 'Hello world!', [['p', 'randomPTag']]);
+        $note = \Transpher\Message::event(1, 'Hello world!', ['p', 'randomPTag']);
         $key = \Transpher\Key::generate();
         $alice->sendSignedMessage($note($key));
         $subscription = Transpher\Message::subscribe();

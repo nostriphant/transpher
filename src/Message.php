@@ -28,7 +28,7 @@ class Message {
         return substr($public_hex, 2);
     }
     
-    static function event(int $kind, string $content, array $tags = []) {
+    static function event(int $kind, string $content, array ...$tags) {
         return \Functional\partial_right([Nostr::class, 'event'], time(), $kind, $tags, $content);
     }
     

@@ -30,7 +30,7 @@ use Monolog\Level;
     $websocket->setLogger($log);
     $agent = new \Transpher\WebSocket\Client($websocket);
     $log->info('Sending Private Direct Message event');
-    $note = Message::event(1059, 'TODO', [['p', $_SERVER['argv'][2]]]);
+    $note = Message::event(1059, 'TODO', ['p', $_SERVER['argv'][2]]);
     $agent->json($note(\Transpher\Key::generate()));
     //$agent->start();
 });

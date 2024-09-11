@@ -38,6 +38,7 @@ class Client extends \Transpher\WebSocket\Client {
         $this->expected_messages[] = ['EVENT', function(\WebSocket\Client $client, array $message) use ($subscriptionId, $content) {
             expect($message[0])->toBe($subscriptionId);
             expect($message[1]['kind'])->toBe(1059);
+            expect($message[1]['content'])->toBe($content);
         }];
         $this->expectNostrEose($subscriptionId);
     }

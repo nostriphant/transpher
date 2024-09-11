@@ -23,6 +23,12 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
 } elseif (str_starts_with($_SERVER['TRANSPHER_STORE'], 'redis')) {
     $log->info('Using redis to store messages');
     $events = new Transpher\Redis($_SERVER['TRANSPHER_STORE']);
+} elseif (is_dir($_SERVER['TRANSPHER_STORE'])) {
+    $log->info('Using directory to store messages');
+    $events = new Transpher\Directory($_SERVER['TRANSPHER_STORE']);
+} else {
+    $log->info('Using memory to save messages (fallback).');
+    $events = [];
 }
 
 $server->start($events, $log);

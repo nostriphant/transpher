@@ -8,9 +8,9 @@ use \Transpher\Filters;
 /**
  * Description of Server
  *
- * @author Rik Meijer <rmeijer@wemanity.com>
+ * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Server {
+class Relay {
     
     static function boot(int $port, array $env, callable $running) : callable {
         $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'websocket.php', $port];
@@ -44,7 +44,7 @@ class Server {
         if (empty($subscription)) {
             yield Nostr::closed($subscriptionId, 'Subscription filters are empty');
         } else {
-            yield from $subscriptions($subscriptionId, Filters::constructSubscription($subscription));
+            yield from $subscriptions($subscriptionId, Filters::constructFromPrototype($subscription));
             yield Nostr::eose($subscriptionId);
         }
     }

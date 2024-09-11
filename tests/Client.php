@@ -67,12 +67,14 @@ class Client extends \Transpher\WebSocket\Client {
         $this->start();
     }
 
-    #[\Override]
     public function start(): void {
         $this->onJson(function(\WebSocket\Client $client, \WebSocket\Connection $connection, array $message) {
             $expected_message = array_shift($this->expected_messages);
             expect(array_shift($message))->toBe($expected_message[0]);
             $expected_message[1]($client, $message);
+        });
+        $this->onDisconnect(function() {
+            expect($this->expected_messages)->toBeEmpty();
         });
         $wrapped_client = $this;
         parent::start();

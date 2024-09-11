@@ -7,7 +7,7 @@ function redis_server(int $port, array $env) {
 
 $main_relay;
 beforeAll(function() use (&$main_relay) {
-    \Transpher\Nostr\Server::boot(8081, [], function (callable $relay) use (&$main_relay) {
+    \Transpher\Nostr\Relay::boot(8081, [], function (callable $relay) use (&$main_relay) {
         $main_relay = $relay;
     });
 });
@@ -151,13 +151,13 @@ describe('relay', function () {
     });
 
     it('sends events to all clients subscribed on author (pubkey), even after restarting the server', function () {
-        $store_redis = 'redis://127.0.0.1:6379/1';
-
         $env = [
-            'TRANSPHER_STORE' => $store_redis
+            'TRANSPHER_STORE' => sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid()
         ];
-
-        \Transpher\Nostr\Server::boot(8082, $env, function (callable $server) use ($env) {
+        mkdir($env['TRANSPHER_STORE']);
+        
+        
+        \Transpher\Nostr\Relay::boot(8082, $env, function (callable $server) use ($env) {
             $alice = \TranspherTests\Client::client(8082);
 
             $key = \Transpher\Key::generate();
@@ -169,7 +169,7 @@ describe('relay', function () {
             expect($status)->toBeArray();
             expect($status['running'])->toBeFalse();
 
-            \Transpher\Nostr\Server::boot(8082, $env, function (callable $server) use ($key) {
+            \Transpher\Nostr\Relay::boot(8082, $env, function (callable $server) use ($key) {
                 $bob = \TranspherTests\Client::client(8082);
                 $subscription = Transpher\Message::subscribe();
 
@@ -212,7 +212,7 @@ describe('relay', function () {
             'TRANSPHER_STORE' => $store_redis
         ];
 
-        \Transpher\Nostr\Server::boot(8083, $env, function (callable $relay) use ($redis, $key_alice) {
+        \Transpher\Nostr\Relay::boot(8083, $env, function (callable $relay) use ($redis, $key_alice) {
             $bob = \TranspherTests\Client::client(8083);
             $subscription = Transpher\Message::subscribe();
             $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');

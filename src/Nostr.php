@@ -47,11 +47,4 @@ class Nostr {
     static function subscribedEvent(string $subscriptionId, array $event) {
         return ['EVENT', $subscriptionId, $event];
     }
-    
-    static function onJson($connection, callable $callback) : void {
-        $connection->onText(function(...$args) use ($callback) {
-            $message = array_pop($args);
-            $callback($args[0], $args[1], json_decode($message->getContent(), true));
-        });
-    }
 }

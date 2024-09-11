@@ -1,6 +1,6 @@
 <?php
 
-namespace Transpher\Nostr\Server;
+namespace Transpher\Nostr\Relay;
 
 /**
  * Description of Agent

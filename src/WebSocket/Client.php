@@ -25,15 +25,18 @@ class Client {
         $this->client->text(Nostr::encode($json));
     }
     public function onJson(callable $callback) {
-        Nostr::onJson($this->client, $callback);
-    }
-    
-    public function start(): void {
-        $this->client->start();
+        $this->client->onText(function(...$args) use ($callback) {
+            $message = array_pop($args);
+            $callback($args[0], $args[1], json_decode($message->getContent(), true));
+        });
     }
 
     public function connect() : bool {
         $this->client->connect();
         return $this->client->isConnected();
+    }
+    
+    public function __call(string $name, array $arguments): mixed {
+        return $this->client->{$name}(...$arguments);
     }
 }

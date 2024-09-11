@@ -11,7 +11,7 @@ use Monolog\Level;
 
 
 
-\Transpher\Nostr\Server::boot($_SERVER['argv'][1], [], function(callable $relay) {
+\Transpher\Nostr\Relay::boot($_SERVER['argv'][1], [], function(callable $relay) {
     \Functional\each(\Functional\filter(get_defined_constants(), fn(mixed $value, string $name) => str_starts_with($name, 'SIG')), function(mixed $value, string $name) use ($relay) {
         if (str_starts_with($name, 'SIG_')) {
         } elseif ($value === SIGKILL) {

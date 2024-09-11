@@ -3,6 +3,7 @@
 namespace Transpher;
 
 use Transpher\Nostr;
+use function Functional\map;
 
 /**
  * Class to contain Message related functions
@@ -30,6 +31,9 @@ class Message {
     
     static function event(int $kind, string $content, array ...$tags) {
         return \Functional\partial_right([Nostr::class, 'event'], time(), $kind, $tags, $content);
+    }
+    static function privateDirect(string $content, string ...$recipients) {
+        return Message::event(1059, $content, ...map($recipients, fn(string $recipient) => ['p', $recipient]));
     }
     
     static function close(callable $subscription) {

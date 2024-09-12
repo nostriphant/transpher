@@ -10,7 +10,7 @@ namespace Transpher;
 /**
  * Description of Directory
  *
- * @author Rik Meijer <rmeijer@wemanity.com>
+ * @author Rik Meijer <hello@rikmeijer.nl>
  */
 class Directory implements \ArrayAccess, \Iterator {
 

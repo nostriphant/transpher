@@ -106,6 +106,26 @@ describe('NIP-44 v2', function () {
                 expect($payload)->toBe($vector->payload, 'Unable to properly encrypt vector message');
             }
         });
+        
+        
+        it('can encrypt & decrypt long messages', function () {
+            foreach (vectors('nip44')->v2->valid->encrypt_decrypt_long_msg as $vector) {
+                $key = openKey($vector->sec2);
+                expect($key->validate()['result'])->toBeTrue();
+
+                $pub2 = $key->getPublic('hex');
+
+                $conversation_key = NIP44::getConversationKey($vector->sec1, $pub2);
+                expect(bin2hex($conversation_key))->toBe($vector->conversation_key);
+
+                expect(NIP44::decrypt($vector->payload, $conversation_key))->toBe($vector->plaintext, 'Unable to properly decrypt vector payload');
+
+                $payload = NIP44::encrypt($vector->plaintext, $conversation_key, hex2bin($vector->nonce));
+                expect(NIP44::decrypt($payload, $conversation_key))->toBe($vector->plaintext, 'Unable to properly decrypt self encrypted payload');
+
+                expect($payload)->toBe($vector->payload, 'Unable to properly encrypt vector message');
+            }
+        });
     });
 });
 

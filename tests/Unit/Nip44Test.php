@@ -31,14 +31,14 @@ describe('NIP-44 v2', function () {
                     '909192939495969798999a9b9c9d9e9f' .
                     'a0a1a2a3a4a5a6a7a8a9aaabacadaeaf'
             );
-            expect(bin2hex(NIP44::hkdf_extract($key, $salt)))->toBe('06a6b88c5853361a06104c9ceb35b45cef760014904671014a193f40c15fc244');
+            expect(bin2hex(NIP44::hmac_digest($salt, $key)))->toBe('06a6b88c5853361a06104c9ceb35b45cef760014904671014a193f40c15fc244');
         });
 
         it('hkdf works', function () {
             foreach (vectors('hkdf')->sha256 as $vector) {
                 $vector_salt = $vector->salt ? hex2bin($vector->salt) : '';
                 $vector_info = $vector->info ? hex2bin($vector->info) : '';
-                $PRK = NIP44::hkdf_extract(hex2bin($vector->IKM), $vector_salt);
+                $PRK = NIP44::hmac_digest($vector_salt, hex2bin($vector->IKM));
                 expect(bin2hex($PRK))->toBe($vector->PRK);
                 $OKM = NIP44::hkdf(hex2bin($vector->IKM), $vector_salt, $vector_info, $vector->L);
                 expect(bin2hex($OKM))->toBe($vector->OKM);

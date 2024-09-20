@@ -23,10 +23,6 @@ class NIP44 {
         return hash_hmac(self::HASH, $data, $key, true);
     }
     
-    static function hkdf_extract(string $ikm, string $salt): string {
-        return self::hmac_digest($salt, $ikm);
-    }
-    
     const HASH_OUTPUT_SIZE = 32;
     
     /**
@@ -77,7 +73,7 @@ class NIP44 {
         } catch (\Exception $e) {
             return false;
         }
-        return self::hkdf_extract(hex2bin($secret), 'nip44-v2');
+        return self::hmac_digest('nip44-v2', hex2bin($secret));
     }
 
     static function getMessageKeys(string $conversationKey, string $nonce): array {
@@ -111,7 +107,6 @@ class NIP44 {
         $cipher = new \phpseclib3\Crypt\ChaCha20();
         $cipher->setKey($key);
         $cipher->setNonce($nonce);
-        //$cipher->setCounter(self::uInt32(0, true));
         return $cipher->encrypt($data);
     }
     
@@ -131,22 +126,6 @@ class NIP44 {
         }
         else if ($endianness === null) {  // machine byte order
             $i = $f("S", $i);
-        }
-
-        return is_array($i) ? $i[1] : $i;
-    }
-    
-    public static function uInt32($i, $endianness=false) {
-        $f = is_int($i) ? "pack" : "unpack";
-
-        if ($endianness === true) {  // big-endian
-            $i = $f("N", $i);
-        }
-        else if ($endianness === false) {  // little-endian
-            $i = $f("V", $i);
-        }
-        else if ($endianness === null) {  // machine byte order
-            $i = $f("L", $i);
         }
 
         return is_array($i) ? $i[1] : $i;

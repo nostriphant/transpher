@@ -71,8 +71,13 @@ class NIP44 {
         return $key1->derive($pub2)->toString('hex');
     }
 
-    static function getConversationKey(string $privkeyA, string $pubkeyB): string {
-        return self::hkdf_extract(hex2bin(self::getSharedSecret($privkeyA, $pubkeyB)), 'nip44-v2');
+    static function getConversationKey(string $privkeyA, string $pubkeyB): bool|string {
+        try {
+            $secret = self::getSharedSecret($privkeyA, $pubkeyB);
+        } catch (\Exception $e) {
+            return false;
+        }
+        return self::hkdf_extract(hex2bin($secret), 'nip44-v2');
     }
 
     static function getMessageKeys(string $conversationKey, string $nonce): array {
@@ -84,9 +89,9 @@ class NIP44 {
         ];
     }
     
-    static function hmacAad(string $key, string $aad, string $message): string {
+    static function hmacAad(string $key, string $aad, string $message): bool|string {
         if (strlen($aad) !== 32) {
-            throw new \Exception('AAD associated data must be 32 bytes, ' . strlen($aad) . ' given.');
+            return false;
         }
         return self::hmac_digest($key, $aad . $message);
         
@@ -158,11 +163,11 @@ class NIP44 {
         $decoded = $utf8_text;
         
         // Validate plaintext length. Minimum is 1 byte, maximum is 65535 bytes
-//        if (strlen($decoded) < 1) {
-//            return false;
-//        } elseif (strlen($decoded) > 65535) {
-//            return false;
-//        }
+        if (strlen($decoded) < 1) {
+            return false;
+        } elseif (strlen($decoded) > 65535) {
+            return false;
+        }
         
         // Padding algorithm is related to powers-of-two, with min padded msg size of 32
         $pad_length = self::calcPaddedLength($utf8_text_length);
@@ -174,39 +179,57 @@ class NIP44 {
         return $unpaddedLengthBytes . str_pad($decoded, $pad_length, chr(0));
     }
     
-    static function unpad(string $padded) {
+    static function unpad(string $padded) : bool|string {
         $unpadded_length = self::uInt16(substr($padded, 0, 2), true);
+        if ($unpadded_length === 0) {
+            return false;
+        }
+        
         $unpadded =  substr($padded, 2, $unpadded_length);
-//        expect (not (unpaddedLen = 0 || unpaddedLen <> unpadded.Length || (2 + calculatePaddedLen unpaddedLen) <> padded.Length)) "Invalid padding"
-//        Encoding.UTF8.GetString unpadded
+        if ($unpadded_length !== strlen($unpadded)) {
+            return false;
+        } elseif (2 + self::calcPaddedLength(strlen($unpadded)) !== strlen($padded)) {
+            return false;
+        }
+        
         return $unpadded;
     }
     
     /* Based on: https://github.com/nbd-wtf/nostr-tools/blob/master/nip44.ts */
-    static function encrypt(string $utf8_text, string $conversationKey, string $salt): string {
-        list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt);
-        
+    static function encrypt(string $utf8_text, string $conversationKey, string $salt): false|string {
         $padded = self::pad($utf8_text);
+        if ($padded === false) {
+            return false;
+        }
+        list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt);
         $ciphertext = self::chacha20($chacha_key, $chacha_nonce, $padded);
         return sodium_bin2base64(self::uInt8(2) . $salt . $ciphertext . self::hmacAad($hmac_key, $salt, $ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
     }
 
     
-    static function decrypt(string $payload, string $conversationKey): string {
-        //expect (cipherText.Length > 0 && cipherText[0] <> '#') "Encryption version is not yet supported"
-        // expect (strlen($payload) >= 132 && strlen($payload) <= 87472) "Invalid payload size"
+    static function decrypt(string $payload, string $conversationKey): bool|string {
+        if ($payload === '') {
+            return false;
+        } elseif ($payload[0] === '#') {
+            return false;
+        }
+        
         $decoded = base64_decode($payload);
-        $version = $decoded[0];
+        $version = self::uInt8(substr($decoded, 0, 1));
+        if ($version !== 2) {
+            return false;
+        }
+        
         $salt = substr($decoded, 1, 32);
         $ciphertext = substr($decoded, 33, -32);
         $mac = substr($decoded, -32);
-        
+
         list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt);
         $expected_mac = self::hmacAad($hmac_key, $salt, $ciphertext);
         if ($mac !== $expected_mac) {
-            throw new \Exception('invalid MAC' . $mac . ' --- ' . $expected_mac);
+            return false;
         }
-        
+
         $padded = self::chacha20($chacha_key, $chacha_nonce, $ciphertext);
         return self::unpad($padded);
       }

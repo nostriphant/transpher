@@ -68,7 +68,9 @@ describe('NIP-44 v2', function () {
         it('get_conversation_key', function () {
             //https://github.com/paulmillr/nip44/blob/main/javascript/test/nip44.vectors.json
             foreach (vectors('nip44')->v2->valid->get_conversation_key as $vector) {
-                expect(bin2hex(NIP44::getConversationKey($vector->sec1, '02' . $vector->pub2)))->toBe($vector->conversation_key);
+                $key = NIP44::getConversationKey($vector->sec1, '02' . $vector->pub2);
+                expect($key)->not()->toBeFalse();
+                expect(bin2hex($key))->toBe($vector->conversation_key, $vector->note??'');
             }
         });
         it('gets message keys', function () {
@@ -96,6 +98,7 @@ describe('NIP-44 v2', function () {
                 $pub2 = $key->getPublic('hex');
 
                 $conversation_key = NIP44::getConversationKey($vector->sec1, $pub2);
+                expect($conversation_key)->not()->toBeFalse();
                 expect(bin2hex($conversation_key))->toBe($vector->conversation_key);
 
                 expect(NIP44::decrypt($vector->payload, $conversation_key))->toBe($vector->plaintext, 'Unable to properly decrypt vector payload');
@@ -123,19 +126,19 @@ describe('NIP-44 v2', function () {
     
     
   describe('invalid', function() {
-    should('encrypt_msg_lengths', function() {
+    it('encrypt_msg_lengths', function() {
       foreach (vectors('nip44')->v2->invalid->encrypt_msg_lengths as $vector) {
-          expect(NIP44::encrypt(str_repeat('a', $vector), randomBytes(32)))->toBeFalse();
+          expect(NIP44::encrypt(str_repeat('a', $vector), random_bytes(32), ''))->toBeFalse();
       }
     });
-    should('decrypt', function() {
+    it('decrypt', function() {
       foreach (vectors('nip44')->v2->invalid->decrypt as $vector) {
-        expect(NIP44::decrypt($vector->payload, hex2bin($vector->conversation_key)))->toBeFalse();
+        expect(NIP44::decrypt($vector->payload, hex2bin($vector->conversation_key)))->toBeFalse($vector->note);
       }
     });
-    should('get_conversation_key', function() {
+    it('get_conversation_key', function() {
       foreach (vectors('nip44')->v2->invalid->get_conversation_key as $vector) {
-        expect(NIP44::getConversationKey($vector->sec1, $vector->pub2))->toBeFalse();
+        expect(NIP44::getConversationKey($vector->sec1, $vector->pub2))->toBeFalse($vector->note);
       }
     });
   });

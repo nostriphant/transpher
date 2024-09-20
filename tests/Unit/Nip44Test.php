@@ -120,5 +120,24 @@ describe('NIP-44 v2', function () {
             }
         });
     });
+    
+    
+  describe('invalid', function() {
+    should('encrypt_msg_lengths', function() {
+      foreach (vectors('nip44')->v2->invalid->encrypt_msg_lengths as $vector) {
+          expect(NIP44::encrypt(str_repeat('a', $vector), randomBytes(32)))->toBeFalse();
+      }
+    });
+    should('decrypt', function() {
+      foreach (vectors('nip44')->v2->invalid->decrypt as $vector) {
+        expect(NIP44::decrypt($vector->payload, hex2bin($vector->conversation_key)))->toBeFalse();
+      }
+    });
+    should('get_conversation_key', function() {
+      foreach (vectors('nip44')->v2->invalid->get_conversation_key as $vector) {
+        expect(NIP44::getConversationKey($vector->sec1, $vector->pub2))->toBeFalse();
+      }
+    });
+  });
 });
 

@@ -5,13 +5,15 @@
     "require": {
         "php": "^8.3",
         "ext-redis" : "*",
+        "ext-sodium" : "*",
         "cboden/ratchet": "^0.4.4",
         "vlucas/phpdotenv": "^5.6",
         "phrity/websocket": "^3.1",
         "monolog/monolog": "^3.7",
         "simplito/elliptic-php": "^1.0",
         "uma/phpecc": "^0.1.3",
-        "rikmeijer/functional-php": "^1.0"
+        "rikmeijer/functional-php": "^1.0",
+        "phpseclib/phpseclib": "~3.0"
     },
     "license": "MIT",
     "autoload": {

@@ -5,12 +5,12 @@ FROM php:8.3
 
 RUN ["apt", "update"]
 
-RUN ["apt-get", "install", "-y", "libzip-dev", "zip", "libgmp-dev"]
+RUN ["apt-get", "install", "-y", "libzip-dev", "zip", "libgmp-dev", "libsodium-dev"]
 RUN ["docker-php-ext-install", "zip", "gmp"]
 
 RUN ["pecl", "install", "--force", "redis"]
 RUN ["rm", "-rf", "/tmp/pear"]
-RUN ["docker-php-ext-enable", "redis"]
+RUN ["docker-php-ext-enable", "redis", "sodium"]
 
 WORKDIR "/app"
 COPY ["composer.json", "composer.lock", "bootstrap.php", "websocket.php", "."]

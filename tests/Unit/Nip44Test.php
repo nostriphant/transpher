@@ -51,15 +51,15 @@ describe('NIP-44 v2', function () {
             // https://github.com/paulmillr/noble-secp256k1/blob/main/test/wycheproof/ecdh_secp256k1_test.json
             foreach (vectors('ecdh-secp256k1')->testGroups[0]->tests as $vector) {
                 if ($vector->result === 'valid') {
-                    $secret = NIP44::getSharedSecret($vector->private, substr($vector->public, 46));
-                    expect(str_pad($secret, 64, '0', STR_PAD_LEFT))->toBe($vector->shared);
+                    $secret = NIP44::getSharedSecret(hex2bin($vector->private), hex2bin(substr($vector->public, 46)));
+                    expect(str_pad(bin2hex($secret), 64, '0', STR_PAD_LEFT))->toBe($vector->shared);
                 }
             }
         });
         it('get_conversation_key', function () {
             //https://github.com/paulmillr/nip44/blob/main/javascript/test/nip44.vectors.json
             foreach (vectors('nip44')->v2->valid->get_conversation_key as $vector) {
-                $key = NIP44::getConversationKey($vector->sec1, '02' . $vector->pub2);
+                $key = NIP44::getConversationKey(hex2bin($vector->sec1), hex2bin('02' . $vector->pub2));
                 expect($key)->not()->toBeFalse();
                 expect(bin2hex($key))->toBe($vector->conversation_key, $vector->note??'');
             }
@@ -88,7 +88,7 @@ describe('NIP-44 v2', function () {
 
                 $pub2 = $key->getPublic('hex');
 
-                $conversation_key = NIP44::getConversationKey($vector->sec1, $pub2);
+                $conversation_key = NIP44::getConversationKey(hex2bin($vector->sec1), hex2bin($pub2));
                 expect($conversation_key)->not()->toBeFalse();
                 expect(bin2hex($conversation_key))->toBe($vector->conversation_key);
 
@@ -129,7 +129,7 @@ describe('NIP-44 v2', function () {
     });
     it('get_conversation_key', function() {
       foreach (vectors('nip44')->v2->invalid->get_conversation_key as $vector) {
-        expect(NIP44::getConversationKey($vector->sec1, $vector->pub2))->toBeFalse($vector->note);
+        expect(NIP44::getConversationKey(hex2bin($vector->sec1), hex2bin($vector->pub2)))->toBeFalse($vector->note);
       }
     });
   });

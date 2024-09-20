@@ -62,9 +62,9 @@ class NIP44 {
     
     static function getSharedSecret(string $privkeyA, string $pubkeyB): string {
         $ec = new EC('secp256k1');
-        $key1 = $ec->keyFromPrivate($privkeyA, 'hex');
-        $pub2 = $ec->keyFromPublic($pubkeyB, 'hex')->pub;
-        return $key1->derive($pub2)->toString('hex');
+        $key1 = $ec->keyFromPrivate(bin2hex($privkeyA), 'hex');
+        $pub2 = $ec->keyFromPublic(bin2hex($pubkeyB), 'hex')->pub;
+        return hex2bin($key1->derive($pub2)->toString('hex'));
     }
 
     static function getConversationKey(string $privkeyA, string $pubkeyB): bool|string {
@@ -73,7 +73,7 @@ class NIP44 {
         } catch (\Exception $e) {
             return false;
         }
-        return self::hmac_digest('nip44-v2', hex2bin($secret));
+        return self::hmac_digest('nip44-v2', $secret);
     }
 
     static function getMessageKeys(string $conversationKey, string $nonce): array {

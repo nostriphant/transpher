@@ -107,9 +107,6 @@ class NIP44 {
         return $chunk * ((int)floor(($length - 1) / $chunk) + 1);
     }
     
-    static function chacha20_poly1305(string $key, string $nonce, string $aad, string $data) : string {
-        return sodium_crypto_aead_chacha20poly1305_ietf_encrypt($data, $aad, $nonce, $key);
-    }
     static function chacha20(string $key, string $nonce, string $data) : string {
         $cipher = new \phpseclib3\Crypt\ChaCha20();
         $cipher->setKey($key);

@@ -3,7 +3,7 @@
 use Transpher\Nostr\NIP44;
 
 function vectors(string $name): object {
-    return json_decode(file_get_contents(__DIR__ . '/' . $name . '.json'), false);
+    return json_decode(file_get_contents(__DIR__ . '/vectors/' . $name . '.json'), false);
 }
 
 function openKey(string $key): \Elliptic\EC\KeyPair {
@@ -53,15 +53,6 @@ describe('NIP-44 v2', function () {
                 if ($vector->result === 'valid') {
                     $secret = NIP44::getSharedSecret($vector->private, substr($vector->public, 46));
                     expect(str_pad($secret, 64, '0', STR_PAD_LEFT))->toBe($vector->shared);
-                }
-            }
-        });
-        it('chacha20', function () {
-            // https://github.com/paulmillr/noble-secp256k1/blob/main/test/wycheproof/ecdh_secp256k1_test.json
-            foreach (vectors('chacha20-poly1305')->testGroups[0]->tests as $vector) {
-                if ($vector->result === 'valid') {
-                    $encrypted = NIP44::chacha20_poly1305(hex2bin($vector->key), hex2bin($vector->iv), hex2bin($vector->aad), hex2bin($vector->msg));
-                    expect(bin2hex($encrypted))->toBe($vector->ct . $vector->tag);
                 }
             }
         });

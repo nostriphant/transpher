@@ -12,22 +12,6 @@ use function Functional\map;
  */
 class Message {
     
-    /**
-     * Generate public key from private key as hex.
-     *
-     * @param string $private_hex
-     *
-     * @return string
-     */
-    static function getPublicFromPrivateKey(string $private_hex): string
-    {
-        $ec = new \Elliptic\EC('secp256k1');
-        $private_key = $ec->keyFromPrivate($private_hex);
-        $public_hex = $private_key->getPublic(true, 'hex');
-
-        return $public_hex;
-    }
-    
     static function event(int $kind, string $content, array ...$tags) {
         return \Functional\partial_right([Nostr::class, 'event'], time(), $kind, $tags, $content);
     }

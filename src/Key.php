@@ -23,12 +23,28 @@ class Key {
     
     static function private(string $hex_private_key) : callable {
         return fn(?callable $input = null) => match ($input) {
-           null => Message::getPublicFromPrivateKey($hex_private_key),
+           null => self::getPublicFromPrivateKey($hex_private_key),
            default => $input($hex_private_key)
         };
     }
     
     static function signer(string $message) : callable {
         return fn(string $hex_private_key) => (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->sign($hex_private_key, $message)['signature'];
+    }
+    
+    /**
+     * Generate public key from private key as hex.
+     *
+     * @param string $private_hex
+     *
+     * @return string
+     */
+    static function getPublicFromPrivateKey(string $private_hex): string
+    {
+        $ec = new \Elliptic\EC('secp256k1');
+        $private_key = $ec->keyFromPrivate($private_hex);
+        $public_hex = $private_key->getPublic(true, 'hex');
+
+        return $public_hex;
     }
 }

@@ -17,9 +17,9 @@ class Message {
     }
     
     
-    static function seal(callable $private_key, array $direct_message, string $salt, string $recipient_pubkey) {
+    static function seal(callable $private_key, array $direct_message, string $recipient_pubkey) {
         $conversation_key = self::getConversationKey($recipient_pubkey);
-        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($direct_message), $private_key($conversation_key), $salt);
+        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($direct_message), $private_key($conversation_key), random_bytes(32));
         return Nostr::event($private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
     }
     
@@ -33,20 +33,19 @@ class Message {
         };
     }
     
-    static function giftWrap(array $event, string $salt, string $recipient_pubkey) {
+    static function giftWrap(array $event, string $recipient_pubkey) {
         $randomKey = \Transpher\Key::generate();
         $conversation_key = self::getConversationKey($recipient_pubkey);
-        $encrypted = Nostr\NIP44::encrypt(json_encode($event), $randomKey($conversation_key), $salt);
+        $encrypted = Nostr\NIP44::encrypt(json_encode($event), $randomKey($conversation_key), random_bytes(32));
         return Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
     }
     
     static function privateDirect(callable $private_key, string $recipient_pubkey) {
         return function(string $message) use ($private_key, $recipient_pubkey) {
-            $salt = random_bytes(32);
             $unsigned_event = Message::event(14, $message, ['p', $recipient_pubkey]);
             $direct_message = $unsigned_event($private_key);
             unset($direct_message[1]['sig']);
-            return self::giftWrap(self::seal($private_key, $direct_message, $salt, $recipient_pubkey), $salt, $recipient_pubkey);
+            return self::giftWrap(self::seal($private_key, $direct_message, $recipient_pubkey), $recipient_pubkey);
         };
     }
     

@@ -17,10 +17,10 @@ class Message {
     }
     
     
-    static function seal(callable $private_key, array $direct_message, string $recipient_pubkey) {
+    static function seal(callable $sender_private_key, string $recipient_pubkey, array $direct_message) {
         $conversation_key = self::getConversationKey($recipient_pubkey);
-        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($direct_message), $private_key($conversation_key), random_bytes(32));
-        return Nostr::event($private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
+        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($direct_message), $sender_private_key($conversation_key), random_bytes(32));
+        return Nostr::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
     }
     
     static function getConversationKey(string $recipient_pubkey) : callable {
@@ -33,19 +33,19 @@ class Message {
         };
     }
     
-    static function giftWrap(array $event, string $recipient_pubkey) {
+    static function giftWrap(string $recipient_pubkey, array $event) {
         $randomKey = \Transpher\Key::generate();
         $conversation_key = self::getConversationKey($recipient_pubkey);
         $encrypted = Nostr\NIP44::encrypt(json_encode($event), $randomKey($conversation_key), random_bytes(32));
         return Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
     }
     
-    static function privateDirect(callable $private_key, string $recipient_pubkey) {
-        return function(string $message) use ($private_key, $recipient_pubkey) {
+    static function privateDirect(callable $private_key) {
+        return function(string $recipient_pubkey, string $message) use ($private_key) {
             $unsigned_event = Message::event(14, $message, ['p', $recipient_pubkey]);
             $direct_message = $unsigned_event($private_key);
             unset($direct_message[1]['sig']);
-            return self::giftWrap(self::seal($private_key, $direct_message, $recipient_pubkey), $recipient_pubkey);
+            return self::giftWrap($recipient_pubkey, self::seal($private_key, $recipient_pubkey, $direct_message));
         };
     }
     

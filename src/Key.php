@@ -38,4 +38,14 @@ class Key {
         };
     }
     
+    static function conversation(string $recipient_pubkey) : callable {
+        return function(string $hex_private_key) use ($recipient_pubkey) : string {
+            $key = Nostr\NIP44::getConversationKey(hex2bin($hex_private_key), hex2bin($recipient_pubkey));
+            if ($key === false) {
+                throw new \Exception('Unable to determine conversation key');
+            }
+            return $key;
+        };
+    }
+    
 }

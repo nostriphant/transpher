@@ -3,6 +3,7 @@
 namespace Transpher;
 
 use Transpher\Nostr;
+use \Transpher\Key;
 use function Functional\map;
 
 /**
@@ -12,30 +13,20 @@ use function Functional\map;
  */
 class Message {
     
-    static function event(int $kind, string $content, array ...$tags) {
+    static function event(int $kind, string $content, array ...$tags) : callable {
         return \Functional\partial_right([Nostr::class, 'event'], time(), $kind, $tags, $content);
     }
     
     
     static function seal(callable $sender_private_key, string $recipient_pubkey, array $direct_message) {
-        $conversation_key = self::getConversationKey($recipient_pubkey);
+        $conversation_key = Key::conversation($recipient_pubkey);
         $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($direct_message), $sender_private_key($conversation_key), random_bytes(32));
         return Nostr::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
     }
     
-    static function getConversationKey(string $recipient_pubkey) : callable {
-        return function(string $hex_private_key) use ($recipient_pubkey) : string {
-            $key = Nostr\NIP44::getConversationKey(hex2bin($hex_private_key), hex2bin($recipient_pubkey));
-            if ($key === false) {
-                throw new \Exception('Unable to determine conversation key');
-            }
-            return $key;
-        };
-    }
-    
     static function giftWrap(string $recipient_pubkey, array $event) {
-        $randomKey = \Transpher\Key::generate();
-        $conversation_key = self::getConversationKey($recipient_pubkey);
+        $randomKey = Key::generate();
+        $conversation_key = Key::conversation($recipient_pubkey);
         $encrypted = Nostr\NIP44::encrypt(json_encode($event), $randomKey($conversation_key), random_bytes(32));
         return Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
     }

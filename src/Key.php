@@ -22,7 +22,7 @@ class Key {
     }
     
     static function private(string $hex_private_key) : callable {
-        return fn(?callable $input = null) => match ($input) {
+        return fn(callable $input) => match ($input) {
            null => self::getPublicFromPrivateKey($hex_private_key),
            default => $input($hex_private_key)
         };
@@ -30,6 +30,10 @@ class Key {
     
     static function signer(string $message) : callable {
         return fn(string $hex_private_key) => (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->sign($hex_private_key, $message)['signature'];
+    }
+    
+    static function public() : callable {
+        return [__CLASS__, 'getPublicFromPrivateKey'];
     }
     
     /**

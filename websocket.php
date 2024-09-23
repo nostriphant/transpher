@@ -14,8 +14,7 @@ $log = new Logger('relay-' . $websocket->getPort());
 $log->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', Level::Debug));
 $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
 
-$server = new \Transpher\WebSocket\Server($websocket);
-$websocket->setLogger($log);
+$server = new \Transpher\WebSocket\Server($websocket, $log);
         
 if (isset($_SERVER['TRANSPHER_STORE']) === false) {
     $log->info('Using memory to save messages.');

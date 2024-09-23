@@ -14,7 +14,9 @@ use WebSocket\Middleware\PingInterval;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 class Client {
-    public function __construct(private \WebSocket\Client $client) {
+    
+    public function __construct(private \WebSocket\Client $client, private \Psr\Log\LoggerInterface $logger) {
+        $this->client->setLogger($this->logger);
         $this->client
             ->addMiddleware(new CloseHandler())
             ->addMiddleware(new PingResponder())
@@ -27,6 +29,7 @@ class Client {
     public function onJson(callable $callback) {
         $this->client->onText(function(...$args) use ($callback) {
             $message = array_pop($args);
+            $this->logger->info('Received ' . $message->getContent());
             $callback($args[0], $args[1], json_decode($message->getContent(), true));
         });
     }

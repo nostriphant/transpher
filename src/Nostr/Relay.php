@@ -49,11 +49,10 @@ class Relay {
         }
     }
     
-    static function relay(callable $to, string $subscriptionId, array $event) : bool {
-        $to(
+    static function relay(callable $to, string $subscriptionId) : callable {
+        return fn(array $event) => $to(
            Nostr::subscribedEvent($subscriptionId, $event),
            Nostr::eose($subscriptionId)
         );
-        return true;
     }
 }

@@ -17,20 +17,47 @@ use function \Functional\reject, \Functional\first, \Functional\each, \Functiona
  */
 class Server {
     
-    public function __construct(private WSServer $server) {
+    public function __construct(private WSServer $server, private \Psr\Log\LoggerInterface $log) {
         $server
             ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
-            ->addMiddleware(new \WebSocket\Middleware\PingResponder());
+            ->addMiddleware(new \WebSocket\Middleware\PingResponder())
+            ->setLogger($log);
     }
     
-    public function start(array|\ArrayAccess $events, \Psr\Log\LoggerInterface $log) {
-        $this->server->onText(function (WSServer $server, Connection $from, \WebSocket\Message\Message $message) use (&$events, $log) {
-            $log->info('Received message: ' . $message->getPayload());
+    private function wrapClient(Connection $client, string $action) : callable {
+        return function(array ...$messages) use ($client, $action) : bool {
+            foreach ($messages as $message) {
+                $encoded_message = Nostr::encode($message);
+                $this->log->debug($action . ' message ' . $encoded_message);
+                $client->text($encoded_message);
+            }
+            return true;
+        };
+    }
+    
+    private function getOthers(Connection $from) {
+        $others = reject($this->server->getConnections(), fn(Connection $client) => $client === $from);
+        
+        return map($others, fn(Connection $client) => fn(array $event) => first(
+            $client->getMeta('subscriptions')??[], 
+            fn(callable $subscription, string $subscriptionId) => if_else(
+                $subscription, 
+                NServer::relay($this->wrapClient($client, 'Relay'), $subscriptionId),
+                Functional::false
+            )($event)
+        ));
+    }
+    
+    public function start(array|\ArrayAccess $events) {
+        $this->server->onText(function (WSServer $server, Connection $from, \WebSocket\Message\Message $message) use (&$events) {
+            $this->log->info('Received message: ' . $message->getPayload());
 
             $payload = json_decode($message->getPayload(), true);
 
             $edit_subscriptions = self::subscriptionEditor($events, $from);
-            $relay_event_to_subscribers = self::eventRelayer($events, $from, $server);
+           
+            $others = $this->getOthers($from);
+            $relay_event_to_subscribers = self::eventRelayer($events, $others);
 
             $subscription_handler = function() use ($relay_event_to_subscribers, $edit_subscriptions) {
                 if (func_num_args() === 1) {
@@ -40,8 +67,10 @@ class Server {
                 }
             };
 
-            $reply = Nostr::wrap([$from, 'text']);
-            foreach(NServer::listen($payload, $subscription_handler, $log) as $reply_message) $reply($reply_message);
+            $reply = $this->wrapClient($from, 'Reply');
+            foreach(NServer::listen($payload, $subscription_handler) as $reply_message) {
+                $reply($reply_message);
+            }
         });
         $this->server->start();
     }
@@ -59,19 +88,10 @@ class Server {
         };
     }
     
-    static function eventRelayer(array|\ArrayAccess &$events, Connection $from, WSServer $server) {
-        $isOther = fn(Connection $client) => $client === $from;
-        $others = reject($server->getConnections(), $isOther);
+    static function eventRelayer(array|\ArrayAccess &$events, array $others) {
         return function(array $event) use (&$events, $others) : void {
             $events[] = $event;
-            each($others, fn(Connection $other) => first(
-                $other->getMeta('subscriptions')??[], 
-                fn(callable $subscription, string $subscriptionId) => if_else(
-                    $subscription, 
-                    fn($event) => NServer::relay(Nostr::wrap([$other, 'text']), $subscriptionId, $event),
-                    Functional::false
-                )($event)
-            ));
+            each($others, fn(callable $other) => $other($event));
         };
     }
 }

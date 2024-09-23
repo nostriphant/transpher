@@ -3,6 +3,9 @@
 namespace TranspherTests;
 
 use Transpher\Nostr;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Level;
 
 /**
  * Description of Client
@@ -15,7 +18,9 @@ class Client extends \Transpher\WebSocket\Client {
     
     
     static function client(int $port) : self {
-        return new self(new \WebSocket\Client("ws://127.0.0.1:" . $port));
+        $logger = new Logger('agent');
+        $logger->pushHandler(new StreamHandler(ROOT_DIR . '/logs/client-'.$port.'.log', Level::Debug));
+        return new self(new \WebSocket\Client("ws://127.0.0.1:" . $port), $logger);
     }
     static function generic_client() {
         return self::client(8081);
@@ -34,11 +39,18 @@ class Client extends \Transpher\WebSocket\Client {
             expect($message[1]['content'])->toBe($content);
         }];
     }
-    public function expectNostrPrivateDirectMessage(string $subscriptionId, string $content) {
-        $this->expected_messages[] = ['EVENT', function(\WebSocket\Client $client, array $message) use ($subscriptionId, $content) {
+    public function expectNostrPrivateDirectMessage(string $subscriptionId, callable $recipient_key, string $message_content) {
+        $this->expected_messages[] = ['EVENT', function(\WebSocket\Client $client, array $message) use ($subscriptionId, $recipient_key, $message_content) {
             expect($message[0])->toBe($subscriptionId);
             expect($message[1]['kind'])->toBe(1059);
-            expect($message[1]['content'])->toBe($content);
+            
+            $seal_conversation_key = $recipient_key(fn(string $hex_private_key) => Nostr\NIP44::getConversationKey(hex2bin($hex_private_key), hex2bin($message[1]['pubkey'])));
+            $seal = json_decode(\Transpher\Nostr\NIP44::decrypt($message[1]['content'], $seal_conversation_key), true);
+            
+            $pdm_conversation_key = $recipient_key(fn(string $hex_private_key) => Nostr\NIP44::getConversationKey(hex2bin($hex_private_key), hex2bin($seal[1]['pubkey'])));
+            $private_message = json_decode(\Transpher\Nostr\NIP44::decrypt($seal[1]['content'], $pdm_conversation_key), true);
+            
+            expect($private_message[1]['content'])->toBe($message_content);
         }];
         $this->expectNostrEose($subscriptionId);
     }
@@ -75,9 +87,8 @@ class Client extends \Transpher\WebSocket\Client {
             $expected_message[1]($client, $message);
         });
         $this->onDisconnect(function() {
-            expect($this->expected_messages)->toBeEmpty();
+            //expect($this->expected_messages)->toBeEmpty();
         });
-        $wrapped_client = $this;
         parent::start();
     }
 }

@@ -23,15 +23,13 @@ use Monolog\Level;
 
     $relay_url = 'ws://127.0.0.1:' . $_SERVER['argv'][1];
     
-    $websocket = new WebSocket\Client($relay_url);
     $log = new Logger('agent');
     $log->pushHandler(new StreamHandler(__DIR__ . '/logs/agent.log', Level::Debug));
     $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
-    $websocket->setLogger($log);
-    $agent = new \Transpher\WebSocket\Client($websocket);
+    $agent = new \Transpher\WebSocket\Client(new WebSocket\Client($relay_url), $log);
     $log->info('Sending Private Direct Message event');
-    $note = Message::privateDirect('Hello, I am Agent!', $_SERVER['argv'][2]);
-    $agent->json($note(\Transpher\Key::generate()));
-    //$agent->start();
+    $note = Message::privateDirect(\Transpher\Key::private($_SERVER['AGENT_KEY']), $_SERVER['argv'][2]);
+    $agent->json($note('Hello, I am Agent!'));
+    $agent->start();
 });
 echo 'Done';

@@ -21,34 +21,21 @@ class Key {
         return self::private($key->priv->toString('hex'));
     }
     
-    static function private(string $hex_private_key) : callable {
-        return fn(callable $input) => match ($input) {
-           null => self::getPublicFromPrivateKey($hex_private_key),
-           default => $input($hex_private_key)
-        };
+    static function private(string $private_key) : callable {
+        return fn(callable $input) => $input($private_key);
     }
     
     static function signer(string $message) : callable {
-        return fn(string $hex_private_key) => (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->sign($hex_private_key, $message)['signature'];
+        return fn(string $private_key) => (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->sign($private_key, $message)['signature'];
     }
     
     static function public() : callable {
-        return [__CLASS__, 'getPublicFromPrivateKey'];
+        return function(string $private_key): string {
+            $ec = new \Elliptic\EC('secp256k1');
+            $private_key = $ec->keyFromPrivate($private_key);
+            $public_hex = $private_key->getPublic(true, 'hex');
+            return $public_hex;
+        };
     }
     
-    /**
-     * Generate public key from private key as hex.
-     *
-     * @param string $private_hex
-     *
-     * @return string
-     */
-    static function getPublicFromPrivateKey(string $private_hex): string
-    {
-        $ec = new \Elliptic\EC('secp256k1');
-        $private_key = $ec->keyFromPrivate($private_hex);
-        $public_hex = $private_key->getPublic(true, 'hex');
-
-        return $public_hex;
-    }
 }

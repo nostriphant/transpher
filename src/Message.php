@@ -49,4 +49,8 @@ class Message {
         return fn() => array_merge($previous(), [$filtered_conditions]);
     }
     
+    
+    static function requestedEvent(string $subscriptionId, array $event) {
+        return ['EVENT', $subscriptionId, $event];
+    }
 }

@@ -3,6 +3,7 @@
 namespace Transpher\Nostr;
 
 use \Transpher\Nostr;
+use \Transpher\Message;
 use \Transpher\Filters;
 
 /**
@@ -51,7 +52,7 @@ class Relay {
     
     static function relay(callable $to, string $subscriptionId) : callable {
         return fn(array $event) => $to(
-           Nostr::requestedEvent($subscriptionId, $event),
+                        Message::requestedEvent($subscriptionId, $event),
            Nostr::eose($subscriptionId)
         );
     }

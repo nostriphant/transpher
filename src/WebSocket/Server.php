@@ -8,6 +8,7 @@ use Functional\Functional;
 use WebSocket\Server as WSServer;
 use Transpher\Nostr\Relay as NServer;
 use WebSocket\Connection;
+use Transpher\Message;
 use function \Functional\reject, \Functional\first, \Functional\each, \Functional\if_else, \Functional\map, \Functional\filter;
 
 /**
@@ -82,7 +83,7 @@ class Server {
                 unset($subscriptions[$subscriptionId]);
             } else {
                 $subscriptions[$subscriptionId] = $subscription;
-                yield from map(filter($events, $subscription), fn(array $event) => Nostr::requestedEvent($subscriptionId, $event));
+                yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
             }
             $from->setMeta('subscriptions', $subscriptions);
         };

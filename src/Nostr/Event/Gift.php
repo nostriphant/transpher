@@ -16,13 +16,13 @@ class Gift {
     static function wrap(string $recipient_pubkey, array $event) : array {
         $randomKey = Key::generate();
         $conversation_key = NIP44::getConversationKey($randomKey, hex2bin($recipient_pubkey));
-        $encrypted = NIP44::encrypt(json_encode($event), $conversation_key, random_bytes(32));
+        $encrypted = NIP44::encrypt(Nostr::encode($event), $conversation_key, random_bytes(32));
         return Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
     }
     
     static function unwrap(Key $recipient_key, string $sender_pubkey, string $gift) : array {
         $seal_conversation_key = NIP44::getConversationKey($recipient_key, hex2bin($sender_pubkey));
-        return json_decode(NIP44::decrypt($gift, $seal_conversation_key), true);
+        return Nostr::decode(NIP44::decrypt($gift, $seal_conversation_key), true);
     }
     
 }

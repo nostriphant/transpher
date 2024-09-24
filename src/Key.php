@@ -13,7 +13,15 @@ use Elliptic\EC;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Key {
+readonly class Key {
+    
+    public function __construct(private string $private_key) {}
+    public function __invoke(callable $input): mixed {
+        return $input($this->private_key);
+    }
+    static function fromHex(string $private_key) : callable {
+        return new self($private_key);
+    }
     
     static function curve() : EC {
         return new EC('secp256k1');
@@ -23,11 +31,7 @@ class Key {
     {
         $ec = self::curve();
         $key = $ec->genKeyPair();
-        return self::private($key->priv->toString('hex'));
-    }
-    
-    static function private(string $private_key) : callable {
-        return fn(callable $input) => $input($private_key);
+        return self::fromHex($key->priv->toString('hex'));
     }
     
     static function signer(string $message) : callable {

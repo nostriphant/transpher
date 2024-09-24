@@ -17,7 +17,7 @@ class Message {
         return \Functional\partial_right([Nostr::class, 'event'], time(), $kind, $tags, $content);
     }
     
-    static function privateDirect(callable $private_key) : callable {
+    static function privateDirect(Key $private_key) : callable {
         return function(string $recipient_pubkey, string $message) use ($private_key) {
             $unsigned_event = Message::event(14, $message, ['p', $recipient_pubkey]);
             $direct_message = $unsigned_event($private_key);

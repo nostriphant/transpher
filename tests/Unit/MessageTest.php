@@ -1,7 +1,7 @@
 <?php
 
 it('can generate a properly signed note', function() {
-    $private_key = \Transpher\Key::private('435790f13406085d153b10bd9e00a9f977e637f10ce37db5ccfc5d3440c12d6c');
+    $private_key = \Transpher\Key::fromHex('435790f13406085d153b10bd9e00a9f977e637f10ce37db5ccfc5d3440c12d6c');
 
     $note = \Transpher\Message::event(1, 'Hello world!');
     $signed_note = $note($private_key);

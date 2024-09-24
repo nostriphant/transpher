@@ -28,7 +28,7 @@ use Monolog\Level;
     $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
     $agent = new \Transpher\WebSocket\Client(new WebSocket\Client($relay_url), $log);
     $log->info('Sending Private Direct Message event');
-    $note = Message::privateDirect(\Transpher\Key::private($_SERVER['AGENT_KEY']));
+    $note = Message::privateDirect(\Transpher\Key::fromHex($_SERVER['AGENT_KEY']));
     $agent->json($note($_SERVER['argv'][2], 'Hello, I am Agent!'));
     $agent->start();
 });

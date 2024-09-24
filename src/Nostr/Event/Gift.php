@@ -20,7 +20,7 @@ class Gift {
         return \Transpher\Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
     }
     
-    static function unwrap(callable $recipient_key, string $sender_pubkey, string $gift) : array {
+    static function unwrap(Key $recipient_key, string $sender_pubkey, string $gift) : array {
         $seal_conversation_key = NIP44::getConversationKey($recipient_key, hex2bin($sender_pubkey));
         return json_decode(NIP44::decrypt($gift, $seal_conversation_key), true);
     }

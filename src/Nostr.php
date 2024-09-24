@@ -29,7 +29,7 @@ class Nostr {
     static function notice(string $message) : array {
         return ['NOTICE', $message];
     }
-    static function event(callable $private_key, int $created_at, int $kind, array $tags, string $content) : array {
+    static function event(Key $private_key, int $created_at, int $kind, array $tags, string $content) : array {
         $id = hash('sha256', self::encode([0, $private_key(Key::public()), $created_at, $kind, $tags, $content]));
         return ['EVENT', [
             "id" => $id,
@@ -38,14 +38,14 @@ class Nostr {
             "kind" => $kind,
             "tags" => $tags,
             "content" => $content,
-            "sig" => $private_key(\Transpher\Key::signer($id))
+            "sig" => $private_key(Key::signer($id))
         ]];
     }
     static function subscribedEvent(string $subscriptionId, array $event) {
         return ['EVENT', $subscriptionId, $event];
     }
     
-    static function seal(callable $sender_private_key, string $recipient_pubkey, array $event) {
+    static function seal(Key $sender_private_key, string $recipient_pubkey, array $event) {
         $conversation_key = Nostr\NIP44::getConversationKey($sender_private_key, hex2bin($recipient_pubkey));
         $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($event), $conversation_key, random_bytes(32));
         return self::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);

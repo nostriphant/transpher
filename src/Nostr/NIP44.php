@@ -103,27 +103,13 @@ class NIP44 {
     }
 
     static function pad(string $utf8_text) {
-
         $utf8_text_length = strlen($utf8_text);
-
-        // Content must be encoded from UTF-8 into byte array
-        $decoded = $utf8_text;
-
-        // Validate plaintext length. Minimum is 1 byte, maximum is 65535 bytes
-        if (strlen($decoded) < 1) {
+        if ($utf8_text_length < 1) {
             return false;
-        } elseif (strlen($decoded) > 65535) {
+        } elseif ($utf8_text_length > 65535) {
             return false;
         }
-
-        // Padding algorithm is related to powers-of-two, with min padded msg size of 32
-        $pad_length = self::calcPaddedLength($utf8_text_length);
-
-        // Plaintext length is encoded in big-endian as first 2 bytes of the padded blob
-        $unpaddedLengthBytes = self::uInt16($utf8_text_length, true);
-
-        // Padding format is: [plaintext_length: u16][plaintext][zero_bytes]
-        return $unpaddedLengthBytes . str_pad($decoded, $pad_length, chr(0));
+        return self::uInt16($utf8_text_length, true) . str_pad($utf8_text, self::calcPaddedLength($utf8_text_length), chr(0));
     }
 
     static function unpad(string $padded): bool|string {

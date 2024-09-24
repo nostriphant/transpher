@@ -40,11 +40,13 @@ class Client extends \Transpher\WebSocket\Client {
         }];
     }
     public function expectNostrPrivateDirectMessage(string $subscriptionId, callable $recipient_key, string $message_content) {
-        $this->expected_messages[] = ['EVENT', function(\WebSocket\Client $client, array $message) use ($subscriptionId, $recipient_key, $message_content) {
-            expect($message[0])->toBe($subscriptionId);
-            expect($message[1]['kind'])->toBe(1059);
+        $this->expected_messages[] = ['EVENT', function(\WebSocket\Client $client, array $gift) use ($subscriptionId, $recipient_key, $message_content) {
+            expect($gift[0])->toBe($subscriptionId);
+            expect($gift[1]['kind'])->toBe(1059);
             
-            $seal = Nostr\Event\Gift::unwrap($recipient_key, $message[1]['pubkey'], $message[1]['content']);
+            $seal = Nostr\Event\Gift::unwrap($recipient_key, $gift[1]['pubkey'], $gift[1]['content']);
+            expect($seal[1]['kind'])->toBe(13);
+            
             $private_message = Nostr\Event\Seal::open($recipient_key, $seal[1]['pubkey'], $seal[1]['content']);
             expect($private_message[1]['content'])->toBe($message_content);
         }];

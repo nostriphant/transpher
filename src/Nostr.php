@@ -1,7 +1,6 @@
 <?php
 
 namespace Transpher;
-use \Transpher\Key;
 
 /**
  * Description of Nostr

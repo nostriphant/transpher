@@ -6,6 +6,7 @@
         "php": "^8.3",
         "ext-redis" : "*",
         "ext-sodium" : "*",
+        "ext-pcntl" : "*",
         "cboden/ratchet": "^0.4.4",
         "vlucas/phpdotenv": "^5.6",
         "phrity/websocket": "^3.1",

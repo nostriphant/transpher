@@ -4,9 +4,10 @@ FROM php:8.3
 # RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 RUN ["apt", "update"]
-
 RUN ["apt-get", "install", "-y", "libzip-dev", "zip", "libgmp-dev", "libsodium-dev"]
-RUN ["docker-php-ext-install", "zip", "gmp"]
+
+RUN ["docker-php-ext-configure", "pcntl", "--enable-pcntl"]
+RUN ["docker-php-ext-install", "zip", "gmp", "pcntl"]
 
 RUN ["pecl", "install", "--force", "redis"]
 RUN ["rm", "-rf", "/tmp/pear"]

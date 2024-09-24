@@ -16,10 +16,6 @@ class Nostr {
     static function decode(string $json) : mixed {
         return json_decode($json, true);
     }
-    
-    static function eose(string $subscriptionId) : array {
-        return ['EOSE', $subscriptionId];
-    }
     static function ok(string $eventId, bool $accepted, string $message = '') : array {
         return ['OK', $eventId, $accepted, $message];
     }
@@ -31,9 +27,5 @@ class Nostr {
     }
     static function notice(string $message) : array {
         return ['NOTICE', $message];
-    }
-    
-    static function requestedEvent(string $subscriptionId, array $event) {
-        return ['EVENT', $subscriptionId, $event];
     }
 }

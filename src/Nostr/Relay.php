@@ -46,14 +46,14 @@ class Relay {
             yield Nostr::closed($subscriptionId, 'Subscription filters are empty');
         } else {
             yield from $subscriptions($subscriptionId, Filters::constructFromPrototype($subscription));
-            yield Nostr::eose($subscriptionId);
+            yield Message::eose($subscriptionId);
         }
     }
     
     static function relay(callable $to, string $subscriptionId) : callable {
         return fn(array $event) => $to(
-                        Message::requestedEvent($subscriptionId, $event),
-           Nostr::eose($subscriptionId)
+            Message::requestedEvent($subscriptionId, $event),
+            Message::eose($subscriptionId)
         );
     }
 }

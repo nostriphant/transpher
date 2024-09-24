@@ -27,6 +27,10 @@ class Message {
         };
     }
     
+    static function eose(string $subscriptionId) : array {
+        return ['EOSE', $subscriptionId];
+    }
+    
     static function close(callable $subscription) : callable {
         return fn() => ['CLOSE', $subscription()[1]];
     }

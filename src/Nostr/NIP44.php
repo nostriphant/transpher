@@ -34,7 +34,7 @@ class NIP44 {
             $mac = hash_init(self::HASH, HASH_HMAC, $prk);
             hash_update($mac, $stepResult);
             hash_update($mac, $info);
-            hash_update($mac, chr($i + 1 % 256));
+            hash_update($mac, chr(($i + 1) % 256));
             $stepResult = hash_final($mac, true);
             $stepSize = min($length, strlen($stepResult));
             $result .= substr($stepResult, 0, $stepSize);

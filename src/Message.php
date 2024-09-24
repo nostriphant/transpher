@@ -30,6 +30,12 @@ class Message {
     static function eose(string $subscriptionId) : array {
         return ['EOSE', $subscriptionId];
     }
+    static function ok(string $eventId, bool $accepted, string $message = '') : array {
+        return ['OK', $eventId, $accepted, $message];
+    }
+    static function accept(string $eventId, string $message = '') : array {
+        return self::ok($eventId, true, $message);
+    }
     
     static function close(callable $subscription) : callable {
         return fn() => ['CLOSE', $subscription()[1]];

@@ -33,7 +33,7 @@ class Relay {
     
     static function event(callable $subscriptions, array $event) : \Generator { 
         yield from $subscriptions($event);
-        yield Nostr::accept($event['id']);
+        yield Message::accept($event['id']);
     }
     
     static function close(callable $subscriptions, string $subscriptionId) : \Generator {

@@ -16,12 +16,6 @@ class Nostr {
     static function decode(string $json) : mixed {
         return json_decode($json, true);
     }
-    static function ok(string $eventId, bool $accepted, string $message = '') : array {
-        return ['OK', $eventId, $accepted, $message];
-    }
-    static function accept(string $eventId, string $message = '') : array {
-        return self::ok($eventId, true, $message);
-    }
     static function closed(string $subscriptionId, string $message = '') : array {
         return ['CLOSED', $subscriptionId, $message];
     }

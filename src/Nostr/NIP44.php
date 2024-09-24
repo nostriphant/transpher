@@ -14,8 +14,12 @@ class NIP44 {
     const HASH = 'sha256';
     const HASH_OUTPUT_SIZE = 32;
 
+    static function hash(string $key) : HashSHA256 {
+        return (new HashSHA256($key));
+    }
+    
     static function hmac_digest(string $key, string $data): string {
-        return (new HashSHA256($key))($data);
+        return self::hash($key)($data);
     }
     
     
@@ -32,7 +36,7 @@ class NIP44 {
         $stepResult = '';
         $result = '';
         for ($i = 0; $i < $iterations; $i++) {
-            $stepResult = (string)(new HashSHA256($prk))($stepResult)($info)(chr(($i + 1) % 256));
+            $stepResult = (string)self::hash($prk)($stepResult)($info)(chr(($i + 1) % 256));
             $stepSize = min($length, strlen($stepResult));
             $result .= substr($stepResult, 0, $stepSize);
             $length -= $stepSize;
@@ -47,7 +51,7 @@ class NIP44 {
         } catch (\Exception $e) {
             return false;
         }
-        return self::hmac_digest('nip44-v2', $secret);
+        return self::hash('nip44-v2')($secret);
     }
 
     static function getMessageKeys(string $conversationKey, string $nonce): array {
@@ -63,7 +67,7 @@ class NIP44 {
         if (strlen($aad) !== 32) {
             return false;
         }
-        return self::hmac_digest($key, $aad . $message);
+        return self::hash($key)($aad . $message);
         
 
     } 

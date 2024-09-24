@@ -15,11 +15,11 @@ class NIP44 {
     const HASH = 'sha256';
     const HASH_OUTPUT_SIZE = 32;
 
-    static function hash(string $key): HashSHA256 {
+    static function hash(#[\SensitiveParameter] string $key): HashSHA256 {
         return (new HashSHA256($key));
     }
 
-    static function hmac_digest(string $key, string $data): string {
+    static function hmac_digest(#[\SensitiveParameter] string $key, string $data): string {
         return self::hash($key)($data);
     }
 
@@ -31,7 +31,7 @@ class NIP44 {
      * @return string
      * 
      */
-    static function hkdf_expand(string $prk, string $info, int $length): string {
+    static function hkdf_expand(#[\SensitiveParameter] string $prk, string $info, int $length): string {
         $iterations = (int) ceil($length / self::HASH_OUTPUT_SIZE);
         $stepResult = '';
         $result = '';
@@ -45,14 +45,14 @@ class NIP44 {
         return $result;
     }
 
-    static function getConversationKey(Key $private_key, string $pubkeyB): bool|string {
+    static function getConversationKey(#[\SensitiveParameter] Key $private_key, string $pubkeyB): bool|string {
         if (false === ($secret = $private_key(Key::sharedSecret(bin2hex($pubkeyB))))) {
             return false;
         }
         return self::hash('nip44-v2')(hex2bin($secret));
     }
 
-    static function getMessageKeys(string $conversationKey, string $nonce): array {
+    static function getMessageKeys(#[\SensitiveParameter] string $conversationKey, string $nonce): array {
         $keys = self::hkdf_expand($conversationKey, $nonce, 76);
         return [
             substr($keys, 0, 32),
@@ -61,7 +61,7 @@ class NIP44 {
         ];
     }
 
-    static function hmacAad(string $key, string $aad, string $message): bool|string {
+    static function hmacAad(#[\SensitiveParameter] string $key, string $aad, string $message): bool|string {
         if (strlen($aad) !== 32) {
             return false;
         }
@@ -128,7 +128,7 @@ class NIP44 {
 
     /* Based on: https://github.com/nbd-wtf/nostr-tools/blob/master/nip44.ts */
 
-    static function encrypt(string $utf8_text, string $conversationKey, string $salt): false|string {
+    static function encrypt(string $utf8_text, #[\SensitiveParameter] string $conversationKey, string $salt): false|string {
         $padded = self::pad($utf8_text);
         if ($padded === false) {
             return false;

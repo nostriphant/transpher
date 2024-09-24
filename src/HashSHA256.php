@@ -9,7 +9,7 @@ namespace Transpher;
  */
 readonly class HashSHA256 {
     private \HashContext $context;
-    public function __construct(string $key) {
+    public function __construct(#[\SensitiveParameter] string $key) {
         $this->context = hash_init('sha256', HASH_HMAC, $key);
     }
     public function __invoke(string $data) : self {

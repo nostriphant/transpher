@@ -19,7 +19,7 @@ readonly class Key {
     public function __invoke(callable $input): mixed {
         return $input($this->private_key);
     }
-    static function fromHex(string $private_key) : callable {
+    static function fromHex(#[\SensitiveParameter] string $private_key) : callable {
         return new self($private_key);
     }
     

@@ -49,7 +49,6 @@ class NIP44 {
         if (false === ($secret = $private_key(Key::sharedSecret(bin2hex($pubkeyB))))) {
             return false;
         }
-        
         return self::hash('nip44-v2')(hex2bin($secret));
     }
 

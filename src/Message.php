@@ -31,7 +31,7 @@ class Message {
     }
     
     static function subscribe() : callable {
-        $subscriptionId = substr(uniqid().uniqid().uniqid().uniqid().uniqid().uniqid(), 0, 64);
+        $subscriptionId = bin2hex(random_bytes(32));
         return fn() => ['REQ', $subscriptionId];
     }
     

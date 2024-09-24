@@ -47,9 +47,9 @@ class Nostr {
     
     
     
-    static function seal(callable $sender_private_key, string $recipient_pubkey, array $direct_message) {
+    static function seal(callable $sender_private_key, string $recipient_pubkey, array $event) {
         $conversation_key = Key::conversation($recipient_pubkey);
-        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($direct_message), $sender_private_key($conversation_key), random_bytes(32));
+        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($event), $sender_private_key($conversation_key), random_bytes(32));
         return self::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
     }
     

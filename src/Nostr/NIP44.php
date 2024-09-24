@@ -28,11 +28,10 @@ class NIP44 {
      */
     static function hkdf_expand(string $prk, string $info, int $length) : string {
         $iterations = (int) ceil(floatval($length) / floatval(self::HASH_OUTPUT_SIZE));
-        $remainingBytes = $length;
         $mixin = '';
         $result = '';
         for ($i = 1; $i < $iterations + 1; $i++) {
-            $mac = hash_init('sha256', HASH_HMAC, $prk);
+            $mac = hash_init(self::HASH, HASH_HMAC, $prk);
             hash_update($mac, $mixin);
             if ($info != null) {
                 hash_update($mac, $info);
@@ -40,10 +39,10 @@ class NIP44 {
             $updateChr = chr($i % 256);
             hash_update($mac, $updateChr);
             $stepResult = hash_final($mac, true);
-            $stepSize = min($remainingBytes, strlen($stepResult));
+            $stepSize = min($length, strlen($stepResult));
             $result .= substr($stepResult, 0, $stepSize);
             $mixin = $stepResult;
-            $remainingBytes -= $stepSize;
+            $length -= $stepSize;
         }
 
         return $result;

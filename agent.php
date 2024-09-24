@@ -29,7 +29,7 @@ use Monolog\Level;
     $agent = new \Transpher\WebSocket\Client(new WebSocket\Client($relay_url), $log);
     $log->info('Sending Private Direct Message event');
     $note = Message::privateDirect(\Transpher\Key::fromHex($_SERVER['AGENT_KEY']));
-    $agent->json($note($_SERVER['argv'][2], 'Hello, I am Agent!'));
+    $agent->json($note($_SERVER['AGENT_OWNER_PUBKEY'], 'Hello, I am Agent!'));
     $agent->start();
 });
 echo 'Done';

@@ -8,8 +8,8 @@ namespace Transpher\Nostr\Relay;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 class Agent {
-    static function boot(int $port, string $pubkey, array $env, callable $running) {
-        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'agent.php', $port, $pubkey];
+    static function boot(int $port, array $env, callable $running) {
+        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'agent.php', $port];
         return \Transpher\Process::start('agent-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Client connected to ws://127.0.0.1:' . $port), $running);
     }
 }

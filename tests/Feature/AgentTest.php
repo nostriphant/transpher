@@ -7,7 +7,7 @@ $agent_key = Key::generate();
 $main_key = Key::generate();
 $main_agent;
 beforeAll(function () use (&$main_agent, $agent_key, $main_key) {
-    Agent::boot(8084, $main_key(Key::public()), ['AGENT_KEY' => $agent_key(fn() => func_get_arg(0))], function (callable $agent) use (&$main_agent) {
+    Agent::boot(8084, ['AGENT_OWNER_PUBKEY' => $main_key(Key::public()), 'AGENT_KEY' => $agent_key(fn() => func_get_arg(0))], function (callable $agent) use (&$main_agent) {
         $main_agent = $agent;
     });
 });

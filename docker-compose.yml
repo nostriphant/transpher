@@ -5,15 +5,13 @@ services:
       - "${TRANSPHER_PORT}:80"
     volumes:
       - logs:/app/logs
+      - data:/app/data
     environment:
-      TRANSPHER_STORE: redis://redis:6379/1
-    depends_on:
-      - redis
-  redis:
-    image: "redis/redis-stack-server"
-    volumes:
-      - redis:/data
-
+      AGENT_KEY: ${AGENT_KEY}
+      AGENT_OWNER_PUBKEY: ${AGENT_OWNER_PUBKEY}
+      TRANSPHER_PORT: ${TRANSPHER_PORT}
+      TRANSPHER_STORE: /app/data
+      
 volumes:
-  redis:
+  data:
   logs:

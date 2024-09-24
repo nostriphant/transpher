@@ -22,4 +22,4 @@ RUN ["/usr/local/bin/php", "composer-setup.php"]
 RUN ["/usr/local/bin/php", "-r", "unlink('composer-setup.php');"]
 RUN ["/usr/local/bin/php", "composer.phar", "--no-dev", "install"]
 
-CMD ["/usr/local/bin/php", "/app/websocket.php"]
+CMD ["/usr/local/bin/php", "/app/agent.php"]

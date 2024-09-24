@@ -15,9 +15,13 @@ use Elliptic\EC;
  */
 class Key {
     
+    static function curve() : EC {
+        return new EC('secp256k1');
+    }
+    
     static function generate(): callable
     {
-        $ec = new EC('secp256k1');
+        $ec = self::curve();
         $key = $ec->genKeyPair();
         return self::private($key->priv->toString('hex'));
     }
@@ -31,21 +35,22 @@ class Key {
     }
     
     static function sharedSecret(string $recipient_pubkey) {
-        return function(string $private_key) use ($recipient_pubkey) : string {
-            $ec = new EC('secp256k1');
-            $key1 = $ec->keyFromPrivate($private_key, 'hex');
-            $pub2 = $ec->keyFromPublic($recipient_pubkey, 'hex')->pub;
-            return hex2bin($key1->derive($pub2)->toString('hex'));
+        return function(string $private_key) use ($recipient_pubkey) : bool|string {
+            $ec = self::curve();
+            try {
+                $key1 = $ec->keyFromPrivate($private_key, 'hex');
+                $pub2 = $ec->keyFromPublic($recipient_pubkey, 'hex')->pub;
+                return $key1->derive($pub2)->toString('hex');
+            } catch (\Exception $e) {
+                return false;
+            }
         };
         
     }
     
     static function public() : callable {
         return function(string $private_key): string {
-            $ec = new EC('secp256k1');
-            $private_key = $ec->keyFromPrivate($private_key);
-            $public_hex = $private_key->getPublic(true, 'hex');
-            return $public_hex;
+            return self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex');
         };
     }
     

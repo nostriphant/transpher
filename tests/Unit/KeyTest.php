@@ -14,7 +14,7 @@ it('shared_secret', function () {
     foreach (vectors('ecdh-secp256k1')->testGroups[0]->tests as $vector) {
         if ($vector->result === 'valid') {
             $secret = Key::private($vector->private)(Key::sharedSecret(substr($vector->public, 46)));
-            expect(str_pad(bin2hex($secret), 64, '0', STR_PAD_LEFT))->toBe($vector->shared);
+            expect(str_pad($secret, 64, '0', STR_PAD_LEFT))->toBe($vector->shared);
         }
     }
 });

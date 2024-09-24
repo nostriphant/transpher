@@ -46,12 +46,11 @@ class NIP44 {
     }
 
     static function getConversationKey(callable $private_key, string $pubkeyB): bool|string {
-        try {
-            $secret = $private_key(Key::sharedSecret(bin2hex($pubkeyB)));
-        } catch (\Exception $e) {
+        if (false === ($secret = $private_key(Key::sharedSecret(bin2hex($pubkeyB))))) {
             return false;
         }
-        return self::hash('nip44-v2')($secret);
+        
+        return self::hash('nip44-v2')(hex2bin($secret));
     }
 
     static function getMessageKeys(string $conversationKey, string $nonce): array {

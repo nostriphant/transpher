@@ -33,7 +33,7 @@ class Nostr {
         return ['NOTICE', $message];
     }
     
-    static function subscribedEvent(string $subscriptionId, array $event) {
+    static function requestedEvent(string $subscriptionId, array $event) {
         return ['EVENT', $subscriptionId, $event];
     }
 }

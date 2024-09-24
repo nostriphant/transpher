@@ -82,7 +82,7 @@ class Server {
                 unset($subscriptions[$subscriptionId]);
             } else {
                 $subscriptions[$subscriptionId] = $subscription;
-                yield from map(filter($events, $subscription), fn(array $event) => Nostr::subscribedEvent($subscriptionId, $event));
+                yield from map(filter($events, $subscription), fn(array $event) => Nostr::requestedEvent($subscriptionId, $event));
             }
             $from->setMeta('subscriptions', $subscriptions);
         };

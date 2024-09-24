@@ -51,7 +51,7 @@ class Relay {
     
     static function relay(callable $to, string $subscriptionId) : callable {
         return fn(array $event) => $to(
-           Nostr::subscribedEvent($subscriptionId, $event),
+           Nostr::requestedEvent($subscriptionId, $event),
            Nostr::eose($subscriptionId)
         );
     }

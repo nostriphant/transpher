@@ -44,10 +44,10 @@ class Client extends \Transpher\WebSocket\Client {
             expect($message[0])->toBe($subscriptionId);
             expect($message[1]['kind'])->toBe(1059);
             
-            $seal_conversation_key = $recipient_key(fn(string $hex_private_key) => Nostr\NIP44::getConversationKey(hex2bin($hex_private_key), hex2bin($message[1]['pubkey'])));
+            $seal_conversation_key = Nostr\NIP44::getConversationKey($recipient_key, hex2bin($message[1]['pubkey']));
             $seal = json_decode(\Transpher\Nostr\NIP44::decrypt($message[1]['content'], $seal_conversation_key), true);
             
-            $pdm_conversation_key = $recipient_key(fn(string $hex_private_key) => Nostr\NIP44::getConversationKey(hex2bin($hex_private_key), hex2bin($seal[1]['pubkey'])));
+            $pdm_conversation_key = Nostr\NIP44::getConversationKey($recipient_key, hex2bin($seal[1]['pubkey']));
             $private_message = json_decode(\Transpher\Nostr\NIP44::decrypt($seal[1]['content'], $pdm_conversation_key), true);
             
             expect($private_message[1]['content'])->toBe($message_content);

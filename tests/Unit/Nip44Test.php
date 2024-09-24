@@ -37,7 +37,8 @@ describe('NIP-44 v2', function () {
         it('get_conversation_key', function () {
             //https://github.com/paulmillr/nip44/blob/main/javascript/test/nip44.vectors.json
             foreach (vectors('nip44')->v2->valid->get_conversation_key as $vector) {
-                $key = NIP44::getConversationKey(hex2bin($vector->sec1), hex2bin('02' . $vector->pub2));
+                $privkey = \Transpher\Key::private($vector->sec1);
+                $key = NIP44::getConversationKey($privkey, hex2bin('02' . $vector->pub2));
                 expect($key)->not()->toBeFalse();
                 expect(bin2hex($key))->toBe($vector->conversation_key, $vector->note??'');
             }
@@ -66,7 +67,8 @@ describe('NIP-44 v2', function () {
 
                 $pub2 = $key->getPublic('hex');
 
-                $conversation_key = NIP44::getConversationKey(hex2bin($vector->sec1), hex2bin($pub2));
+                $privkey = \Transpher\Key::private($vector->sec1);
+                $conversation_key = NIP44::getConversationKey($privkey, hex2bin($pub2));
                 expect($conversation_key)->not()->toBeFalse();
                 expect(bin2hex($conversation_key))->toBe($vector->conversation_key);
 
@@ -107,7 +109,8 @@ describe('NIP-44 v2', function () {
     });
     it('get_conversation_key', function() {
       foreach (vectors('nip44')->v2->invalid->get_conversation_key as $vector) {
-        expect(NIP44::getConversationKey(hex2bin($vector->sec1), hex2bin($vector->pub2)))->toBeFalse($vector->note);
+        $privkey = \Transpher\Key::private($vector->sec1);
+        expect(NIP44::getConversationKey($privkey, hex2bin($vector->pub2)))->toBeFalse($vector->note);
       }
     });
   });

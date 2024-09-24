@@ -45,28 +45,16 @@ class Nostr {
         return ['EVENT', $subscriptionId, $event];
     }
     
-    
-    
-    static function conversation(string $recipient_pubkey) : callable {
-        return function(string $hex_private_key) use ($recipient_pubkey) : string {
-            $key = Nostr\NIP44::getConversationKey(hex2bin($hex_private_key), hex2bin($recipient_pubkey));
-            if ($key === false) {
-                throw new \Exception('Unable to determine conversation key');
-            }
-            return $key;
-        };
-    }
-    
     static function seal(callable $sender_private_key, string $recipient_pubkey, array $event) {
-        $conversation_key = self::conversation($recipient_pubkey);
-        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($event), $sender_private_key($conversation_key), random_bytes(32));
+        $conversation_key = Nostr\NIP44::getConversationKey($sender_private_key, hex2bin($recipient_pubkey));
+        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($event), $conversation_key, random_bytes(32));
         return self::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
     }
     
     static function giftWrap(string $recipient_pubkey, array $event) {
         $randomKey = Key::generate();
-        $conversation_key = self::conversation($recipient_pubkey);
-        $encrypted = Nostr\NIP44::encrypt(json_encode($event), $randomKey($conversation_key), random_bytes(32));
+        $conversation_key = Nostr\NIP44::getConversationKey($randomKey, hex2bin($recipient_pubkey));
+        $encrypted = Nostr\NIP44::encrypt(json_encode($event), $conversation_key, random_bytes(32));
         return self::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
     }
 }

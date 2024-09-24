@@ -45,9 +45,9 @@ class NIP44 {
         return $result;
     }
 
-    static function getConversationKey(string $privkeyA, string $pubkeyB): bool|string {
+    static function getConversationKey(callable $private_key, string $pubkeyB): bool|string {
         try {
-            $secret = Key::private(bin2hex($privkeyA))(Key::sharedSecret(bin2hex($pubkeyB)));
+            $secret = $private_key(Key::sharedSecret(bin2hex($pubkeyB)));
         } catch (\Exception $e) {
             return false;
         }

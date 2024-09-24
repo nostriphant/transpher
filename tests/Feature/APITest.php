@@ -1,6 +1,8 @@
 <?php
 
 use \Transpher\Key;
+use \Transpher\Message;
+use \TranspherTests\Client;
 
 function redis_server(int $port, array $env) {
     $cmd = ['/opt/homebrew/bin/redis-server', '--port', $port];
@@ -19,17 +21,17 @@ afterAll(function() use (&$main_relay) {
 
 describe('relay', function () {
     it('accepts clients', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
 
         expect($alice->connect())->toBeTrue();
         expect($bob->connect())->toBeTrue();
     });
 
     it('responds with OK on simple events', function () {
-        $alice = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
 
-        $note = \Transpher\Message::event(1, 'Hello world!');
+        $note = Message::event(1, 'Hello world!');
         $signed_note = $note(Key::generate());
 
         $alice->expectNostrOK($signed_note[1]['id']);
@@ -39,7 +41,7 @@ describe('relay', function () {
     });
 
     it('responds with a NOTICE on unsupported message types', function () {
-        $alice = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
 
         $alice->expectNostrNotice('Message type UNKNOWN not supported');
 
@@ -48,26 +50,26 @@ describe('relay', function () {
     });
 
     it('replies CLOSED on non-existing filters', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
 
-        $note = \Transpher\Message::event(1, 'Hello world!');
+        $note = Message::event(1, 'Hello world!');
         $alice->sendSignedMessage($note(Key::generate()));
 
         $bob->expectNostrNotice('Invalid message');
-        $subscription = Transpher\Message::subscribe();
+        $subscription = Message::subscribe();
         $bob->json($subscription());
         $bob->start();
     });
 
     it('replies CLOSED on empty filters', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
 
-        $note = \Transpher\Message::event(1, 'Hello world!');
+        $note = Message::event(1, 'Hello world!');
         $alice->sendSignedMessage($note(Key::generate()));
 
-        $subscription = Transpher\Message::subscribe();
+        $subscription = Message::subscribe();
 
         $bob->expectNostrClosed($subscription()[1], 'Subscription filters are empty');
         $request = $subscription();
@@ -77,77 +79,77 @@ describe('relay', function () {
     });
 
     it('sends events to all clients subscribed on event id', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
 
-        $note1 = \Transpher\Message::event(1, 'Hello worlda!');
+        $note1 = Message::event(1, 'Hello worlda!');
         $alice->sendSignedMessage($note1(Key::generate()));
 
-        $note2 = \Transpher\Message::event(1, 'Hello worldi!');
+        $note2 = Message::event(1, 'Hello worldi!');
         $note2_signed = $note2(Key::generate());
         $alice->sendSignedMessage($note2_signed);
 
-        $subscription = Transpher\Message::subscribe();
+        $subscription = Message::subscribe();
 
         $bob->expectNostrEvent($subscription()[1], 'Hello worldi!');
         $bob->expectNostrEose($subscription()[1]);
-        $bob->json(Transpher\Message::filter($subscription, ids: [$note2_signed[1]['id']])());
+        $bob->json(Message::filter($subscription, ids: [$note2_signed[1]['id']])());
         $bob->start();
     });
 
     it('sends events to all clients subscribed on author (pubkey)', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
 
-        $note = \Transpher\Message::event(1, 'Hello world!');
+        $note = Message::event(1, 'Hello world!');
         $key = Key::generate();
         $alice->sendSignedMessage($note($key));
-        $subscription = Transpher\Message::subscribe();
+        $subscription = Message::subscribe();
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
 
-        $request = Transpher\Message::filter($subscription, authors: [$key(Key::public())])();
+        $request = Message::filter($subscription, authors: [$key(Key::public())])();
         $bob->json($request);
         $bob->start();
     });
 
     it('sends events to all clients subscribed on p-tag', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
 
-        $note = \Transpher\Message::event(1, 'Hello world!', ['p', 'randomPTag']);
+        $note = Message::event(1, 'Hello world!', ['p', 'randomPTag']);
         $key = Key::generate();
         $alice->sendSignedMessage($note($key));
-        $subscription = Transpher\Message::subscribe();
+        $subscription = Message::subscribe();
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
 
-        $request = Transpher\Message::filter($subscription, tags: ['#p' => ['randomPTag']])();
+        $request = Message::filter($subscription, tags: ['#p' => ['randomPTag']])();
         $bob->json($request);
         $bob->start();
     });
     
     it('closes subscription and stop sending events to subscribers', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
         $key = Key::generate();
 
-        $note = \Transpher\Message::event(1, 'Hello world!');
+        $note = Message::event(1, 'Hello world!');
         $alice->sendSignedMessage($note($key));
 
-        $subscription = Transpher\Message::subscribe();
+        $subscription = Message::subscribe();
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
 
-        $request = Transpher\Message::filter($subscription, authors: [$key(Key::public())])();
+        $request = Message::filter($subscription, authors: [$key(Key::public())])();
         $bob->json($request);
         $bob->start();
 
         $bob->expectNostrClosed($subscription()[1], '');
 
-        $request = Transpher\Message::close($subscription)();
+        $request = Message::close($subscription)();
         $bob->json($request);
         $bob->start();
     });
@@ -160,11 +162,11 @@ describe('relay', function () {
         
         
         \Transpher\Nostr\Relay::boot(8082, $env, function (callable $server) use ($env) {
-            $alice = \TranspherTests\Client::client(8082);
+            $alice = Client::client(8082);
 
             $key = Key::generate();
 
-            $note = \Transpher\Message::event(1, 'Hello wirld!');
+            $note = Message::event(1, 'Hello wirld!');
             $alice->sendSignedMessage($note($key));
 
             $status = $server();
@@ -172,13 +174,13 @@ describe('relay', function () {
             expect($status['running'])->toBeFalse();
 
             \Transpher\Nostr\Relay::boot(8082, $env, function (callable $server) use ($key) {
-                $bob = \TranspherTests\Client::client(8082);
-                $subscription = Transpher\Message::subscribe();
+                $bob = Client::client(8082);
+                $subscription = Message::subscribe();
 
                 $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
                 $bob->expectNostrEose($subscription()[1]);
 
-                $request = Transpher\Message::filter($subscription, authors: [$key(Key::public())])();
+                $request = Message::filter($subscription, authors: [$key(Key::public())])();
                 $bob->json($request);
                 $bob->start();
 
@@ -193,7 +195,7 @@ describe('relay', function () {
         $store_redis = 'redis://127.0.0.1:6379/1';
 
         $key_alice = Key::generate();
-        $note = \Transpher\Message::event(1, 'Hello wirld!');
+        $note = Message::event(1, 'Hello wirld!');
 
         $redis = new \Redis();
 
@@ -215,12 +217,12 @@ describe('relay', function () {
         ];
 
         \Transpher\Nostr\Relay::boot(8083, $env, function (callable $relay) use ($redis, $key_alice) {
-            $bob = \TranspherTests\Client::client(8083);
-            $subscription = Transpher\Message::subscribe();
+            $bob = Client::client(8083);
+            $subscription = Message::subscribe();
             $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
             $bob->expectNostrEose($subscription()[1]);
 
-            $request = Transpher\Message::filter($subscription, authors: [$key_alice(Key::public())])();
+            $request = Message::filter($subscription, authors: [$key_alice(Key::public())])();
             $bob->json($request);
             $bob->start();
 
@@ -230,40 +232,40 @@ describe('relay', function () {
     });
 
     it('sends events to all clients subscribed on kind', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
 
-        $note = \Transpher\Message::event(3, 'Hello world!');
+        $note = Message::event(3, 'Hello world!');
         $alice->sendSignedMessage($note(Key::generate()));
 
-        $subscription = Transpher\Message::subscribe();
+        $subscription = Message::subscribe();
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
 
-        $bob->json(Transpher\Message::filter($subscription, kinds: [3])());
+        $bob->json(Message::filter($subscription, kinds: [3])());
         $bob->start();
     });
 
     it('relays events to Bob after they subscribed on Alices messages', function () {
-        $alice = \TranspherTests\Client::generic_client();
-        $bob = \TranspherTests\Client::generic_client();
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
         $key_alice = Key::generate();
 
-        $subscription = Transpher\Message::subscribe();
+        $subscription = Message::subscribe();
 
         $bob->expectNostrEose($subscription()[1]);
 
-        $request = Transpher\Message::filter($subscription, authors: [$key_alice(Key::public())])();
+        $request = Message::filter($subscription, authors: [$key_alice(Key::public())])();
         $bob->json($request);
         $bob->start();
         $bob->expectNostrEvent($subscription()[1], 'Relayable Hello worlda!');
         $bob->expectNostrEose($subscription()[1]);
 
-        $note1 = \Transpher\Message::event(1, 'Relayable Hello worlda!');
+        $note1 = Message::event(1, 'Relayable Hello worlda!');
         $alice->sendSignedMessage($note1($key_alice));
 
-        $note2 = \Transpher\Message::event(1, 'Hello worldi!');
+        $note2 = Message::event(1, 'Hello worldi!');
         $alice->sendSignedMessage($note2(Key::generate()));
 
         $bob->start(function () {

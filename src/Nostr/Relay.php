@@ -38,12 +38,12 @@ class Relay {
     
     static function close(callable $subscriptions, string $subscriptionId) : \Generator {
         yield from $subscriptions($subscriptionId, null);
-        yield Nostr::closed($subscriptionId);
+        yield Message::closed($subscriptionId);
     }
     
     static function req(callable $subscriptions, string $subscriptionId, array $subscription) : \Generator {
         if (empty($subscription)) {
-            yield Nostr::closed($subscriptionId, 'Subscription filters are empty');
+            yield Message::closed($subscriptionId, 'Subscription filters are empty');
         } else {
             yield from $subscriptions($subscriptionId, Filters::constructFromPrototype($subscription));
             yield Message::eose($subscriptionId);

@@ -16,7 +16,4 @@ class Nostr {
     static function decode(string $json) : mixed {
         return json_decode($json, true);
     }
-    static function closed(string $subscriptionId, string $message = '') : array {
-        return ['CLOSED', $subscriptionId, $message];
-    }
 }

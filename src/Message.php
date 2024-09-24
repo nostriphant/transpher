@@ -39,6 +39,9 @@ class Message {
     static function notice(string $message) : array {
         return ['NOTICE', $message];
     }
+    static function closed(string $subscriptionId, string $message = '') : array {
+        return ['CLOSED', $subscriptionId, $message];
+    }
     
     static function close(callable $subscription) : callable {
         return fn() => ['CLOSE', $subscription()[1]];

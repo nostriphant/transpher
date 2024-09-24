@@ -1,7 +1,7 @@
 <?php
 
 namespace Transpher\Nostr\Event;
-
+use Transpher\Nostr;
 use Transpher\Nostr\NIP44;
 use Transpher\Key;
 
@@ -17,7 +17,7 @@ class Gift {
         $randomKey = Key::generate();
         $conversation_key = NIP44::getConversationKey($randomKey, hex2bin($recipient_pubkey));
         $encrypted = NIP44::encrypt(json_encode($event), $conversation_key, random_bytes(32));
-        return \Transpher\Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
+        return Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
     }
     
     static function unwrap(Key $recipient_key, string $sender_pubkey, string $gift) : array {

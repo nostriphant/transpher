@@ -44,10 +44,4 @@ class Nostr {
     static function subscribedEvent(string $subscriptionId, array $event) {
         return ['EVENT', $subscriptionId, $event];
     }
-    
-    static function seal(Key $sender_private_key, string $recipient_pubkey, array $event) {
-        $conversation_key = Nostr\NIP44::getConversationKey($sender_private_key, hex2bin($recipient_pubkey));
-        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($event), $conversation_key, random_bytes(32));
-        return self::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
-    }
 }

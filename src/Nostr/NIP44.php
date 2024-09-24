@@ -54,13 +54,9 @@ class NIP44 {
         return hash_hkdf(self::HASH, $ikm, $length, $info, $salt);
     }
     
-    static function getSharedSecret(string $privkeyA, string $pubkeyB): string {
-        return Key::private(bin2hex($privkeyA))(Key::sharedSecret(bin2hex($pubkeyB)));
-    }
-
     static function getConversationKey(string $privkeyA, string $pubkeyB): bool|string {
         try {
-            $secret = self::getSharedSecret($privkeyA, $pubkeyB);
+            $secret = Key::private(bin2hex($privkeyA))(Key::sharedSecret(bin2hex($pubkeyB)));
         } catch (\Exception $e) {
             return false;
         }

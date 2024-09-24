@@ -113,18 +113,16 @@ class NIP44 {
     }
 
     static function unpad(string $padded): bool|string {
-        $unpadded_length = self::uInt16(substr($padded, 0, 2), true);
-        if ($unpadded_length === 0) {
+        $expected_unpadded_length = self::uInt16(substr($padded, 0, 2), true);
+        $unpadded = substr($padded, 2, $expected_unpadded_length);
+        $actual_unpadded_length = strlen($unpadded);
+        if ($expected_unpadded_length === 0) {
+            return false;
+        } elseif ($expected_unpadded_length !== $actual_unpadded_length) {
+            return false;
+        } elseif (2 + self::calcPaddedLength($actual_unpadded_length) !== strlen($padded)) {
             return false;
         }
-
-        $unpadded = substr($padded, 2, $unpadded_length);
-        if ($unpadded_length !== strlen($unpadded)) {
-            return false;
-        } elseif (2 + self::calcPaddedLength(strlen($unpadded)) !== strlen($padded)) {
-            return false;
-        }
-
         return $unpadded;
     }
 

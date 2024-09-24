@@ -36,8 +36,7 @@ class NIP44 {
             if ($info != null) {
                 hash_update($mac, $info);
             }
-            $updateChr = chr($i % 256);
-            hash_update($mac, $updateChr);
+            hash_update($mac, chr($i % 256));
             $stepResult = hash_final($mac, true);
             $stepSize = min($length, strlen($stepResult));
             $result .= substr($stepResult, 0, $stepSize);

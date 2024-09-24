@@ -14,7 +14,8 @@ use function Functional\map;
 class Message {
     
     static function event(int $kind, string $content, array ...$tags) : callable {
-        return \Functional\partial_right([Nostr::class, 'event'], time(), $kind, $tags, $content);
+        $event = new Nostr\Event(time(), $kind, $content, ...$tags);
+        return fn(Key $private_key) => ['EVENT', $event($private_key)];
     }
     
     static function privateDirect(Key $private_key) : callable {

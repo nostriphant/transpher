@@ -32,10 +32,7 @@ class Nostr {
     static function notice(string $message) : array {
         return ['NOTICE', $message];
     }
-    static function event(Key $private_key, int $created_at, int $kind, array $tags, string $content) : array {
-        $event = new Nostr\Event($created_at, $kind, $content, ...$tags);
-        return ['EVENT', $event($private_key)];
-    }
+    
     static function subscribedEvent(string $subscriptionId, array $event) {
         return ['EVENT', $subscriptionId, $event];
     }

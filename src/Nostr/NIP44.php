@@ -27,7 +27,7 @@ class NIP44 {
      * 
      */
     static function hkdf_expand(string $prk, string $info, int $length) : string {
-        $iterations = (int) ceil(floatval($length) / floatval(self::HASH_OUTPUT_SIZE));
+        $iterations = (int) ceil($length / self::HASH_OUTPUT_SIZE);
         $stepResult = '';
         $result = '';
         for ($i = 0; $i < $iterations; $i++) {

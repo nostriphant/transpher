@@ -34,19 +34,6 @@ describe('NIP-44 v2', function () {
             expect(bin2hex(NIP44::hmac_digest($salt, $key)))->toBe('06a6b88c5853361a06104c9ceb35b45cef760014904671014a193f40c15fc244');
         });
 
-        it('hkdf works', function () {
-            foreach (vectors('hkdf')->sha256 as $vector) {
-                $vector_salt = $vector->salt ? hex2bin($vector->salt) : '';
-                $vector_info = $vector->info ? hex2bin($vector->info) : '';
-                $PRK = NIP44::hmac_digest($vector_salt, hex2bin($vector->IKM));
-                expect(bin2hex($PRK))->toBe($vector->PRK);
-                $OKM = NIP44::hkdf(hex2bin($vector->IKM), $vector_salt, $vector_info, $vector->L);
-                expect(bin2hex($OKM))->toBe($vector->OKM);
-                expect(bin2hex(NIP44::hkdf(hex2bin($vector->IKM), $vector_salt, $vector_info, $vector->L, ["cleanup" => true])))->toBe($vector->OKM);
-                expect(bin2hex(NIP44::hkdf(hex2bin($vector->IKM), $vector_salt, $vector_info, $vector->L, ["cleanup" => false])))->toBe($vector->OKM);
-            }
-        });
-
         it('get_conversation_key', function () {
             //https://github.com/paulmillr/nip44/blob/main/javascript/test/nip44.vectors.json
             foreach (vectors('nip44')->v2->valid->get_conversation_key as $vector) {

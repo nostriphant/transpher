@@ -11,13 +11,12 @@ use Transpher\Key;
 class NIP44 {
     
     const HASH = 'sha256';
-    const HASH_OUTPUTLEN = 32;
+    const HASH_OUTPUT_SIZE = 32;
 
     static function hmac_digest(string $key, string $data): string {
         return hash_hmac(self::HASH, $data, $key, true);
     }
     
-    const HASH_OUTPUT_SIZE = 32;
     
     /**
      * Based on https://github.com/mgp25/libsignal-php/blob/master/src/kdf/HKDF.php
@@ -48,10 +47,6 @@ class NIP44 {
         }
 
         return $result;
-    }
-    
-    static function hkdf(string $ikm, string $salt, string $info, int $length) : string {
-        return hash_hkdf(self::HASH, $ikm, $length, $info, $salt);
     }
     
     static function getConversationKey(string $privkeyA, string $pubkeyB): bool|string {

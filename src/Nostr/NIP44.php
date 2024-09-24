@@ -1,13 +1,7 @@
 <?php
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
- */
-
 namespace Transpher\Nostr;
-
-use Elliptic\EC;
+use Transpher\Key;
 
 /**
  * Description of NIP44
@@ -61,10 +55,7 @@ class NIP44 {
     }
     
     static function getSharedSecret(string $privkeyA, string $pubkeyB): string {
-        $ec = new EC('secp256k1');
-        $key1 = $ec->keyFromPrivate(bin2hex($privkeyA), 'hex');
-        $pub2 = $ec->keyFromPublic(bin2hex($pubkeyB), 'hex')->pub;
-        return hex2bin($key1->derive($pub2)->toString('hex'));
+        return Key::private(bin2hex($privkeyA))(Key::sharedSecret(bin2hex($pubkeyB)));
     }
 
     static function getConversationKey(string $privkeyA, string $pubkeyB): bool|string {

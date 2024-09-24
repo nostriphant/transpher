@@ -6,6 +6,7 @@
  */
 
 namespace Transpher;
+use Elliptic\EC;
 
 /**
  * Description of Key
@@ -16,7 +17,7 @@ class Key {
     
     static function generate(): callable
     {
-        $ec = new \Elliptic\EC('secp256k1');
+        $ec = new EC('secp256k1');
         $key = $ec->genKeyPair();
         return self::private($key->priv->toString('hex'));
     }
@@ -29,9 +30,19 @@ class Key {
         return fn(string $private_key) => (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->sign($private_key, $message)['signature'];
     }
     
+    static function sharedSecret(string $recipient_pubkey) {
+        return function(string $private_key) use ($recipient_pubkey) : string {
+            $ec = new EC('secp256k1');
+            $key1 = $ec->keyFromPrivate($private_key, 'hex');
+            $pub2 = $ec->keyFromPublic($recipient_pubkey, 'hex')->pub;
+            return hex2bin($key1->derive($pub2)->toString('hex'));
+        };
+        
+    }
+    
     static function public() : callable {
         return function(string $private_key): string {
-            $ec = new \Elliptic\EC('secp256k1');
+            $ec = new EC('secp256k1');
             $private_key = $ec->keyFromPrivate($private_key);
             $public_hex = $private_key->getPublic(true, 'hex');
             return $public_hex;

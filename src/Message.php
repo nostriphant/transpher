@@ -22,7 +22,7 @@ class Message {
             $unsigned_event = Message::event(14, $message, ['p', $recipient_pubkey]);
             $direct_message = $unsigned_event($private_key);
             unset($direct_message[1]['sig']);
-            return Nostr::giftWrap($recipient_pubkey, Nostr::seal($private_key, $recipient_pubkey, $direct_message));
+            return Nostr\Event\Gift::wrap($recipient_pubkey, Nostr::seal($private_key, $recipient_pubkey, $direct_message));
         };
     }
     

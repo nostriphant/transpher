@@ -50,11 +50,4 @@ class Nostr {
         $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($event), $conversation_key, random_bytes(32));
         return self::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
     }
-    
-    static function giftWrap(string $recipient_pubkey, array $event) {
-        $randomKey = Key::generate();
-        $conversation_key = Nostr\NIP44::getConversationKey($randomKey, hex2bin($recipient_pubkey));
-        $encrypted = Nostr\NIP44::encrypt(json_encode($event), $conversation_key, random_bytes(32));
-        return self::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
-    }
 }

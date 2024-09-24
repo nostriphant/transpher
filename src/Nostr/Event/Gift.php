@@ -17,7 +17,9 @@ class Gift {
         $randomKey = Key::generate();
         $conversation_key = NIP44::getConversationKey($randomKey, hex2bin($recipient_pubkey));
         $encrypted = NIP44::encrypt(Nostr::encode($event), $conversation_key, random_bytes(32));
-        return Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
+        
+        $gift = new Nostr\Event(mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, $encrypted, ['p', $recipient_pubkey]);
+        return $gift($randomKey);
     }
     
     static function unwrap(Key $recipient_key, string $sender_pubkey, string $gift) : array {

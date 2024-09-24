@@ -13,13 +13,15 @@ use Transpher\Key;
  */
 class Seal {
     
-    static function close(Key $sender_private_key, string $recipient_pubkey, array $event) {
+    static function close(Key $sender_private_key, string $recipient_pubkey, array $event) : array {
         $conversation_key = NIP44::getConversationKey($sender_private_key, hex2bin($recipient_pubkey));
         $encrypted_direct_message = NIP44::encrypt(Nostr::encode($event), $conversation_key, random_bytes(32));
-        return Nostr::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 13, [], $encrypted_direct_message);
+        
+        $seal = new Nostr\Event(mktime(rand(0,23), rand(0,59), rand(0,59)), 13, $encrypted_direct_message, []);
+        return $seal($sender_private_key);
     }
     
-    static function open(Key $recipient_private_key, string $sender_pubkey, string $seal) {
+    static function open(Key $recipient_private_key, string $sender_pubkey, string $seal) : array {
         $pdm_conversation_key = NIP44::getConversationKey($recipient_private_key, hex2bin($sender_pubkey));
         return Nostr::decode(NIP44::decrypt($seal, $pdm_conversation_key));
     }

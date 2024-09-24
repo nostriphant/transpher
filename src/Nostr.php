@@ -33,16 +33,8 @@ class Nostr {
         return ['NOTICE', $message];
     }
     static function event(Key $private_key, int $created_at, int $kind, array $tags, string $content) : array {
-        $id = hash('sha256', self::encode([0, $private_key(Key::public()), $created_at, $kind, $tags, $content]));
-        return ['EVENT', [
-            "id" => $id,
-            "pubkey" => $private_key(Key::public()),
-            "created_at" => $created_at,
-            "kind" => $kind,
-            "tags" => $tags,
-            "content" => $content,
-            "sig" => $private_key(Key::signer($id))
-        ]];
+        $event = new Nostr\Event($created_at, $kind, $content, ...$tags);
+        return ['EVENT', $event($private_key)];
     }
     static function subscribedEvent(string $subscriptionId, array $event) {
         return ['EVENT', $subscriptionId, $event];

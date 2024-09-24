@@ -19,10 +19,10 @@ class Message {
     
     static function privateDirect(Key $private_key) : callable {
         return function(string $recipient_pubkey, string $message) use ($private_key) {
-            $unsigned_event = Message::event(14, $message, ['p', $recipient_pubkey]);
+            $unsigned_event = new Nostr\Event(time(), 14, $message, ['p', $recipient_pubkey]);
             $direct_message = $unsigned_event($private_key);
-            unset($direct_message[1]['sig']);
-            return Nostr\Event\Gift::wrap($recipient_pubkey, Nostr\Event\Seal::close($private_key, $recipient_pubkey, $direct_message));
+            unset($direct_message['sig']);
+            return ['EVENT', Nostr\Event\Gift::wrap($recipient_pubkey, Nostr\Event\Seal::close($private_key, $recipient_pubkey, $direct_message))];
         };
     }
     

@@ -19,7 +19,4 @@ class Nostr {
     static function closed(string $subscriptionId, string $message = '') : array {
         return ['CLOSED', $subscriptionId, $message];
     }
-    static function notice(string $message) : array {
-        return ['NOTICE', $message];
-    }
 }

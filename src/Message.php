@@ -36,6 +36,9 @@ class Message {
     static function accept(string $eventId, string $message = '') : array {
         return self::ok($eventId, true, $message);
     }
+    static function notice(string $message) : array {
+        return ['NOTICE', $message];
+    }
     
     static function close(callable $subscription) : callable {
         return fn() => ['CLOSE', $subscription()[1]];

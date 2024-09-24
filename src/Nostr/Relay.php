@@ -21,12 +21,12 @@ class Relay {
     static function listen(array $message, callable $subscriptions) {
         $type = array_shift($message);
         if (is_callable([self::class, $type]) === false) {
-            yield Nostr::notice('Message type ' . $type . ' not supported');
+            yield Message::notice('Message type ' . $type . ' not supported');
         } else {
             try {
                 yield from call_user_func([self::class, $type], $subscriptions, ...$message);
             } catch (\ArgumentCountError $ex) {
-                yield Nostr::notice('Invalid message');
+                yield Message::notice('Invalid message');
             }
         }
     }

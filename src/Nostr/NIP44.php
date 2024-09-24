@@ -14,7 +14,9 @@ class NIP44 {
     const HASH_OUTPUT_SIZE = 32;
 
     static function hmac_digest(string $key, string $data): string {
-        return hash_hmac(self::HASH, $data, $key, true);
+        $hash = hash_init(self::HASH, HASH_HMAC, $key);
+        hash_update($hash, $data);
+        return hash_final($hash, true);
     }
     
     

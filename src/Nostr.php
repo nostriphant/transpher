@@ -1,6 +1,7 @@
 <?php
 
 namespace Transpher;
+use \Transpher\Key;
 
 /**
  * Description of Nostr
@@ -42,5 +43,20 @@ class Nostr {
     }
     static function subscribedEvent(string $subscriptionId, array $event) {
         return ['EVENT', $subscriptionId, $event];
+    }
+    
+    
+    
+    static function seal(callable $sender_private_key, string $recipient_pubkey, array $direct_message) {
+        $conversation_key = Key::conversation($recipient_pubkey);
+        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($direct_message), $sender_private_key($conversation_key), random_bytes(32));
+        return self::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
+    }
+    
+    static function giftWrap(string $recipient_pubkey, array $event) {
+        $randomKey = Key::generate();
+        $conversation_key = Key::conversation($recipient_pubkey);
+        $encrypted = Nostr\NIP44::encrypt(json_encode($event), $randomKey($conversation_key), random_bytes(32));
+        return self::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
     }
 }

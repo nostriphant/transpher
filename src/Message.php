@@ -17,34 +17,20 @@ class Message {
         return \Functional\partial_right([Nostr::class, 'event'], time(), $kind, $tags, $content);
     }
     
-    
-    static function seal(callable $sender_private_key, string $recipient_pubkey, array $direct_message) {
-        $conversation_key = Key::conversation($recipient_pubkey);
-        $encrypted_direct_message = Nostr\NIP44::encrypt(json_encode($direct_message), $sender_private_key($conversation_key), random_bytes(32));
-        return Nostr::event($sender_private_key, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, [], $encrypted_direct_message);
-    }
-    
-    static function giftWrap(string $recipient_pubkey, array $event) {
-        $randomKey = Key::generate();
-        $conversation_key = Key::conversation($recipient_pubkey);
-        $encrypted = Nostr\NIP44::encrypt(json_encode($event), $randomKey($conversation_key), random_bytes(32));
-        return Nostr::event($randomKey, mktime(rand(0,23), rand(0,59), rand(0,59)), 1059, ['p', $recipient_pubkey], $encrypted);
-    }
-    
-    static function privateDirect(callable $private_key) {
+    static function privateDirect(callable $private_key) : callable {
         return function(string $recipient_pubkey, string $message) use ($private_key) {
             $unsigned_event = Message::event(14, $message, ['p', $recipient_pubkey]);
             $direct_message = $unsigned_event($private_key);
             unset($direct_message[1]['sig']);
-            return self::giftWrap($recipient_pubkey, self::seal($private_key, $recipient_pubkey, $direct_message));
+            return Nostr::giftWrap($recipient_pubkey, Nostr::seal($private_key, $recipient_pubkey, $direct_message));
         };
     }
     
-    static function close(callable $subscription) {
+    static function close(callable $subscription) : callable {
         return fn() => ['CLOSE', $subscription()[1]];
     }
     
-    static function subscribe() {
+    static function subscribe() : callable {
         $subscriptionId = substr(uniqid().uniqid().uniqid().uniqid().uniqid().uniqid(), 0, 64);
         return fn() => ['REQ', $subscriptionId];
     }

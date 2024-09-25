@@ -7,8 +7,8 @@ services:
       - logs:/app/logs
       - data:/app/data
     environment:
-      AGENT_KEY: ${AGENT_KEY}
-      AGENT_OWNER_PUBKEY: ${AGENT_OWNER_PUBKEY}
+      AGENT_NSEC: ${AGENT_NSEC}
+      AGENT_OWNER_NPUB: ${AGENT_OWNER_NPUB}
       TRANSPHER_PORT: ${TRANSPHER_PORT}
       TRANSPHER_STORE: /app/data
       

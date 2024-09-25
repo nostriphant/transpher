@@ -21,12 +21,7 @@ class Message {
     }
     
     static function privateDirect(Key $private_key) : callable {
-        return function(string $recipient_pubkey, string $message) use ($private_key) {
-            $unsigned_event = new Event(time(), 14, $message, ['p', $recipient_pubkey]);
-            $direct_message = $unsigned_event($private_key);
-            unset($direct_message['sig']);
-            return ['EVENT', Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, $direct_message))];
-        };
+        return new Message\PrivateDirect($private_key);
     }
     
     static function eose(string $subscriptionId) : array {

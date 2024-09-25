@@ -52,4 +52,12 @@ readonly class Process {
         $process = new static($process_id, $cmd, $env, $runtest);
         $running($process);
     }
+    
+    static function gracefulExit() {
+        pcntl_signal(SIGTERM, function(int $sig, array $info) {
+            printf("Received INT signal, exiting gracefully\n");
+            exit(0);
+        }, false );
+        pcntl_async_signals(true);
+    }
 }

@@ -24,18 +24,22 @@ readonly class Process {
         while ($runtest(file_get_contents($output_file)) === false) {
             // wait till process is ready
         }
-        
-        
-        if ($this->process === false) {
-        } elseif (is_resource($this->process)) {
-            fclose($pipes[0]);
-        }   
+    }
+    
+    public function __destruct() {
+        $this();
     }
     
     public function __invoke(int $signal = 15) : array {
+        if ($this->process === false) {
+            return [];
+        } elseif (is_resource($this->process) === false) {
+            return [];
+        }
+        
         $status = proc_get_status($this->process);
 
-        proc_terminate($this->process, $signal);
+        proc_terminate($this->process, 15);
         while ($status['running']) {
             $status = proc_get_status($this->process);
         }

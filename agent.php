@@ -8,6 +8,12 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 
+function handle_interrupt(int $sig, array $info){
+    printf("Received INT signal, exiting gracefully\n");
+    exit(0);
+}
+pcntl_signal(SIGTERM, 'handle_interrupt', false );
+pcntl_async_signals(true);
 
 $port = $_SERVER['argv'][1] ?? 80;
 

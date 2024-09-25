@@ -44,9 +44,8 @@ class Message {
         return fn() => ['CLOSE', $subscription()[1]];
     }
     
-    static function subscribe() : callable {
-        $subscriptionId = bin2hex(random_bytes(32));
-        return fn() => ['REQ', $subscriptionId];
+    static function subscribe() : Message\Subscribe {
+        return new Message\Subscribe();
     }
     
     static function filter(callable $previous, mixed ...$conditions) {

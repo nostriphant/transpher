@@ -1,5 +1,4 @@
 <?php
-pcntl_async_signals(TRUE);
 
 require_once __DIR__ . '/bootstrap.php';
 
@@ -13,15 +12,6 @@ use Monolog\Level;
 $port = $_SERVER['argv'][1] ?? 80;
 
 \Transpher\Nostr\Relay::boot($port, [], function(callable $relay) use ($port) {
-    \Functional\each(\Functional\filter(get_defined_constants(), fn(mixed $value, string $name) => str_starts_with($name, 'SIG')), function(mixed $value, string $name) use ($relay) {
-        if (str_starts_with($name, 'SIG_')) {
-        } elseif ($value === SIGKILL) {
-        } elseif ($value === SIGSTOP) {
-        } else {
-            pcntl_signal(constant($name), $relay);
-        }
-    });
-
     $relay_url = 'ws://127.0.0.1:' . $port;
     
     $log = new Logger('agent');

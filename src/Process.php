@@ -35,7 +35,6 @@ class Process {
                 $status = proc_get_status($process);
                 
                 proc_terminate($process, $signal);
-                pcntl_waitpid($status['pid'], $pcntl_status, WUNTRACED);
                 while ($status['running']) {
                     $status = proc_get_status($process);
                 }

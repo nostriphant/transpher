@@ -13,7 +13,7 @@ use \Transpher\Filters;
 class Relay {
     
     static function boot(int $port, array $env, callable $running) : void {
-        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'websocket.php', $port];
+        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $port];
         \Transpher\Process::start('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Server is running'), $running);
     }
     

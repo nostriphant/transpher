@@ -40,25 +40,16 @@ class Message {
         return ['CLOSED', $subscriptionId, $message];
     }
     
-    static function close(callable $subscription) : callable {
-        return fn() => ['CLOSE', $subscription()[1]];
+    static function close(Message\Subscribe $subscription) : Message\Subscribe\Close {
+        return new Message\Subscribe\Close($subscription()[1]);
     }
     
     static function subscribe() : Message\Subscribe {
         return new Message\Subscribe();
     }
     
-    static function filter(callable $previous, mixed ...$conditions) {
-        $filtered_conditions = array_filter($conditions, fn(string $key) => in_array($key, ["ids", "authors", "kinds", "tags", "since", "until", "limit"]), ARRAY_FILTER_USE_KEY);
-        if (count($filtered_conditions) === 0) {
-            return $previous;
-        }
-        if (array_key_exists('tags', $filtered_conditions)) {
-            $tags = $filtered_conditions['tags'];
-            unset($filtered_conditions['tags']);
-            $filtered_conditions = array_merge($filtered_conditions, $tags);
-        }
-        return fn() => array_merge($previous(), [$filtered_conditions]);
+    static function filter(Message\Subscribe\Chain $previous, mixed ...$conditions) {
+        return new Message\Subscribe\Filter($previous, ...$conditions);
     }
     
     

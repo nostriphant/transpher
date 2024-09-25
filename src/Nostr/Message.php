@@ -16,11 +16,11 @@ use function Functional\map;
  */
 class Message {
     
-    static function event(int $kind, string $content, array ...$tags) : callable {
+    static function event(int $kind, string $content, array ...$tags) : Message\Event {
         return new Message\Event(new Event(time(), $kind, $content, ...$tags));
     }
     
-    static function privateDirect(Key $private_key) : callable {
+    static function privateDirect(Key $private_key) : Message\PrivateDirect {
         return new Message\PrivateDirect($private_key);
     }
     

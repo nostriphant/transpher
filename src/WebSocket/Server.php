@@ -8,7 +8,7 @@ use Functional\Functional;
 use WebSocket\Server as WSServer;
 use Transpher\Nostr\Relay as NServer;
 use WebSocket\Connection;
-use Transpher\Message;
+use Transpher\Nostr\Message;
 use function \Functional\reject, \Functional\first, \Functional\each, \Functional\if_else, \Functional\map, \Functional\filter;
 
 /**

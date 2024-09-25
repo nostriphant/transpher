@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/bootstrap.php';
 
-use Transpher\Message;
+use Transpher\Nostr\Message;
 use \Transpher\Key;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;

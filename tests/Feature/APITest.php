@@ -1,7 +1,7 @@
 <?php
 
 use \Transpher\Key;
-use \Transpher\Message;
+use \Transpher\Nostr\Message;
 use \TranspherTests\Client;
 
 function redis_server(int $port, array $env) {

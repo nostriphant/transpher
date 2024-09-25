@@ -1,6 +1,6 @@
 <?php
 
-namespace Transpher;
+namespace Transpher\Nostr;
 
 use Transpher\Nostr;
 use Transpher\Key;

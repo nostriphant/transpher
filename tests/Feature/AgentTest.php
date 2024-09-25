@@ -2,6 +2,7 @@
 
 use Transpher\Nostr\Relay\Agent;
 use Transpher\Key;
+use Transpher\Nostr\Message;
 
 describe('agent', function () : void {
     it('starts relay and seeks connection with client', function () : void {
@@ -14,9 +15,9 @@ describe('agent', function () : void {
             ], 
             function (callable $agent) use ($alice_key) : void {
                 $alice = \TranspherTests\Client::client(8084);
-                $subscription = Transpher\Message::subscribe();
+                $subscription = Message::subscribe();
                 
-                $request = Transpher\Message::filter($subscription, tags: [['#p' => [$alice_key(Key::public())]]])();
+                $request = Message::filter($subscription, tags: [['#p' => [$alice_key(Key::public())]]])();
                 $alice->expectNostrPrivateDirectMessage($subscription()[1], $alice_key, 'Hello, I am Agent!');
                 $alice->json($request);
                 $alice->start();

@@ -2,7 +2,7 @@
 
 namespace Transpher\Nostr;
 
-use \Transpher\Message;
+use \Transpher\Nostr\Message;
 use \Transpher\Filters;
 
 /**

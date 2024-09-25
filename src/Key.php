@@ -6,7 +6,7 @@
  */
 
 namespace Transpher;
-
+use Transpher\Nostr\Key\Format;
 use Elliptic\EC;
 use function BitWasp\Bech32\convertBits;
 use function BitWasp\Bech32\decode;
@@ -61,11 +61,21 @@ readonly class Key {
         };
     }
 
-    static function public(): callable {
-        return function (#[\SensitiveParameter] string $private_key): string {
-            return substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2);
+    static function public(Format $format = Format::HEXIDECIMAL): callable {
+        return fn (#[\SensitiveParameter] string $private_key): string => match ($format) {
+            Format::BINARY => hex2bin(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2)),
+            Format::BECH32 => self::convertHexToBech32(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2), 'npub'),
+            Format::HEXIDECIMAL => substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2),
         };
     }
+    static function private(Format $format = Format::HEXIDECIMAL): callable {
+        return fn (#[\SensitiveParameter] string $private_key): string => match ($format) {
+            Format::BINARY => hex2bin($private_key),
+            Format::BECH32 => self::convertHexToBech32($private_key, 'nsec'),
+            Format::HEXIDECIMAL => $private_key,
+        };
+    }
+    
 
     static function convertBech32ToHex(#[\SensitiveParameter] string $bech32_key) : string {
         $str = '';

@@ -7,9 +7,13 @@ $agent_key = Key::generate();
 $main_key = Key::generate();
 $main_agent;
 beforeAll(function () use (&$main_agent, $agent_key, $main_key) {
-    Agent::boot(8084, ['AGENT_OWNER_PUBKEY' => $main_key(Key::public()), 'AGENT_KEY' => $agent_key(fn() => func_get_arg(0))], function (callable $agent) use (&$main_agent) {
-        $main_agent = $agent;
-    });
+    Agent::boot(8084, [
+        'AGENT_OWNER_NPUB' => $main_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)), 
+        'AGENT_NSEC' => $agent_key(Key::private(\Transpher\Nostr\Key\Format::BECH32))], 
+        function (callable $agent) use (&$main_agent) {
+            $main_agent = $agent;
+        }
+    );
 });
 afterAll(function () use (&$main_agent) {
     $status = $main_agent(Key::public());

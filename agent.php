@@ -4,6 +4,7 @@ pcntl_async_signals(TRUE);
 require_once __DIR__ . '/bootstrap.php';
 
 use Transpher\Message;
+use \Transpher\Key;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -28,8 +29,8 @@ $port = $_SERVER['argv'][1] ?? 80;
     $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
     $agent = new \Transpher\WebSocket\Client(new WebSocket\Client($relay_url), $log);
     $log->info('Sending Private Direct Message event');
-    $note = Message::privateDirect(\Transpher\Key::fromHex($_SERVER['AGENT_KEY']));
-    $agent->json($note($_SERVER['AGENT_OWNER_PUBKEY'], 'Hello, I am Agent!'));
+    $note = Message::privateDirect(Key::fromBech32($_SERVER['AGENT_NSEC']));
+    $agent->json($note(Key::convertBech32ToHex($_SERVER['AGENT_OWNER_NPUB']), 'Hello, I am Agent!'));
     $agent->start();
 });
 echo 'Done';

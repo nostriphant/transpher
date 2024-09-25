@@ -26,6 +26,9 @@ it('converts between bytes, bech32 and hexidecimal', function() {
     
     $key = Key::fromBech32($private_key_bech32);
     expect($key(fn() => func_get_arg(0)))->toBe($private_key_hex);
+    expect($key(Key::public(\Transpher\Nostr\Key\Format::BECH32)))->toBe($public_key_bech32);
+    expect($key(Key::public(\Transpher\Nostr\Key\Format::HEXIDECIMAL)))->toBe($public_key_hex);
+    expect($key(Key::public(\Transpher\Nostr\Key\Format::BINARY)))->toBe(hex2bin($public_key_hex));
 });
 
 

@@ -12,9 +12,9 @@ use \Transpher\Filters;
  */
 class Relay {
     
-    static function boot(int $port, array $env, callable $running) : callable {
+    static function boot(int $port, array $env, callable $running) : void {
         $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'websocket.php', $port];
-        return \Transpher\Process::start('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Server is running'), $running);
+        \Transpher\Process::start('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Server is running'), $running);
     }
     
     static function listen(array $message, callable $subscriptions) {

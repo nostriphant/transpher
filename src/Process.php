@@ -8,7 +8,7 @@ namespace Transpher;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 class Process {
-    static function start(string $process_id, array $cmd, array $env, callable $runtest, callable $running) : callable {
+    static function start(string $process_id, array $cmd, array $env, callable $runtest, callable $running) : void {
         $cwd = getcwd();
         
         $output_file = $cwd . "/logs/{$process_id}-errors.log";
@@ -27,11 +27,11 @@ class Process {
         
         
         if ($process === false) {
-            return fn() => [];
+            
         } elseif (is_resource($process)) {
             fclose($pipes[0]);
             
-            $running($killProcess = function(int $signal = 15) use ($process_id, $process, $pipes, $output_file) : array {
+            $running(function(int $signal = 15) use ($process_id, $process, $pipes, $output_file) : array {
                 $status = proc_get_status($process);
                 
                 proc_terminate($process, $signal);
@@ -42,9 +42,6 @@ class Process {
                 proc_close($process);
                 return $status;
             });
-            
-            return $killProcess;
         }
-        return fn() => [];
     }
 }

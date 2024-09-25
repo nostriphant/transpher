@@ -3,7 +3,10 @@
 namespace Transpher;
 
 use Transpher\Nostr;
-use \Transpher\Key;
+use Transpher\Key;
+use Transpher\Nostr\Event;
+use Transpher\Nostr\Event\Gift;
+use Transpher\Nostr\Event\Seal;
 use function Functional\map;
 
 /**
@@ -14,16 +17,16 @@ use function Functional\map;
 class Message {
     
     static function event(int $kind, string $content, array ...$tags) : callable {
-        $event = new Nostr\Event(time(), $kind, $content, ...$tags);
+        $event = new Event(time(), $kind, $content, ...$tags);
         return fn(Key $private_key) => ['EVENT', $event($private_key)];
     }
     
     static function privateDirect(Key $private_key) : callable {
         return function(string $recipient_pubkey, string $message) use ($private_key) {
-            $unsigned_event = new Nostr\Event(time(), 14, $message, ['p', $recipient_pubkey]);
+            $unsigned_event = new Event(time(), 14, $message, ['p', $recipient_pubkey]);
             $direct_message = $unsigned_event($private_key);
             unset($direct_message['sig']);
-            return ['EVENT', Nostr\Event\Gift::wrap($recipient_pubkey, Nostr\Event\Seal::close($private_key, $recipient_pubkey, $direct_message))];
+            return ['EVENT', Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, $direct_message))];
         };
     }
     

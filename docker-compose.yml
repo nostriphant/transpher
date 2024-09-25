@@ -11,6 +11,7 @@ services:
       AGENT_OWNER_NPUB: ${AGENT_OWNER_NPUB}
       TRANSPHER_PORT: ${TRANSPHER_PORT}
       TRANSPHER_STORE: /app/data
+    restart: unless-stopped
       
 volumes:
   data:

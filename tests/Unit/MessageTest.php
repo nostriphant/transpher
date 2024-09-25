@@ -27,11 +27,11 @@ it('can generate a properly signed note', function() {
     expect($event[1]['content'])->toBe('Hello world!');
     expect($event[1]['tags'])->toBe([]);
     expect($event[1]['created_at'])->toBeInt();
-    expect($event[1]['pubkey'])->toBe('0389ac55aeeb301252da33b51ca4d189cb1d665b8f00618f5ea72c2ec59ca555e9');
+    expect($event[1]['pubkey'])->toBe('89ac55aeeb301252da33b51ca4d189cb1d665b8f00618f5ea72c2ec59ca555e9');
 
     $sign = new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature();
     $reporting = set_error_handler(fn() => null);
-    $verification = $sign->verify(substr($event[1]['pubkey'], 2), $event[1]['sig'], $event[1]['id']);
+    $verification = $sign->verify(substr('02' . $event[1]['pubkey'], 2), $event[1]['sig'], $event[1]['id']);
     set_error_handler($reporting);
 
     expect($verification)->toBeTrue();

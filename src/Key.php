@@ -54,7 +54,7 @@ readonly class Key {
     
     static function public() : callable {
         return function(string $private_key): string {
-            return self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex');
+            return substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2);
         };
     }
     

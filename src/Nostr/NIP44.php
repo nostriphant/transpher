@@ -46,7 +46,7 @@ class NIP44 {
     }
 
     static function getConversationKey(#[\SensitiveParameter] Key $private_key, string $pubkeyB): bool|string {
-        if (false === ($secret = $private_key(Key::sharedSecret(bin2hex($pubkeyB))))) {
+        if (false === ($secret = $private_key(Key::sharedSecret('02' . bin2hex($pubkeyB))))) {
             return false;
         }
         return self::hash('nip44-v2')(hex2bin($secret));

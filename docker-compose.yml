@@ -9,6 +9,7 @@ services:
     environment:
       AGENT_NSEC: ${AGENT_NSEC}
       AGENT_OWNER_NPUB: ${AGENT_OWNER_NPUB}
+      RELAY_URL: ${RELAY_URL}
       TRANSPHER_PORT: ${TRANSPHER_PORT}
       TRANSPHER_STORE: /app/data
     restart: unless-stopped

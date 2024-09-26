@@ -10,10 +10,8 @@ use Monolog\Level;
 
 Transpher\Process::gracefulExit();
 
-$port = $_SERVER['argv'][1] ?? 80;
-
-\Transpher\Nostr\Relay::boot($port, [], function(callable $relay) use ($port) {
-    $relay_url = 'ws://127.0.0.1:' . $port;
+\Transpher\Nostr\Relay::boot($_SERVER['argv'][1] ?? 80, [], function(callable $relay) {
+    $relay_url = $_SERVER['RELAY_URL'];
     
     $log = new Logger('agent');
     $log->pushHandler(new StreamHandler(__DIR__ . '/logs/agent.log', Level::Debug));
@@ -25,7 +23,7 @@ $port = $_SERVER['argv'][1] ?? 80;
     $agent = new \Transpher\WebSocket\Client(new WebSocket\Client($relay_url), $log);
     $log->info('Sending Private Direct Message event');
     $note = Message::privateDirect($agent_key);
-    $agent->json($note(Key::convertBech32ToHex($_SERVER['AGENT_OWNER_NPUB']), 'Hello, I am Agent!'));
+    $agent->json($note(Key::convertBech32ToHex($_SERVER['AGENT_OWNER_NPUB']), 'Hello, I am your agent! The URL of your relay is ' . $relay_url));
     $agent->start();
 });
 echo 'Done';

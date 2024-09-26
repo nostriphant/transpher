@@ -10,7 +10,7 @@ describe('agent', function () : void {
         $agent_key = Key::generate();
         $alice_key = Key::generate();
         Agent::boot(8084, [
-                'AGENT_OWNER_NPUB' => $alice_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)), 
+                'RELAY_OWNER_NPUB' => $alice_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)), 
                 'AGENT_NSEC' => $agent_key(Key::private(\Transpher\Nostr\Key\Format::BECH32)),
                 'RELAY_URL' => 'ws://127.0.0.1:8084'
             ], 

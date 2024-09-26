@@ -20,6 +20,41 @@ afterAll(function() use (&$main_relay) {
 });
 
 describe('relay', function () {
+    it('sends an information document (NIP-11), when on a HTTP request', function() {
+        $hostname = 'localhost:8080';
+        
+        $owner_key = Key::generate();
+        $cmd = [PHP_BINARY, '-d', 'variables_order=EGPCS', '-S', $hostname, '-t', ROOT_DIR . '/public'];
+        \Transpher\Process::start('relay-http', $cmd, [
+            'RELAY_OWNER_NPUB' => $owner_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)), 
+            'RELAY_NAME' => 'Really relay',
+            'RELAY_DESCRIPTION' => 'This is my dev relay',
+            'RELAY_CONTACT' => 'nostr@rikmeijer.nl'
+        ], fn(string $line) => str_contains($line, 'Development Server (http://'.$hostname.') started'), function(Transpher\Process $http) use ($owner_key, $hostname) {
+            $curl = curl_init('http://' . $hostname);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, ['Accept: application/nostr+json']);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            $responseText = curl_exec($curl);
+            expect($responseText)->not()->toBeFalse(curl_error($curl));
+            
+            $response = \Transpher\Nostr::decode($responseText);
+
+            expect($response)->not()->toBeNull();
+            expect($response)->toBe([
+                 "name" => 'Really relay',
+                 "description" => 'This is my dev relay',
+                 "pubkey" => $owner_key(Key::public(\Transpher\Nostr\Key\Format::HEXIDECIMAL)),
+                 "contact" => "nostr@rikmeijer.nl",
+                 "supported_nips" => [1, 11],
+                 "software" => 'Transpher',
+                 "version" => 'dev'
+            ]);
+            
+            $http();
+        });
+    
+    });
+    
     it('accepts clients', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();

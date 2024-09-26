@@ -14,14 +14,15 @@ readonly class Process {
     public function __construct(string $process_id, array $cmd, array $env, callable $runtest) {
         $cwd = getcwd();
         $output_file = $cwd . "/logs/{$process_id}-output.log";
+        $error_file = $cwd . "/logs/{$process_id}-errors.log";
         $descriptorspec = [
-            0 => ["pipe", "r"],  // stdin is a pipe that the child will read from
-            1 => ["file", $output_file, "w"],  // stdout is a pipe that the child will write to
-            2 => ["file", $cwd . "/logs/{$process_id}-errors.log", "w"] // stderr is a file to write to
+            0 => ["pipe", "r"],  
+            1 => ["file", $output_file, "w"],  
+            2 => ["file", $error_file, "w"]
         ];
 
         $this->process = proc_open($cmd, $descriptorspec, $pipes, $cwd, $env);
-        while ($runtest(file_get_contents($output_file)) === false) {
+        while ($runtest(file_get_contents($output_file))  === false && (is_file($error_file) === false || $runtest(file_get_contents($error_file)) === false)) {
             // wait till process is ready
         }
     }

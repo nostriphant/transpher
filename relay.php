@@ -10,7 +10,7 @@ Transpher\Process::gracefulExit();
 
 $port = $_SERVER['argv'][1] ?? $_ENV['TRANSPHER_PORT'] ?? 80;
 $websocket = new WebSocket\Server($port);
-
+            
 // create a log channel
 $log = new Logger('relay-' . $websocket->getPort());
 $log->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', Level::Debug));

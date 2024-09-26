@@ -23,7 +23,7 @@ Transpher\Process::gracefulExit();
     $agent = new \Transpher\WebSocket\Client(new WebSocket\Client($relay_url), $log);
     $log->info('Sending Private Direct Message event');
     $note = Message::privateDirect($agent_key);
-    $agent->json($note(Key::convertBech32ToHex($_SERVER['AGENT_OWNER_NPUB']), 'Hello, I am your agent! The URL of your relay is ' . $relay_url));
+    $agent->json($note(Key::convertBech32ToHex($_SERVER['RELAY_OWNER_NPUB']), 'Hello, I am your agent! The URL of your relay is ' . $relay_url));
     $agent->start();
 });
 echo 'Done';

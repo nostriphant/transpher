@@ -9,7 +9,7 @@ services:
       - data:/app/data
     environment:
       AGENT_NSEC: ${AGENT_NSEC}
-      RELAY_OWNER_NPUB: ${AGENT_OWNER_NPUB}
+      RELAY_OWNER_NPUB: ${RELAY_OWNER_NPUB}
       RELAY_URL: ${RELAY_URL}
       RELAY_NAME: ${RELAY_NAME}
       RELAY_DESCRIPTION: ${RELAY_DESCRIPTION}

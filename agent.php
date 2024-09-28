@@ -13,15 +13,16 @@ $log = new Logger('agent');
 $log->pushHandler(new StreamHandler(__DIR__ . '/logs/agent.log', Level::Debug));
 $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
 
-$relay_port = $_SERVER['argv'][1] ?? 80;
+$http_port = $_SERVER['argv'][1] ?? 80;
+$relay_port = $http_port + 1;
 
-$hostname = 'localhost:'.($relay_port+1);
+$hostname = 'localhost:'.$http_port;
 $cmd = [PHP_BINARY, '-d', 'variables_order=EGPCS', '-S', $hostname, '-t', ROOT_DIR . '/public'];
 \Transpher\Process::start('relay-http', $cmd, [
-    'RELAY_OWNER_NPUB' => $_SERVER['RELAY_OWNER_NPUB'], 
-    'RELAY_NAME' => $_SERVER['RELAY_NAME'],
-    'RELAY_DESCRIPTION' => $_SERVER['RELAY_DESCRIPTION'],
-    'RELAY_CONTACT' => $_SERVER['RELAY_CONTACT']
+    'RELAY_OWNER_NPUB' => $_SERVER['RELAY_OWNER_NPUB'] ?? null, 
+    'RELAY_NAME' => $_SERVER['RELAY_NAME'] ?? 'Transpher',
+    'RELAY_DESCRIPTION' => $_SERVER['RELAY_DESCRIPTION'] ?? 'Nostr Relay written in PHP',
+    'RELAY_CONTACT' => $_SERVER['RELAY_CONTACT'] ?? 'Nobody'
 ], fn(string $line) => str_contains($line, 'Development Server (http://'.$hostname.') started'), function(Transpher\Process $http) use ($hostname, $relay_port, $log) {
     $log->info('HTTP server listening on http://'.$hostname.'...');
     

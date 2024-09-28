@@ -12,14 +12,14 @@ describe('agent', function () : void {
         Agent::boot(8084, [
                 'RELAY_OWNER_NPUB' => $alice_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)), 
                 'AGENT_NSEC' => $agent_key(Key::private(\Transpher\Nostr\Key\Format::BECH32)),
-                'RELAY_URL' => 'ws://127.0.0.1:8084'
+                'RELAY_URL' => 'ws://127.0.0.1:8085'
             ], 
             function (callable $agent) use ($alice_key) : void {
-                $alice = \TranspherTests\Client::client(8084);
+                $alice = \TranspherTests\Client::client(8085);
                 $subscription = Message::subscribe();
                 
                 $request = Message::filter($subscription, tags: [['#p' => [$alice_key(Key::public())]]])();
-                $alice->expectNostrPrivateDirectMessage($subscription()[1], $alice_key, 'Hello, I am your agent! The URL of your relay is ws://127.0.0.1:8084');
+                $alice->expectNostrPrivateDirectMessage($subscription()[1], $alice_key, 'Hello, I am your agent! The URL of your relay is ws://127.0.0.1:8085');
                 $alice->json($request);
                 $alice->start();
                 
@@ -32,14 +32,14 @@ describe('agent', function () : void {
         $agent_key = Key::generate();
         Agent::boot(8084, [
                 'AGENT_NSEC' => $agent_key(Key::private(\Transpher\Nostr\Key\Format::BECH32)),
-                'RELAY_URL' => 'ws://127.0.0.1:8084',
+                'RELAY_URL' => 'ws://127.0.0.1:8085',
                 'RELAY_OWNER_NPUB' => $owner_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)), 
                 'RELAY_NAME' => 'Really relay',
                 'RELAY_DESCRIPTION' => 'This is my dev relay',
                 'RELAY_CONTACT' => 'nostr@rikmeijer.nl'
             ], 
             function (callable $agent) use ($owner_key) : void {
-                $curl = curl_init('http://localhost:8085');
+                $curl = curl_init('http://localhost:8084');
                 curl_setopt($curl, CURLOPT_HTTPHEADER, ['Accept: application/nostr+json']);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
                 $responseText = curl_exec($curl);

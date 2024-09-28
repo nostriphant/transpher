@@ -27,7 +27,7 @@ $requestHandler = new class() implements RequestHandler {
     {
         return new Response(
             status: HttpStatus::OK,
-            headers: ['Content-Type' => 'application/json+nostr'],
+            headers: ['Content-Type' => 'application/json'],
             body: json_encode([
                 "name" => $_SERVER['RELAY_NAME'],
                 "description" => $_SERVER['RELAY_DESCRIPTION'],

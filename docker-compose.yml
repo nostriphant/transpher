@@ -2,7 +2,8 @@ services:
   relay:
     image: "rikmeijer84/transpher:latest"
     ports:
-      - "${TRANSPHER_PORT}:80"
+      - "${HTTP_PORT}:80"
+      - "${RELAY_PORT}:81"
     volumes:
       - logs:/app/logs
       - data:/app/data
@@ -10,7 +11,6 @@ services:
       AGENT_NSEC: ${AGENT_NSEC}
       AGENT_OWNER_NPUB: ${AGENT_OWNER_NPUB}
       RELAY_URL: ${RELAY_URL}
-      TRANSPHER_PORT: ${TRANSPHER_PORT}
       TRANSPHER_STORE: /app/data
     restart: unless-stopped
       

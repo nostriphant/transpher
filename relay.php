@@ -8,7 +8,7 @@ use Monolog\Level;
 
 Transpher\Process::gracefulExit();
 
-$port = $_SERVER['argv'][1] ?? $_ENV['TRANSPHER_PORT'] ?? 80;
+$port = $_SERVER['argv'][1] ?? 80;
 $websocket = new WebSocket\Server($port);
             
 // create a log channel

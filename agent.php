@@ -16,14 +16,13 @@ $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
 $http_port = $_SERVER['argv'][1] ?? 80;
 $relay_port = $http_port + 1;
 
-$hostname = 'localhost:'.$http_port;
-$cmd = [PHP_BINARY, '-d', 'variables_order=EGPCS', '-S', $hostname, '-t', ROOT_DIR . '/public'];
-\Transpher\Process::start('relay-http', $cmd, [
+$hostname = '127.0.0.1:'.$http_port;
+\Transpher\Process::start('http', [PHP_BINARY, ROOT_DIR . '/http.php', $hostname], [
     'RELAY_OWNER_NPUB' => $_SERVER['RELAY_OWNER_NPUB'] ?? null, 
     'RELAY_NAME' => $_SERVER['RELAY_NAME'] ?? 'Transpher',
     'RELAY_DESCRIPTION' => $_SERVER['RELAY_DESCRIPTION'] ?? 'Nostr Relay written in PHP',
     'RELAY_CONTACT' => $_SERVER['RELAY_CONTACT'] ?? 'Nobody'
-], fn(string $line) => str_contains($line, 'Development Server (http://'.$hostname.') started'), function(Transpher\Process $http) use ($hostname, $relay_port, $log) {
+], fn(string $line) => str_contains($line, 'Listening on http://'.$hostname.'/'), function(Transpher\Process $http) use ($hostname, $relay_port, $log) {
     $log->info('HTTP server listening on http://'.$hostname.'...');
     
     \Transpher\Nostr\Relay::boot($relay_port, [], function(callable $relay) use ($log) {
@@ -38,5 +37,5 @@ $cmd = [PHP_BINARY, '-d', 'variables_order=EGPCS', '-S', $hostname, '-t', ROOT_D
         $agent->json($note(Key::convertBech32ToHex($_SERVER['RELAY_OWNER_NPUB']), 'Hello, I am your agent! The URL of your relay is ' . $relay_url));
         $agent->start();
     });
-    echo 'Done';
 });
+echo 'Done';

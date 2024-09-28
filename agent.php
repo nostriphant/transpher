@@ -16,7 +16,7 @@ $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
 $http_port = $_SERVER['argv'][1] ?? 80;
 $relay_port = $http_port + 1;
 
-$hostname = '127.0.0.1:'.$http_port;
+$hostname = '0.0.0.0:'.$http_port;
 \Transpher\Process::start('http', [PHP_BINARY, ROOT_DIR . '/http.php', $hostname], [
     'RELAY_OWNER_NPUB' => $_SERVER['RELAY_OWNER_NPUB'] ?? null, 
     'RELAY_NAME' => $_SERVER['RELAY_NAME'] ?? 'Transpher',

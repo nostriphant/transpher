@@ -53,16 +53,12 @@ class Server {
     }
     
     static function subscribe(Connection $from, array|\ArrayAccess &$events) : callable {
-        return function(string $subscriptionId, ?callable $subscription) use ($from, &$events) {
-            if (is_null($subscription)) {
-                yield Message::closed($subscriptionId, 'Subscription filters are empty');
-            } else {
-                $subscriptions = $from->getMeta('subscriptions')??[];
-                $subscriptions[$subscriptionId] = $subscription;
-                yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
-                yield Message::eose($subscriptionId);
-                $from->setMeta('subscriptions', $subscriptions);
-            }
+        return function(string $subscriptionId, callable $subscription) use ($from, &$events) {
+            $subscriptions = $from->getMeta('subscriptions')??[];
+            $subscriptions[$subscriptionId] = $subscription;
+            yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
+            yield Message::eose($subscriptionId);
+            $from->setMeta('subscriptions', $subscriptions);
         };
     }
     

@@ -29,21 +29,15 @@ class Relay {
             case 'REQ':
                 if (count($message) < 2) {
                     yield Message::notice('Invalid message');
+                } elseif (empty($message[1])) {
+                    yield Message::closed($message[0], 'Subscription filters are empty');
+                } else {
+                    yield from $subscribe($message[0], Filters::constructFromPrototype($message[1]));
                 }
-                yield from $subscribe(array_shift($message), self::req(array_shift($message)??[]));
                 break;
             default: 
                 yield Message::notice('Message type ' . $type . ' not supported');
                 break;
-        }
-    }
-    
-    
-    static function req(array $subscription) : ?callable {
-        if (empty($subscription)) {
-            return null;
-        } else {
-            return Filters::constructFromPrototype($subscription);
         }
     }
     

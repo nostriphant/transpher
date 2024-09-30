@@ -5,7 +5,9 @@ require_once __DIR__ . '/bootstrap.php';
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
-use function \Functional\reject, \Functional\map;
+
+use Functional\Functional;
+use function \Functional\first, \Functional\reject, \Functional\if_else, \Functional\map;
 
 Transpher\Process::gracefulExit();
 
@@ -37,7 +39,16 @@ $websocket = new class($port, $log) extends WebSocket\Server {
             $this->log->info('Received message: ' . $message->getPayload());
             $payload = \Transpher\Nostr::decode($message->getPayload());
             
-            $callback($from, $payload);
+            $others = $this->getOthers($from, fn(\WebSocket\Connection $client) => fn(array $event) => first(
+                $client->getMeta('subscriptions')??[], 
+                fn(callable $subscription, string $subscriptionId) => if_else(
+                    $subscription, 
+                    \Transpher\Nostr\Relay::relay(\Transpher\WebSocket\Server::wrapClient($client, 'Relay', $this->log), $subscriptionId),
+                    Functional::false
+                )($event)
+            ));
+            
+            $callback($from, $others, $payload);
         });
     }
 };

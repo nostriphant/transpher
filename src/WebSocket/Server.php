@@ -9,7 +9,7 @@ use WebSocket\Server as WSServer;
 use Transpher\Nostr\Relay as NServer;
 use WebSocket\Connection;
 use Transpher\Nostr\Message;
-use function \Functional\first, \Functional\each, \Functional\if_else, \Functional\map, \Functional\filter;
+use function \Functional\each, \Functional\map, \Functional\filter;
 
 /**
  * Description of WebSocket
@@ -19,24 +19,16 @@ use function \Functional\first, \Functional\each, \Functional\if_else, \Function
 class Server {
     
     public function __construct(private WSServer $server, private \Psr\Log\LoggerInterface $log, array|\ArrayAccess $events) {
-        $this->server->onJson(function(Connection $from, array $payload) use ($log, &$events) {
-            $edit_subscriptions = self::subscriptionEditor($events, $from);
+        $this->server->onJson(function(Connection $from, array $others, array $payload) use ($log, &$events) {
+            $edit_subscriptions = self::subscriptionEditor($from);
            
-            $others = $this->server->getOthers($from, fn(Connection $client) => fn(array $event) => first(
-                $client->getMeta('subscriptions')??[], 
-                fn(callable $subscription, string $subscriptionId) => if_else(
-                    $subscription, 
-                    NServer::relay(self::wrapClient($client, 'Relay', $this->log), $subscriptionId),
-                    Functional::false
-                )($event)
-            ));
             $relay_event_to_subscribers = self::eventRelayer($events, $others);
 
-            $subscription_handler = function() use ($relay_event_to_subscribers, $edit_subscriptions) {
+            $subscription_handler = function() use (&$events, $relay_event_to_subscribers, $edit_subscriptions) {
                 if (func_num_args() === 1) {
                     $relay_event_to_subscribers(func_get_arg(0));
                 } else {
-                    yield from $edit_subscriptions(...func_get_args());
+                    yield from $edit_subscriptions($events, ...func_get_args());
                 }
             };
 
@@ -62,8 +54,8 @@ class Server {
         $this->server->start();
     }
     
-    static function subscriptionEditor(array|\ArrayAccess &$events, Connection $from) {
-        return function(string $subscriptionId, ?callable $subscription) use (&$events, $from) {
+    static function subscriptionEditor(Connection $from) {
+        return function(array|\ArrayAccess &$events, string $subscriptionId, ?callable $subscription) use ($from) {
             $subscriptions = $from->getMeta('subscriptions')??[];
             if (is_null($subscription)) {
                 unset($subscriptions[$subscriptionId]);

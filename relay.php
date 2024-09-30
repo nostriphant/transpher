@@ -29,9 +29,18 @@ $websocket = new class($port, $log) extends WebSocket\Server {
         
     }
     
-    public function getOthers(\WebSocket\Connection $from, callable $wrap) {
-        $others = reject($this->getConnections(), fn(\WebSocket\Connection $client) => $client === $from); 
-        return map($others, $wrap);
+    public function wrapOthers(array $others) {
+        return map($others, fn(\WebSocket\Connection $client) => fn(array $event) => first(
+            $client->getMeta('subscriptions')??[], 
+            fn(callable $subscription, string $subscriptionId) => if_else(
+                $subscription, 
+                fn(array $event) => \Transpher\Nostr\Relay::wrapClient($client, 'Relay', $this->log)(
+                    \Transpher\Nostr\Message::requestedEvent($subscriptionId, $event),
+                    \Transpher\Nostr\Message::eose($subscriptionId)
+                ),
+                Functional::false
+            )($event)
+        ));
     }
     
     public function onJson(callable $callback) {
@@ -40,17 +49,7 @@ $websocket = new class($port, $log) extends WebSocket\Server {
             $payload = \Transpher\Nostr::decode($message->getPayload());
             
             $reply = \Transpher\Nostr\Relay::wrapClient($from, 'Reply', $this->log);
-            $others = $this->getOthers($from, fn(\WebSocket\Connection $client) => fn(array $event) => first(
-                $client->getMeta('subscriptions')??[], 
-                fn(callable $subscription, string $subscriptionId) => if_else(
-                    $subscription, 
-                    fn(array $event) => \Transpher\Nostr\Relay::wrapClient($client, 'Relay', $this->log)(
-                        \Transpher\Nostr\Message::requestedEvent($subscriptionId, $event),
-                        \Transpher\Nostr\Message::eose($subscriptionId)
-                    ),
-                    Functional::false
-                )($event)
-            ));
+            $others = $this->wrapOthers(reject($this->getConnections(), fn(\WebSocket\Connection $client) => $client === $from));
             $subscriptions = function(?array $subscriptions = null) use ($from) : array {
                 if (isset($subscriptions)) {
                     $from->setMeta('subscriptions', $subscriptions);
@@ -58,7 +57,6 @@ $websocket = new class($port, $log) extends WebSocket\Server {
                 return $from->getMeta('subscriptions')??[];
             };
             
-        
             foreach($callback($subscriptions, $others, $payload) as $reply_message) {
                 $reply($reply_message);
             }

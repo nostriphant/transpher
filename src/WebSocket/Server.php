@@ -9,7 +9,7 @@ use WebSocket\Server as WSServer;
 use Transpher\Nostr\Relay as NServer;
 use WebSocket\Connection;
 use Transpher\Nostr\Message;
-use function \Functional\reject, \Functional\first, \Functional\each, \Functional\if_else, \Functional\map, \Functional\filter;
+use function \Functional\first, \Functional\each, \Functional\if_else, \Functional\map, \Functional\filter;
 
 /**
  * Description of WebSocket
@@ -18,12 +18,7 @@ use function \Functional\reject, \Functional\first, \Functional\each, \Functiona
  */
 class Server {
     
-    public function __construct(private WSServer $server, private \Psr\Log\LoggerInterface $log) {
-        $server
-            ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
-            ->addMiddleware(new \WebSocket\Middleware\PingResponder())
-            ->setLogger($log);
-    }
+    public function __construct(private WSServer $server, private \Psr\Log\LoggerInterface $log) {}
     
     private function wrapClient(Connection $client, string $action) : callable {
         return function(array ...$messages) use ($client, $action) : bool {
@@ -36,19 +31,6 @@ class Server {
         };
     }
     
-    private function getOthers(Connection $from) {
-        $others = reject($this->server->getConnections(), fn(Connection $client) => $client === $from);
-        
-        return map($others, fn(Connection $client) => fn(array $event) => first(
-            $client->getMeta('subscriptions')??[], 
-            fn(callable $subscription, string $subscriptionId) => if_else(
-                $subscription, 
-                NServer::relay($this->wrapClient($client, 'Relay'), $subscriptionId),
-                Functional::false
-            )($event)
-        ));
-    }
-    
     public function start(array|\ArrayAccess $events) {
         $this->server->onText(function (WSServer $server, Connection $from, \WebSocket\Message\Message $message) use (&$events) {
             $this->log->info('Received message: ' . $message->getPayload());
@@ -57,7 +39,14 @@ class Server {
 
             $edit_subscriptions = self::subscriptionEditor($events, $from);
            
-            $others = $this->getOthers($from);
+            $others = $this->server->getOthers($from, fn(Connection $client) => fn(array $event) => first(
+                $client->getMeta('subscriptions')??[], 
+                fn(callable $subscription, string $subscriptionId) => if_else(
+                    $subscription, 
+                    NServer::relay($this->wrapClient($client, 'Relay'), $subscriptionId),
+                    Functional::false
+                )($event)
+            ));
             $relay_event_to_subscribers = self::eventRelayer($events, $others);
 
             $subscription_handler = function() use ($relay_event_to_subscribers, $edit_subscriptions) {

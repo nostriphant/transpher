@@ -5,16 +5,33 @@ require_once __DIR__ . '/bootstrap.php';
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
+use function \Functional\reject, \Functional\map;
 
 Transpher\Process::gracefulExit();
 
 $port = $_SERVER['argv'][1] ?? 80;
-$websocket = new WebSocket\Server($port);
             
 // create a log channel
-$log = new Logger('relay-' . $websocket->getPort());
+$log = new Logger('relay-' . $port);
 $log->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', Level::Debug));
 $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
+
+$websocket = new class($port, $log) extends WebSocket\Server {
+    
+    public function __construct(int $port, private \Psr\Log\LoggerInterface $log) {
+        parent::__construct($port);
+        $this
+            ->addMiddleware(new \WebSocket\Middleware\CloseHandler())
+            ->addMiddleware(new \WebSocket\Middleware\PingResponder())
+            ->setLogger($log);
+        
+    }
+    
+    public function getOthers(\WebSocket\Connection $from, callable $wrap) {
+        $others = reject($this->getConnections(), fn(\WebSocket\Connection $client) => $client === $from); 
+        return map($others, $wrap);
+    }
+};
 
 $server = new \Transpher\WebSocket\Server($websocket, $log);
         

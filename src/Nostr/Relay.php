@@ -38,10 +38,10 @@ class Relay {
         $type = array_shift($message);
         switch (strtoupper($type)) {
             case 'EVENT': 
-                yield from self::relay($others, $this->events)(...$message);
+                yield from self::relay($others, $this->events, ...$message);
                 break;
             case 'CLOSE': 
-                yield from self::closeSubscription($from)(...$message);
+                yield from self::closeSubscription($from, ...$message);
                 break;
             case 'REQ':
                 if (count($message) < 2) {
@@ -49,7 +49,7 @@ class Relay {
                 } elseif (empty($message[1])) {
                     yield Message::closed($message[0], 'Subscription filters are empty');
                 } else {
-                    yield from self::subscribe($from, $this->events)($message[0], Filters::constructFromPrototype($message[1]));
+                    yield from self::subscribe($from, $this->events, $message[0], Filters::constructFromPrototype($message[1]));
                 }
                 break;
             default: 
@@ -58,30 +58,24 @@ class Relay {
         }
     }
     
-    static function closeSubscription(\WebSocket\Connection $from) : callable {
-        return function(string $subscriptionId) use ($from) {
-            $subscriptions = $from->getMeta('subscriptions')??[];
-            unset($subscriptions[$subscriptionId]);
-            $from->setMeta('subscriptions', $subscriptions);
-            yield Message::closed($subscriptionId);
-        };
+    static function closeSubscription(\WebSocket\Connection $from, string $subscriptionId) {
+        $subscriptions = $from->getMeta('subscriptions')??[];
+        unset($subscriptions[$subscriptionId]);
+        $from->setMeta('subscriptions', $subscriptions);
+        yield Message::closed($subscriptionId);
     }
     
-    static function subscribe(\WebSocket\Connection  $from, array|\ArrayAccess &$events) : callable {
-        return function(string $subscriptionId, callable $subscription) use ($from, &$events) {
-            $subscriptions = $from->getMeta('subscriptions')??[];
-            $subscriptions[$subscriptionId] = $subscription;
-            yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
-            yield Message::eose($subscriptionId);
-            $from->setMeta('subscriptions', $subscriptions);
-        };
+    static function subscribe(\WebSocket\Connection  $from, array|\ArrayAccess &$events, string $subscriptionId, callable $subscription) {
+        $subscriptions = $from->getMeta('subscriptions')??[];
+        $subscriptions[$subscriptionId] = $subscription;
+        yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
+        yield Message::eose($subscriptionId);
+        $from->setMeta('subscriptions', $subscriptions);
     }
     
-    static function relay(array $others, array|\ArrayAccess &$events) : callable {
-        return function(array $event) use (&$events, $others) {
-            $events[] = $event;
-            each($others, fn(callable $other) => $other($event));
-            yield Message::accept($event['id']);
-        };
+    static function relay(array $others, array|\ArrayAccess &$events, array $event) {
+        $events[] = $event;
+        each($others, fn(callable $other) => $other($event));
+        yield Message::accept($event['id']);
     }
 }

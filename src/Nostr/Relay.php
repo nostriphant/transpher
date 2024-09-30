@@ -17,32 +17,33 @@ class Relay {
         \Transpher\Process::start('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Server is running'), $running);
     }
     
-    static function listen(array $message, callable $subscriptions) {
+    static function listen(array $message, callable $relay, callable $close, callable $subscribe) {
         $type = array_shift($message);
-        if (is_callable([self::class, $type]) === false) {
-            yield Message::notice('Message type ' . $type . ' not supported');
-        } else {
-            try {
-                yield from call_user_func([self::class, $type], $subscriptions, ...$message);
-            } catch (\ArgumentCountError $ex) {
-                yield Message::notice('Invalid message');
-            }
+        switch (strtoupper($type)) {
+            case 'EVENT': 
+                yield from $relay(...$message);
+                break;
+            case 'CLOSE': 
+                yield from $close(...$message);
+                break;
+            case 'REQ':
+                if (count($message) < 2) {
+                    yield Message::notice('Invalid message');
+                }
+                yield from $subscribe(array_shift($message), self::req(array_shift($message)??[]));
+                break;
+            default: 
+                yield Message::notice('Message type ' . $type . ' not supported');
+                break;
         }
     }
     
-    static function event(callable $subscriptions, array $event) : \Generator { 
-        yield from $subscriptions();
-    }
     
-    static function close(callable $subscriptions, string $subscriptionId) : \Generator {
-        yield from $subscriptions($subscriptionId);
-    }
-    
-    static function req(callable $subscriptions, string $subscriptionId, array $subscription) : \Generator {
+    static function req(array $subscription) : ?callable {
         if (empty($subscription)) {
-            yield Message::closed($subscriptionId, 'Subscription filters are empty');
+            return null;
         } else {
-            yield from $subscriptions($subscriptionId, Filters::constructFromPrototype($subscription));
+            return Filters::constructFromPrototype($subscription);
         }
     }
     

@@ -50,7 +50,7 @@ describe('relay', function () {
         $alice->start();
     });
 
-    it('replies CLOSED on non-existing filters', function () {
+    it('replies NOTICE Invalid message on non-existing filters', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 

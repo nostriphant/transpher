@@ -32,35 +32,45 @@ class Server {
     }
     
     public function __invoke(Connection $from, callable $reply, array $others, array $payload) {
-        $subscription_handler = fn() => yield from match(func_num_args()) {
-            0 => self::relay($this->events, $others, $payload[1]),
-            1 => self::closeSubscriptions($from, $this->events, func_get_arg(0)),
-            default => self::subscribe($from, $this->events, ...func_get_args())
-        };
-
-        foreach(NServer::listen($payload, $subscription_handler) as $reply_message) {
+        $callbacks = [
+            'relay' => \Transpher\WebSocket\Server::relay($others, $this->events),
+            'close' => \Transpher\WebSocket\Server::closeSubscription($from),
+            'subscribe' => \Transpher\WebSocket\Server::subscribe($from, $this->events)
+        ];
+        
+        foreach(NServer::listen($payload, ...$callbacks) as $reply_message) {
             $reply($reply_message);
         }
     }
     
-    static function closeSubscriptions(Connection $from, array|\ArrayAccess &$events, string $subscriptionId) {
-        $subscriptions = $from->getMeta('subscriptions')??[];
-        unset($subscriptions[$subscriptionId]);
-        $from->setMeta('subscriptions', $subscriptions);
-        yield Message::closed($subscriptionId);
+    static function closeSubscription(Connection $from) : callable {
+        return function(string $subscriptionId) use ($from) {
+            $subscriptions = $from->getMeta('subscriptions')??[];
+            unset($subscriptions[$subscriptionId]);
+            $from->setMeta('subscriptions', $subscriptions);
+            yield Message::closed($subscriptionId);
+        };
     }
     
-    static function subscribe(Connection $from, array|\ArrayAccess &$events, string $subscriptionId, callable $subscription) {
-        $subscriptions = $from->getMeta('subscriptions')??[];
-        $subscriptions[$subscriptionId] = $subscription;
-        yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
-        yield Message::eose($subscriptionId);
-        $from->setMeta('subscriptions', $subscriptions);
+    static function subscribe(Connection $from, array|\ArrayAccess &$events) : callable {
+        return function(string $subscriptionId, ?callable $subscription) use ($from, &$events) {
+            if (is_null($subscription)) {
+                yield Message::closed($subscriptionId, 'Subscription filters are empty');
+            } else {
+                $subscriptions = $from->getMeta('subscriptions')??[];
+                $subscriptions[$subscriptionId] = $subscription;
+                yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
+                yield Message::eose($subscriptionId);
+                $from->setMeta('subscriptions', $subscriptions);
+            }
+        };
     }
     
-    static function relay(array|\ArrayAccess &$events, array $others, array $event) {
-        $events[] = $event;
-        each($others, fn(callable $other) => $other($event));
-        yield Message::accept($event['id']);
+    static function relay(array $others, array|\ArrayAccess &$events) : callable {
+        return function(array $event) use (&$events, $others) {
+            $events[] = $event;
+            each($others, fn(callable $other) => $other($event));
+            yield Message::accept($event['id']);
+        };
     }
 }

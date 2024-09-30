@@ -4,6 +4,7 @@ namespace Transpher\Nostr;
 
 use \Transpher\Nostr\Message;
 use \Transpher\Filters;
+use function \Functional\map, \Functional\each, \Functional\filter;
 
 /**
  * Description of Server
@@ -15,6 +16,61 @@ class Relay {
     static function boot(int $port, array $env, callable $running) : void {
         $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $port];
         \Transpher\Process::start('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Server is running'), $running);
+    }
+    
+    
+    public function __construct(private \Psr\Log\LoggerInterface $log, private array|\ArrayAccess $events) {
+        
+    }
+    
+    static function wrapClient(\WebSocket\Connection $client, string $action, \Psr\Log\LoggerInterface $log) : callable {
+        return function(array ...$messages) use ($client, $action, $log) : bool {
+            foreach ($messages as $message) {
+                $encoded_message = \Transpher\Nostr::encode($message);
+                $log->debug($action . ' message ' . $encoded_message);
+                $client->text($encoded_message);
+            }
+            return true;
+        };
+    }
+    
+    public function __invoke(\WebSocket\Connection  $from, callable $reply, array $others, array $payload) {
+        $callbacks = [
+            'relay' => self::relay($others, $this->events),
+            'close' => self::closeSubscription($from),
+            'subscribe' => self::subscribe($from, $this->events)
+        ];
+        
+        foreach(self::listen($payload, ...$callbacks) as $reply_message) {
+            $reply($reply_message);
+        }
+    }
+    
+    static function closeSubscription(\WebSocket\Connection  $from) : callable {
+        return function(string $subscriptionId) use ($from) {
+            $subscriptions = $from->getMeta('subscriptions')??[];
+            unset($subscriptions[$subscriptionId]);
+            $from->setMeta('subscriptions', $subscriptions);
+            yield Message::closed($subscriptionId);
+        };
+    }
+    
+    static function subscribe(\WebSocket\Connection  $from, array|\ArrayAccess &$events) : callable {
+        return function(string $subscriptionId, callable $subscription) use ($from, &$events) {
+            $subscriptions = $from->getMeta('subscriptions')??[];
+            $subscriptions[$subscriptionId] = $subscription;
+            yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
+            yield Message::eose($subscriptionId);
+            $from->setMeta('subscriptions', $subscriptions);
+        };
+    }
+    
+    static function relay(array $others, array|\ArrayAccess &$events) : callable {
+        return function(array $event) use (&$events, $others) {
+            $events[] = $event;
+            each($others, fn(callable $other) => $other($event));
+            yield Message::accept($event['id']);
+        };
     }
     
     static function listen(array $message, callable $relay, callable $close, callable $subscribe) {
@@ -39,12 +95,5 @@ class Relay {
                 yield Message::notice('Message type ' . $type . ' not supported');
                 break;
         }
-    }
-    
-    static function relay(callable $to, string $subscriptionId) : callable {
-        return fn(array $event) => $to(
-            Message::requestedEvent($subscriptionId, $event),
-            Message::eose($subscriptionId)
-        );
     }
 }

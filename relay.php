@@ -39,12 +39,15 @@ $websocket = new class($port, $log) extends WebSocket\Server {
             $this->log->info('Received message: ' . $message->getPayload());
             $payload = \Transpher\Nostr::decode($message->getPayload());
             
-            $reply = \Transpher\WebSocket\Server::wrapClient($from, 'Reply', $this->log);
+            $reply = \Transpher\Nostr\Relay::wrapClient($from, 'Reply', $this->log);
             $others = $this->getOthers($from, fn(\WebSocket\Connection $client) => fn(array $event) => first(
                 $client->getMeta('subscriptions')??[], 
                 fn(callable $subscription, string $subscriptionId) => if_else(
                     $subscription, 
-                    \Transpher\Nostr\Relay::relay(\Transpher\WebSocket\Server::wrapClient($client, 'Relay', $this->log), $subscriptionId),
+                    fn(array $event) => \Transpher\Nostr\Relay::wrapClient($client, 'Relay', $this->log)(
+                        \Transpher\Nostr\Message::requestedEvent($subscriptionId, $event),
+                        \Transpher\Nostr\Message::eose($subscriptionId)
+                    ),
                     Functional::false
                 )($event)
             ));
@@ -69,6 +72,6 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
     $events = [];
 }
 
-$server = new \Transpher\WebSocket\Server($log, $events);
-$websocket->onJson($server);
+$relay = new \Transpher\Nostr\Relay($log, $events);
+$websocket->onJson($relay);
 $websocket->start();

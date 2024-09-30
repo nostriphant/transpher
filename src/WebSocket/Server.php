@@ -37,12 +37,9 @@ class Server {
 
         $relay_event_to_subscribers = self::eventRelayer($this->events, $others);
 
-        $subscription_handler = function() use (&$events, $relay_event_to_subscribers, $edit_subscriptions) {
-            if (func_num_args() === 1) {
-                $relay_event_to_subscribers(func_get_arg(0));
-            } else {
-                yield from $edit_subscriptions($this->events, ...func_get_args());
-            }
+        $subscription_handler = fn() => yield from match(func_num_args()) {
+            1 => $relay_event_to_subscribers(func_get_arg(0)),
+            default => $edit_subscriptions($this->events, ...func_get_args())
         };
 
         foreach(NServer::listen($payload, $subscription_handler) as $reply_message) {
@@ -65,9 +62,10 @@ class Server {
     }
     
     static function eventRelayer(array|\ArrayAccess &$events, array $others) {
-        return function(array $event) use (&$events, $others) : void {
+        return function(array $event) use (&$events, $others) : array {
             $events[] = $event;
             each($others, fn(callable $other) => $other($event));
+            return [];
         };
     }
 }

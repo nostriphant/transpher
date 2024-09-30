@@ -31,9 +31,17 @@ $websocket = new class($port, $log) extends WebSocket\Server {
         $others = reject($this->getConnections(), fn(\WebSocket\Connection $client) => $client === $from); 
         return map($others, $wrap);
     }
+    
+    public function onJson(callable $callback) {
+        $this->onText(function (\WebSocket\Server $server, \WebSocket\Connection $from, \WebSocket\Message\Message $message) use ($callback) {
+            $this->log->info('Received message: ' . $message->getPayload());
+            $payload = \Transpher\Nostr::decode($message->getPayload());
+            
+            $callback($from, $payload);
+        });
+    }
 };
 
-$server = new \Transpher\WebSocket\Server($websocket, $log);
         
 if (isset($_SERVER['TRANSPHER_STORE']) === false) {
     $log->info('Using memory to save messages.');
@@ -49,4 +57,5 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
     $events = [];
 }
 
-$server->start($events, $log);
+$server = new \Transpher\WebSocket\Server($websocket, $log, $events);
+$server->start();

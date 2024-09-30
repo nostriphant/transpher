@@ -18,25 +18,8 @@ use function \Functional\first, \Functional\each, \Functional\if_else, \Function
  */
 class Server {
     
-    public function __construct(private WSServer $server, private \Psr\Log\LoggerInterface $log) {}
-    
-    private function wrapClient(Connection $client, string $action) : callable {
-        return function(array ...$messages) use ($client, $action) : bool {
-            foreach ($messages as $message) {
-                $encoded_message = Nostr::encode($message);
-                $this->log->debug($action . ' message ' . $encoded_message);
-                $client->text($encoded_message);
-            }
-            return true;
-        };
-    }
-    
-    public function start(array|\ArrayAccess $events) {
-        $this->server->onText(function (WSServer $server, Connection $from, \WebSocket\Message\Message $message) use (&$events) {
-            $this->log->info('Received message: ' . $message->getPayload());
-
-            $payload = json_decode($message->getPayload(), true);
-
+    public function __construct(private WSServer $server, private \Psr\Log\LoggerInterface $log, array|\ArrayAccess $events) {
+        $this->server->onJson(function(Connection $from, array $payload) use ($log, &$events) {
             $edit_subscriptions = self::subscriptionEditor($events, $from);
            
             $others = $this->server->getOthers($from, fn(Connection $client) => fn(array $event) => first(
@@ -62,6 +45,20 @@ class Server {
                 $reply($reply_message);
             }
         });
+    }
+    
+    private function wrapClient(Connection $client, string $action) : callable {
+        return function(array ...$messages) use ($client, $action) : bool {
+            foreach ($messages as $message) {
+                $encoded_message = Nostr::encode($message);
+                $this->log->debug($action . ' message ' . $encoded_message);
+                $client->text($encoded_message);
+            }
+            return true;
+        };
+    }
+    
+    public function start() {
         $this->server->start();
     }
     

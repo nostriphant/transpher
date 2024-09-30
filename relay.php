@@ -52,7 +52,11 @@ $websocket = new class($port, $log) extends WebSocket\Server {
                 )($event)
             ));
             
-            $callback($from, $reply, $others, $payload);
+            
+        
+            foreach($callback($from, $others, $payload) as $reply_message) {
+                $reply($reply_message);
+            }
         });
     }
 };

@@ -34,19 +34,31 @@ class Relay {
         };
     }
     
-    public function __invoke(\WebSocket\Connection  $from, callable $reply, array $others, array $payload) {
-        $callbacks = [
-            'relay' => self::relay($others, $this->events),
-            'close' => self::closeSubscription($from),
-            'subscribe' => self::subscribe($from, $this->events)
-        ];
-        
-        foreach(self::listen($payload, ...$callbacks) as $reply_message) {
-            $reply($reply_message);
+    public function __invoke(\WebSocket\Connection $from, array $others, array $message) {
+        $type = array_shift($message);
+        switch (strtoupper($type)) {
+            case 'EVENT': 
+                yield from self::relay($others, $this->events)(...$message);
+                break;
+            case 'CLOSE': 
+                yield from self::closeSubscription($from)(...$message);
+                break;
+            case 'REQ':
+                if (count($message) < 2) {
+                    yield Message::notice('Invalid message');
+                } elseif (empty($message[1])) {
+                    yield Message::closed($message[0], 'Subscription filters are empty');
+                } else {
+                    yield from self::subscribe($from, $this->events)($message[0], Filters::constructFromPrototype($message[1]));
+                }
+                break;
+            default: 
+                yield Message::notice('Message type ' . $type . ' not supported');
+                break;
         }
     }
     
-    static function closeSubscription(\WebSocket\Connection  $from) : callable {
+    static function closeSubscription(\WebSocket\Connection $from) : callable {
         return function(string $subscriptionId) use ($from) {
             $subscriptions = $from->getMeta('subscriptions')??[];
             unset($subscriptions[$subscriptionId]);
@@ -71,29 +83,5 @@ class Relay {
             each($others, fn(callable $other) => $other($event));
             yield Message::accept($event['id']);
         };
-    }
-    
-    static function listen(array $message, callable $relay, callable $close, callable $subscribe) {
-        $type = array_shift($message);
-        switch (strtoupper($type)) {
-            case 'EVENT': 
-                yield from $relay(...$message);
-                break;
-            case 'CLOSE': 
-                yield from $close(...$message);
-                break;
-            case 'REQ':
-                if (count($message) < 2) {
-                    yield Message::notice('Invalid message');
-                } elseif (empty($message[1])) {
-                    yield Message::closed($message[0], 'Subscription filters are empty');
-                } else {
-                    yield from $subscribe($message[0], Filters::constructFromPrototype($message[1]));
-                }
-                break;
-            default: 
-                yield Message::notice('Message type ' . $type . ' not supported');
-                break;
-        }
     }
 }

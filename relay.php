@@ -51,10 +51,15 @@ $websocket = new class($port, $log) extends WebSocket\Server {
                     Functional::false
                 )($event)
             ));
-            
+            $subscriptions = function(?array $subscriptions = null) use ($from) : array {
+                if (isset($subscriptions)) {
+                    $from->setMeta('subscriptions', $subscriptions);
+                }
+                return $from->getMeta('subscriptions')??[];
+            };
             
         
-            foreach($callback($from, $others, $payload) as $reply_message) {
+            foreach($callback($subscriptions, $others, $payload) as $reply_message) {
                 $reply($reply_message);
             }
         });

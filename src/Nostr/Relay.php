@@ -34,14 +34,7 @@ class Relay {
         };
     }
     
-    public function __invoke(\WebSocket\Connection $from, array $others, array $message) : \Generator {
-        $subscriptions = function(?array $subscriptions = null) use ($from) : array {
-            if (isset($subscriptions)) {
-                $from->setMeta('subscriptions', $subscriptions);
-            }
-            return $from->getMeta('subscriptions')??[];
-        };
-        
+    public function __invoke(callable $subscriptions, array $others, array $message) : \Generator {
         $type = array_shift($message);
         switch (strtoupper($type)) {
             case 'EVENT': 

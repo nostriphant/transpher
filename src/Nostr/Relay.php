@@ -31,13 +31,11 @@ class Relay {
     }
     
     static function event(callable $subscriptions, array $event) : \Generator { 
-        yield from $subscriptions($event);
-        yield Message::accept($event['id']);
+        yield from $subscriptions();
     }
     
     static function close(callable $subscriptions, string $subscriptionId) : \Generator {
-        yield from $subscriptions($subscriptionId, null);
-        yield Message::closed($subscriptionId);
+        yield from $subscriptions($subscriptionId);
     }
     
     static function req(callable $subscriptions, string $subscriptionId, array $subscription) : \Generator {
@@ -45,7 +43,6 @@ class Relay {
             yield Message::closed($subscriptionId, 'Subscription filters are empty');
         } else {
             yield from $subscriptions($subscriptionId, Filters::constructFromPrototype($subscription));
-            yield Message::eose($subscriptionId);
         }
     }
     

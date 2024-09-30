@@ -34,7 +34,7 @@ $websocket = new class($port, $log) extends WebSocket\Server {
             $client->getMeta('subscriptions')??[], 
             fn(callable $subscription, string $subscriptionId) => if_else(
                 $subscription, 
-                fn(array $event) => \Transpher\Nostr\Relay::wrapClient($client, 'Relay', $this->log)(
+                fn(array $event) => $this->wrapClient($client, 'Relay')(
                     \Transpher\Nostr\Message::requestedEvent($subscriptionId, $event),
                     \Transpher\Nostr\Message::eose($subscriptionId)
                 ),
@@ -43,12 +43,22 @@ $websocket = new class($port, $log) extends WebSocket\Server {
         ));
     }
     
+    private function wrapClient(\WebSocket\Connection $client, string $action) : callable {
+        return function(array ...$messages) use ($client, $action) : bool {
+            foreach ($messages as $message) {
+                $encoded_message = \Transpher\Nostr::encode($message);
+                $this->log->debug($action . ' message ' . $encoded_message);
+                $client->text($encoded_message);
+            }
+            return true;
+        };
+    }
+    
     public function onJson(callable $callback) {
         $this->onText(function (\WebSocket\Server $server, \WebSocket\Connection $from, \WebSocket\Message\Message $message) use ($callback) {
             $this->log->info('Received message: ' . $message->getPayload());
             $payload = \Transpher\Nostr::decode($message->getPayload());
             
-            $reply = \Transpher\Nostr\Relay::wrapClient($from, 'Reply', $this->log);
             $others = $this->wrapOthers(reject($this->getConnections(), fn(\WebSocket\Connection $client) => $client === $from));
             $subscriptions = function(?array $subscriptions = null) use ($from) : array {
                 if (isset($subscriptions)) {
@@ -57,6 +67,7 @@ $websocket = new class($port, $log) extends WebSocket\Server {
                 return $from->getMeta('subscriptions')??[];
             };
             
+            $reply = $this->wrapClient($from, 'Reply');
             foreach($callback($subscriptions, $others, $payload) as $reply_message) {
                 $reply($reply_message);
             }
@@ -79,6 +90,6 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
     $events = [];
 }
 
-$relay = new \Transpher\Nostr\Relay($log, $events);
+$relay = new \Transpher\Nostr\Relay($events);
 $websocket->onJson($relay);
 $websocket->start();

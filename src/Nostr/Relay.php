@@ -19,19 +19,8 @@ class Relay {
     }
     
     
-    public function __construct(private \Psr\Log\LoggerInterface $log, private array|\ArrayAccess $events) {
+    public function __construct(private array|\ArrayAccess $events) {
         
-    }
-    
-    static function wrapClient(\WebSocket\Connection $client, string $action, \Psr\Log\LoggerInterface $log) : callable {
-        return function(array ...$messages) use ($client, $action, $log) : bool {
-            foreach ($messages as $message) {
-                $encoded_message = \Transpher\Nostr::encode($message);
-                $log->debug($action . ' message ' . $encoded_message);
-                $client->text($encoded_message);
-            }
-            return true;
-        };
     }
     
     public function __invoke(callable $subscriptions, array $others, array $message) : \Generator {

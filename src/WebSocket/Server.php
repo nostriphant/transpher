@@ -17,25 +17,8 @@ use function \Functional\each, \Functional\map, \Functional\filter;
  */
 class Server {
     
-    public function __construct(callable $onjson, private \Psr\Log\LoggerInterface $log, array|\ArrayAccess $events) {
-        $onjson(function(Connection $from, array $others, array $payload) use (&$events) {
-            $edit_subscriptions = self::subscriptionEditor($from);
-           
-            $relay_event_to_subscribers = self::eventRelayer($events, $others);
-
-            $subscription_handler = function() use (&$events, $relay_event_to_subscribers, $edit_subscriptions) {
-                if (func_num_args() === 1) {
-                    $relay_event_to_subscribers(func_get_arg(0));
-                } else {
-                    yield from $edit_subscriptions($events, ...func_get_args());
-                }
-            };
-
-            $reply = self::wrapClient($from, 'Reply', $this->log);
-            foreach(NServer::listen($payload, $subscription_handler) as $reply_message) {
-                $reply($reply_message);
-            }
-        });
+    public function __construct(private \Psr\Log\LoggerInterface $log, private array|\ArrayAccess $events) {
+        
     }
     
     static function wrapClient(Connection $client, string $action, \Psr\Log\LoggerInterface $log) : callable {
@@ -47,6 +30,24 @@ class Server {
             }
             return true;
         };
+    }
+    
+    public function __invoke(Connection $from, callable $reply, array $others, array $payload) {
+        $edit_subscriptions = self::subscriptionEditor($from);
+
+        $relay_event_to_subscribers = self::eventRelayer($this->events, $others);
+
+        $subscription_handler = function() use (&$events, $relay_event_to_subscribers, $edit_subscriptions) {
+            if (func_num_args() === 1) {
+                $relay_event_to_subscribers(func_get_arg(0));
+            } else {
+                yield from $edit_subscriptions($this->events, ...func_get_args());
+            }
+        };
+
+        foreach(NServer::listen($payload, $subscription_handler) as $reply_message) {
+            $reply($reply_message);
+        }
     }
     
     

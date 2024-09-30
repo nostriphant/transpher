@@ -39,6 +39,7 @@ $websocket = new class($port, $log) extends WebSocket\Server {
             $this->log->info('Received message: ' . $message->getPayload());
             $payload = \Transpher\Nostr::decode($message->getPayload());
             
+            $reply = \Transpher\WebSocket\Server::wrapClient($from, 'Reply', $this->log);
             $others = $this->getOthers($from, fn(\WebSocket\Connection $client) => fn(array $event) => first(
                 $client->getMeta('subscriptions')??[], 
                 fn(callable $subscription, string $subscriptionId) => if_else(
@@ -48,7 +49,7 @@ $websocket = new class($port, $log) extends WebSocket\Server {
                 )($event)
             ));
             
-            $callback($from, $others, $payload);
+            $callback($from, $reply, $others, $payload);
         });
     }
 };
@@ -68,6 +69,6 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
     $events = [];
 }
 
-$server = new \Transpher\WebSocket\Server([$websocket, 'onJson'], $log, $events);
-
+$server = new \Transpher\WebSocket\Server($log, $events);
+$websocket->onJson($server);
 $websocket->start();

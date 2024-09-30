@@ -68,5 +68,6 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
     $events = [];
 }
 
-$server = new \Transpher\WebSocket\Server($websocket, $log, $events);
-$server->start();
+$server = new \Transpher\WebSocket\Server([$websocket, 'onJson'], $log, $events);
+
+$websocket->start();

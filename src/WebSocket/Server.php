@@ -4,7 +4,6 @@
 namespace Transpher\WebSocket;
 
 use Transpher\Nostr;
-use Functional\Functional;
 use WebSocket\Server as WSServer;
 use Transpher\Nostr\Relay as NServer;
 use WebSocket\Connection;
@@ -18,8 +17,8 @@ use function \Functional\each, \Functional\map, \Functional\filter;
  */
 class Server {
     
-    public function __construct(private WSServer $server, private \Psr\Log\LoggerInterface $log, array|\ArrayAccess $events) {
-        $this->server->onJson(function(Connection $from, array $others, array $payload) use ($log, &$events) {
+    public function __construct(callable $onjson, private \Psr\Log\LoggerInterface $log, array|\ArrayAccess $events) {
+        $onjson(function(Connection $from, array $others, array $payload) use (&$events) {
             $edit_subscriptions = self::subscriptionEditor($from);
            
             $relay_event_to_subscribers = self::eventRelayer($events, $others);
@@ -50,9 +49,6 @@ class Server {
         };
     }
     
-    public function start() {
-        $this->server->start();
-    }
     
     static function subscriptionEditor(Connection $from) {
         return function(array|\ArrayAccess &$events, string $subscriptionId, ?callable $subscription) use ($from) {

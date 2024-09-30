@@ -26,7 +26,7 @@ class Server {
                 $client->getMeta('subscriptions')??[], 
                 fn(callable $subscription, string $subscriptionId) => if_else(
                     $subscription, 
-                    NServer::relay($this->wrapClient($client, 'Relay'), $subscriptionId),
+                    NServer::relay(self::wrapClient($client, 'Relay', $this->log), $subscriptionId),
                     Functional::false
                 )($event)
             ));
@@ -40,18 +40,18 @@ class Server {
                 }
             };
 
-            $reply = $this->wrapClient($from, 'Reply');
+            $reply = self::wrapClient($from, 'Reply', $this->log);
             foreach(NServer::listen($payload, $subscription_handler) as $reply_message) {
                 $reply($reply_message);
             }
         });
     }
     
-    private function wrapClient(Connection $client, string $action) : callable {
-        return function(array ...$messages) use ($client, $action) : bool {
+    static function wrapClient(Connection $client, string $action, \Psr\Log\LoggerInterface $log) : callable {
+        return function(array ...$messages) use ($client, $action, $log) : bool {
             foreach ($messages as $message) {
                 $encoded_message = Nostr::encode($message);
-                $this->log->debug($action . ' message ' . $encoded_message);
+                $log->debug($action . ' message ' . $encoded_message);
                 $client->text($encoded_message);
             }
             return true;

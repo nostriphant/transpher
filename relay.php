@@ -76,11 +76,13 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
         };
     }
     
-    private function subscriptions(string $clientId, ?array $subscriptions = null) : array {
-        if (isset($subscriptions)) {
-            $this->subscriptions[$clientId] = $subscriptions;
-        }
-        return $this->subscriptions[$clientId]??[];
+    private function subscriptions(string $clientId) : callable {
+        return function(?array $subscriptions = null) use ($clientId) { 
+            if (isset($subscriptions)) {
+                $this->subscriptions[$clientId] = $subscriptions;
+            }
+            return $this->subscriptions[$clientId]??[];
+        };
     }
     
     #[\Override]
@@ -97,7 +99,7 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
             $this->log->info('Received message: ' . $payload);
             $payload = \Transpher\Nostr::decode($payload);
 
-            $subscriptions = fn(?array $subscriptions = null) => $this->subscriptions($client->getId(), $subscriptions);
+            $subscriptions = $this->subscriptions($client->getId());
 
             $unsubscribe = function(string $subscriptionId) use ($subscriptions) {
                 $client_subscriptions = $subscriptions();
@@ -119,7 +121,7 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
             };
             
             $relay = function(array $event) : array {
-                return select($this->gateway->getClients(), fn(WebsocketClient $pos_receiver) => first($this->subscriptions($pos_receiver->getId()), fn(callable $subscription, string $subscriptionId) => $subscription($event)));
+                return select($this->gateway->getClients(), fn(WebsocketClient $pos_receiver) => first($this->subscriptions($pos_receiver->getId())(), fn(callable $subscription, string $subscriptionId) => $subscription($event)));
             };
             
             $reply = $this->wrapClient($client, 'Reply');

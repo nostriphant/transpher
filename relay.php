@@ -64,12 +64,6 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
         private readonly WebsocketGateway $gateway = new WebsocketClientGateway()
     ) {
     }
-    
-    public function wrapOthers(WebsocketGateway $gateway) {
-        return function(array $event) use ($gateway) : array {
-            return select($gateway->getClients(), fn(WebsocketClient $pos_receiver) => first($this->subscriptions($pos_receiver->getId()), fn(callable $subscription, string $subscriptionId) => $subscription($event)));
-        };
-    }
 
     private function wrapClient(WebsocketClient $client, string $action) : callable {
         return function(array ...$messages) use ($client, $action) : bool {
@@ -124,8 +118,12 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
                 $subscriptions($client_subscriptions);
             };
             
+            $relay = function(array $event) : array {
+                return select($this->gateway->getClients(), fn(WebsocketClient $pos_receiver) => first($this->subscriptions($pos_receiver->getId()), fn(callable $subscription, string $subscriptionId) => $subscription($event)));
+            };
+            
             $reply = $this->wrapClient($client, 'Reply');
-            foreach(($this->relay)($this->wrapOthers($this->gateway), $unsubscribe, $subscribe, $payload) as $reply_message) {
+            foreach(($this->relay)($relay, $unsubscribe, $subscribe, $payload) as $reply_message) {
                 $reply($reply_message);
             }
         }

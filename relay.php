@@ -67,7 +67,7 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
     
     public function wrapOthers(WebsocketGateway $gateway) {
         return function(array $event) use ($gateway) : array {
-            return select($gateway->getClients(), fn(WebsocketClient $pos_receiver) => first($this->subscriptions($pos_receiver->getId()), fn(callable $subscription, string $subscriptionId) => $subscription($pos_receiver, $event)));
+            return select($gateway->getClients(), fn(WebsocketClient $pos_receiver) => first($this->subscriptions($pos_receiver->getId()), fn(callable $subscription, string $subscriptionId) => $subscription($event)));
         };
     }
 
@@ -105,8 +105,21 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
 
             $subscriptions = fn(?array $subscriptions = null) => $this->subscriptions($client->getId(), $subscriptions);
 
+            $subscribe = function(string $subscriptionId, callable $subscription) use ($client, $subscriptions) {
+                $client_subscriptions = $subscriptions();
+                $client_subscriptions[$subscriptionId] = function(array $event) use ($client, $subscriptionId, $subscription) {
+                    if ($subscription($event)) {
+                        $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event)));
+                        $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
+                        return true;
+                    }
+                    return false;
+                };
+                $subscriptions($client_subscriptions);
+            };
+            
             $reply = $this->wrapClient($client, 'Reply');
-            foreach(($this->relay)($subscriptions, $this->wrapOthers($this->gateway), $payload) as $reply_message) {
+            foreach(($this->relay)($subscriptions, $this->wrapOthers($this->gateway), $subscribe, $payload) as $reply_message) {
                 $reply($reply_message);
             }
         }

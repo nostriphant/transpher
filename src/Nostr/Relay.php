@@ -23,11 +23,11 @@ class Relay {
         
     }
     
-    public function __invoke(callable $subscriptions, callable $others, array $message) : \Generator {
+    public function __invoke(callable $subscriptions, callable $relay, callable $subscribe, array $message) : \Generator {
         $type = array_shift($message);
         switch (strtoupper($type)) {
             case 'EVENT': 
-                yield from self::relay($others, $this->events, ...$message);
+                yield from self::relay($relay, $this->events, ...$message);
                 break;
             case 'CLOSE': 
                 yield from self::closeSubscription($subscriptions, ...$message);
@@ -38,7 +38,7 @@ class Relay {
                 } elseif (empty($message[1])) {
                     yield Message::closed($message[0], 'Subscription filters are empty');
                 } else {
-                    yield from self::subscribe($subscriptions, $this->events, $message[0], Filters::constructFromPrototype($message[1]));
+                    yield from self::subscribe($subscribe, $this->events, $message[0], Filters::constructFromPrototype($message[1]));
                 }
                 break;
             default: 
@@ -54,25 +54,16 @@ class Relay {
         yield Message::closed($subscriptionId);
     }
     
-    static function subscribe(callable $client_subscriptions, array|\ArrayAccess &$events, string $subscriptionId, callable $subscription) {
-        $subscriptions = $client_subscriptions();
-        $subscriptions[$subscriptionId] = function(\Amp\Websocket\WebsocketClient $client, array $event) use ($subscriptionId, $subscription) {
-            if ($subscription($event)) {
-                $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event)));
-                $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
-                return true;
-            }
-            return false;
-        };
-        $client_subscriptions($subscriptions);
+    static function subscribe(callable $subscribe, array|\ArrayAccess &$events, string $subscriptionId, callable $subscription) {
+        $subscribe($subscriptionId, $subscription);
         
         yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
         yield Message::eose($subscriptionId);
     }
     
-    static function relay(callable $others, array|\ArrayAccess &$events, array $event) {
+    static function relay(callable $relay, array|\ArrayAccess &$events, array $event) {
         $events[] = $event;
-        $others($event);
+        $relay($event);
         yield Message::accept($event['id']);
     }
 }

@@ -23,14 +23,14 @@ class Relay {
         
     }
     
-    public function __invoke(callable $subscriptions, callable $relay, callable $subscribe, array $message) : \Generator {
+    public function __invoke(callable $relay, callable $unsubscribe, callable $subscribe, array $message) : \Generator {
         $type = array_shift($message);
         switch (strtoupper($type)) {
             case 'EVENT': 
                 yield from self::relay($relay, $this->events, ...$message);
                 break;
             case 'CLOSE': 
-                yield from self::closeSubscription($subscriptions, ...$message);
+                yield from self::closeSubscription($unsubscribe, ...$message);
                 break;
             case 'REQ':
                 if (count($message) < 2) {
@@ -47,10 +47,8 @@ class Relay {
         }
     }
     
-    static function closeSubscription(callable $client_subscriptions, string $subscriptionId) {
-        $subscriptions = $client_subscriptions();
-        unset($subscriptions[$subscriptionId]);
-        $client_subscriptions($subscriptions);
+    static function closeSubscription(callable $unsubscribe, string $subscriptionId) {
+        $unsubscribe($subscriptionId);
         yield Message::closed($subscriptionId);
     }
     

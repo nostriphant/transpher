@@ -105,6 +105,12 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
 
             $subscriptions = fn(?array $subscriptions = null) => $this->subscriptions($client->getId(), $subscriptions);
 
+            $unsubscribe = function(string $subscriptionId) use ($subscriptions) {
+                $client_subscriptions = $subscriptions();
+                unset($client_subscriptions[$subscriptionId]);
+                $subscriptions($client_subscriptions);
+            };
+            
             $subscribe = function(string $subscriptionId, callable $subscription) use ($client, $subscriptions) {
                 $client_subscriptions = $subscriptions();
                 $client_subscriptions[$subscriptionId] = function(array $event) use ($client, $subscriptionId, $subscription) {
@@ -119,7 +125,7 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
             };
             
             $reply = $this->wrapClient($client, 'Reply');
-            foreach(($this->relay)($subscriptions, $this->wrapOthers($this->gateway), $subscribe, $payload) as $reply_message) {
+            foreach(($this->relay)($this->wrapOthers($this->gateway), $unsubscribe, $subscribe, $payload) as $reply_message) {
                 $reply($reply_message);
             }
         }

@@ -17,10 +17,15 @@ describe('agent', function () : void {
             function (callable $agent) use ($alice_key) : void {
                 $alice = \TranspherTests\Client::client(8085);
                 $subscription = Message::subscribe();
+                expect($subscription)->toBeCallable();
                 
                 $request = Message::filter($subscription, tags: [['#p' => [$alice_key(Key::public())]]])();
                 $alice->expectNostrPrivateDirectMessage($subscription()[1], $alice_key, 'Hello, I am your agent! The URL of your relay is ws://127.0.0.1:8085');
                 $alice->json($request);
+                expect($request[2])->toBeArray();
+                expect($request[2][0])->toBeArray();
+                expect($request[2][0]['#p'])->toContain($alice_key(Key::public()));
+                
                 $alice->start();
                 
                 $agent();

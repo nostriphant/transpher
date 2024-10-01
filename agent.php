@@ -31,11 +31,11 @@ $hostname = '0.0.0.0:'.$http_port;
         $agent_key = Key::fromBech32($_SERVER['AGENT_NSEC']);
         $log->info('Running agent with public key ' . $agent_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)));
 
-        $agent = new \Transpher\WebSocket\Client(new WebSocket\Client($relay_url), $log);
+        $log->info('Client connecting to ' . $relay_url);
+        $agent = new \Transpher\WebSocket\Client($relay_url);
         $log->info('Sending Private Direct Message event');
         $note = Message::privateDirect($agent_key);
         $agent->json($note(Key::convertBech32ToHex($_SERVER['RELAY_OWNER_NPUB']), 'Hello, I am your agent! The URL of your relay is ' . $relay_url));
-        $agent->start();
     });
 });
 echo 'Done';

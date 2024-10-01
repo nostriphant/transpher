@@ -21,14 +21,6 @@ afterAll(function() use (&$main_relay) {
 
 describe('relay', function () {
     
-    it('accepts clients', function () {
-        $alice = Client::generic_client();
-        $bob = Client::generic_client();
-
-        expect($alice->connect())->toBeTrue();
-        expect($bob->connect())->toBeTrue();
-    });
-
     it('responds with OK on simple events', function () {
         $alice = Client::generic_client();
 
@@ -256,12 +248,9 @@ describe('relay', function () {
         $subscription = Message::subscribe();
 
         $bob->expectNostrEose($subscription()[1]);
-
         $request = Message::filter($subscription, authors: [$key_alice(Key::public())])();
         $bob->json($request);
         $bob->start();
-        $bob->expectNostrEvent($subscription()[1], 'Relayable Hello worlda!');
-        $bob->expectNostrEose($subscription()[1]);
 
         $note1 = Message::event(1, 'Relayable Hello worlda!');
         $alice->sendSignedMessage($note1($key_alice));
@@ -269,8 +258,8 @@ describe('relay', function () {
         $note2 = Message::event(1, 'Hello worldi!');
         $alice->sendSignedMessage($note2(Key::generate()));
 
-        $bob->start(function () {
-
-        });
+        $bob->expectNostrEvent($subscription()[1], 'Relayable Hello worlda!');
+        $bob->expectNostrEose($subscription()[1]);
+        $bob->start();
     });
 });

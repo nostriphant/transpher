@@ -23,7 +23,7 @@ class Relay {
         
     }
     
-    public function __invoke(callable $subscriptions, array $others, array $message) : \Generator {
+    public function __invoke(callable $subscriptions, callable $others, array $message) : \Generator {
         $type = array_shift($message);
         switch (strtoupper($type)) {
             case 'EVENT': 
@@ -56,16 +56,23 @@ class Relay {
     
     static function subscribe(callable $client_subscriptions, array|\ArrayAccess &$events, string $subscriptionId, callable $subscription) {
         $subscriptions = $client_subscriptions();
-        $subscriptions[$subscriptionId] = $subscription;
+        $subscriptions[$subscriptionId] = function(\Amp\Websocket\WebsocketClient $client, array $event) use ($subscriptionId, $subscription) {
+            if ($subscription($event)) {
+                $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event)));
+                $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
+                return true;
+            }
+            return false;
+        };
         $client_subscriptions($subscriptions);
         
         yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
         yield Message::eose($subscriptionId);
     }
     
-    static function relay(array $others, array|\ArrayAccess &$events, array $event) {
+    static function relay(callable $others, array|\ArrayAccess &$events, array $event) {
         $events[] = $event;
-        each($others, fn(callable $other) => $other($event));
+        $others($event);
         yield Message::accept($event['id']);
     }
 }

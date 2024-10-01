@@ -3,9 +3,9 @@
 namespace Transpher\WebSocket;
 
 use Transpher\Nostr;
-use WebSocket\Middleware\CloseHandler;
-use WebSocket\Middleware\PingResponder;
-use WebSocket\Middleware\PingInterval;
+use Amp\Websocket\Client\WebsocketHandshake;
+use Amp\Websocket\WebsocketCloseCode;
+use function Amp\Websocket\Client\connect;
 
 
 /**
@@ -14,32 +14,39 @@ use WebSocket\Middleware\PingInterval;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 class Client {
+
+    private bool $listening = false;
     
-    public function __construct(private \WebSocket\Client $client, private \Psr\Log\LoggerInterface $logger) {
-        $this->client->setLogger($this->logger);
-        $this->client
-            ->addMiddleware(new CloseHandler())
-            ->addMiddleware(new PingResponder())
-            ->addMiddleware(new PingInterval(interval: 30));
+    public function __construct(private string $url) {
+        $this->onJson(fn() => null);
+        $handshake = (new WebsocketHandshake($this->url));
+        $this->connection = connect($handshake);
     }
     
-    public function json(mixed $json) {
-        $this->client->text(Nostr::encode($json));
+    public function json(mixed $json) : void {
+        $this->connection->sendText(Nostr::encode($json));
     }
     public function onJson(callable $callback) {
-        $this->client->onText(function(...$args) use ($callback) {
-            $message = array_pop($args);
-            $this->logger->info('Received ' . $message->getContent());
-            $callback($args[0], $args[1], json_decode($message->getContent(), true));
-        });
+        $this->onjson_callback = $callback;
     }
 
-    public function connect() : bool {
-        $this->client->connect();
-        return $this->client->isConnected();
+    private \Amp\Websocket\Client\WebsocketConnection $connection;
+    private \Closure $onjson_callback;
+    
+    public function receive() : ?\Amp\Websocket\WebsocketMessage {
+        return $this->connection->receive();
     }
     
-    public function __call(string $name, array $arguments): mixed {
-        return $this->client->{$name}(...$arguments);
+    
+    public function start() : void {
+        $this->listening = true;
+        while ($this->listening && ($message = $this->receive())) {
+            $payload = $message->buffer();
+            ($this->onjson_callback)([$this, 'ignore'], Nostr::decode($payload));
+        }
+    }
+    
+    public function ignore() : void {
+        $this->listening = false;
     }
 }

@@ -18,8 +18,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use function Amp\trapSignal;
-use Functional\Functional;
-use function \Functional\first, \Functional\reject, \Functional\if_else, \Functional\map;
+use function \Functional\select, \Functional\first;
 
 $port = $_SERVER['argv'][1] ?? 80;
 
@@ -66,25 +65,17 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
     ) {
     }
     
-    public function wrapOthers(array $others) {
-        return map($others, fn(WebsocketClient $client) => fn(array $event) => first(
-            $this->subscriptions($client->getId()), 
-            fn(callable $subscription, string $subscriptionId) => if_else(
-                $subscription, 
-                fn(array $event) => $this->wrapClient($client, 'Relay')(
-                    \Transpher\Nostr\Message::requestedEvent($subscriptionId, $event),
-                    \Transpher\Nostr\Message::eose($subscriptionId)
-                ),
-                Functional::false
-            )($event)
-        ));
+    public function wrapOthers(WebsocketGateway $gateway) {
+        return function(array $event) use ($gateway) : array {
+            return select($gateway->getClients(), fn(WebsocketClient $pos_receiver) => first($this->subscriptions($pos_receiver->getId()), fn(callable $subscription, string $subscriptionId) => $subscription($pos_receiver, $event)));
+        };
     }
 
     private function wrapClient(WebsocketClient $client, string $action) : callable {
         return function(array ...$messages) use ($client, $action) : bool {
             foreach ($messages as $message) {
                 $encoded_message = \Transpher\Nostr::encode($message);
-                $this->log->debug($action . ' message ' . $encoded_message);
+                $this->log->info($action . ' message ' . $encoded_message);
                 $client->sendText($encoded_message);
             }
             return true;
@@ -104,7 +95,6 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
         Request $request,
         Response $response,
     ): void {
-        $others = $this->wrapOthers($this->gateway->getClients());
         $this->gateway->addClient($client);
 
         /* \Amp\Websocket\WebsocketMessage $message */
@@ -116,7 +106,7 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
             $subscriptions = fn(?array $subscriptions = null) => $this->subscriptions($client->getId(), $subscriptions);
 
             $reply = $this->wrapClient($client, 'Reply');
-            foreach(($this->relay)($subscriptions, $others, $payload) as $reply_message) {
+            foreach(($this->relay)($subscriptions, $this->wrapOthers($this->gateway), $payload) as $reply_message) {
                 $reply($reply_message);
             }
         }

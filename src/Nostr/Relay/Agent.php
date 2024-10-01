@@ -10,6 +10,6 @@ namespace Transpher\Nostr\Relay;
 class Agent {
     static function boot(int $port, array $env, callable $running) {
         $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'agent.php', $port];
-        \Transpher\Process::start('agent-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Client connected to ws://127.0.0.1:' . $port+1), $running);
+        \Transpher\Process::start('agent-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Client connecting to ws://127.0.0.1'), $running);
     }
 }

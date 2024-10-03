@@ -18,10 +18,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use function Amp\trapSignal;
-use function \Functional\each;
 use Transpher\Nostr\Relay\Subscriptions;
-use Transpher\Nostr\Relay\Subscriptions\Unsubscribe;
-use Transpher\Nostr\Relay\Subscriptions\Subscribe;
 
 $port = $_SERVER['argv'][1] ?? 80;
 

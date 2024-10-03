@@ -27,10 +27,6 @@ readonly class Process {
         }
     }
     
-    public function __destruct() {
-        $this();
-    }
-    
     public function __invoke(int $signal = 15) : array {
         if ($this->process === false) {
             return [];
@@ -47,11 +43,6 @@ readonly class Process {
 
         proc_close($this->process);
         return $status;
-    }
-    
-    static function start(string $process_id, array $cmd, array $env, callable $runtest, callable $running) : void {
-        $process = new static($process_id, $cmd, $env, $runtest);
-        $running($process);
     }
     
     static function gracefulExit() {

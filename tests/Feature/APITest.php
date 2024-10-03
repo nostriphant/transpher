@@ -11,9 +11,7 @@ function redis_server(int $port, array $env) {
 
 $main_relay;
 beforeAll(function() use (&$main_relay) {
-    \Transpher\Nostr\Relay::boot(8081, [], function (callable $relay) use (&$main_relay) {
-        $main_relay = $relay;
-    });
+    $main_relay = \Transpher\Nostr\Relay::boot(8081, []);
 });
 afterAll(function() use (&$main_relay) {
     $main_relay();
@@ -154,34 +152,33 @@ describe('relay', function () {
         mkdir($env['TRANSPHER_STORE']);
         
         
-        \Transpher\Nostr\Relay::boot(8082, $env, function (callable $server) use ($env) {
-            $alice = Client::client(8082);
+        $server = \Transpher\Nostr\Relay::boot(8082, $env);
+        $alice = Client::client(8082);
 
-            $key = Key::generate();
+        $key = Key::generate();
 
-            $note = Message::event(1, 'Hello wirld!');
-            $alice->sendSignedMessage($note($key));
+        $note = Message::event(1, 'Hello wirld!');
+        $alice->sendSignedMessage($note($key));
 
-            $status = $server();
-            expect($status)->toBeArray();
-            expect($status['running'])->toBeFalse();
+        $status = $server();
+        expect($status)->toBeArray();
+        expect($status['running'])->toBeFalse();
 
-            \Transpher\Nostr\Relay::boot(8082, $env, function (callable $server) use ($key) {
-                $bob = Client::client(8082);
-                $subscription = Message::subscribe();
+        $server = \Transpher\Nostr\Relay::boot(8082, $env);
+        
+        $bob = Client::client(8082);
+        $subscription = Message::subscribe();
 
-                $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
-                $bob->expectNostrEose($subscription()[1]);
+        $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
+        $bob->expectNostrEose($subscription()[1]);
 
-                $request = Message::filter($subscription, authors: [$key(Key::public())])();
-                $bob->json($request);
-                $bob->start();
+        $request = Message::filter($subscription, authors: [$key(Key::public())])();
+        $bob->json($request);
+        $bob->start();
 
-                $status = $server();
-                expect($status)->toBeArray();
-                expect($status['running'])->toBeFalse();
-            });
-        });
+        $status = $server();
+        expect($status)->toBeArray();
+        expect($status['running'])->toBeFalse();
     });
 
     it('uses redis as a back-end store', function () {
@@ -205,23 +202,21 @@ describe('relay', function () {
         expect($redis->scan($iterator)[0])->toBe($note_request[1]['id']);
         // configure server to use store
 
-        $env = [
+        $relay = \Transpher\Nostr\Relay::boot(8083, [
             'TRANSPHER_STORE' => $store_redis
-        ];
+        ]);
+        
+        $bob = Client::client(8083);
+        $subscription = Message::subscribe();
+        $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
+        $bob->expectNostrEose($subscription()[1]);
 
-        \Transpher\Nostr\Relay::boot(8083, $env, function (callable $relay) use ($redis, $key_alice) {
-            $bob = Client::client(8083);
-            $subscription = Message::subscribe();
-            $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
-            $bob->expectNostrEose($subscription()[1]);
+        $request = Message::filter($subscription, authors: [$key_alice(Key::public())])();
+        $bob->json($request);
+        $bob->start();
 
-            $request = Message::filter($subscription, authors: [$key_alice(Key::public())])();
-            $bob->json($request);
-            $bob->start();
-
-            $redis->flushDB();
-            $relay();
-        });
+        $redis->flushDB();
+        $relay();
     });
 
     it('sends events to all clients subscribed on kind', function () {

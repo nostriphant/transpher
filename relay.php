@@ -134,7 +134,6 @@ $websocket = new class(new WebSocket($server, $logger, $acceptor, $clientHandler
 
 $router = new Router($server, $logger, $errorHandler);
 $router->addRoute('GET', '/', $websocket);
-$router->setFallback(new DocumentRoot($server, $errorHandler, ROOT_DIR . '/public'));
 
 $server->start($router, $errorHandler);
 

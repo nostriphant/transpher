@@ -14,7 +14,7 @@ RUN ["rm", "-rf", "/tmp/pear"]
 RUN ["docker-php-ext-enable", "redis", "sodium"]
 
 WORKDIR "/app"
-COPY ["composer.json", "composer.lock", "bootstrap.php", "agent.php", "relay.php", "."]
+COPY ["composer.json", "composer.lock", "bootstrap.php", "agent.php", "."]
 COPY ["src", "src"]
 
 RUN ["/usr/local/bin/php", "-r", "copy('https://getcomposer.org/installer', 'composer-setup.php');"]
@@ -24,6 +24,5 @@ RUN ["/usr/local/bin/php", "-r", "unlink('composer-setup.php');"]
 RUN ["/usr/local/bin/php", "composer.phar", "--no-dev", "install"]
 
 EXPOSE 80
-EXPOSE 81
 
 CMD ["/usr/local/bin/php", "/app/agent.php", "80"]

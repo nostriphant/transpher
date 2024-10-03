@@ -1,22 +1,35 @@
 services:
   relay:
-    image: "rikmeijer84/transpher:latest"
+    build:
+      context: .
+      dockerfile: docker/relay.Dockerfile
     ports:
-      - "${HTTP_PORT}:80"
-      - "${RELAY_PORT}:81"
+      - "${RELAY_PORT}:80"
     volumes:
       - logs:/app/logs
       - data:/app/data
     environment:
-      AGENT_NSEC: ${AGENT_NSEC}
       RELAY_OWNER_NPUB: ${RELAY_OWNER_NPUB}
-      RELAY_URL: ${RELAY_URL}
       RELAY_NAME: ${RELAY_NAME}
       RELAY_DESCRIPTION: ${RELAY_DESCRIPTION}
       RELAY_CONTACT: ${RELAY_CONTACT}
       TRANSPHER_STORE: /app/data
     restart: unless-stopped
       
+  agent:
+    build:
+      context: .
+      dockerfile: docker/agent.Dockerfile
+    volumes:
+      - logs:/app/logs
+    environment:
+      AGENT_NSEC: ${AGENT_NSEC}
+      RELAY_OWNER_NPUB: ${RELAY_OWNER_NPUB}
+      RELAY_URL: ${RELAY_URL}
+    depends_on:
+        - relay
+    restart: unless-stopped
+    
 volumes:
   data:
   logs:

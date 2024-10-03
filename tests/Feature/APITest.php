@@ -240,7 +240,7 @@ describe('relay', function () {
         $bob->start();
     });
 
-    it('relays events to Bob after they subscribed on Alices messages', function () {
+    it('relays events to Bob, sent after they subscribed on Alices messages', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
         $key_alice = Key::generate();

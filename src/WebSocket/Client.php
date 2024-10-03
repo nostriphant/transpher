@@ -3,8 +3,6 @@
 namespace Transpher\WebSocket;
 
 use Transpher\Nostr;
-use Amp\Websocket\Client\WebsocketHandshake;
-use Amp\Websocket\WebsocketCloseCode;
 use function Amp\Websocket\Client\connect;
 
 
@@ -19,8 +17,7 @@ class Client {
     
     public function __construct(private string $url) {
         $this->onJson(fn() => null);
-        $handshake = (new WebsocketHandshake($this->url));
-        $this->connection = connect($handshake);
+        $this->connection = connect($this->url);
     }
     
     public function json(mixed $json) : void {
@@ -49,4 +46,10 @@ class Client {
     public function ignore() : void {
         $this->listening = false;
     }
+    
+    public function stop() : void {
+        $this->listening = false;
+        $this->connection->close();
+    }
+    
 }

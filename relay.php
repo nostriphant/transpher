@@ -18,7 +18,10 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use function Amp\trapSignal;
-use function \Functional\select, \Functional\first;
+use function \Functional\each;
+use Transpher\Nostr\Relay\Subscriptions;
+use Transpher\Nostr\Relay\Subscriptions\Unsubscribe;
+use Transpher\Nostr\Relay\Subscriptions\Subscribe;
 
 $port = $_SERVER['argv'][1] ?? 80;
 
@@ -56,33 +59,11 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
 $relay = new \Transpher\Nostr\Relay($events);
 $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
     
-    private array $subscriptions = [];
-    
     public function __construct(
         private readonly \Transpher\Nostr\Relay $relay,
         private readonly \Psr\Log\LoggerInterface $log,
         private readonly WebsocketGateway $gateway = new WebsocketClientGateway()
     ) {
-    }
-
-    private function wrapClient(WebsocketClient $client, string $action) : callable {
-        return function(array ...$messages) use ($client, $action) : bool {
-            foreach ($messages as $message) {
-                $encoded_message = \Transpher\Nostr::encode($message);
-                $this->log->info($action . ' message ' . $encoded_message);
-                $client->sendText($encoded_message);
-            }
-            return true;
-        };
-    }
-    
-    private function subscriptions(string $clientId) : callable {
-        return function(?array $subscriptions = null) use ($clientId) { 
-            if (isset($subscriptions)) {
-                $this->subscriptions[$clientId] = $subscriptions;
-            }
-            return $this->subscriptions[$clientId]??[];
-        };
     }
     
     #[\Override]
@@ -98,35 +79,26 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
             $payload = (string)$message;
             $this->log->info('Received message: ' . $payload);
             $payload = \Transpher\Nostr::decode($payload);
-
-            $subscriptions = $this->subscriptions($client->getId());
-
-            $unsubscribe = function(string $subscriptionId) use ($subscriptions) {
-                $client_subscriptions = $subscriptions();
-                unset($client_subscriptions[$subscriptionId]);
-                $subscriptions($client_subscriptions);
-            };
+            if (is_null($payload)) {
+                continue;
+            }
+            $listner = \Functional\partial_right($this->relay, $payload);
             
-            $subscribe = function(string $subscriptionId, callable $subscription) use ($client, $subscriptions) {
-                $client_subscriptions = $subscriptions();
-                $client_subscriptions[$subscriptionId] = function(array $event) use ($client, $subscriptionId, $subscription) {
-                    if ($subscription($event)) {
-                        $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event)));
-                        $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
-                        return true;
-                    }
-                    return false;
-                };
-                $subscriptions($client_subscriptions);
-            };
+            $subscribe = Functional\partial_right([Subscriptions::class, 'subscribe'], function(string $subscriptionId, array $event) use ($client) : bool {
+                $this->log->info('Relay event ' . \Transpher\Nostr::encode($event));
+                $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event)));
+                $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
+                return true;
+            });
             
-            $relay = function(array $event) : array {
-                return select($this->gateway->getClients(), fn(WebsocketClient $pos_receiver) => first($this->subscriptions($pos_receiver->getId())(), fn(callable $subscription, string $subscriptionId) => $subscription($event)));
-            };
+            $unsubscribe = [Subscriptions::class, 'unsubscribe'];
             
-            $reply = $this->wrapClient($client, 'Reply');
-            foreach(($this->relay)($relay, $unsubscribe, $subscribe, $payload) as $reply_message) {
-                $reply($reply_message);
+            $relay = Subscriptions::makeStore();
+            
+            foreach($listner($relay, $unsubscribe, $subscribe) as $reply_message) {
+                $encoded_message = \Transpher\Nostr::encode($reply_message);
+                $this->log->info('Reply message ' . $encoded_message);
+                $client->sendText($encoded_message);
             }
         }
     }
@@ -143,6 +115,6 @@ $server->start($router, $errorHandler);
 // Await SIGINT or SIGTERM to be received.
 $signal = trapSignal([SIGINT, SIGTERM]);
 
-$logger->info(sprintf("Received signal %d, stopping HTTP server", $signal));
+$logger->info(sprintf("Received signal %d, stopping Relay server", $signal));
 
 $server->stop();

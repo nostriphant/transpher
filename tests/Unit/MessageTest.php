@@ -39,6 +39,8 @@ it('can generate a properly signed note', function() {
 
 it('can create a subscribe message with a kinds filter', function() {
     $subscription = Message::subscribe();
+    expect($subscription)->toBeCallable();
+                
     $message = Message::filter($subscription, kinds:[1])();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();

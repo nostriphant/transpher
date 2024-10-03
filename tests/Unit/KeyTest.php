@@ -3,6 +3,8 @@
 use \Transpher\Key;
 use Transpher\Nostr\NIP44;
 
+require_once __DIR__ . '/functions.php';
+
 it('generates a public key without an argument', function() {
     $private_key = Key::fromHex('435790f13406085d153b10bd9e00a9f977e637f10ce37db5ccfc5d3440c12d6c');
 

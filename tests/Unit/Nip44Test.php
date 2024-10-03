@@ -3,9 +3,7 @@
 use Transpher\Key;
 use Transpher\Nostr\NIP44;
 
-function vectors(string $name): object {
-    return json_decode(file_get_contents(__DIR__ . '/vectors/' . $name . '.json'), false);
-}
+require_once __DIR__ . '/functions.php';
 
 function openKey(string $key): \Elliptic\EC\KeyPair {
     $ec = new \Elliptic\EC('secp256k1');

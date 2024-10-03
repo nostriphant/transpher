@@ -117,15 +117,12 @@ $websocket = new class(new WebSocket($server, $logger, $acceptor, $clientHandler
         } elseif ($request->getHeader('Accept') === 'application/nostr+json') {
             return new Response(
                 headers: ['Content-Type' => 'application/json'],
-                body: json_encode([
-                    "name" => $_SERVER['RELAY_NAME'],
-                    "description" => $_SERVER['RELAY_DESCRIPTION'],
-                    "pubkey" => \Transpher\Key::convertBech32ToHex($_SERVER['RELAY_OWNER_NPUB']),
-                    "contact" => $_SERVER['RELAY_CONTACT'],
-                    "supported_nips" => [1, 11],
-                    "software" => 'Transpher',
-                    "version" => 'dev'
-                ])
+                body: json_encode(\Transpher\Nostr\Relay\InformationDocument::generate(
+                    $_SERVER['RELAY_NAME'],
+                    $_SERVER['RELAY_DESCRIPTION'],
+                    $_SERVER['RELAY_OWNER_NPUB'],
+                    $_SERVER['RELAY_CONTACT']
+                ))
             );
         }
         return $this->websocket->handleRequest($request);

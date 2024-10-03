@@ -4,6 +4,7 @@ require_once __DIR__ . '/bootstrap.php';
 
 use Amp\Http\Server\DefaultErrorHandler;
 use Amp\Http\Server\Request;
+use Amp\Http\Server\RequestHandler;
 use Amp\Http\Server\Response;
 use Amp\Http\Server\Router;
 use Amp\Http\Server\SocketHttpServer;
@@ -101,7 +102,35 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
     }
 };
 
-$websocket = new Websocket($server, $logger, $acceptor, $clientHandler);
+$websocket = new class(new WebSocket($server, $logger, $acceptor, $clientHandler)) implements RequestHandler {
+    
+    public function __construct(private WebSocket $websocket) {
+    }
+    public function __call(string $name, array $arguments): mixed {
+        return $this->websocket->$name(...$arguments);
+    }
+    
+    #[\Override]
+    public function handleRequest(Request $request): Response {
+        if ($request->hasHeader('Accept') === false) {
+            
+        } elseif ($request->getHeader('Accept') === 'application/nostr+json') {
+            return new Response(
+                headers: ['Content-Type' => 'application/json'],
+                body: json_encode([
+                    "name" => $_SERVER['RELAY_NAME'],
+                    "description" => $_SERVER['RELAY_DESCRIPTION'],
+                    "pubkey" => \Transpher\Key::convertBech32ToHex($_SERVER['RELAY_OWNER_NPUB']),
+                    "contact" => $_SERVER['RELAY_CONTACT'],
+                    "supported_nips" => [1, 11],
+                    "software" => 'Transpher',
+                    "version" => 'dev'
+                ])
+            );
+        }
+        return $this->websocket->handleRequest($request);
+    }
+};
 
 $router = new Router($server, $logger, $errorHandler);
 $router->addRoute('GET', '/', $websocket);

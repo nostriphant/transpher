@@ -23,6 +23,6 @@ RUN ["/usr/local/bin/php", "composer-setup.php"]
 RUN ["/usr/local/bin/php", "-r", "unlink('composer-setup.php');"]
 RUN ["/usr/local/bin/php", "composer.phar", "--no-dev", "install"]
 
-EXPOSE 81
+EXPOSE 80
 
-CMD ["/usr/local/bin/php", "/app/relay.php", "81"]
+CMD ["/usr/local/bin/php", "/app/relay.php", "80"]

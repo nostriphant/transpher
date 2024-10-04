@@ -8,6 +8,7 @@ use Amp\Http\Server\RequestHandler;
 use Amp\Http\Server\Response;
 use Amp\Http\Server\Router;
 use Amp\Http\Server\SocketHttpServer;
+use Amp\Http\HttpStatus;
 use Amp\Socket;
 use Amp\Websocket\Server\Websocket;
 use Amp\Websocket\Server\WebsocketClientGateway;
@@ -111,9 +112,8 @@ $websocket = new class(new WebSocket($server, $logger, $acceptor, $clientHandler
     
     #[\Override]
     public function handleRequest(Request $request): Response {
-        if ($request->hasHeader('Accept') === false) {
-            
-        } elseif ($request->getHeader('Accept') === 'application/nostr+json') {
+        $response =  $this->websocket->handleRequest($request);
+        if ($response->getStatus() === HttpStatus::UPGRADE_REQUIRED) {
             return new Response(
                 headers: ['Content-Type' => 'application/json'],
                 body: json_encode(\Transpher\Nostr\Relay\InformationDocument::generate(
@@ -124,7 +124,8 @@ $websocket = new class(new WebSocket($server, $logger, $acceptor, $clientHandler
                 ))
             );
         }
-        return $this->websocket->handleRequest($request);
+        
+        return $response;
     }
 };
 

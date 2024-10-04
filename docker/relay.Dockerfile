@@ -24,4 +24,4 @@ RUN ["/usr/local/bin/php", "composer.phar", "--no-dev", "install"]
 
 EXPOSE 80
 
-CMD ["/usr/local/bin/php", "/app/relay.php", "80"]
+CMD ["/usr/local/bin/php", "/app/relay.php", "0.0.0.0:80"]

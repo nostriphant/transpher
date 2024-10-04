@@ -20,16 +20,16 @@ use Monolog\Level;
 use function Amp\trapSignal;
 use Transpher\Nostr\Relay\Subscriptions;
 
-$port = $_SERVER['argv'][1] ?? 80;
-
 $logger = new Logger('relay-' . $port);
 $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', Level::Debug));
 $logger->pushHandler(new StreamHandler(STDOUT, Level::Info));
 
 $server = SocketHttpServer::createForDirectAccess($logger);
 
-$server->expose(new Socket\InternetAddress('127.0.0.1', $port));
-$server->expose(new Socket\InternetAddress('[::1]', $port));
+for ($a = 1; $a < $_SERVER['argc']; $a++) {
+    list($ip, $port) = explode($_SERVER['argv'][$a]);
+    $server->expose(new Socket\InternetAddress($ip, $port));
+}
 
 $errorHandler = new DefaultErrorHandler();
 

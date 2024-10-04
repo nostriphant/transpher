@@ -14,8 +14,8 @@ use function \Functional\map, \Functional\each, \Functional\filter;
  */
 class Relay {
     
-    static function boot(int $port, array $env) : Process {
-        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $port];
+    static function boot(string $address, array $env) : Process {
+        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $address];
         return new Process('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http://127.0.0.1:'.$port.'/'));
     }
     

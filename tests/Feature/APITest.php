@@ -11,7 +11,7 @@ function redis_server(int $port, array $env) {
 
 $main_relay;
 beforeAll(function() use (&$main_relay) {
-    $main_relay = \Transpher\Nostr\Relay::boot(8081, []);
+    $main_relay = \Transpher\Nostr\Relay::boot('127.0.0.1:8081', []);
 });
 afterAll(function() use (&$main_relay) {
     $main_relay();
@@ -152,7 +152,7 @@ describe('relay', function () {
         mkdir($env['TRANSPHER_STORE']);
         
         
-        $server = \Transpher\Nostr\Relay::boot(8082, $env);
+        $server = \Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
         $alice = Client::client(8082);
 
         $key = Key::generate();
@@ -164,7 +164,7 @@ describe('relay', function () {
         expect($status)->toBeArray();
         expect($status['running'])->toBeFalse();
 
-        $server = \Transpher\Nostr\Relay::boot(8082, $env);
+        $server = \Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
         
         $bob = Client::client(8082);
         $subscription = Message::subscribe();
@@ -202,7 +202,7 @@ describe('relay', function () {
         expect($redis->scan($iterator)[0])->toBe($note_request[1]['id']);
         // configure server to use store
 
-        $relay = \Transpher\Nostr\Relay::boot(8083, [
+        $relay = \Transpher\Nostr\Relay::boot('127.0.0.1:8083', [
             'TRANSPHER_STORE' => $store_redis
         ]);
         
@@ -263,7 +263,7 @@ describe('relay', function () {
         $owner_key = Key::generate();
         $agent_key = Key::generate();
         
-        $relay = \Transpher\Nostr\Relay::boot(8087, [
+        $relay = \Transpher\Nostr\Relay::boot('127.0.0.1:8087', [
             'AGENT_NSEC' => $agent_key(Key::private(\Transpher\Nostr\Key\Format::BECH32)),
             'RELAY_URL' => 'ws://127.0.0.1:8087',
             'RELAY_OWNER_NPUB' => $owner_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)), 

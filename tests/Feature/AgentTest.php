@@ -6,7 +6,7 @@ use Transpher\Nostr\Message;
 
 describe('agent', function () : void {
     it('starts relay and sends private direct messsage to relay owner', function () : void {
-        $relay = \Transpher\Nostr\Relay::boot(8085, []);
+        $relay = \Transpher\Nostr\Relay::boot('127.0.0.1:8085', []);
         
         $agent_key = Key::generate();
         $alice_key = Key::generate();

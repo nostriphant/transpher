@@ -57,8 +57,7 @@ class Relay {
                         $relay(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
                         return true;
                     });
-                    yield from map(filter($this->events, $subscription), fn(array $event) => Message::requestedEvent($message[0], $event));
-                    yield Message::eose($message[0]);
+                    Subscriptions::makeStore()($message[0]);
                 }
                 break;
                 

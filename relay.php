@@ -27,7 +27,7 @@ $logger->pushHandler(new StreamHandler(STDOUT, Level::Info));
 $server = SocketHttpServer::createForDirectAccess($logger);
 
 for ($a = 1; $a < $_SERVER['argc']; $a++) {
-    list($ip, $port) = explode($_SERVER['argv'][$a]);
+    list($ip, $port) = explode(":", $_SERVER['argv'][$a]);
     $server->expose(new Socket\InternetAddress($ip, $port));
 }
 

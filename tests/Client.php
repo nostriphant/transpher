@@ -75,6 +75,10 @@ class Client extends \Transpher\WebSocket\Client {
         $this->start();
     }
     
+    public function __destruct() {
+        expect($this->expected_messages)->toBeEmpty();
+    }
+    
     public function start(): void {
         $this->onJson(function(callable $stop, array $message) {
             $expected_message = array_shift($this->expected_messages);

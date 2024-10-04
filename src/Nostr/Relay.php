@@ -41,8 +41,12 @@ class Relay {
                 break;
             
             case 'CLOSE': 
-                Subscriptions::unsubscribe($message[0]);
-                yield Message::closed($message[0]);
+                if (count($message) < 1) {
+                    yield Message::notice('Missing subscription ID');
+                } else {
+                    Subscriptions::unsubscribe($message[0]);
+                    yield Message::closed($message[0]);
+                }
                 break;
             
             case 'REQ':

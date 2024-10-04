@@ -26,7 +26,7 @@ class Client {
     public function onJson(callable $callback) {
         $this->onjson_callback = $callback;
     }
-
+   
     private \Amp\Websocket\Client\WebsocketConnection $connection;
     private \Closure $onjson_callback;
     

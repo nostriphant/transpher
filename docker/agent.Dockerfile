@@ -22,6 +22,4 @@ RUN ["/usr/local/bin/php", "composer-setup.php"]
 RUN ["/usr/local/bin/php", "-r", "unlink('composer-setup.php');"]
 RUN ["/usr/local/bin/php", "composer.phar", "--no-dev", "install"]
 
-EXPOSE 80
-
-CMD ["/usr/local/bin/php", "/app/agent.php", "80"]
+CMD ["/usr/local/bin/php", "/app/agent.php"]

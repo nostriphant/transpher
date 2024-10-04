@@ -5,6 +5,7 @@ namespace Transpher\Nostr;
 use \Transpher\Nostr\Message;
 use \Transpher\Filters;
 use \Transpher\Process;
+use Transpher\Nostr\Relay\Subscriptions;
 use function \Functional\map, \Functional\each, \Functional\filter;
 
 /**
@@ -25,45 +26,45 @@ class Relay {
         
     }
     
-    public function __invoke(callable $relay, callable $unsubscribe, callable $subscribe, array $message) : \Generator {
+    public function __invoke(string $payload, callable $relay) : \Generator {
+        $message = \Transpher\Nostr::decode($payload);
+        if (is_null($message)) {
+            yield Message::notice('Invalid message');
+        }
+        
         $type = array_shift($message);
         switch (strtoupper($type)) {
             case 'EVENT': 
-                yield from self::relay($relay, $this->events, ...$message);
+                $this->events[] = $message[0];
+                Subscriptions::makeStore()($message[0]);
+                yield Message::accept($message[0]['id']);
                 break;
+            
             case 'CLOSE': 
-                yield from self::closeSubscription($unsubscribe, ...$message);
+                Subscriptions::unsubscribe($message[0]);
+                yield Message::closed($message[0]);
                 break;
+            
             case 'REQ':
                 if (count($message) < 2) {
                     yield Message::notice('Invalid message');
                 } elseif (empty($message[1])) {
                     yield Message::closed($message[0], 'Subscription filters are empty');
                 } else {
-                    yield from self::subscribe($subscribe, $this->events, $message[0], Filters::constructFromPrototype($message[1]));
+                    $subscription = Filters::constructFromPrototype($message[1]);
+                    Subscriptions::subscribe($message[0], $subscription, function(string $subscriptionId, array $event) use ($relay) : bool {
+                        $relay(\Transpher\Nostr::encode(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event)));
+                        $relay(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
+                        return true;
+                    });
+                    yield from map(filter($this->events, $subscription), fn(array $event) => Message::requestedEvent($message[0], $event));
+                    yield Message::eose($message[0]);
                 }
                 break;
+                
             default: 
                 yield Message::notice('Message type ' . $type . ' not supported');
                 break;
         }
-    }
-    
-    static function closeSubscription(callable $unsubscribe, string $subscriptionId) {
-        $unsubscribe($subscriptionId);
-        yield Message::closed($subscriptionId);
-    }
-    
-    static function subscribe(callable $subscribe, array|\ArrayAccess &$events, string $subscriptionId, callable $subscription) {
-        $subscribe($subscriptionId, $subscription);
-        
-        yield from map(filter($events, $subscription), fn(array $event) => Message::requestedEvent($subscriptionId, $event));
-        yield Message::eose($subscriptionId);
-    }
-    
-    static function relay(callable $relay, array|\ArrayAccess &$events, array $event) {
-        $events[] = $event;
-        $relay($event);
-        yield Message::accept($event['id']);
     }
 }

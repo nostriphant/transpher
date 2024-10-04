@@ -21,16 +21,14 @@ use Monolog\Level;
 use function Amp\trapSignal;
 use Transpher\Nostr\Relay\Subscriptions;
 
+list($ip, $port) = explode(":", $_SERVER['argv'][1]);
+
 $logger = new Logger('relay-' . $port);
 $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', Level::Debug));
 $logger->pushHandler(new StreamHandler(STDOUT, Level::Info));
 
 $server = SocketHttpServer::createForDirectAccess($logger);
-
-for ($a = 1; $a < $_SERVER['argc']; $a++) {
-    list($ip, $port) = explode(":", $_SERVER['argv'][$a]);
-    $server->expose(new Socket\InternetAddress($ip, $port));
-}
+$server->expose(new Socket\InternetAddress($ip, $port));
 
 $errorHandler = new DefaultErrorHandler();
 
@@ -76,24 +74,13 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
         foreach ($client as $message) {
             $payload = (string)$message;
             $this->log->info('Received message: ' . $payload);
-            $payload = \Transpher\Nostr::decode($payload);
-            if (is_null($payload)) {
-                continue;
-            }
-            $listner = \Functional\partial_right($this->relay, $payload);
-            
-            $subscribe = Functional\partial_right([Subscriptions::class, 'subscribe'], function(string $subscriptionId, array $event) use ($client) : bool {
-                $this->log->info('Relay event ' . \Transpher\Nostr::encode($event));
-                $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event)));
-                $client->sendText(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
+            $relay = function(string $text) use ($client) : bool {
+                $this->log->info('Relay message ' . $text);
+                $client->sendText($text);
                 return true;
-            });
-            
-            $unsubscribe = [Subscriptions::class, 'unsubscribe'];
-            
-            $relay = Subscriptions::makeStore();
-            
-            foreach($listner($relay, $unsubscribe, $subscribe) as $reply_message) {
+            };
+
+            foreach(($this->relay)($payload, $relay) as $reply_message) {
                 $encoded_message = \Transpher\Nostr::encode($reply_message);
                 $this->log->info('Reply message ' . $encoded_message);
                 $client->sendText($encoded_message);

@@ -26,7 +26,7 @@ class Relay {
         
     }
     
-    public function __invoke(string $payload, callable $relay) : \Generator {
+    public function __invoke(string $payload, callable $store, callable $relay) : \Generator {
         $message = \Transpher\Nostr::decode($payload);
         if (is_null($message)) {
             yield Message::notice('Invalid message');
@@ -36,7 +36,7 @@ class Relay {
         switch (strtoupper($type)) {
             case 'EVENT': 
                 $this->events[] = $message[0];
-                Subscriptions::makeStore()($message[0]);
+                $store($message[0]);
                 yield Message::accept($message[0]['id']);
                 break;
             

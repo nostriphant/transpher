@@ -80,7 +80,7 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
                 return true;
             };
 
-            foreach(($this->relay)($payload, $relay) as $reply_message) {
+            foreach(($this->relay)($payload, Subscriptions::makeStore(), $relay) as $reply_message) {
                 $encoded_message = \Transpher\Nostr::encode($reply_message);
                 $this->log->info('Reply message ' . $encoded_message);
                 $client->sendText($encoded_message);

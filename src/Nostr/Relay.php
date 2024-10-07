@@ -26,7 +26,7 @@ class Relay {
         
     }
     
-    public function __invoke(string $payload, callable $store, callable $relay) : \Generator {
+    public function __invoke(string $payload, Subscriptions $store, callable $relay) : \Generator {
         $message = \Transpher\Nostr::decode($payload);
         if (is_null($message)) {
             yield Message::notice('Invalid message');

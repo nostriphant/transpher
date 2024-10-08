@@ -18,7 +18,7 @@ use Amp\Websocket\WebsocketClient;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
-use function Amp\trapSignal;
+use function Amp\trapSignal, \Functional\each;
 use Transpher\Nostr\Relay\Subscriptions;
 
 list($ip, $port) = explode(":", $_SERVER['argv'][1]);
@@ -72,17 +72,9 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
         foreach ($client as $message) {
             $payload = (string)$message;
             $this->log->info('Received message: ' . $payload);
-            $relay = function(string $text) use ($client) : bool {
-                $this->log->info('Relay message ' . $text);
-                $client->sendText($text);
-                return true;
-            };
+            $relay = new Transpher\WebSocket\SendNostr('Relay', $client, $this->log);
 
-            foreach(($this->relay)($payload, Subscriptions::makeStore(), $relay) as $reply_message) {
-                $encoded_message = \Transpher\Nostr::encode($reply_message);
-                $this->log->info('Reply message ' . $encoded_message);
-                $client->sendText($encoded_message);
-            }
+            each(($this->relay)($payload, Subscriptions::makeStore(), $relay), new Transpher\WebSocket\SendNostr('Reply', $client, $this->log));
         }
     }
 };

@@ -57,8 +57,8 @@ class Relay {
                 } else {
                     $subscription = Filters::constructFromPrototype($message[1]);
                     Subscriptions::subscribe($message[0], $subscription, function(string $subscriptionId, array $event) use ($relay) : bool {
-                        $relay(\Transpher\Nostr::encode(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event)));
-                        $relay(\Transpher\Nostr::encode(\Transpher\Nostr\Message::eose($subscriptionId)));
+                        $relay(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event));
+                        $relay(\Transpher\Nostr\Message::eose($subscriptionId));
                         return true;
                     });
                     yield from map(filter($this->events, $subscription), fn(array $event) => Message::requestedEvent($message[0], $event));

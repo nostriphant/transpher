@@ -2,7 +2,7 @@
 <?xml-model xlink:href="/your/path/to/phing-grammar.rng" type="application/xml" 
                     schematypens="http://relaxng.org/ns/structure/1.0" ?>
                     
-<project name="Radar" default="dist">
+<project name="Transpher" default="dist">
 
     <!-- ============================================  -->
     <!-- Target: prepare                               -->
@@ -10,11 +10,16 @@
     <target name="prepare">
         <echo msg="Making directory ./build" />
         <mkdir dir="./build" />
+        <delete>
+            <fileset dir="./data">
+                <include name="*.php" />
+            </fileset>
+        </delete>
     </target>
     
     <target name="test" depends="prepare">
         <exec executable="./vendor/bin/pest" passthru="true" checkreturn="true">
-            
+            <arg line="--parallel"/>
         </exec>
     </target>
 

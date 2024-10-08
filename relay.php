@@ -69,8 +69,6 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
         Response $response,
     ): void {
         $this->gateway->addClient($client);
-
-        /* \Amp\Websocket\WebsocketMessage $message */
         foreach ($client as $message) {
             $payload = (string)$message;
             $this->log->info('Received message: ' . $payload);

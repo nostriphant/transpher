@@ -13,7 +13,7 @@ use Transpher\Nostr\Relay\Sender;
  */
 readonly class SendNostr implements Sender {
     
-    public function __construct(private string $action, private WebsocketClient $client, private LoggerInterface $log) {}
+    private function __construct(private string $action, private WebsocketClient $client, private LoggerInterface $log) {}
     
     #[\Override]
     public function __invoke(mixed $json) : bool {

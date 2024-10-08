@@ -72,8 +72,8 @@ $clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
         foreach ($client as $message) {
             $payload = (string)$message;
             $this->log->info('Received message: ' . $payload);
-            $relay = new Transpher\WebSocket\SendNostr('Relay', $client, $this->log);
-            each(($this->relay)($payload, Subscriptions::makeStore(), $relay), new Transpher\WebSocket\SendNostr('Reply', $client, $this->log));
+            $relay = Transpher\WebSocket\SendNostr::relay($client, $this->log);
+            each(($this->relay)($payload, Subscriptions::makeStore(), $relay), Transpher\WebSocket\SendNostr::reply($client, $this->log));
         }
     }
 };

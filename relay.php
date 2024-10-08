@@ -34,9 +34,6 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 if (isset($_SERVER['TRANSPHER_STORE']) === false) {
     $logger->info('Using memory to save messages.');
     $events = [];
-} elseif (str_starts_with($_SERVER['TRANSPHER_STORE'], 'redis')) {
-    $logger->info('Using redis to store messages');
-    $events = new Transpher\Redis($_SERVER['TRANSPHER_STORE']);
 } elseif (is_dir($_SERVER['TRANSPHER_STORE'])) {
     $logger->info('Using directory to store messages');
     $events = new Transpher\Directory($_SERVER['TRANSPHER_STORE']);

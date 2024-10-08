@@ -4,11 +4,6 @@ use \Transpher\Key;
 use \Transpher\Nostr\Message;
 use \TranspherTests\Client;
 
-function redis_server(int $port, array $env) {
-    $cmd = ['/opt/homebrew/bin/redis-server', '--port', $port];
-    return Transpher\Process::start('redis', $cmd, $env);
-}
-
 $main_relay;
 beforeAll(function() use (&$main_relay) {
     $main_relay = \Transpher\Nostr\Relay::boot('127.0.0.1:8081', []);
@@ -129,44 +124,6 @@ describe('relay', function () {
         $status = $server();
         expect($status)->toBeArray();
         expect($status['running'])->toBeFalse();
-    });
-
-    it('uses redis as a back-end store', function () {
-        $store_redis = 'redis://127.0.0.1:6379/1';
-
-        $key_alice = Key::generate();
-        $note = Message::event(1, 'Hello wirld!');
-
-        $redis = new \Redis();
-
-        expect($redis->connect('localhost', 6379, context: []))->toBeTrue();
-        $redis->select(1);
-
-        $redis->flushDB();
-
-        $note_request = $note($key_alice);
-        $redis->rawCommand('JSON.set', $note_request[1]['id'], '$', json_encode($note_request[1]));
-
-        expect($redis->dbSize())->toBe(1);
-        $iterator = null;
-        expect($redis->scan($iterator)[0])->toBe($note_request[1]['id']);
-        // configure server to use store
-
-        $relay = \Transpher\Nostr\Relay::boot('127.0.0.1:8083', [
-            'TRANSPHER_STORE' => $store_redis
-        ]);
-        
-        $bob = Client::client(8083);
-        $subscription = Message::subscribe();
-        $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
-        $bob->expectNostrEose($subscription()[1]);
-
-        $request = Message::filter($subscription, authors: [$key_alice(Key::public())])();
-        $bob->json($request);
-        $bob->start();
-
-        $redis->flushDB();
-        $relay();
     });
 
     it('sends events to all clients subscribed on kind', function () {

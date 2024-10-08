@@ -60,7 +60,7 @@ class Relay {
                             return true;
                         });
                         
-                        yield from map(call_user_func($this->events, $subscription), fn(array $event) => Message::requestedEvent($message[0], $event));
+                        yield from map(call_user_func($this->events, $subscription), partial_left([Message::class, 'requestedEvent'], $message[0]));
                         yield Message::eose($message[0]);
                     }
                     break;

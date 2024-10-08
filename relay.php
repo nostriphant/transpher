@@ -12,14 +12,10 @@ use Amp\Http\HttpStatus;
 use Amp\Socket;
 use Amp\Websocket\Server\Websocket;
 use Amp\Websocket\Server\WebsocketClientGateway;
-use Amp\Websocket\Server\WebsocketClientHandler;
-use Amp\Websocket\Server\WebsocketGateway;
-use Amp\Websocket\WebsocketClient;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
-use function Amp\trapSignal, \Functional\each;
-use Transpher\Nostr\Relay\Subscriptions;
+use function Amp\trapSignal;
 
 list($ip, $port) = explode(":", $_SERVER['argv'][1]);
 
@@ -53,30 +49,7 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
 }
 
 $relay = new \Transpher\Nostr\Relay($events);
-$clientHandler = new class($relay, $logger) implements WebsocketClientHandler {
-    
-    public function __construct(
-        private readonly \Transpher\Nostr\Relay $relay,
-        private readonly \Psr\Log\LoggerInterface $log,
-        private readonly WebsocketGateway $gateway = new WebsocketClientGateway()
-    ) {
-    }
-    
-    #[\Override]
-    public function handleClient(
-        WebsocketClient $client,
-        Request $request,
-        Response $response,
-    ): void {
-        $this->gateway->addClient($client);
-        foreach ($client as $message) {
-            $payload = (string)$message;
-            $this->log->info('Received message: ' . $payload);
-            $relay = Transpher\WebSocket\SendNostr::relay($client, $this->log);
-            each(($this->relay)($payload, Subscriptions::makeStore(), $relay), Transpher\WebSocket\SendNostr::reply($client, $this->log));
-        }
-    }
-};
+$clientHandler = new \Transpher\WebSocket\ClientHandler($relay, $logger, new WebsocketClientGateway());
 
 $websocket = new class(new WebSocket($server, $logger, $acceptor, $clientHandler)) implements RequestHandler {
     

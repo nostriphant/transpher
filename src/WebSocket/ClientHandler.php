@@ -1,0 +1,43 @@
+<?php
+
+namespace Transpher\WebSocket;
+use Transpher\WebSocket\SendNostr;
+use function \Functional\each;
+use \Psr\Log\LoggerInterface; 
+use \Transpher\Nostr\Relay;
+use Amp\Websocket\Server\WebsocketClientHandler;
+use Amp\Websocket\Server\WebsocketGateway;
+use Transpher\Nostr\Relay\Subscriptions;
+use Amp\Websocket\WebsocketClient;
+use Amp\Http\Server\Request;
+use Amp\Http\Server\Response;
+
+
+/**
+ * Description of ClientHandler
+ *
+ * @author Rik Meijer <hello@rikmeijer.nl>
+ */
+readonly class ClientHandler implements WebsocketClientHandler {
+    public function __construct(
+        private Relay $relay,
+        private LoggerInterface $log,
+        private WebsocketGateway $gateway
+    ) {
+    }
+    
+    #[\Override]
+    public function handleClient(
+        WebsocketClient $client,
+        Request $request,
+        Response $response,
+    ): void {
+        $this->gateway->addClient($client);
+        foreach ($client as $message) {
+            $payload = (string)$message;
+            $this->log->info('Received message: ' . $payload);
+            $relay = SendNostr::relay($client, $this->log);
+            each(($this->relay)($payload, Subscriptions::makeStore(), $relay), SendNostr::reply($client, $this->log));
+        }
+    }
+}

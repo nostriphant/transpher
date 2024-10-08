@@ -6,7 +6,7 @@ use \Transpher\Nostr\Message;
 use \Transpher\Filters;
 use \Transpher\Process;
 use Transpher\Nostr\Relay\Subscriptions;
-use function \Functional\map, \Functional\each, \Functional\filter;
+use function \Functional\partial_left;
 
 /**
  * Description of Server
@@ -35,7 +35,6 @@ class Relay {
             switch (strtoupper($type)) {
                 case 'EVENT': 
                     $this->events[] = $message[0];
-                    $store($message[0]);
                     yield Message::accept($message[0]['id']);
                     break;
 
@@ -60,7 +59,8 @@ class Relay {
                             $relay(\Transpher\Nostr\Message::eose($subscriptionId));
                             return true;
                         });
-                        yield from map(filter($this->events, $subscription), fn(array $event) => Message::requestedEvent($message[0], $event));
+                        
+                        yield from map(call_user_func($this->events, $subscription), fn(array $event) => Message::requestedEvent($message[0], $event));
                         yield Message::eose($message[0]);
                     }
                     break;

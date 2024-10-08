@@ -1,12 +1,8 @@
 <?php
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
- */
-
 namespace Transpher;
-
+use function \Functional\map, \Functional\filter;
+use Transpher\Nostr\Relay\Subscriptions;
 /**
  * Description of Directory
  *
@@ -14,13 +10,19 @@ namespace Transpher;
  */
 class Directory implements \ArrayAccess, \Iterator {
 
-    private array $events;
+    private array $events = [];
+    private Subscriptions $subscriptions;
 
     public function __construct(private string $store) {
+        $this->subscriptions = Subscriptions::makeStore();
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {
             $event = include $event_file;
             $this->events[$event['id']] = $event;
         }   
+    }
+    
+    public function __invoke(callable $subscription) : array {
+        return filter($this->events, $subscription);
     }
     
     private function file(array $event) {
@@ -41,6 +43,7 @@ class Directory implements \ArrayAccess, \Iterator {
     public function offsetSet(mixed $offset, mixed $event): void {
         if (is_null($offset)) {
             $offset = $event['id'];
+            call_user_func($this->subscriptions, $event);
         }
         $this->events[$offset] = $event;
         file_put_contents($this->file($event), '<?php return ' . var_export($event, true) . ';');

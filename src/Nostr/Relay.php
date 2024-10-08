@@ -30,6 +30,7 @@ class Relay {
         $message = \Transpher\Nostr::decode($payload);
         if (is_null($message)) {
             yield Message::notice('Invalid message');
+            return;
         }
         
         $type = array_shift($message);

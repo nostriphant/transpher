@@ -3,12 +3,8 @@
 require_once __DIR__ . '/bootstrap.php';
 
 use Amp\Http\Server\DefaultErrorHandler;
-use Amp\Http\Server\Request;
-use Amp\Http\Server\RequestHandler;
-use Amp\Http\Server\Response;
 use Amp\Http\Server\Router;
 use Amp\Http\Server\SocketHttpServer;
-use Amp\Http\HttpStatus;
 use Amp\Socket;
 use Amp\Websocket\Server\Websocket;
 use Amp\Websocket\Server\WebsocketClientGateway;
@@ -51,32 +47,7 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
 $relay = new \Transpher\Nostr\Relay($events);
 $clientHandler = new \Transpher\WebSocket\ClientHandler($relay, $logger, new WebsocketClientGateway());
 
-$websocket = new class(new WebSocket($server, $logger, $acceptor, $clientHandler)) implements RequestHandler {
-    
-    public function __construct(private WebSocket $websocket) {
-    }
-    public function __call(string $name, array $arguments): mixed {
-        return $this->websocket->$name(...$arguments);
-    }
-    
-    #[\Override]
-    public function handleRequest(Request $request): Response {
-        $response =  $this->websocket->handleRequest($request);
-        if ($response->getStatus() === HttpStatus::UPGRADE_REQUIRED) {
-            return new Response(
-                headers: ['Content-Type' => 'application/json'],
-                body: json_encode(\Transpher\Nostr\Relay\InformationDocument::generate(
-                    $_SERVER['RELAY_NAME'],
-                    $_SERVER['RELAY_DESCRIPTION'],
-                    $_SERVER['RELAY_OWNER_NPUB'],
-                    $_SERVER['RELAY_CONTACT']
-                ))
-            );
-        }
-        
-        return $response;
-    }
-};
+$websocket = new Transpher\WebSocket\RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler));
 
 $router = new Router($server, $logger, $errorHandler);
 $router->addRoute('GET', '/', $websocket);

@@ -12,6 +12,7 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use function Amp\trapSignal;
+use Transpher\WebSocket\RequestHandler;
 
 list($ip, $port) = explode(":", $_SERVER['argv'][1]);
 
@@ -48,7 +49,7 @@ $relay = new \Transpher\Nostr\Relay($events);
 $clientHandler = new \Transpher\WebSocket\ClientHandler($relay, $logger, new WebsocketClientGateway());
 
 $router = new Router($server, $logger, $errorHandler);
-$router->addRoute('GET', '/', new Transpher\WebSocket\RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler)));
+$router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler)));
 
 $server->start($router, $errorHandler);
 

@@ -47,10 +47,8 @@ if (isset($_SERVER['TRANSPHER_STORE']) === false) {
 $relay = new \Transpher\Nostr\Relay($events);
 $clientHandler = new \Transpher\WebSocket\ClientHandler($relay, $logger, new WebsocketClientGateway());
 
-$websocket = new Transpher\WebSocket\RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler));
-
 $router = new Router($server, $logger, $errorHandler);
-$router->addRoute('GET', '/', $websocket);
+$router->addRoute('GET', '/', new Transpher\WebSocket\RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler)));
 
 $server->start($router, $errorHandler);
 

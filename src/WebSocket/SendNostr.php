@@ -23,4 +23,8 @@ readonly class SendNostr implements Sender {
         return true;
     }
     
+    static function __callStatic(string $name, array $arguments): mixed {
+        return new self(ucwords($name), ...$arguments);
+    }
+    
 }

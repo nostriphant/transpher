@@ -21,8 +21,9 @@ class Directory implements \ArrayAccess, \Iterator {
         }   
     }
     
-    public function __invoke(callable $subscription) : array {
-        return filter($this->events, $subscription);
+    public function __invoke(string $subscriptionId, callable $subscription) : \Generator {
+        yield from map(filter($this->events, $subscription), partial_left([Message::class, 'requestedEvent'], $subscriptionId));
+        yield Message::eose($subscriptionId);
     }
     
     private function file(array $event) {

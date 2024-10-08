@@ -30,17 +30,9 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
 //);
 
-
-if (isset($_SERVER['TRANSPHER_STORE']) === false) {
-    $logger->info('Using memory to save messages.');
-    $events = [];
-} elseif (is_dir($_SERVER['TRANSPHER_STORE'])) {
-    $logger->info('Using directory to store messages');
-    $events = new Transpher\Directory($_SERVER['TRANSPHER_STORE']);
-} else {
-    $logger->info('Using memory to save messages (fallback).');
-    $events = [];
-}
+$store_path = ROOT_DIR . '/data';
+is_dir($store_path) || mkdir($store_path);
+$events = new Transpher\Directory($store_path);
 
 $relay = new \Transpher\Nostr\Relay($events);
 $clientHandler = new \Transpher\WebSocket\ClientHandler($relay, $logger, new WebsocketClientGateway());

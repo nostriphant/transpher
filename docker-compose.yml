@@ -13,7 +13,6 @@ services:
       RELAY_NAME: ${RELAY_NAME}
       RELAY_DESCRIPTION: ${RELAY_DESCRIPTION}
       RELAY_CONTACT: ${RELAY_CONTACT}
-      TRANSPHER_STORE: /app/data
     restart: unless-stopped
       
   agent:

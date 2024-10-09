@@ -24,7 +24,7 @@ class Relay {
         
     }
     
-    public function __invoke(string $payload, Subscriptions $store, callable $relay) : \Generator {
+    public function __invoke(string $payload, callable $relay) : \Generator {
         $message = \Transpher\Nostr::decode($payload);
         if (is_null($message)) {
             yield Message::notice('Invalid message');
@@ -51,11 +51,7 @@ class Relay {
                     } elseif (empty($message[1])) {
                         yield Message::closed($message[0], 'Subscription filters are empty');
                     } else {
-                        yield from call_user_func($this->events, $message[0], $message[1], function(string $subscriptionId, array $event) use ($relay) : bool {
-                            $relay(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event));
-                            $relay(\Transpher\Nostr\Message::eose($subscriptionId));
-                            return true;
-                        });
+                        yield from call_user_func($this->events, $message[0], $message[1], $relay);
                     }
                     break;
 

@@ -1,13 +1,13 @@
 <?php
 
-namespace Transpher\Nostr\Event;
+namespace Transpher\Nostr;
 
 /**
  * Description of Event
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-readonly class Signed {
+readonly class Event {
 
     public function __construct(
         public string $id, 

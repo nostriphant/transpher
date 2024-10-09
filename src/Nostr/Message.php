@@ -4,7 +4,7 @@ namespace Transpher\Nostr;
 
 use Transpher\Key;
 use Transpher\Nostr\Rumor;
-use Transpher\Nostr\Event\Signed;
+use Transpher\Nostr\Event;
 
 /**
  * Class to contain Message related functions
@@ -50,7 +50,7 @@ class Message {
     }
     
     
-    static function requestedEvent(string $subscriptionId, Signed $event) {
-        return ['EVENT', $subscriptionId, Signed::export($event)];
+    static function requestedEvent(string $subscriptionId, Event $event) {
+        return ['EVENT', $subscriptionId, Event::export($event)];
     }
 }

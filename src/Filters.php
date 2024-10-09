@@ -2,7 +2,7 @@
 namespace Transpher;
 
 use function Functional\partial_left, Functional\some, \Functional\map, \Functional\true;
-use \Transpher\Nostr\Event\Signed;
+use \Transpher\Nostr\Event;
 
 /**
  * Description of Filters
@@ -26,7 +26,7 @@ readonly class Filters implements Nostr\Relay\Filter {
         ]);
     }
     
-    public function __invoke(Signed $event) : bool {
+    public function __invoke(Event $event) : bool {
         return true(map($this->possible_filters, fn($subscription_filter) => $subscription_filter($event)));
     }
     
@@ -51,20 +51,20 @@ readonly class Filters implements Nostr\Relay\Filter {
     }
     
     static function scalar(string|int $event_field) : callable {
-        return fn(array $filter_values, Signed $event) : bool => in_array($event->$event_field, $filter_values);
+        return fn(array $filter_values, Event $event) : bool => in_array($event->$event_field, $filter_values);
     }
     static function since(string $event_field) : callable {
-        return fn(int $filter_value, Signed $event) : bool => $event->$event_field >= $filter_value;
+        return fn(int $filter_value, Event $event) : bool => $event->$event_field >= $filter_value;
     }
     static function until(string $event_field) : callable {
-        return fn(int $filter_value, Signed $event) : bool => $event->$event_field <= $filter_value;
+        return fn(int $filter_value, Event $event) : bool => $event->$event_field <= $filter_value;
     }
     static function tag(string $event_tag_identifier) : callable {
-        return fn(array $filter_values, Signed $event) : bool => some($event->tags, fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filter_values));
+        return fn(array $filter_values, Event $event) : bool => some($event->tags, fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filter_values));
     }
     static function limit() {
         $hits = 0;
-        return function(int $limit, Signed $event) use (&$hits) {
+        return function(int $limit, Event $event) use (&$hits) {
             $hits++;
             return $limit >= $hits;
         };

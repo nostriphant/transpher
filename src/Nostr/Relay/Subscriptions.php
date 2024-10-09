@@ -5,7 +5,7 @@ namespace Transpher\Nostr\Relay;
 use Functional\Functional;
 use function \Functional\if_else, \Functional\first;
 use Transpher\Nostr\Message;
-use Transpher\Nostr\Event\Signed;
+use Transpher\Nostr\Event;
 use Transpher\Filters;
 
 /**
@@ -17,7 +17,7 @@ use Transpher\Filters;
     
     private static array $subscriptions = [];
 
-    static function apply(Signed $event): bool {
+    static function apply(Event $event): bool {
         if (empty(self::$subscriptions)) {
             return false;
         }

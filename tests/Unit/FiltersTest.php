@@ -1,10 +1,10 @@
 <?php
 
 use Transpher\Filters;
-use Transpher\Nostr\Event\Signed;
+use Transpher\Nostr\Event;
 
-function event(array $event) : Signed {
-    return Signed::import(array_merge([
+function event(array $event) : Event {
+    return new Event(...array_merge([
         'id' => '',
         'pubkey' => '',
         'created_at' => time(),

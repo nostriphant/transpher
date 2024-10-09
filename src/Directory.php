@@ -5,7 +5,7 @@ use function \Functional\map, \Functional\filter, \Functional\partial_left;
 use Transpher\Nostr\Relay\Subscriptions;
 use Transpher\Nostr\Relay\Filter;
 use Transpher\Nostr\Message;
-use Transpher\Nostr\Event\Signed;
+use Transpher\Nostr\Event;
 
 /**
  * Description of Directory
@@ -27,7 +27,7 @@ class Directory implements \ArrayAccess, \Iterator {
         return fn(string $subscriptionId) => map(filter($this->events, $subscription), partial_left([Message::class, 'requestedEvent'], $subscriptionId));
     }
     
-    private function file(Signed $event) {
+    private function file(Event $event) {
         return $this->store . DIRECTORY_SEPARATOR . $event->id . '.php';
     }
 
@@ -37,7 +37,7 @@ class Directory implements \ArrayAccess, \Iterator {
     }
 
     #[\Override]
-    public function offsetGet(mixed $offset): Signed {
+    public function offsetGet(mixed $offset): Event {
         return $this->events[$offset];
     }
 

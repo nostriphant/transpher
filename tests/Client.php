@@ -46,8 +46,13 @@ class Client extends \Transpher\WebSocket\Client {
             
             $seal = Nostr\Event\Gift::unwrap($recipient_key, $gift['pubkey'], $gift['content']);
             expect($seal['kind'])->toBe(13);
-            
+            expect($seal['pubkey'])->toBeString();
+            expect($seal['content'])->toBeString();
+
             $private_message = Nostr\Event\Seal::open($recipient_key, $seal['pubkey'], $seal['content']);
+            expect($private_message)->toBeArray();
+            expect($private_message)->toHaveKey('id');
+            expect($private_message)->toHaveKey('content');
             expect($private_message['content'])->toBe($message_content);
         }];
         $this->expectNostrEose($subscriptionId);

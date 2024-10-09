@@ -1,6 +1,9 @@
 <?php
 
 namespace Transpher\Nostr\Message;
+use Transpher\Key;
+use Transpher\Nostr\Event\Gift;
+use Transpher\Nostr\Event\Seal;
 
 /**
  * Description of PrivateDirect
@@ -9,11 +12,14 @@ namespace Transpher\Nostr\Message;
  */
 readonly class PrivateDirect {
     
-    public function __construct(private \Transpher\Key $private_key) {}
+    public function __construct(private Key $private_key) {}
     public function __invoke(string $recipient_pubkey, string $message) : array {
-        $unsigned_event = new \Transpher\Nostr\Rumor(time(), 14, $message, ['p', $recipient_pubkey]);
-        $direct_message = $unsigned_event($this->private_key);
-        unset($direct_message['sig']);
-        return ['EVENT', \Transpher\Nostr\Event\Gift::wrap($recipient_pubkey, \Transpher\Nostr\Event\Seal::close($this->private_key, $recipient_pubkey, $direct_message))];
+        return ['EVENT', get_object_vars(Gift::wrap($recipient_pubkey, Seal::close($this->private_key, $recipient_pubkey, new \Transpher\Nostr\Rumor(
+            pubkey: call_user_func($this->private_key, Key::public()),
+            created_at: time(), 
+            kind: 14, 
+            content: $message, 
+            tags: [['p', $recipient_pubkey]]
+        ))))];
     }
 }

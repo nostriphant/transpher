@@ -18,11 +18,13 @@ describe('relay', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 
-        $note1 = Message::rumor(1, 'Hello worlda!');
-        $alice->sendSignedMessage($note1(Key::generate()));
+        $alice_key = Key::generate();
+        $note1 = Message::rumor($alice_key(Key::public()), 1, 'Hello worlda!');
+        $alice->sendSignedMessage($note1($alice_key));
 
-        $note2 = Message::rumor(1, 'Hello worldi!');
-        $note2_signed = $note2(Key::generate());
+        $key_charlie = Key::generate();
+        $note2 = Message::rumor($key_charlie(Key::public()), 1, 'Hello worldi!');
+        $note2_signed = $note2($key_charlie);
         $alice->sendSignedMessage($note2_signed);
 
         $subscription = Message::subscribe();
@@ -37,15 +39,15 @@ describe('relay', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 
-        $note = Message::rumor(1, 'Hello world!');
-        $key = Key::generate();
-        $alice->sendSignedMessage($note($key));
+        $alice_key = Key::generate();
+        $note = Message::rumor($alice_key(Key::public()), 1, 'Hello world!');
+        $alice->sendSignedMessage($note($alice_key));
         $subscription = Message::subscribe();
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
 
-        $request = Message::filter($subscription, authors: [$key(Key::public())])();
+        $request = Message::filter($subscription, authors: [$alice_key(Key::public())])();
         $bob->json($request);
         $bob->start();
     });
@@ -53,10 +55,10 @@ describe('relay', function () {
     it('sends events to all clients subscribed on p-tag', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
+        $alice_key = Key::generate();
 
-        $note = Message::rumor(1, 'Hello world!', ['p', 'randomPTag']);
-        $key = Key::generate();
-        $alice->sendSignedMessage($note($key));
+        $note = Message::rumor($alice_key(Key::public()), 1, 'Hello world!', ['p', 'randomPTag']);
+        $alice->sendSignedMessage($note($alice_key));
         $subscription = Message::subscribe();
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -70,16 +72,16 @@ describe('relay', function () {
     it('closes subscription and stop sending events to subscribers', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
-        $key = Key::generate();
+        $alice_key = Key::generate();
 
-        $note = Message::rumor(1, 'Hello world!');
-        $alice->sendSignedMessage($note($key));
+        $note = Message::rumor($alice_key(Key::public()), 1, 'Hello world!');
+        $alice->sendSignedMessage($note($alice_key));
 
         $subscription = Message::subscribe();
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
 
-        $request = Message::filter($subscription, authors: [$key(Key::public())])();
+        $request = Message::filter($subscription, authors: [$alice_key(Key::public())])();
         $bob->json($request);
         $bob->start();
 
@@ -100,10 +102,10 @@ describe('relay', function () {
         $server = \Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
         $alice = Client::client(8082);
 
-        $key = Key::generate();
+        $alice_key = Key::generate();
 
-        $note = Message::rumor(1, 'Hello wirld!');
-        $alice->sendSignedMessage($note($key));
+        $note = Message::rumor($alice_key(Key::public()), 1, 'Hello wirld!');
+        $alice->sendSignedMessage($note($alice_key));
 
         $status = $server();
         expect($status)->toBeArray();
@@ -117,7 +119,7 @@ describe('relay', function () {
         $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
         $bob->expectNostrEose($subscription()[1]);
 
-        $request = Message::filter($subscription, authors: [$key(Key::public())])();
+        $request = Message::filter($subscription, authors: [$alice_key(Key::public())])();
         $bob->json($request);
         $bob->start();
 
@@ -129,9 +131,10 @@ describe('relay', function () {
     it('sends events to all clients subscribed on kind', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
-
-        $note = Message::rumor(3, 'Hello world!');
-        $alice->sendSignedMessage($note(Key::generate()));
+        $alice_key = Key::generate();
+        
+        $note = Message::rumor($alice_key(Key::public()), 3, 'Hello world!');
+        $alice->sendSignedMessage($note($alice_key));
 
         $subscription = Message::subscribe();
 
@@ -145,20 +148,21 @@ describe('relay', function () {
     it('relays events to Bob, sent after they subscribed on Alices messages', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
-        $key_alice = Key::generate();
+        $alice_key = Key::generate();
 
         $subscription = Message::subscribe();
 
         $bob->expectNostrEose($subscription()[1]);
-        $request = Message::filter($subscription, authors: [$key_alice(Key::public())])();
+        $request = Message::filter($subscription, authors: [$alice_key(Key::public())])();
         $bob->json($request);
         $bob->start();
 
-        $note1 = Message::rumor(1, 'Relayable Hello worlda!');
-        $alice->sendSignedMessage($note1($key_alice));
+        $note1 = Message::rumor($alice_key(Key::public()), 1, 'Relayable Hello worlda!');
+        $alice->sendSignedMessage($note1($alice_key));
 
-        $note2 = Message::rumor(1, 'Hello worldi!');
-        $alice->sendSignedMessage($note2(Key::generate()));
+        $key_charlie = Key::generate();
+        $note2 = Message::rumor($key_charlie(Key::public()), 1, 'Hello worldi!');
+        $alice->sendSignedMessage($note2($key_charlie));
 
         $bob->expectNostrEvent($subscription()[1], 'Relayable Hello worlda!');
         $bob->expectNostrEose($subscription()[1]);

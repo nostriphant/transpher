@@ -26,15 +26,18 @@ class Client extends \TranspherTests\Client {
     
     private $messages = [];
     
-    public function __construct(private string $url) {
+    public function __construct() {
         
+    }
+    static function generic_client() : self {
+        return new self();
     }
     
     #[\Override]
     public function json(mixed $value) : void {
         $events = [];
         $relay = new \Transpher\Nostr\Relay($events);
-        foreach ($relay(\Transpher\Nostr::encode($value)) as $response) {
+        foreach ($relay(\Transpher\Nostr::encode($value), fn() => true) as $response) {
             $this->messages[] = \Transpher\Nostr::encode($response);
         }
     }
@@ -77,9 +80,10 @@ it('responds with a NOTICE on unsupported message types', function () {
 
 it('responds with OK on simple events', function () {
     $alice = Client::generic_client();
-
-    $note = Message::rumor(1, 'Hello world!');
-    $signed_note = $note(Key::generate());
+    $key_alice = Key::generate();
+    
+    $note = Message::rumor($key_alice(Key::public()), 1, 'Hello world!');
+    $signed_note = $note($key_alice);
 
     $alice->expectNostrOK($signed_note[1]['id']);
 
@@ -91,9 +95,10 @@ it('responds with OK on simple events', function () {
 it('replies NOTICE Invalid message on non-existing filters', function () {
     $alice = Client::generic_client();
     $bob = Client::generic_client();
+    $key_alice = Key::generate();
 
-    $note = Message::rumor(1, 'Hello world!');
-    $alice->sendSignedMessage($note(Key::generate()));
+    $note = Message::rumor($key_alice(Key::public()), 1, 'Hello world!');
+    $alice->sendSignedMessage($note($key_alice));
 
     $bob->expectNostrNotice('Invalid message');
     $subscription = Message::subscribe();
@@ -104,9 +109,10 @@ it('replies NOTICE Invalid message on non-existing filters', function () {
 it('replies CLOSED on empty filters', function () {
     $alice = Client::generic_client();
     $bob = Client::generic_client();
+    $key_alice = Key::generate();
 
-    $note = Message::rumor(1, 'Hello world!');
-    $alice->sendSignedMessage($note(Key::generate()));
+    $note = Message::rumor($key_alice(Key::public()), 1, 'Hello world!');
+    $alice->sendSignedMessage($note($key_alice));
 
     $subscription = Message::subscribe();
 

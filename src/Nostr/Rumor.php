@@ -11,23 +11,22 @@ use Transpher\Key;
  */
 readonly class Rumor {
     
-    private array $tags;
+    public string $id;
     
-    public function __construct(private int $created_at, private int $kind, private string $content, array ...$tags) {
-        $this->tags = $tags;
+    public function __construct(public int $created_at, public string $pubkey, public int $kind, public string $content, public array $tags) {
+        $this->id = hash('sha256', Nostr::encode([0, $this->pubkey, $this->created_at, $this->kind, $this->tags, $this->content]));
     }
 
-    public function __invoke(Key $private_key): array {
-        $id = hash('sha256', Nostr::encode([0, $private_key(Key::public()), $this->created_at, $this->kind, $this->tags, $this->content]));
-        return [
-            "id" => $id,
-            "pubkey" => $private_key(Key::public()),
+    public function __invoke(Key $private_key): Event {
+        return new Event(...[
+            "id" => $this->id,
+            "pubkey" => $this->pubkey,
             "created_at" => $this->created_at,
             "kind" => $this->kind,
             "tags" => $this->tags,
             "content" => $this->content,
-            "sig" => $private_key(Key::signer($id))
-        ];
+            "sig" => $private_key(Key::signer($this->id))
+        ]);
     }
     
 }

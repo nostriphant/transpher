@@ -6,7 +6,7 @@ use \Transpher\Nostr\Message;
 it('can generate a properly signed note', function() {
     $private_key = Key::fromHex('435790f13406085d153b10bd9e00a9f977e637f10ce37db5ccfc5d3440c12d6c');
 
-    $note = Message::rumor(1, 'Hello world!');
+    $note = Message::rumor($private_key(Key::public()), 1, 'Hello world!');
     $signed_note = $note($private_key);
 
     $event = $signed_note;

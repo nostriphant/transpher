@@ -13,8 +13,14 @@ use Transpher\Nostr\Event;
  */
 class Message {
     
-    static function rumor(int $kind, string $content, array ...$tags) : Message\Rumor {
-        return new Message\Rumor(new Rumor(time(), $kind, $content, ...$tags));
+    static function rumor(string $sender_pubkey, int $kind, string $content, array ...$tags) : Message\Rumor {
+        return new Message\Rumor(new Rumor(
+            pubkey: $sender_pubkey,
+            created_at: time(), 
+            kind: $kind, 
+            content: $content,
+            tags: $tags
+        ));
     }
     
     static function privateDirect(Key $private_key) : Message\PrivateDirect {

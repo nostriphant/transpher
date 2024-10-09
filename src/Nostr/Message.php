@@ -49,8 +49,7 @@ class Message {
         return new Message\Subscribe\Filter($previous, ...$conditions);
     }
     
-    
     static function requestedEvent(string $subscriptionId, Event $event) {
-        return ['EVENT', $subscriptionId, Event::export($event)];
+        return ['EVENT', $subscriptionId, get_object_vars($event)];
     }
 }

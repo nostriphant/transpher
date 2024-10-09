@@ -32,7 +32,7 @@ class Relay {
             $type = array_shift($message);
             switch (strtoupper($type)) {
                 case 'EVENT': 
-                    $this->events[] = Event::import($message[0]);
+                    $this->events[] = new Event(...$message[0]);
                     yield Message::accept($message[0]['id']);
                     break;
 

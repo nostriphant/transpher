@@ -21,15 +21,7 @@ readonly class Event {
 
     }
     
-    static function import(array $event) : self {
-        return new self(...$event);
-    }
-    
-    static function export(self $event) : array {
-        return get_object_vars($event);
-    }
-    
     public static function __set_state(array $properties) : self {
-        return self::import($properties);
+        return new Event(...$properties);
     }
 }

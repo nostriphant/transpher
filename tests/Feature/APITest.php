@@ -18,10 +18,10 @@ describe('relay', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 
-        $note1 = Message::event(1, 'Hello worlda!');
+        $note1 = Message::rumor(1, 'Hello worlda!');
         $alice->sendSignedMessage($note1(Key::generate()));
 
-        $note2 = Message::event(1, 'Hello worldi!');
+        $note2 = Message::rumor(1, 'Hello worldi!');
         $note2_signed = $note2(Key::generate());
         $alice->sendSignedMessage($note2_signed);
 
@@ -37,7 +37,7 @@ describe('relay', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 
-        $note = Message::event(1, 'Hello world!');
+        $note = Message::rumor(1, 'Hello world!');
         $key = Key::generate();
         $alice->sendSignedMessage($note($key));
         $subscription = Message::subscribe();
@@ -54,7 +54,7 @@ describe('relay', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 
-        $note = Message::event(1, 'Hello world!', ['p', 'randomPTag']);
+        $note = Message::rumor(1, 'Hello world!', ['p', 'randomPTag']);
         $key = Key::generate();
         $alice->sendSignedMessage($note($key));
         $subscription = Message::subscribe();
@@ -72,7 +72,7 @@ describe('relay', function () {
         $bob = Client::generic_client();
         $key = Key::generate();
 
-        $note = Message::event(1, 'Hello world!');
+        $note = Message::rumor(1, 'Hello world!');
         $alice->sendSignedMessage($note($key));
 
         $subscription = Message::subscribe();
@@ -102,7 +102,7 @@ describe('relay', function () {
 
         $key = Key::generate();
 
-        $note = Message::event(1, 'Hello wirld!');
+        $note = Message::rumor(1, 'Hello wirld!');
         $alice->sendSignedMessage($note($key));
 
         $status = $server();
@@ -130,7 +130,7 @@ describe('relay', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 
-        $note = Message::event(3, 'Hello world!');
+        $note = Message::rumor(3, 'Hello world!');
         $alice->sendSignedMessage($note(Key::generate()));
 
         $subscription = Message::subscribe();
@@ -154,10 +154,10 @@ describe('relay', function () {
         $bob->json($request);
         $bob->start();
 
-        $note1 = Message::event(1, 'Relayable Hello worlda!');
+        $note1 = Message::rumor(1, 'Relayable Hello worlda!');
         $alice->sendSignedMessage($note1($key_alice));
 
-        $note2 = Message::event(1, 'Hello worldi!');
+        $note2 = Message::rumor(1, 'Hello worldi!');
         $alice->sendSignedMessage($note2(Key::generate()));
 
         $bob->expectNostrEvent($subscription()[1], 'Relayable Hello worlda!');

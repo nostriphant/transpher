@@ -17,7 +17,7 @@ class Seal {
         $conversation_key = NIP44::getConversationKey($sender_private_key, hex2bin($recipient_pubkey));
         $encrypted_direct_message = NIP44::encrypt(Nostr::encode($event), $conversation_key, random_bytes(32));
         
-        $seal = new Nostr\Event(mktime(rand(0,23), rand(0,59), rand(0,59)), 13, $encrypted_direct_message, []);
+        $seal = new Nostr\Rumor(mktime(rand(0,23), rand(0,59), rand(0,59)), 13, $encrypted_direct_message, []);
         return $seal($sender_private_key);
     }
     

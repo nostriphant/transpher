@@ -3,7 +3,7 @@
 namespace Transpher;
 use function \Functional\map, \Functional\filter, \Functional\partial_left;
 use Transpher\Nostr\Relay\Subscriptions;
-use Transpher\Filters;
+use Transpher\Nostr\Relay\Filter;
 use Transpher\Nostr\Message;
 use Transpher\Nostr\Event\Signed;
 

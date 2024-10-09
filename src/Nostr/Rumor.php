@@ -9,7 +9,7 @@ use Transpher\Key;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-readonly class Event {
+readonly class Rumor {
     
     private array $tags;
     

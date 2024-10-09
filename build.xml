@@ -30,7 +30,7 @@
         <property name="docker_tag" value="rikmeijer84/transpher:latest" override="true" />
         
         <echo msg="Building docker images ${docker_tag}..." />
-        <exec executable="/usr/local/bin/docker">
+        <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">
             <arg line="build --platform linux/amd64,linux/arm64  -t ${docker_tag} ."/>
         </exec>
     </target>
@@ -41,7 +41,7 @@
     <target name="run" depends="build">
         <echo msg="Run container with image ${docker_tag}..." />
         
-        <exec executable="/usr/local/bin/docker">
+        <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">
             <arg line="run --rm -p 8000:80 ${docker_tag}"/>
         </exec>
     </target>
@@ -49,7 +49,7 @@
     <target name="dist" depends="build">
         <echo msg="Pushing docker image ${docker_tag}..." />
 
-        <exec executable="/usr/local/bin/docker">
+        <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">
             <arg line="push ${docker_tag}"/>
         </exec>
     </target>

@@ -7,6 +7,7 @@ use \Transpher\Key;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
+use function \Amp\trapSignal;
 
 $relay_url = $_SERVER['RELAY_URL'];
 $agent_nsec = $_SERVER['AGENT_NSEC'];

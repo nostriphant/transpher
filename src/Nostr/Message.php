@@ -2,12 +2,8 @@
 
 namespace Transpher\Nostr;
 
-use Transpher\Nostr;
 use Transpher\Key;
-use Transpher\Nostr\Event;
-use Transpher\Nostr\Event\Gift;
-use Transpher\Nostr\Event\Seal;
-use function Functional\map;
+use Transpher\Nostr\Rumor;
 use Transpher\Nostr\Event\Signed;
 
 /**
@@ -17,8 +13,8 @@ use Transpher\Nostr\Event\Signed;
  */
 class Message {
     
-    static function event(int $kind, string $content, array ...$tags) : Message\Event {
-        return new Message\Event(new Event(time(), $kind, $content, ...$tags));
+    static function rumor(int $kind, string $content, array ...$tags) : Message\Rumor {
+        return new Message\Rumor(new Rumor(time(), $kind, $content, ...$tags));
     }
     
     static function privateDirect(Key $private_key) : Message\PrivateDirect {

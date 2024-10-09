@@ -78,7 +78,7 @@ it('responds with a NOTICE on unsupported message types', function () {
 it('responds with OK on simple events', function () {
     $alice = Client::generic_client();
 
-    $note = Message::event(1, 'Hello world!');
+    $note = Message::rumor(1, 'Hello world!');
     $signed_note = $note(Key::generate());
 
     $alice->expectNostrOK($signed_note[1]['id']);
@@ -92,7 +92,7 @@ it('replies NOTICE Invalid message on non-existing filters', function () {
     $alice = Client::generic_client();
     $bob = Client::generic_client();
 
-    $note = Message::event(1, 'Hello world!');
+    $note = Message::rumor(1, 'Hello world!');
     $alice->sendSignedMessage($note(Key::generate()));
 
     $bob->expectNostrNotice('Invalid message');
@@ -105,7 +105,7 @@ it('replies CLOSED on empty filters', function () {
     $alice = Client::generic_client();
     $bob = Client::generic_client();
 
-    $note = Message::event(1, 'Hello world!');
+    $note = Message::rumor(1, 'Hello world!');
     $alice->sendSignedMessage($note(Key::generate()));
 
     $subscription = Message::subscribe();

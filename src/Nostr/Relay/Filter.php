@@ -1,6 +1,6 @@
 <?php
 
-namespace Transpher\Nostr\Relay;
+namespace rikmeijer\Transpher\Nostr\Relay;
 
 /**
  * Description of Filter
@@ -9,5 +9,5 @@ namespace Transpher\Nostr\Relay;
  */
 interface Filter {
     public function __construct(array $filter_prototype);
-    public function __invoke(\Transpher\Nostr\Event $event) : bool;
+    public function __invoke(\rikmeijer\Transpher\Nostr\Event $event) : bool;
 }

@@ -1,6 +1,6 @@
 <?php
 
-use Transpher\Nostr\Relay\Subscriptions;
+use rikmeijer\Transpher\Nostr\Relay\Subscriptions;
 
 it('adds and  removes a subscription from the subscriptions-closure', function() {
     $subscriptions = new Subscriptions();

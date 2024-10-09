@@ -1,10 +1,10 @@
 <?php
 
-namespace Transpher\WebSocket;
+namespace rikmeijer\Transpher\WebSocket;
 
 use Amp\Websocket\WebsocketClient;
 use Psr\Log\LoggerInterface;
-use Transpher\Nostr\Relay\Sender;
+use rikmeijer\Transpher\Nostr\Relay\Sender;
 
 /**
  * Description of Reply
@@ -17,7 +17,7 @@ readonly class SendNostr implements Sender {
     
     #[\Override]
     public function __invoke(mixed $json) : bool {
-        $text = \Transpher\Nostr::encode($json);
+        $text = \rikmeijer\Transpher\Nostr::encode($json);
         $this->log->info($this->action . ' message ' . $text);
         $this->client->sendText($text);
         return true;

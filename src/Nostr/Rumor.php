@@ -1,8 +1,8 @@
 <?php
 
-namespace Transpher\Nostr;
-use Transpher\Nostr;
-use Transpher\Key;
+namespace rikmeijer\Transpher\Nostr;
+use rikmeijer\Transpher\Nostr;
+use rikmeijer\Transpher\Key;
 
 /**
  * Description of Event

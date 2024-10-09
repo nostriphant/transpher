@@ -1,12 +1,12 @@
 <?php
 
-use \Transpher\Key;
-use \Transpher\Nostr\Message;
-use \TranspherTests\Client;
+use \rikmeijer\Transpher\Key;
+use \rikmeijer\Transpher\Nostr\Message;
+use \rikmeijer\TranspherTests\Client;
 
 $main_relay;
 beforeAll(function() use (&$main_relay) {
-    $main_relay = \Transpher\Nostr\Relay::boot('127.0.0.1:8081', []);
+    $main_relay = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8081', []);
 });
 afterAll(function() use (&$main_relay) {
     $main_relay();
@@ -99,7 +99,7 @@ describe('relay', function () {
         mkdir($env['TRANSPHER_STORE']);
         
         
-        $server = \Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
+        $server = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
         $alice = Client::client(8082);
 
         $alice_key = Key::generate();
@@ -111,7 +111,7 @@ describe('relay', function () {
         expect($status)->toBeArray();
         expect($status['running'])->toBeFalse();
 
-        $server = \Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
+        $server = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
         
         $bob = Client::client(8082);
         $subscription = Message::subscribe();
@@ -174,10 +174,10 @@ describe('relay', function () {
         $owner_key = Key::generate();
         $agent_key = Key::generate();
         
-        $relay = \Transpher\Nostr\Relay::boot('127.0.0.1:8087', [
-            'AGENT_NSEC' => $agent_key(Key::private(\Transpher\Nostr\Key\Format::BECH32)),
+        $relay = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8087', [
+            'AGENT_NSEC' => $agent_key(Key::private(\rikmeijer\Transpher\Nostr\Key\Format::BECH32)),
             'RELAY_URL' => 'ws://127.0.0.1:8087',
-            'RELAY_OWNER_NPUB' => $owner_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)), 
+            'RELAY_OWNER_NPUB' => $owner_key(Key::public(\rikmeijer\Transpher\Nostr\Key\Format::BECH32)), 
             'RELAY_NAME' => 'Really relay',
             'RELAY_DESCRIPTION' => 'This is my dev relay',
             'RELAY_CONTACT' => 'nostr@rikmeijer.nl'
@@ -190,13 +190,13 @@ describe('relay', function () {
         $responseText = curl_exec($curl);
         expect($responseText)->not()->toBeFalse('['. curl_errno($curl).'] ' . curl_error($curl));
         expect($responseText)->not()->toContain('<b>Warning</b>');
-        $response = \Transpher\Nostr::decode($responseText);
+        $response = \rikmeijer\Transpher\Nostr::decode($responseText);
 
         expect($response)->not()->toBeNull($responseText);
         expect($response)->toBe([
              "name" => 'Really relay',
              "description" => 'This is my dev relay',
-             "pubkey" => $owner_key(Key::public(\Transpher\Nostr\Key\Format::HEXIDECIMAL)),
+             "pubkey" => $owner_key(Key::public(\rikmeijer\Transpher\Nostr\Key\Format::HEXIDECIMAL)),
              "contact" => "nostr@rikmeijer.nl",
              "supported_nips" => [1, 11],
              "software" => 'Transpher',

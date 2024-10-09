@@ -1,6 +1,6 @@
 <?php
 
-namespace Transpher\Nostr\Relay;
+namespace rikmeijer\Transpher\Nostr\Relay;
 
 /**
  * Description of InformationDocument
@@ -12,7 +12,7 @@ class InformationDocument {
         return [
             "name" => $name,
             "description" => $description,
-            "pubkey" => \Transpher\Key::convertBech32ToHex($npub),
+            "pubkey" => \rikmeijer\Transpher\Key::convertBech32ToHex($npub),
             "contact" => $contact,
             "supported_nips" => [1, 11],
             "software" => 'Transpher',

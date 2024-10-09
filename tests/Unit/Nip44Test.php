@@ -1,7 +1,7 @@
 <?php
 
-use Transpher\Key;
-use Transpher\Nostr\NIP44;
+use rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Nostr\NIP44;
 
 require_once __DIR__ . '/functions.php';
 
@@ -36,7 +36,7 @@ describe('NIP-44 v2', function () {
         it('get_conversation_key', function () {
             //https://github.com/paulmillr/nip44/blob/main/javascript/test/nip44.vectors.json
             foreach (vectors('nip44')->v2->valid->get_conversation_key as $vector) {
-                $privkey = \Transpher\Key::fromHex($vector->sec1);
+                $privkey = \rikmeijer\Transpher\Key::fromHex($vector->sec1);
                 $key = NIP44::getConversationKey($privkey, hex2bin($vector->pub2));
                 expect($key)->not()->toBeFalse();
                 expect(bin2hex($key))->toBe($vector->conversation_key, $vector->note??'');
@@ -64,7 +64,7 @@ describe('NIP-44 v2', function () {
                 $key = Key::fromHex($vector->sec2);
                 $pub2 = $key(Key::public());
 
-                $privkey = \Transpher\Key::fromHex($vector->sec1);
+                $privkey = \rikmeijer\Transpher\Key::fromHex($vector->sec1);
                 $conversation_key = NIP44::getConversationKey($privkey, hex2bin($pub2));
                 expect($conversation_key)->not()->toBeFalse();
                 expect(bin2hex($conversation_key))->toBe($vector->conversation_key);
@@ -106,7 +106,7 @@ describe('NIP-44 v2', function () {
     });
     it('get_conversation_key', function() {
       foreach (vectors('nip44')->v2->invalid->get_conversation_key as $vector) {
-        $privkey = \Transpher\Key::fromHex($vector->sec1);
+        $privkey = \rikmeijer\Transpher\Key::fromHex($vector->sec1);
         expect($privkey(Key::sharedSecret($vector->pub2)))->toBeFalse($vector->note);
       }
     });

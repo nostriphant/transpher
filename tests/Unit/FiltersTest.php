@@ -1,7 +1,7 @@
 <?php
 
-use Transpher\Filters;
-use Transpher\Nostr\Event;
+use rikmeijer\Transpher\Filters;
+use rikmeijer\Transpher\Nostr\Event;
 
 function event(array $event) : Event {
     return new Event(...array_merge([

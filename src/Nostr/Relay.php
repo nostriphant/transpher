@@ -1,10 +1,10 @@
 <?php
 
-namespace Transpher\Nostr;
+namespace rikmeijer\Transpher\Nostr;
 
-use \Transpher\Nostr\Message;
-use \Transpher\Process;
-use Transpher\Nostr\Relay\Subscriptions;
+use \rikmeijer\Transpher\Nostr\Message;
+use \rikmeijer\Transpher\Process;
+use rikmeijer\Transpher\Nostr\Relay\Subscriptions;
 
 /**
  * Description of Server
@@ -25,7 +25,7 @@ class Relay {
     }
     
     public function __invoke(string $payload, callable $relay) : \Generator {
-        $message = \Transpher\Nostr::decode($payload);
+        $message = \rikmeijer\Transpher\Nostr::decode($payload);
         if (is_null($message)) {
             yield Message::notice('Invalid message');
         } else {

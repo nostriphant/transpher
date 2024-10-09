@@ -1,10 +1,10 @@
 <?php
 
-namespace Transpher\Nostr;
+namespace rikmeijer\Transpher\Nostr;
 
-use Transpher\Key;
-use Transpher\Nostr\Rumor;
-use Transpher\Nostr\Event;
+use rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Nostr\Rumor;
+use rikmeijer\Transpher\Nostr\Event;
 
 /**
  * Class to contain Message related functions

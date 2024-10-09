@@ -1,15 +1,15 @@
 <?php
 
-namespace TranspherTests;
+namespace rikmeijer\TranspherTests;
 
-use Transpher\Nostr;
+use rikmeijer\Transpher\Nostr;
 
 /**
  * Description of Client
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Client extends \Transpher\WebSocket\Client {
+class Client extends \rikmeijer\Transpher\WebSocket\Client {
 
     private $expected_messages = [];
     

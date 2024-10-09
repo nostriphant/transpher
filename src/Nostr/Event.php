@@ -1,6 +1,6 @@
 <?php
 
-namespace Transpher\Nostr;
+namespace rikmeijer\Transpher\Nostr;
 
 /**
  * Description of Event

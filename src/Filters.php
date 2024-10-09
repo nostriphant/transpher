@@ -1,8 +1,8 @@
 <?php
-namespace Transpher;
+namespace rikmeijer\Transpher;
 
 use function Functional\partial_left, Functional\some, \Functional\map, \Functional\true;
-use \Transpher\Nostr\Event;
+use \rikmeijer\Transpher\Nostr\Event;
 
 /**
  * Description of Filters

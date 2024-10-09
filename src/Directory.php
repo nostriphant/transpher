@@ -1,11 +1,11 @@
 <?php
 
-namespace Transpher;
+namespace rikmeijer\Transpher;
 use function \Functional\map, \Functional\filter, \Functional\partial_left;
-use Transpher\Nostr\Relay\Subscriptions;
-use Transpher\Nostr\Relay\Filter;
-use Transpher\Nostr\Message;
-use Transpher\Nostr\Event;
+use rikmeijer\Transpher\Nostr\Relay\Subscriptions;
+use rikmeijer\Transpher\Nostr\Relay\Filter;
+use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Nostr\Event;
 
 /**
  * Description of Directory

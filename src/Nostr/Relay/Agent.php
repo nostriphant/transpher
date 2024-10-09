@@ -1,7 +1,7 @@
 <?php
 
-namespace Transpher\Nostr\Relay;
-use \Transpher\Process;
+namespace rikmeijer\Transpher\Nostr\Relay;
+use \rikmeijer\Transpher\Process;
 
 /**
  * Description of Agent

@@ -1,12 +1,12 @@
 <?php
 
-namespace Transpher\Nostr\Relay;
+namespace rikmeijer\Transpher\Nostr\Relay;
 
 use Functional\Functional;
 use function \Functional\if_else, \Functional\first;
-use Transpher\Nostr\Message;
-use Transpher\Nostr\Event;
-use Transpher\Filters;
+use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Nostr\Event;
+use rikmeijer\Transpher\Filters;
 
 /**
  * Description of Subscriptions

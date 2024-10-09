@@ -25,8 +25,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Transpher\\": "src/",
-	    "TranspherTests\\": "tests/"
+            "rikmeijer\\Transpher\\": "src/",
+	    "rikmeijer\\TranspherTests\\": "tests/"
         }
     },
     "authors": [

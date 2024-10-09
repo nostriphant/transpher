@@ -1,7 +1,7 @@
 <?php
 
-use \Transpher\Key;
-use \Transpher\Nostr\Message;
+use \rikmeijer\Transpher\Key;
+use \rikmeijer\Transpher\Nostr\Message;
 
 it('generates a NIP11 Relay Information Document', function() {
     
@@ -10,7 +10,7 @@ it('generates a NIP11 Relay Information Document', function() {
     $owner_npub = 'npub1cza3sx7rn389ja5gqkaut0wnf3gg799srg5c6ca7g5gdjaqhecqsg485p4';
     $contact = 'nostr@rikmeijer.nl';
     
-    expect(\Transpher\Nostr\Relay\InformationDocument::generate($name, $description, $owner_npub, $contact))->toBe([
+    expect(\rikmeijer\Transpher\Nostr\Relay\InformationDocument::generate($name, $description, $owner_npub, $contact))->toBe([
         "name" => 'Transpher Relay',
         "description" => 'Some interesting description goes here',
         "pubkey" => 'c0bb181bc39c4e59768805bbc5bdd34c508f14b01a298d63be4510d97417ce01',
@@ -22,7 +22,7 @@ it('generates a NIP11 Relay Information Document', function() {
     
 });
 
-class Client extends \TranspherTests\Client {
+class Client extends \rikmeijer\TranspherTests\Client {
     
     private $messages = [];
     
@@ -36,9 +36,9 @@ class Client extends \TranspherTests\Client {
     #[\Override]
     public function json(mixed $value) : void {
         $events = [];
-        $relay = new \Transpher\Nostr\Relay($events);
-        foreach ($relay(\Transpher\Nostr::encode($value), fn() => true) as $response) {
-            $this->messages[] = \Transpher\Nostr::encode($response);
+        $relay = new \rikmeijer\Transpher\Nostr\Relay($events);
+        foreach ($relay(\rikmeijer\Transpher\Nostr::encode($value), fn() => true) as $response) {
+            $this->messages[] = \rikmeijer\Transpher\Nostr::encode($response);
         }
     }
     

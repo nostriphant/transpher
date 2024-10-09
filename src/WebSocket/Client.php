@@ -1,8 +1,8 @@
 <?php
 
-namespace Transpher\WebSocket;
+namespace rikmeijer\Transpher\WebSocket;
 
-use Transpher\Nostr;
+use rikmeijer\Transpher\Nostr;
 use function Amp\Websocket\Client\connect;
 
 

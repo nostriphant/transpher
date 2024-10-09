@@ -5,8 +5,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
  */
 
-namespace Transpher;
-use Transpher\Nostr\Key\Format;
+namespace rikmeijer\Transpher;
+use rikmeijer\Transpher\Nostr\Key\Format;
 use Elliptic\EC;
 use function BitWasp\Bech32\convertBits;
 use function BitWasp\Bech32\decode;

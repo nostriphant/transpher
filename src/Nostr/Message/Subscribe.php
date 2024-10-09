@@ -1,5 +1,5 @@
 <?php
-namespace Transpher\Nostr\Message;
+namespace rikmeijer\Transpher\Nostr\Message;
 
 /**
  * Description of Subscribe

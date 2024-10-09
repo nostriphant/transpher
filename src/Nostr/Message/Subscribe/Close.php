@@ -1,6 +1,6 @@
 <?php
 
-namespace Transpher\Nostr\Message\Subscribe;
+namespace rikmeijer\Transpher\Nostr\Message\Subscribe;
 
 /**
  * Description of Close

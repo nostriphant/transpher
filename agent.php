@@ -2,8 +2,8 @@
 
 require_once __DIR__ . '/bootstrap.php';
 
-use Transpher\Nostr\Message;
-use \Transpher\Key;
+use rikmeijer\Transpher\Nostr\Message;
+use \rikmeijer\Transpher\Key;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -19,10 +19,10 @@ $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
 
 
 $agent_key = Key::fromBech32($agent_nsec);
-$log->info('Running agent with public key ' . $agent_key(Key::public(\Transpher\Nostr\Key\Format::BECH32)));
+$log->info('Running agent with public key ' . $agent_key(Key::public(\rikmeijer\Transpher\Nostr\Key\Format::BECH32)));
 
 $log->info('Client connecting to ' . $relay_url);
-$agent = new \Transpher\WebSocket\Client($relay_url);
+$agent = new \rikmeijer\Transpher\WebSocket\Client($relay_url);
 $log->info('Sending Private Direct Message event');
 $note = Message::privateDirect($agent_key);
 $agent->json($note(Key::convertBech32ToHex($relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $relay_url));

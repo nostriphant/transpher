@@ -1,6 +1,6 @@
 <?php
 
-namespace Transpher;
+namespace rikmeijer\Transpher;
 
 /**
  * Description of Hash

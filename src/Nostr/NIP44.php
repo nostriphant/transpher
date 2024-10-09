@@ -1,9 +1,9 @@
 <?php
 
-namespace Transpher\Nostr;
+namespace rikmeijer\Transpher\Nostr;
 
-use \Transpher\HashSHA256;
-use Transpher\Key;
+use \rikmeijer\Transpher\HashSHA256;
+use rikmeijer\Transpher\Key;
 
 /**
  * Description of NIP44

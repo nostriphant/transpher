@@ -5,7 +5,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPInterface.php to edit this template
  */
 
-namespace Transpher\Nostr\Message\Subscribe;
+namespace rikmeijer\Transpher\Nostr\Message\Subscribe;
 
 /**
  *

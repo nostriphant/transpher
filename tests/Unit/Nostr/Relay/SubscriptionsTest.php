@@ -7,10 +7,7 @@ it('adds and  removes a subscription from the subscriptions-closure', function()
     $refl_subscriptions = (new ReflectionObject($subscriptions));
     expect($refl_subscriptions->getStaticPropertyValue('subscriptions'))->toHaveCount(0);
     
-    $true = Mockery::mock(\Transpher\Nostr\Relay\Filter::class);
-    $true->shouldReceive('__invoke')->andReturnTrue();
-    
-    Subscriptions::subscribe('my-awesome-subscription', $true, function(string $subscriptionId, array $event) : bool {
+    Subscriptions::subscribe('my-awesome-subscription', ['id' => ''], function(string $subscriptionId, array $event) : bool {
         return true;
     });
     expect($refl_subscriptions->getStaticPropertyValue('subscriptions'))->toHaveCount(1);

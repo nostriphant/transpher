@@ -6,6 +6,7 @@ use Functional\Functional;
 use function \Functional\if_else, \Functional\first;
 use Transpher\Nostr\Message;
 use Transpher\Nostr\Event\Signed;
+use Transpher\Filters;
 
 /**
  * Description of Subscriptions
@@ -30,8 +31,10 @@ use Transpher\Nostr\Event\Signed;
             return true;
         });
     }
-    static function subscribe(string $subscriptionId, Filter $matcher, callable $relay) : void {
+    static function subscribe(string $subscriptionId, array $prototype, callable $relay) : Filter {
+        $matcher = new Filters($prototype);
         self::$subscriptions[$subscriptionId] = if_else($matcher, fn() => $relay, fn() => false);
+        return $matcher;
     }
     static function unsubscribe(string $subscriptionId) : void {
         unset(self::$subscriptions[$subscriptionId]);

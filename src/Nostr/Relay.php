@@ -51,7 +51,10 @@ class Relay {
                     } elseif (empty($message[1])) {
                         yield Message::closed($message[0], 'Subscription filters are empty');
                     } else {
-                        yield from call_user_func($this->events, $message[0], $message[1], $relay);
+                        $subscription = Subscriptions::subscribe($message[0], $message[1], $relay);
+                        $subscribed_events = call_user_func($this->events, $subscription);
+                        yield from $subscribed_events($message[0]);
+                        yield Message::eose($message[0]);
                     }
                     break;
 

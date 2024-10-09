@@ -5,6 +5,7 @@ use function \Functional\map, \Functional\filter, \Functional\partial_left;
 use Transpher\Nostr\Relay\Subscriptions;
 use Transpher\Filters;
 use Transpher\Nostr\Message;
+use Transpher\Nostr\Event\Signed;
 
 /**
  * Description of Directory
@@ -18,7 +19,7 @@ class Directory implements \ArrayAccess, \Iterator {
     public function __construct(private string $store) {
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {
             $event = include $event_file;
-            $this->events[$event['id']] = $event;
+            $this->events[$event->id] = $event;
         }   
     }
     
@@ -30,8 +31,8 @@ class Directory implements \ArrayAccess, \Iterator {
         yield Message::eose($subscriptionId);
     }
     
-    private function file(array $event) {
-        return $this->store . DIRECTORY_SEPARATOR . $event['id'] . '.php';
+    private function file(Signed $event) {
+        return $this->store . DIRECTORY_SEPARATOR . $event->id . '.php';
     }
 
     #[\Override]
@@ -40,14 +41,14 @@ class Directory implements \ArrayAccess, \Iterator {
     }
 
     #[\Override]
-    public function offsetGet(mixed $offset): array {
+    public function offsetGet(mixed $offset): Signed {
         return $this->events[$offset];
     }
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $event): void {
         if (is_null($offset)) {
-            $offset = $event['id'];
+            $offset = $event->id;
             Subscriptions::apply($event);
         }
         $this->events[$offset] = $event;

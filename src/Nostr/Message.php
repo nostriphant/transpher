@@ -8,6 +8,7 @@ use Transpher\Nostr\Event;
 use Transpher\Nostr\Event\Gift;
 use Transpher\Nostr\Event\Seal;
 use function Functional\map;
+use Transpher\Nostr\Event\Signed;
 
 /**
  * Class to contain Message related functions
@@ -53,7 +54,7 @@ class Message {
     }
     
     
-    static function requestedEvent(string $subscriptionId, array $event) {
-        return ['EVENT', $subscriptionId, $event];
+    static function requestedEvent(string $subscriptionId, Signed $event) {
+        return ['EVENT', $subscriptionId, Signed::export($event)];
     }
 }

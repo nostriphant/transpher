@@ -1,9 +1,10 @@
 <?php
 
 namespace Transpher;
-use function \Functional\map, \Functional\filter;
+use function \Functional\map, \Functional\filter, \Functional\partial_left;
 use Transpher\Nostr\Relay\Subscriptions;
 use Transpher\Filters;
+use Transpher\Nostr\Message;
 
 /**
  * Description of Directory
@@ -13,10 +14,8 @@ use Transpher\Filters;
 class Directory implements \ArrayAccess, \Iterator {
 
     private array $events = [];
-    private Subscriptions $subscriptions;
-
+        
     public function __construct(private string $store) {
-        $this->subscriptions = Subscriptions::makeStore();
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {
             $event = include $event_file;
             $this->events[$event['id']] = $event;
@@ -26,8 +25,8 @@ class Directory implements \ArrayAccess, \Iterator {
     public function __invoke(string $subscriptionId, array $subscriptionPrototype, callable $relay) : \Generator {
         $subscription = new Filters($subscriptionPrototype);
         Subscriptions::subscribe($subscriptionId, $subscription, function(string $subscriptionId, array $event) use ($relay) : bool {
-            $relay(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event));
-            $relay(\Transpher\Nostr\Message::eose($subscriptionId));
+            $relay(Message::requestedEvent($subscriptionId, $event));
+            $relay(Message::eose($subscriptionId));
             return true;
         });
         
@@ -53,7 +52,7 @@ class Directory implements \ArrayAccess, \Iterator {
     public function offsetSet(mixed $offset, mixed $event): void {
         if (is_null($offset)) {
             $offset = $event['id'];
-            call_user_func($this->subscriptions, $event);
+            Subscriptions::apply($event);
         }
         $this->events[$offset] = $event;
         file_put_contents($this->file($event), '<?php return ' . var_export($event, true) . ';');

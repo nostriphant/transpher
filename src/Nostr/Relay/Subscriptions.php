@@ -10,28 +10,19 @@ use function \Functional\if_else, \Functional\first, \Functional\not, \Functiona
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
- readonly class Subscriptions {
+ class Subscriptions {
     
-    public function __construct(private array $subscriptions = []) {
+    private static array $subscriptions = [];
+
+    static function apply(array $event): bool {
+        return empty(self::$subscriptions) ? false : null !== first(self::$subscriptions, fn(array $subscription) => $subscription[1]($event));
     }
-    public function __invoke(array $event): bool {
-        return empty($this->subscriptions) ? false : null !== first($this->subscriptions, fn(array $subscription) => $subscription[1]($event));
-    }
-    
-    static function makeStore(?Subscriptions $subscriptions = null) : self {
-        static $_subscriptions = new self();
-        if (isset($subscriptions)) {
-            $_subscriptions = $subscriptions;
-        }
-        return $_subscriptions;
-    }
-    
     static function subscribe(string $subscriptionId, Filter $matcher, callable $success) : void {
         $subscription_relay = if_else($matcher, fn($event) => $success($subscriptionId, $event), Functional::false);
-        self::makeStore(new self(array_merge(Subscriptions::makeStore()->subscriptions, [[$subscriptionId, $subscription_relay]])));
+        self::$subscriptions[] = [$subscriptionId, $subscription_relay];
     }
     static function unsubscribe(string $subscriptionId) : void {
-        self::makeStore(new self(array_filter(Subscriptions::makeStore()->subscriptions, fn(array $item) => $item[0] !== $subscriptionId)));
+        self::$subscriptions = array_filter(self::$subscriptions, fn(array $item) => $item[0] !== $subscriptionId);
     }
     
 }

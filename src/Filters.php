@@ -9,7 +9,7 @@ use function Functional\partial_left, Functional\some;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-readonly class Filters {
+readonly class Filters implements Nostr\Relay\Filter {
     
     private array $possible_filters;
     

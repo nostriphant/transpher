@@ -26,7 +26,7 @@ use function \Functional\if_else, \Functional\first, \Functional\not, \Functiona
         return $_subscriptions;
     }
     
-    static function subscribe(string $subscriptionId, callable $matcher, callable $success) : void {
+    static function subscribe(string $subscriptionId, Filter $matcher, callable $success) : void {
         $subscription_relay = if_else($matcher, fn($event) => $success($subscriptionId, $event), Functional::false);
         self::makeStore(new self(array_merge(Subscriptions::makeStore()->subscriptions, [[$subscriptionId, $subscription_relay]])));
     }

@@ -3,10 +3,8 @@
 namespace Transpher\Nostr;
 
 use \Transpher\Nostr\Message;
-use \Transpher\Filters;
 use \Transpher\Process;
 use Transpher\Nostr\Relay\Subscriptions;
-use function \Functional\partial_left;
 
 /**
  * Description of Server
@@ -53,14 +51,11 @@ class Relay {
                     } elseif (empty($message[1])) {
                         yield Message::closed($message[0], 'Subscription filters are empty');
                     } else {
-                        $subscription = Filters::constructFromPrototype($message[1]);
-                        Subscriptions::subscribe($message[0], $subscription, function(string $subscriptionId, array $event) use ($relay) : bool {
+                        yield from call_user_func($this->events, $message[0], $message[1], function(string $subscriptionId, array $event) use ($relay) : bool {
                             $relay(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event));
                             $relay(\Transpher\Nostr\Message::eose($subscriptionId));
                             return true;
                         });
-                        
-                        yield from call_user_func($this->events, $message[0], $subscription);
                     }
                     break;
 

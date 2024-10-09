@@ -3,6 +3,8 @@
 namespace Transpher;
 use function \Functional\map, \Functional\filter;
 use Transpher\Nostr\Relay\Subscriptions;
+use Transpher\Filters;
+
 /**
  * Description of Directory
  *
@@ -21,7 +23,10 @@ class Directory implements \ArrayAccess, \Iterator {
         }   
     }
     
-    public function __invoke(string $subscriptionId, callable $subscription) : \Generator {
+    public function __invoke(string $subscriptionId, array $subscriptionPrototype, callable $success) : \Generator {
+        $subscription = Filters::constructFromPrototype($subscriptionPrototype);
+        Subscriptions::subscribe($subscriptionId, $subscription, $success);
+        
         yield from map(filter($this->events, $subscription), partial_left([Message::class, 'requestedEvent'], $subscriptionId));
         yield Message::eose($subscriptionId);
     }

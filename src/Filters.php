@@ -26,8 +26,8 @@ readonly class Filters {
         ]);
     }
     
-    public function __invoke() : callable {
-        return fn(array $event) => \Functional\true(\Functional\map($this->possible_filters, fn($subscription_filter) => $subscription_filter($event)));
+    public function __invoke(array $event) : bool {
+        return \Functional\true(\Functional\map($this->possible_filters, fn($subscription_filter) => $subscription_filter($event)));
     }
     
     static function invalid(array $filters, string $filter_field, callable $type_test) {

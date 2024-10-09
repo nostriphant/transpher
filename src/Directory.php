@@ -12,7 +12,7 @@ use Transpher\Nostr\Event\Signed;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Directory implements \ArrayAccess, \Iterator {
+class Directory implements \ArrayAccess {
 
     private array $events = [];
         
@@ -59,30 +59,5 @@ class Directory implements \ArrayAccess, \Iterator {
     public function offsetUnset(mixed $offset): void {
         unlink($this->file($this->events[$offset]));
         unset($this->events[$offset]);
-    }
-    
-    #[\Override]
-    public function current(): array {
-        return \current($this->events);
-    }
-
-    #[\Override]
-    public function key(): string {
-        return \key($this->events);
-    }
-
-    #[\Override]
-    public function next(): void {
-        \next($this->events);
-    }
-
-    #[\Override]
-    public function rewind(): void {
-        \reset($this->events);
-    }
-
-    #[\Override]
-    public function valid(): bool {
-        return \current($this->events) !== false;
     }
 }

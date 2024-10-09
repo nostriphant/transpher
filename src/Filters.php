@@ -1,8 +1,7 @@
 <?php
 namespace Transpher;
 
-use Functional\Functional;
-use function Functional\partial_left, Functional\some;
+use function Functional\partial_left, Functional\some, \Functional\map, \Functional\true;
 use \Transpher\Nostr\Event\Signed;
 
 /**
@@ -28,7 +27,7 @@ readonly class Filters implements Nostr\Relay\Filter {
     }
     
     public function __invoke(Signed $event) : bool {
-        return \Functional\true(\Functional\map($this->possible_filters, fn($subscription_filter) => $subscription_filter($event)));
+        return true(map($this->possible_filters, fn($subscription_filter) => $subscription_filter($event)));
     }
     
     static function invalid(array $filters, string $filter_field, callable $type_test) {

@@ -3,9 +3,6 @@
 namespace TranspherTests;
 
 use Transpher\Nostr;
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Level;
 
 /**
  * Description of Client

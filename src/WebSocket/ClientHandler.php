@@ -7,7 +7,6 @@ use \Psr\Log\LoggerInterface;
 use \Transpher\Nostr\Relay;
 use Amp\Websocket\Server\WebsocketClientHandler;
 use Amp\Websocket\Server\WebsocketGateway;
-use Transpher\Nostr\Relay\Subscriptions;
 use Amp\Websocket\WebsocketClient;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;

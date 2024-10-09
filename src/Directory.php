@@ -24,11 +24,7 @@ class Directory implements \ArrayAccess, \Iterator {
     
     public function __invoke(string $subscriptionId, array $subscriptionPrototype, callable $relay) : \Generator {
         $subscription = new Filters($subscriptionPrototype);
-        Subscriptions::subscribe($subscriptionId, $subscription, function(string $subscriptionId, array $event) use ($relay) : bool {
-            $relay(Message::requestedEvent($subscriptionId, $event));
-            $relay(Message::eose($subscriptionId));
-            return true;
-        });
+        Subscriptions::subscribe($subscriptionId, $subscription, $relay);
         
         yield from map(filter($this->events, $subscription), partial_left([Message::class, 'requestedEvent'], $subscriptionId));
         yield Message::eose($subscriptionId);

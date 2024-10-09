@@ -24,7 +24,8 @@ class Directory implements \ArrayAccess, \Iterator {
     }
     
     public function __invoke(string $subscriptionId, array $subscriptionPrototype, callable $relay) : \Generator {
-        $subscription = Filters::constructFromPrototype($subscriptionPrototype);
+        $filters = new Filters($subscriptionPrototype);
+        $subscription = $filters();
         Subscriptions::subscribe($subscriptionId, $subscription, function(string $subscriptionId, array $event) use ($relay) : bool {
             $relay(\Transpher\Nostr\Message::requestedEvent($subscriptionId, $event));
             $relay(\Transpher\Nostr\Message::eose($subscriptionId));

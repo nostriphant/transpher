@@ -3,32 +3,37 @@
 use Transpher\Filters;
 
 it('filters p-tags', function() {
-    $subscription = Filters::constructFromPrototype(['#p' => ['RandomPTag']]);
+    $filters = new Filters(['#p' => ['RandomPTag']]);
+    $subscription = $filters();
     expect($subscription(['tags' => [['p', 'RandomPTag']]]))->toBeTrue();
 });
 
 
 it('filters e-tags', function() {
-    $subscription = Filters::constructFromPrototype(['#e' => ['RandomEventId']]);
+    $filters = new Filters(['#e' => ['RandomEventId']]);
+    $subscription = $filters();
     expect($subscription(['tags' => [['e', 'RandomEventId']]]))->toBeTrue();
 });
 
 it('filters created since', function() {
     $time = time();
-    $subscription = Filters::constructFromPrototype(['since' => $time - 100]);
+    $filters = new Filters(['since' => $time - 100]);
+    $subscription = $filters();
     expect($subscription(['created_at' => $time]))->toBeTrue();
 });
 
 it('filters created until', function() {
     $time = time();
-    $subscription = Filters::constructFromPrototype(['until' => $time + 100]);
+    $filters = new Filters(['until' => $time + 100]);
+    $subscription = $filters();
     expect($subscription(['created_at' => $time]))->toBeTrue();
 });
 
 
 it('filters maximum number of items', function() {
     $time = time();
-    $subscription = Filters::constructFromPrototype(['until' => $time + 100, 'limit' => 5]);
+    $filters = new Filters(['until' => $time + 100, 'limit' => 5]);
+    $subscription = $filters();
     expect($subscription(['created_at' => $time]))->toBeTrue();
     expect($subscription(['created_at' => $time]))->toBeTrue();
     expect($subscription(['created_at' => $time]))->toBeTrue();

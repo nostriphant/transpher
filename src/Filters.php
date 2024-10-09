@@ -9,10 +9,12 @@ use function Functional\partial_left, Functional\some;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Filters {
+readonly class Filters {
     
-    static function constructFromPrototype(array $filter_prototype) : callable {
-        $possible_filters = array_map(fn(callable $possible_filter) => $possible_filter($filter_prototype), [
+    private array $possible_filters;
+    
+    public function __construct(array $filter_prototype) {
+        $this->possible_filters = array_map(fn(callable $possible_filter) => $possible_filter($filter_prototype), [
             self::make('ids', self::scalar('id')),
             self::make('kinds', self::scalar('kind')),
             self::make('authors', self::scalar('pubkey')),
@@ -22,8 +24,10 @@ class Filters {
             self::make('#e', self::tag('e')),
             self::make('limit', self::limit())
         ]);
-        
-        return fn(array $event) => \Functional\true(\Functional\map($possible_filters, fn($subscription_filter) => $subscription_filter($event)));
+    }
+    
+    public function __invoke() : callable {
+        return fn(array $event) => \Functional\true(\Functional\map($this->possible_filters, fn($subscription_filter) => $subscription_filter($event)));
     }
     
     static function invalid(array $filters, string $filter_field, callable $type_test) {

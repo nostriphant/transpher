@@ -15,6 +15,6 @@ readonly class Decrypter {
         $this->conversation_key = NIP44::getConversationKey($recipient_key, $sender_pubkey);
     }
     public function __invoke(string $message) : string {
-        return NIP44::decrypt($message, $this->conversation_key);
+        return NIP44::decrypt($message, new NIP44\MessageKeys($this->conversation_key));
     }
 }

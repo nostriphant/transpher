@@ -101,17 +101,17 @@ class NIP44 {
 
     /* Based on: https://github.com/nbd-wtf/nostr-tools/blob/master/nip44.ts */
 
-    static function encrypt(string $utf8_text, #[\SensitiveParameter] string $conversationKey, string $salt): false|string {
+    static function encrypt(string $utf8_text, NIP44\MessageKeys $keys, string $salt): false|string {
         $padded = self::pad($utf8_text);
         if ($padded === false) {
             return false;
         }
-        list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt);
+        list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($salt, 32, 12, 32));
         $ciphertext = self::chacha20($chacha_key, $chacha_nonce, $padded);
         return sodium_bin2base64(self::uInt8(2) . $salt . $ciphertext . self::hmacAad($hmac_key, $salt, $ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
     }
 
-    static function decrypt(string $payload, string $conversationKey): bool|string {
+    static function decrypt(string $payload, NIP44\MessageKeys $keys): bool|string {
         if ($payload === '') {
             return false;
         } elseif ($payload[0] === '#') {
@@ -128,7 +128,7 @@ class NIP44 {
         $ciphertext = substr($decoded, 33, -32);
         $mac = substr($decoded, -32);
 
-        list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt);
+        list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($salt, 32, 12, 32));
         $expected_mac = self::hmacAad($hmac_key, $salt, $ciphertext);
         if ($mac !== $expected_mac) {
             return false;

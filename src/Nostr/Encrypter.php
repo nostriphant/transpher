@@ -15,6 +15,6 @@ readonly class Encrypter {
         $this->conversation_key = NIP44::getConversationKey($sender_key, $recipient_pubkey);
     }
     public function __invoke(string $message) : string {
-        return NIP44::encrypt($message, $this->conversation_key, random_bytes(32));
+        return NIP44::encrypt($message, new NIP44\MessageKeys($this->conversation_key), random_bytes(32));
     }
 }

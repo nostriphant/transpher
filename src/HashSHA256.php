@@ -8,6 +8,9 @@ namespace rikmeijer\Transpher;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 readonly class HashSHA256 {
+    
+    const OUTPUT_SIZE = 32;
+    
     private \HashContext $context;
     public function __construct(#[\SensitiveParameter] string $key) {
         $this->context = hash_init('sha256', HASH_HMAC, $key);

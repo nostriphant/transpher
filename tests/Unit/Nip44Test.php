@@ -3,6 +3,7 @@
 use rikmeijer\Transpher\Key;
 use rikmeijer\Transpher\Nostr\NIP44;
 use rikmeijer\Transpher\Nostr;
+use rikmeijer\Transpher\Nostr\NIP44\MessageKeys;
 
 require_once __DIR__ . '/functions.php';
 
@@ -57,11 +58,16 @@ describe('NIP-44 v2', function () {
         it('gets message keys', function () {
             $conversation_key = hex2bin(vectors('nip44')->v2->valid->get_message_keys->conversation_key);
             expect($conversation_key)->not()->toBeEmpty();
+            $message_key_maker = new MessageKeys($conversation_key);
             foreach (vectors('nip44')->v2->valid->get_message_keys->keys as $vector) {
-                list($chacha_key, $chacha_nonce, $hmac_key) = NIP44::getMessageKeys($conversation_key, hex2bin($vector->nonce), 32, 12, 32);
-                expect(bin2hex($chacha_key))->toBe($vector->chacha_key);
-                expect(bin2hex($chacha_nonce))->toBe($vector->chacha_nonce);
-                expect(bin2hex($hmac_key))->toBe($vector->hmac_key);
+                $expected = [
+                    $vector->chacha_key,
+                    $vector->chacha_nonce,
+                    $vector->hmac_key
+                ];
+                foreach ($message_key_maker(hex2bin($vector->nonce), 32, 12, 32) as $key) {
+                    expect(bin2hex($key))->toBe(array_shift($expected));
+                }
             }
         });
 

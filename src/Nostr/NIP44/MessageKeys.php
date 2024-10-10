@@ -32,12 +32,11 @@ readonly class MessageKeys {
             $result .= substr($stepResult, 0, $stepSize);
             $length -= $stepSize;
         }
-
         return $result;
     }
     
-    public function __invoke(string $nonce, int ...$lengths) : \Generator {
-        $keys = $this->hkdf_expand($nonce, array_sum($lengths));
+    public function __invoke(string $salt, int ...$lengths) : \Generator {
+        $keys = $this->hkdf_expand($salt, array_sum($lengths));
         $offset = 0;
         foreach ($lengths as $length) {
             yield substr($keys, $offset, $length);

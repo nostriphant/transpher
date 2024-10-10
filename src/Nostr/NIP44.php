@@ -65,10 +65,8 @@ class NIP44 {
             return false;
         }
         
-        list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($salt, 32, 12, 32));
-        $ciphertext = (new NIP44\ChaCha20($chacha_key, $chacha_nonce))($padded);
-        $hmac = new NIP44\HMACAad(self::hash($hmac_key), $salt);
-        return sodium_bin2base64(Primitives::uInt8(2) . $salt . $ciphertext . $hmac($ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
+        $encrypter = new NIP44\Encrypter($keys, $salt);
+        return sodium_bin2base64(Primitives::uInt8(2) . $encrypter($padded), SODIUM_BASE64_VARIANT_ORIGINAL);
     }
 
     static function decrypt(string $payload, NIP44\MessageKeys $keys): bool|string {

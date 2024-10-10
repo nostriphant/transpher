@@ -2,7 +2,6 @@
 
 namespace rikmeijer\Transpher\Nostr\Event;
 use rikmeijer\Transpher\Nostr;
-use rikmeijer\Transpher\Nostr\NIP44;
 use rikmeijer\Transpher\Key;
 use rikmeijer\Transpher\Nostr\Rumor;
 use rikmeijer\Transpher\Nostr\Event;
@@ -16,20 +15,19 @@ use rikmeijer\Transpher\Nostr\Event;
 class Seal {
     
     static function close(Key $sender_private_key, string $recipient_pubkey, Rumor $event) : Event {
-        $conversation_key = NIP44::getConversationKey($sender_private_key, hex2bin($recipient_pubkey));
-        
+        $encrypter = Nostr::encrypt($sender_private_key, hex2bin($recipient_pubkey));
         $seal = new Rumor(
             pubkey: $sender_private_key(Key::public()),
             created_at: mktime(rand(0,23), rand(0,59), rand(0,59)), 
             kind: 13, 
-            content: NIP44::encrypt(Nostr::encode(get_object_vars($event)), $conversation_key, random_bytes(32)), 
+            content: $encrypter(Nostr::encode(get_object_vars($event))), 
             tags: []
         );
         return $seal($sender_private_key);
     }
     
     static function open(Key $recipient_private_key, string $sender_pubkey, string $seal) : array {
-        $pdm_conversation_key = NIP44::getConversationKey($recipient_private_key, hex2bin($sender_pubkey));
-        return Nostr::decode(NIP44::decrypt($seal, $pdm_conversation_key));
+        $decrypter = Nostr::decrypt($recipient_private_key, hex2bin($sender_pubkey));
+        return Nostr::decode($decrypter($seal));
     }
 }

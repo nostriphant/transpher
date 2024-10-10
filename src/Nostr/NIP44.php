@@ -52,13 +52,9 @@ class NIP44 {
         return self::hash('nip44-v2')(hex2bin($secret));
     }
 
-    static function getMessageKeys(#[\SensitiveParameter] string $conversationKey, string $nonce, int ...$lengths): array {
-        $keys = self::hkdf_expand($conversationKey, $nonce, array_sum($lengths));
-        return [
-            substr($keys, 0, array_shift($lengths)),
-            substr($keys, 32, array_shift($lengths)),
-            substr($keys, 44, array_shift($lengths))
-        ];
+    static function getMessageKeys(#[\SensitiveParameter] string $conversationKey, string $nonce): array {
+        $keys = new NIP44\MessageKeys($conversationKey);
+        return iterator_to_array($keys($nonce, 32, 12, 32));
     }
 
     static function hmacAad(#[\SensitiveParameter] string $key, string $aad, string $message): bool|string {
@@ -133,7 +129,7 @@ class NIP44 {
         if ($padded === false) {
             return false;
         }
-        list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt, 32, 12, 32);
+        list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt);
         $ciphertext = self::chacha20($chacha_key, $chacha_nonce, $padded);
         return sodium_bin2base64(self::uInt8(2) . $salt . $ciphertext . self::hmacAad($hmac_key, $salt, $ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
     }
@@ -155,7 +151,7 @@ class NIP44 {
         $ciphertext = substr($decoded, 33, -32);
         $mac = substr($decoded, -32);
 
-        list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt, 32, 12, 32);
+        list($chacha_key, $chacha_nonce, $hmac_key) = self::getMessageKeys($conversationKey, $salt);
         $expected_mac = self::hmacAad($hmac_key, $salt, $ciphertext);
         if ($mac !== $expected_mac) {
             return false;

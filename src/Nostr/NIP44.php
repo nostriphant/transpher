@@ -61,8 +61,6 @@ class NIP44 {
         $padded = self::pad($utf8_text);
         if ($padded === false) {
             return false;
-        } elseif (strlen($salt) !== 32) {
-            return false;
         }
         
         $encrypter = new NIP44\Encrypter($keys, $salt);

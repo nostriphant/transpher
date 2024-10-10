@@ -29,11 +29,6 @@ class NIP44 {
         return self::hash('nip44-v2')(hex2bin($secret));
     }
 
-    static function getMessageKeys(#[\SensitiveParameter] string $conversationKey, string $nonce): array {
-        $keys = new NIP44\MessageKeys($conversationKey);
-        return iterator_to_array($keys($nonce, 32, 12, 32));
-    }
-
     static function hmacAad(#[\SensitiveParameter] string $key, string $aad, string $message): bool|string {
         if (strlen($aad) !== 32) {
             return false;

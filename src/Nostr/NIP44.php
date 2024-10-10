@@ -22,13 +22,6 @@ class NIP44 {
         return self::hash($key)($data);
     }
 
-    static function getConversationKey(#[\SensitiveParameter] Key $private_key, string $pubkeyB): bool|string {
-        if (false === ($secret = $private_key(Key::sharedSecret('02' . bin2hex($pubkeyB))))) {
-            return false;
-        }
-        return self::hash('nip44-v2')(hex2bin($secret));
-    }
-
     static function hmacAad(#[\SensitiveParameter] string $key, string $aad, string $message): bool|string {
         if (strlen($aad) !== 32) {
             return false;

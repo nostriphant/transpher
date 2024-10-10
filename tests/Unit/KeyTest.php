@@ -48,8 +48,8 @@ it('shared_secret', function () {
     $public_key_hex = 'ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6';
     $private_key = Key::fromHex('56350645f60b55570901937c9196e618a5b87a2b64968b09c0b404efef74d2b5');
     
-    $key = NIP44::getConversationKey($private_key, hex2bin($public_key_hex));
-    expect($key)->not()->toBeEmpty();
+    $key = new NIP44\ConversationKey($private_key, hex2bin($public_key_hex));
+    expect(''.$key)->not()->toBeEmpty();
     
 });
 

@@ -3,7 +3,7 @@
 namespace rikmeijer\Transpher\Nostr;
 
 use \rikmeijer\Transpher\HashSHA256;
-use rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Nostr\NIP44\Primitives;
 
 /**
  * Description of NIP44
@@ -30,25 +30,7 @@ class NIP44 {
         $chunk = $nextPower <= 256 ? 32 : $nextPower / 8;
         return $chunk * ((int) floor(($length - 1) / $chunk) + 1);
     }
-
-    public static function uInt8($i) {
-        return is_int($i) ? pack("C", $i) : unpack("C", $i)[1];
-    }
-
-    public static function uInt16($i, $endianness = false) {
-        $f = is_int($i) ? "pack" : "unpack";
-
-        if ($endianness === true) {  // big-endian
-            $i = $f("n", $i);
-        } else if ($endianness === false) {  // little-endian
-            $i = $f("v", $i);
-        } else if ($endianness === null) {  // machine byte order
-            $i = $f("S", $i);
-        }
-
-        return is_array($i) ? $i[1] : $i;
-    }
-
+    
     static function pad(string $utf8_text) {
         $utf8_text_length = strlen($utf8_text);
         if ($utf8_text_length < 1) {
@@ -56,11 +38,11 @@ class NIP44 {
         } elseif ($utf8_text_length > 65535) {
             return false;
         }
-        return self::uInt16($utf8_text_length, true) . str_pad($utf8_text, self::calcPaddedLength($utf8_text_length), chr(0));
+        return Primitives::uInt16($utf8_text_length, true) . str_pad($utf8_text, self::calcPaddedLength($utf8_text_length), chr(0));
     }
 
     static function unpad(string $padded): bool|string {
-        $expected_unpadded_length = self::uInt16(substr($padded, 0, 2), true);
+        $expected_unpadded_length = Primitives::uInt16(substr($padded, 0, 2), true);
         $unpadded = substr($padded, 2, $expected_unpadded_length);
         $actual_unpadded_length = strlen($unpadded);
         if ($expected_unpadded_length === 0) {
@@ -86,7 +68,7 @@ class NIP44 {
         list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($salt, 32, 12, 32));
         $ciphertext = (new NIP44\ChaCha20($chacha_key, $chacha_nonce))($padded);
         $hmac = new NIP44\HMACAad(self::hash($hmac_key), $salt);
-        return sodium_bin2base64(self::uInt8(2) . $salt . $ciphertext . $hmac($ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
+        return sodium_bin2base64(Primitives::uInt8(2) . $salt . $ciphertext . $hmac($ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
     }
 
     static function decrypt(string $payload, NIP44\MessageKeys $keys): bool|string {
@@ -97,7 +79,7 @@ class NIP44 {
         }
 
         $decoded = base64_decode($payload);
-        $version = self::uInt8(substr($decoded, 0, 1));
+        $version = Primitives::uInt8(substr($decoded, 0, 1));
         if ($version !== 2) {
             return false;
         }

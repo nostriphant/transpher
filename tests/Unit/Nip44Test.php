@@ -2,6 +2,7 @@
 
 use rikmeijer\Transpher\Key;
 use rikmeijer\Transpher\Nostr\NIP44;
+use rikmeijer\Transpher\Nostr;
 
 require_once __DIR__ . '/functions.php';
 
@@ -11,6 +12,17 @@ function openKey(string $key): \Elliptic\EC\KeyPair {
 }
 
 describe('NIP-44 v2', function () {
+    it('Nostr class wraps around NIP44 implementation', function() {
+        $recipient_key = Key::generate();
+        $sender_key = Key::generate();
+        
+        $encrypter = Nostr::encrypt($sender_key, $recipient_key(Key::public(Nostr\Key\Format::BINARY)));
+        $encrypted = $encrypter('Hello World!');
+        
+        $decrypter = Nostr::decrypt($recipient_key, $sender_key(Key::public(Nostr\Key\Format::BINARY)));
+        expect($decrypter($encrypted))->toBe('Hello World!');
+    });
+    
     describe('valid', function () {
         it('is sane', function () {
             $key1 = openKey('00f4b7ff7cccc98813a69fae3df222bfe3f4e28f764bf91b4a10d8096ce446b254');

@@ -13,7 +13,6 @@ use rikmeijer\Transpher\Key;
 class NIP44 {
 
     const HASH = 'sha256';
-    const HASH_OUTPUT_SIZE = 32;
 
     static function hash(#[\SensitiveParameter] string $key): HashSHA256 {
         return (new HashSHA256($key));
@@ -21,28 +20,6 @@ class NIP44 {
 
     static function hmac_digest(#[\SensitiveParameter] string $key, string $data): string {
         return self::hash($key)($data);
-    }
-
-    /**
-     * Based on https://github.com/mgp25/libsignal-php/blob/master/src/kdf/HKDF.php
-     * @param string $prk
-     * @param string $info
-     * @param int $length
-     * @return string
-     * 
-     */
-    static function hkdf_expand(#[\SensitiveParameter] string $prk, string $info, int $length): string {
-        $iterations = (int) ceil($length / self::HASH_OUTPUT_SIZE);
-        $stepResult = '';
-        $result = '';
-        for ($i = 0; $i < $iterations; $i++) {
-            $stepResult = (string) self::hash($prk)($stepResult)($info)(chr(($i + 1) % 256));
-            $stepSize = min($length, strlen($stepResult));
-            $result .= substr($stepResult, 0, $stepSize);
-            $length -= $stepSize;
-        }
-
-        return $result;
     }
 
     static function getConversationKey(#[\SensitiveParameter] Key $private_key, string $pubkeyB): bool|string {

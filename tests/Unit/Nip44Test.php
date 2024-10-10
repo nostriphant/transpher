@@ -86,10 +86,12 @@ describe('NIP-44 v2', function () {
                 $conversation_key = NIP44::getConversationKey($privkey, hex2bin($pub2));
                 expect($conversation_key)->not()->toBeFalse();
                 expect(bin2hex($conversation_key))->toBe($vector->conversation_key);
-                expect(NIP44::decrypt($vector->payload, new MessageKeys($conversation_key)))->toBe($vector->plaintext, 'Unable to properly decrypt vector payload');
+                $keys = new MessageKeys($conversation_key);
+                
+                expect(NIP44::decrypt($vector->payload, $keys))->toBe($vector->plaintext, 'Unable to properly decrypt vector payload');
 
-                $payload = NIP44::encrypt($vector->plaintext, new MessageKeys($conversation_key), hex2bin($vector->nonce));
-                expect(NIP44::decrypt($payload, new MessageKeys($conversation_key)))->toBe($vector->plaintext, 'Unable to properly decrypt self encrypted payload');
+                $payload = NIP44::encrypt($vector->plaintext, $keys, hex2bin($vector->nonce));
+                expect(NIP44::decrypt($payload, $keys))->toBe($vector->plaintext, 'Unable to properly decrypt self encrypted payload');
 
                 expect($payload)->toBe($vector->payload, 'Unable to properly encrypt vector message');
             }
@@ -100,11 +102,12 @@ describe('NIP-44 v2', function () {
             foreach (vectors('nip44')->v2->valid->encrypt_decrypt_long_msg as $vector) {
                 $plaintext = str_repeat($vector->pattern, $vector->repeat);
                 expect(hash('sha256', $plaintext))->toBe($vector->plaintext_sha256);
+                $keys = new MessageKeys(hex2bin($vector->conversation_key));
                 
-                $payload = NIP44::encrypt($plaintext, new MessageKeys(hex2bin($vector->conversation_key)), hex2bin($vector->nonce));
+                $payload = NIP44::encrypt($plaintext, $keys, hex2bin($vector->nonce));
                 expect(hash('sha256', $payload))->toBe($vector->payload_sha256, 'Unable to properly encrypt long text');
                 
-                expect(NIP44::decrypt($payload, new MessageKeys(hex2bin($vector->conversation_key))))->toBe($plaintext, 'Unable to properly decrypt self encrypted payload');
+                expect(NIP44::decrypt($payload, $keys))->toBe($plaintext, 'Unable to properly decrypt self encrypted payload');
             }
         });
     });

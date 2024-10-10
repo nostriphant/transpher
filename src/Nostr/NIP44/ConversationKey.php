@@ -3,7 +3,7 @@
 namespace rikmeijer\Transpher\Nostr\NIP44;
 use rikmeijer\Transpher\Nostr\NIP44\MessageKeys;
 use rikmeijer\Transpher\Key;
-use rikmeijer\Transpher\HashSHA256;
+use \rikmeijer\Transpher\Nostr\NIP44;
 
 
 /**
@@ -17,7 +17,7 @@ readonly class ConversationKey {
         if (false === ($secret = $recipient_key(Key::sharedSecret('02' . bin2hex($sender_pubkey))))) {
             return false;
         }
-        $this->conversation_key = (new HashSHA256('nip44-v2'))(hex2bin($secret));
+        $this->conversation_key = NIP44::hash('nip44-v2')(hex2bin($secret));
     }
     public function __invoke(): MessageKeys {
         return new MessageKeys($this->conversation_key);

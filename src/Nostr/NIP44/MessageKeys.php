@@ -2,7 +2,7 @@
 
 namespace rikmeijer\Transpher\Nostr\NIP44;
 use rikmeijer\Transpher\HashSHA256;
-
+use rikmeijer\Transpher\Nostr\NIP44;
 /**
  * Description of MessageKeys
  *
@@ -27,7 +27,7 @@ readonly class MessageKeys {
         $stepResult = '';
         $result = '';
         for ($i = 0; $i < $iterations; $i++) {
-            $stepResult = (string) (new HashSHA256($this->conversation_key))($stepResult)($info)(chr(($i + 1) % 256));
+            $stepResult = (string) NIP44::hash($this->conversation_key)($stepResult)($info)(chr(($i + 1) % 256));
             $stepSize = min($length, strlen($stepResult));
             $result .= substr($stepResult, 0, $stepSize);
             $length -= $stepSize;

@@ -22,13 +22,6 @@ class NIP44 {
         return self::hash($key)($data);
     }
 
-    static function hmacAad(#[\SensitiveParameter] string $key, string $aad, string $message): bool|string {
-        if (strlen($aad) !== 32) {
-            return false;
-        }
-        return self::hash($key)($aad . $message);
-    }
-
     static function calcPaddedLength(int $length) {
         if ($length <= 32) {
             return 32;
@@ -86,10 +79,14 @@ class NIP44 {
         $padded = self::pad($utf8_text);
         if ($padded === false) {
             return false;
+        } elseif (strlen($salt) !== 32) {
+            return false;
         }
+        
         list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($salt, 32, 12, 32));
         $ciphertext = (new NIP44\ChaCha20($chacha_key, $chacha_nonce))($padded);
-        return sodium_bin2base64(self::uInt8(2) . $salt . $ciphertext . self::hmacAad($hmac_key, $salt, $ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
+        $hmac = new NIP44\HMACAad(self::hash($hmac_key), $salt);
+        return sodium_bin2base64(self::uInt8(2) . $salt . $ciphertext . $hmac($ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
     }
 
     static function decrypt(string $payload, NIP44\MessageKeys $keys): bool|string {
@@ -110,8 +107,8 @@ class NIP44 {
         $mac = substr($decoded, -32);
 
         list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($salt, 32, 12, 32));
-        $expected_mac = self::hmacAad($hmac_key, $salt, $ciphertext);
-        if ($mac !== $expected_mac) {
+        $hmac = new NIP44\HMACAad(self::hash($hmac_key), $salt);
+        if ($mac !== $hmac($ciphertext)) {
             return false;
         }
 

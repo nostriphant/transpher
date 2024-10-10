@@ -45,13 +45,6 @@ class NIP44 {
         return $chunk * ((int) floor(($length - 1) / $chunk) + 1);
     }
 
-    static function chacha20(string $key, string $nonce, string $data): string {
-        $cipher = new \phpseclib3\Crypt\ChaCha20();
-        $cipher->setKey($key);
-        $cipher->setNonce($nonce);
-        return $cipher->encrypt($data);
-    }
-
     public static function uInt8($i) {
         return is_int($i) ? pack("C", $i) : unpack("C", $i)[1];
     }
@@ -102,7 +95,7 @@ class NIP44 {
             return false;
         }
         list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($salt, 32, 12, 32));
-        $ciphertext = self::chacha20($chacha_key, $chacha_nonce, $padded);
+        $ciphertext = (new NIP44\ChaCha20($chacha_key, $chacha_nonce))($padded);
         return sodium_bin2base64(self::uInt8(2) . $salt . $ciphertext . self::hmacAad($hmac_key, $salt, $ciphertext), SODIUM_BASE64_VARIANT_ORIGINAL);
     }
 
@@ -129,7 +122,7 @@ class NIP44 {
             return false;
         }
 
-        $padded = self::chacha20($chacha_key, $chacha_nonce, $ciphertext);
+        $padded = (new NIP44\ChaCha20($chacha_key, $chacha_nonce))($ciphertext);
         return self::unpad($padded);
     }
 }

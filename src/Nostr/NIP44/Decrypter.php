@@ -1,7 +1,6 @@
 <?php
 
 namespace rikmeijer\Transpher\Nostr\NIP44;
-use rikmeijer\Transpher\Nostr\NIP44;
 use rikmeijer\Transpher\Nostr\NIP44\MessageKeys;
 
 /**
@@ -18,7 +17,7 @@ readonly class Decrypter {
         list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($this->salt, 32, 12, 32));
     
         $this->chacha = new ChaCha20($chacha_key, $chacha_nonce);
-        $this->hmac = new HMACAad(NIP44::hash($hmac_key), $this->salt);
+        $this->hmac = new HMACAad(new Hash($hmac_key), $this->salt);
     }
     
     public function __invoke(string $decoded) : string {

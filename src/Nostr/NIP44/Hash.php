@@ -1,13 +1,13 @@
 <?php
 
-namespace rikmeijer\Transpher;
+namespace rikmeijer\Transpher\Nostr\NIP44;
 
 /**
  * Description of Hash
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-readonly class HashSHA256 {
+readonly class Hash {
     
     const OUTPUT_SIZE = 32;
     

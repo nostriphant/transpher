@@ -2,7 +2,6 @@
 
 namespace rikmeijer\Transpher\Nostr;
 
-use \rikmeijer\Transpher\HashSHA256;
 use rikmeijer\Transpher\Nostr\NIP44\Primitives;
 use rikmeijer\Transpher\Nostr\NIP44\Padding;
 
@@ -13,10 +12,6 @@ use rikmeijer\Transpher\Nostr\NIP44\Padding;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 class NIP44 {
-    
-    static function hash(#[\SensitiveParameter] string $key): HashSHA256 {
-        return (new HashSHA256($key));
-    }
 
     static function encrypt(string $utf8_text, NIP44\MessageKeys $keys, string $salt): string {
         $padded = Padding::add($utf8_text);

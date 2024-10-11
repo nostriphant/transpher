@@ -1,8 +1,8 @@
 <?php
 
 namespace rikmeijer\Transpher\Nostr\NIP44;
-use rikmeijer\Transpher\HashSHA256;
 use rikmeijer\Transpher\Nostr\NIP44;
+
 /**
  * Description of MessageKeys
  *
@@ -23,11 +23,11 @@ readonly class MessageKeys {
      * 
      */
     private function hkdf_expand(string $info, int $length): string {
-        $iterations = (int) ceil($length / HashSHA256::OUTPUT_SIZE);
+        $iterations = (int) ceil($length / Hash::OUTPUT_SIZE);
         $stepResult = '';
         $result = '';
         for ($i = 0; $i < $iterations; $i++) {
-            $stepResult = (string) NIP44::hash($this->conversation_key)($stepResult)($info)(chr(($i + 1) % 256));
+            $stepResult = (string)(new Hash($this->conversation_key))($stepResult)($info)(chr(($i + 1) % 256));
             $stepSize = min($length, strlen($stepResult));
             $result .= substr($stepResult, 0, $stepSize);
             $length -= $stepSize;

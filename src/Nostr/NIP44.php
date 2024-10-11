@@ -81,16 +81,12 @@ class NIP44 {
         }
 
         $salt = substr($decoded, 1, 32);
-        $ciphertext = substr($decoded, 33, -32);
-        $mac = substr($decoded, -32);
-
-        list($chacha_key, $chacha_nonce, $hmac_key) = iterator_to_array($keys($salt, 32, 12, 32));
-        $hmac = new NIP44\HMACAad(self::hash($hmac_key), $salt);
-        if ($mac !== $hmac($ciphertext)) {
+        $decrypter = new NIP44\Decrypter($keys, $salt);
+        try {
+            $padded = $decrypter($decoded);
+        } catch (\Exception $e) {
             return false;
         }
-
-        $padded = (new NIP44\ChaCha20($chacha_key, $chacha_nonce))($ciphertext);
         return self::unpad($padded);
     }
 }

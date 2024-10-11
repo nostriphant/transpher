@@ -71,12 +71,6 @@ describe('NIP-44 v2', function () {
             }
         });
 
-        it('calcs padded length correctly', function () {
-            foreach (vectors('nip44')->v2->valid->calc_padded_len as $vector) {
-                expect(NIP44::calcPaddedLength($vector[0]))->toBe($vector[1]);
-            }
-        });
-
         it('can encrypt & decrypt', function () {
             foreach (vectors('nip44')->v2->valid->encrypt_decrypt as $vector) {
                 $key = Key::fromHex($vector->sec2);

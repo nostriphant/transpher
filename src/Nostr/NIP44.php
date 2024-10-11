@@ -8,22 +8,15 @@ use rikmeijer\Transpher\Nostr\NIP44\Padding;
 
 /**
  * Description of NIP44
+ * Based on: https://github.com/nbd-wtf/nostr-tools/blob/master/nip44.ts
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 class NIP44 {
-
-    const HASH = 'sha256';
-
+    
     static function hash(#[\SensitiveParameter] string $key): HashSHA256 {
         return (new HashSHA256($key));
     }
-
-    static function hmac_digest(#[\SensitiveParameter] string $key, string $data): string {
-        return self::hash($key)($data);
-    }
-
-    /* Based on: https://github.com/nbd-wtf/nostr-tools/blob/master/nip44.ts */
 
     static function encrypt(string $utf8_text, NIP44\MessageKeys $keys, string $salt): string {
         $padded = Padding::add($utf8_text);

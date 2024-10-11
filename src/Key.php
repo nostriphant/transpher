@@ -56,7 +56,7 @@ readonly class Key {
                 $pub2 = $ec->keyFromPublic($recipient_pubkey, 'hex')->pub;
                 return $key1->derive($pub2)->toString('hex');
             } catch (\Exception $e) {
-                return false;
+                throw new \InvalidArgumentException($e->getMessage());
             }
         };
     }

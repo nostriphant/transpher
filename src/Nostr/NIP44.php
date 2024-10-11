@@ -34,9 +34,9 @@ class NIP44 {
     static function pad(string $utf8_text) {
         $utf8_text_length = strlen($utf8_text);
         if ($utf8_text_length < 1) {
-            return false;
+            throw new \InvalidArgumentException('text too short (< 1 char)');
         } elseif ($utf8_text_length > 65535) {
-            return false;
+            throw new \InvalidArgumentException('text too long (> 65535 char)');
         }
         return Primitives::uInt16($utf8_text_length, true) . str_pad($utf8_text, self::calcPaddedLength($utf8_text_length), chr(0));
     }
@@ -46,47 +46,38 @@ class NIP44 {
         $unpadded = substr($padded, 2, $expected_unpadded_length);
         $actual_unpadded_length = strlen($unpadded);
         if ($expected_unpadded_length === 0) {
-            return false;
+            throw new \InvalidArgumentException('text too short (< 1 char)');
         } elseif ($expected_unpadded_length !== $actual_unpadded_length) {
-            return false;
+            throw new \InvalidArgumentException('expected length mismatch');
         } elseif (2 + self::calcPaddedLength($actual_unpadded_length) !== strlen($padded)) {
-            return false;
+            throw new \InvalidArgumentException('length re-calculation failed');
         }
         return $unpadded;
     }
 
     /* Based on: https://github.com/nbd-wtf/nostr-tools/blob/master/nip44.ts */
 
-    static function encrypt(string $utf8_text, NIP44\MessageKeys $keys, string $salt): false|string {
+    static function encrypt(string $utf8_text, NIP44\MessageKeys $keys, string $salt): string {
         $padded = self::pad($utf8_text);
-        if ($padded === false) {
-            return false;
-        }
-        
         $encrypter = new NIP44\Encrypter($keys, $salt);
         return sodium_bin2base64(Primitives::uInt8(2) . $encrypter($padded), SODIUM_BASE64_VARIANT_ORIGINAL);
     }
 
     static function decrypt(string $payload, NIP44\MessageKeys $keys): bool|string {
         if ($payload === '') {
-            return false;
+            throw new \InvalidArgumentException('empty payload');
         } elseif ($payload[0] === '#') {
-            return false;
+            throw new \InvalidArgumentException('encryption version not supported');
         }
 
         $decoded = base64_decode($payload);
         $version = Primitives::uInt8(substr($decoded, 0, 1));
         if ($version !== 2) {
-            return false;
+            throw new \InvalidArgumentException('encryption version not supported');
         }
 
         $salt = substr($decoded, 1, 32);
         $decrypter = new NIP44\Decrypter($keys, $salt);
-        try {
-            $padded = $decrypter($decoded);
-        } catch (\Exception $e) {
-            return false;
-        }
-        return self::unpad($padded);
+        return self::unpad($decrypter($decoded));
     }
 }

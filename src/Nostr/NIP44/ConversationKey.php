@@ -15,7 +15,7 @@ readonly class ConversationKey {
     private string $conversation_key;
     public function __construct(#[\SensitiveParameter] Key $recipient_key, string $sender_pubkey) {
         if (false === ($secret = $recipient_key(Key::sharedSecret('02' . bin2hex($sender_pubkey))))) {
-            return false;
+            throw new \InvalidArgumentException('Can not find shared secret for given keys');
         }
         $this->conversation_key = NIP44::hash('nip44-v2')(hex2bin($secret));
     }

@@ -115,18 +115,18 @@ describe('NIP-44 v2', function () {
   describe('invalid', function() {
     it('encrypt_msg_lengths', function() {
       foreach (vectors('nip44')->v2->invalid->encrypt_msg_lengths as $vector) {
-          expect(NIP44::encrypt(str_repeat('a', $vector), new MessageKeys(random_bytes(32)), ''))->toBeFalse();
+          expect(fn() => NIP44::encrypt(str_repeat('a', $vector), new MessageKeys(random_bytes(32)), ''))->toThrow(\InvalidArgumentException::class, message: $vector);
       }
     });
     it('decrypt', function() {
       foreach (vectors('nip44')->v2->invalid->decrypt as $vector) {
-        expect(NIP44::decrypt($vector->payload, new MessageKeys(hex2bin($vector->conversation_key))))->toBeFalse($vector->note);
+        expect(fn() => NIP44::decrypt($vector->payload, new MessageKeys(hex2bin($vector->conversation_key))))->toThrow(\InvalidArgumentException::class, message: $vector->note);
       }
     });
     it('get_conversation_key', function() {
       foreach (vectors('nip44')->v2->invalid->get_conversation_key as $vector) {
         $privkey = \rikmeijer\Transpher\Key::fromHex($vector->sec1);
-        expect($privkey(Key::sharedSecret($vector->pub2)))->toBeFalse($vector->note);
+        expect(fn() => $privkey(Key::sharedSecret($vector->pub2)))->toThrow(\InvalidArgumentException::class, message: $vector->note);
       }
     });
   });

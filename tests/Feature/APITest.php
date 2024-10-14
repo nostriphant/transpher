@@ -1,12 +1,12 @@
 <?php
 
-use \rikmeijer\Transpher\Key;
-use \rikmeijer\Transpher\Nostr\Message;
-use \rikmeijer\TranspherTests\Client;
+use rikmeijer\Transpher\Nostr\Key;
+use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\TranspherTests\Client;
 
 $main_relay;
 beforeAll(function() use (&$main_relay) {
-    $main_relay = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8081', []);
+    $main_relay = \rikmeijer\Transpher\Relay::boot('127.0.0.1:8081', []);
 });
 afterAll(function() use (&$main_relay) {
     $main_relay();
@@ -50,6 +50,31 @@ describe('relay', function () {
         $request = Message::filter($subscription, authors: [$alice_key(Key::public())])();
         $bob->json($request);
         $bob->start();
+    });
+    
+    
+    it('sends events to Charly who uses two filters in their subscription', function () {
+        $alice = Client::generic_client();
+        $bob = Client::generic_client();
+        $charlie = Client::generic_client();
+
+        $alice_key = Key::generate();
+        $alice_note = Message::rumor($alice_key(Key::public()), 1, 'Hello world, from Alice!');
+        $alice->sendSignedMessage($alice_note($alice_key));
+        
+        $bob_key = Key::generate();
+        $bob_note = Message::rumor($bob_key(Key::public()), 1, 'Hello world, from Bob!');
+        $alice->sendSignedMessage($bob_note($bob_key));
+        
+        $subscription = Message::subscribe();
+        $charlie->expectNostrEvent($subscription()[1], 'Hello world, from Alice!');
+        $charlie->expectNostrEvent($subscription()[1], 'Hello world, from Bob!');
+        $charlie->expectNostrEose($subscription()[1]);
+
+        $request_alice = Message::filter($subscription, authors: [$alice_key(Key::public())]);
+        $request_bob = Message::filter($request_alice, authors: [$bob_key(Key::public())]);
+        $charlie->json($request_bob());
+        $charlie->start();
     });
 
     it('sends events to all clients subscribed on p-tag', function () {
@@ -99,7 +124,7 @@ describe('relay', function () {
         mkdir($env['TRANSPHER_STORE']);
         
         
-        $server = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
+        $server = \rikmeijer\Transpher\Relay::boot('127.0.0.1:8082', $env);
         $alice = Client::client(8082);
 
         $alice_key = Key::generate();
@@ -111,7 +136,7 @@ describe('relay', function () {
         expect($status)->toBeArray();
         expect($status['running'])->toBeFalse();
 
-        $server = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8082', $env);
+        $server = \rikmeijer\Transpher\Relay::boot('127.0.0.1:8082', $env);
         
         $bob = Client::client(8082);
         $subscription = Message::subscribe();
@@ -174,7 +199,7 @@ describe('relay', function () {
         $owner_key = Key::generate();
         $agent_key = Key::generate();
         
-        $relay = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8087', [
+        $relay = \rikmeijer\Transpher\Relay::boot('127.0.0.1:8087', [
             'AGENT_NSEC' => $agent_key(Key::private(\rikmeijer\Transpher\Nostr\Key\Format::BECH32)),
             'RELAY_URL' => 'ws://127.0.0.1:8087',
             'RELAY_OWNER_NPUB' => $owner_key(Key::public(\rikmeijer\Transpher\Nostr\Key\Format::BECH32)), 

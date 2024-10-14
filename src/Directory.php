@@ -2,8 +2,7 @@
 
 namespace rikmeijer\Transpher;
 use function \Functional\map, \Functional\filter, \Functional\partial_left;
-use rikmeijer\Transpher\Nostr\Relay\Subscriptions;
-use rikmeijer\Transpher\Nostr\Relay\Filter;
+use rikmeijer\Transpher\Relay\Subscription;
 use rikmeijer\Transpher\Nostr\Message;
 use rikmeijer\Transpher\Nostr\Event;
 
@@ -23,7 +22,7 @@ class Directory implements \ArrayAccess, \Iterator {
         }   
     }
     
-    public function __invoke(Filter $subscription) : callable {
+    public function __invoke(Subscription $subscription) : callable {
         return fn(string $subscriptionId) => map(filter($this->events, $subscription), partial_left([Message::class, 'requestedEvent'], $subscriptionId));
     }
     
@@ -45,7 +44,6 @@ class Directory implements \ArrayAccess, \Iterator {
     public function offsetSet(mixed $offset, mixed $event): void {
         if (is_null($offset)) {
             $offset = $event->id;
-            Subscriptions::apply($event);
         }
         $this->events[$offset] = $event;
         file_put_contents($this->file($event), '<?php return ' . var_export($event, true) . ';');

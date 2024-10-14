@@ -1,7 +1,8 @@
 <?php
 
-use \rikmeijer\Transpher\Key;
-use \rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Nostr\Key;
+use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Relay\InformationDocument;
 
 it('generates a NIP11 Relay Information Document', function() {
     
@@ -10,7 +11,7 @@ it('generates a NIP11 Relay Information Document', function() {
     $owner_npub = 'npub1cza3sx7rn389ja5gqkaut0wnf3gg799srg5c6ca7g5gdjaqhecqsg485p4';
     $contact = 'nostr@rikmeijer.nl';
     
-    expect(\rikmeijer\Transpher\Nostr\Relay\InformationDocument::generate($name, $description, $owner_npub, $contact))->toBe([
+    expect(InformationDocument::generate($name, $description, $owner_npub, $contact))->toBe([
         "name" => 'Transpher Relay',
         "description" => 'Some interesting description goes here',
         "pubkey" => 'c0bb181bc39c4e59768805bbc5bdd34c508f14b01a298d63be4510d97417ce01',
@@ -36,8 +37,13 @@ class Client extends \rikmeijer\TranspherTests\Client {
     #[\Override]
     public function json(mixed $value) : void {
         $events = [];
-        $relay = new \rikmeijer\Transpher\Nostr\Relay($events);
-        foreach ($relay(\rikmeijer\Transpher\Nostr::encode($value), fn() => true) as $response) {
+        $relay = new \rikmeijer\Transpher\Relay($events);
+        
+        $relayer = Mockery::mock(\rikmeijer\Transpher\Relay\Sender::class)->allows([
+                '__invoke' => true
+        ]);
+        
+        foreach ($relay(\rikmeijer\Transpher\Nostr::encode($value), $relayer) as $response) {
             $this->messages[] = \rikmeijer\Transpher\Nostr::encode($response);
         }
     }

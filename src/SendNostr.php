@@ -1,10 +1,10 @@
 <?php
 
-namespace rikmeijer\Transpher\WebSocket;
+namespace rikmeijer\Transpher;
 
 use Amp\Websocket\WebsocketClient;
 use Psr\Log\LoggerInterface;
-use rikmeijer\Transpher\Nostr\Relay\Sender;
+use rikmeijer\Transpher\Relay\Sender;
 
 /**
  * Description of Reply

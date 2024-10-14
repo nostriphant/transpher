@@ -1,12 +1,12 @@
 <?php
 
-use rikmeijer\Transpher\Nostr\Relay\Agent;
-use rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Agent;
+use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\Message;
 
 describe('agent', function () : void {
     it('starts relay and sends private direct messsage to relay owner', function () : void {
-        $relay = \rikmeijer\Transpher\Nostr\Relay::boot('127.0.0.1:8085', []);
+        $relay = \rikmeijer\Transpher\Relay::boot('127.0.0.1:8085', []);
         
         $agent_key = Key::generate();
         $alice_key = Key::generate();

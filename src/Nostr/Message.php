@@ -2,10 +2,6 @@
 
 namespace rikmeijer\Transpher\Nostr;
 
-use rikmeijer\Transpher\Key;
-use rikmeijer\Transpher\Nostr\Rumor;
-use rikmeijer\Transpher\Nostr\Event;
-
 /**
  * Class to contain Message related functions
  *

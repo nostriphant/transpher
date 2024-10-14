@@ -1,10 +1,11 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr;
+namespace rikmeijer\Transpher;
 
-use \rikmeijer\Transpher\Nostr\Message;
-use \rikmeijer\Transpher\Process;
-use rikmeijer\Transpher\Nostr\Relay\Subscriptions;
+use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Nostr\Event;
+use rikmeijer\Transpher\Relay\Subscriptions;
+use rikmeijer\Transpher\Relay\Sender;
 
 /**
  * Description of Server
@@ -24,7 +25,7 @@ class Relay {
         
     }
     
-    public function __invoke(string $payload, callable $relay) : \Generator {
+    public function __invoke(string $payload, Sender $relay) : \Generator {
         $message = \rikmeijer\Transpher\Nostr::decode($payload);
         if (is_null($message)) {
             yield Message::notice('Invalid message');
@@ -32,7 +33,9 @@ class Relay {
             $type = array_shift($message);
             switch (strtoupper($type)) {
                 case 'EVENT': 
-                    $this->events[] = new Event(...$message[0]);
+                    $event = new Event(...$message[0]);
+                    $this->events[] = $event;
+                    Subscriptions::apply($event);
                     yield Message::accept($message[0]['id']);
                     break;
 
@@ -48,13 +51,17 @@ class Relay {
                 case 'REQ':
                     if (count($message) < 2) {
                         yield Message::notice('Invalid message');
-                    } elseif (empty($message[1])) {
-                        yield Message::closed($message[0], 'Subscription filters are empty');
+                        break;
+                    } 
+                    
+                    $subscription_id = array_shift($message);
+                    if (empty($message[0])) {
+                        yield Message::closed($subscription_id, 'Subscription filters are empty');
                     } else {
-                        $subscription = Subscriptions::subscribe($message[0], $message[1], $relay);
+                        $subscription = Subscriptions::subscribe($relay, $subscription_id, ...$message);
                         $subscribed_events = call_user_func($this->events, $subscription);
-                        yield from $subscribed_events($message[0]);
-                        yield Message::eose($message[0]);
+                        yield from $subscribed_events($subscription_id);
+                        yield Message::eose($subscription_id);
                     }
                     break;
 

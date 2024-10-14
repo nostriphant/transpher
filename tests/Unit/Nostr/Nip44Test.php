@@ -1,12 +1,12 @@
 <?php
 
-use rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\NIP44;
 use rikmeijer\Transpher\Nostr\NIP44\Hash;
 use rikmeijer\Transpher\Nostr;
 use rikmeijer\Transpher\Nostr\NIP44\MessageKeys;
 
-require_once __DIR__ . '/functions.php';
+require_once dirname(__DIR__) . '/functions.php';
 
 function openKey(string $key): \Elliptic\EC\KeyPair {
     $ec = new \Elliptic\EC('secp256k1');
@@ -50,7 +50,7 @@ describe('NIP-44 v2', function () {
         it('get_conversation_key', function () {
             //https://github.com/paulmillr/nip44/blob/main/javascript/test/nip44.vectors.json
             foreach (vectors('nip44')->v2->valid->get_conversation_key as $vector) {
-                $privkey = \rikmeijer\Transpher\Key::fromHex($vector->sec1);
+                $privkey = Key::fromHex($vector->sec1);
                 $key = new NIP44\ConversationKey($privkey, hex2bin($vector->pub2));
                 expect(''.$key)->not()->toBeFalse();
                 expect(bin2hex($key))->toBe($vector->conversation_key, $vector->note??'');
@@ -77,7 +77,7 @@ describe('NIP-44 v2', function () {
                 $key = Key::fromHex($vector->sec2);
                 $pub2 = $key(Key::public());
 
-                $privkey = \rikmeijer\Transpher\Key::fromHex($vector->sec1);
+                $privkey = Key::fromHex($vector->sec1);
                 $conversation_key = new NIP44\ConversationKey($privkey, hex2bin($pub2));
                 expect(bin2hex(''.$conversation_key))->toBe($vector->conversation_key);
                 $keys = $conversation_key();
@@ -120,7 +120,7 @@ describe('NIP-44 v2', function () {
     });
     it('get_conversation_key', function() {
       foreach (vectors('nip44')->v2->invalid->get_conversation_key as $vector) {
-        $privkey = \rikmeijer\Transpher\Key::fromHex($vector->sec1);
+        $privkey = Key::fromHex($vector->sec1);
         expect(fn() => $privkey(Key::sharedSecret($vector->pub2)))->toThrow(\InvalidArgumentException::class, message: $vector->note);
       }
     });

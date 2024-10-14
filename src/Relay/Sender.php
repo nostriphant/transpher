@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\Relay;
+namespace rikmeijer\Transpher\Relay;
 
 /**
  * Description of Replier

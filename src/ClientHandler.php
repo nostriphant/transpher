@@ -1,10 +1,9 @@
 <?php
 
-namespace rikmeijer\Transpher\WebSocket;
-use rikmeijer\Transpher\WebSocket\SendNostr;
+namespace rikmeijer\Transpher;
 use function \Functional\each;
 use \Psr\Log\LoggerInterface; 
-use \rikmeijer\Transpher\Nostr\Relay;
+use \rikmeijer\Transpher\Relay;
 use Amp\Websocket\Server\WebsocketClientHandler;
 use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\WebsocketClient;

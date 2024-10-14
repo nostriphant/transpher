@@ -9,7 +9,7 @@ use rikmeijer\Transpher\Nostr;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Client extends \rikmeijer\Transpher\WebSocket\Client {
+class Client extends \rikmeijer\Transpher\Client {
 
     private $expected_messages = [];
     

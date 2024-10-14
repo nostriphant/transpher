@@ -1,9 +1,11 @@
 <?php
 
-namespace rikmeijer\Transpher\WebSocket;
+namespace rikmeijer\Transpher;
 
 use rikmeijer\Transpher\Nostr;
 use function Amp\Websocket\Client\connect;
+use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Nostr\Key;
 
 
 /**
@@ -18,6 +20,11 @@ class Client {
     public function __construct(private string $url) {
         $this->onJson(fn() => null);
         $this->connection = connect($this->url);
+    }
+    
+    public function privateDirectMessage(Key $sender, string $recipient_npub, string $message) {
+        $note = Message::privateDirect($sender);
+        $this->json($note(Key::convertBech32ToHex($recipient_npub), str_replace('{relay_url}', $this->url, $message)));
     }
     
     public function json(mixed $json) : void {

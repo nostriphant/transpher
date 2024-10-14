@@ -12,7 +12,8 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use function Amp\trapSignal;
-use rikmeijer\Transpher\WebSocket\RequestHandler;
+use rikmeijer\Transpher\ClientHandler;
+use rikmeijer\Transpher\RequestHandler;
 
 list($ip, $port) = explode(":", $_SERVER['argv'][1]);
 
@@ -34,8 +35,8 @@ $store_path = ROOT_DIR . '/data';
 is_dir($store_path) || mkdir($store_path);
 $events = new rikmeijer\Transpher\Directory($store_path);
 
-$relay = new \rikmeijer\Transpher\Nostr\Relay($events);
-$clientHandler = new \rikmeijer\Transpher\WebSocket\ClientHandler($relay, $logger, new WebsocketClientGateway());
+$relay = new \rikmeijer\Transpher\Relay($events);
+$clientHandler = new ClientHandler($relay, $logger, new WebsocketClientGateway());
 
 $router = new Router($server, $logger, $errorHandler);
 $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler)));

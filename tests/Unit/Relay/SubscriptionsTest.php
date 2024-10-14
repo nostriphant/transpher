@@ -1,15 +1,17 @@
 <?php
 
-use rikmeijer\Transpher\Nostr\Relay\Subscriptions;
+use rikmeijer\Transpher\Relay\Subscriptions;
 
 it('adds and  removes a subscription from the subscriptions-closure', function() {
     $subscriptions = new Subscriptions();
     $refl_subscriptions = (new ReflectionObject($subscriptions));
     expect($refl_subscriptions->getStaticPropertyValue('subscriptions'))->toHaveCount(0);
     
-    Subscriptions::subscribe('my-awesome-subscription', ['id' => ''], function(string $subscriptionId, array $event) : bool {
-        return true;
-    });
+    $relayer = Mockery::mock(\rikmeijer\Transpher\Relay\Sender::class)->allows([
+            '__invoke' => true
+    ]);
+    
+    Subscriptions::subscribe($relayer, 'my-awesome-subscription', ['id' => '']);
     expect($refl_subscriptions->getStaticPropertyValue('subscriptions'))->toHaveCount(1);
     
     Subscriptions::unsubscribe('my-missing-subscription');

@@ -1,8 +1,7 @@
 <?php
 
 namespace rikmeijer\Transpher\Nostr\NIP44;
-use rikmeijer\Transpher\Nostr\NIP44\MessageKeys;
-use rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Nostr\Key;
 
 
 /**

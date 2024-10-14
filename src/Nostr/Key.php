@@ -5,8 +5,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
  */
 
-namespace rikmeijer\Transpher;
-use rikmeijer\Transpher\Nostr\Key\Format;
+namespace rikmeijer\Transpher\Nostr;
 use Elliptic\EC;
 use function BitWasp\Bech32\convertBits;
 use function BitWasp\Bech32\decode;
@@ -61,18 +60,18 @@ readonly class Key {
         };
     }
 
-    static function public(Format $format = Format::HEXIDECIMAL): callable {
+    static function public(Key\Format $format = Key\Format::HEXIDECIMAL): callable {
         return fn (#[\SensitiveParameter] string $private_key): string => match ($format) {
-            Format::BINARY => hex2bin(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2)),
-            Format::BECH32 => self::convertHexToBech32(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2), 'npub'),
-            Format::HEXIDECIMAL => substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2),
+            Key\Format::BINARY => hex2bin(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2)),
+            Key\Format::BECH32 => self::convertHexToBech32(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2), 'npub'),
+            Key\Format::HEXIDECIMAL => substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2),
         };
     }
-    static function private(Format $format = Format::HEXIDECIMAL): callable {
+    static function private(Key\Format $format = Key\Format::HEXIDECIMAL): callable {
         return fn (#[\SensitiveParameter] string $private_key): string => match ($format) {
-            Format::BINARY => hex2bin($private_key),
-            Format::BECH32 => self::convertHexToBech32($private_key, 'nsec'),
-            Format::HEXIDECIMAL => $private_key,
+            Key\Format::BINARY => hex2bin($private_key),
+            Key\Format::BECH32 => self::convertHexToBech32($private_key, 'nsec'),
+            Key\Format::HEXIDECIMAL => $private_key,
         };
     }
     

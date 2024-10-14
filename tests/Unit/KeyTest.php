@@ -1,6 +1,6 @@
 <?php
 
-use \rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\NIP44;
 
 require_once __DIR__ . '/functions.php';

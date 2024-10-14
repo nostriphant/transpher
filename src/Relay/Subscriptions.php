@@ -1,12 +1,10 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\Relay;
+namespace rikmeijer\Transpher\Relay;
 
-use Functional\Functional;
 use function \Functional\if_else, \Functional\first;
 use rikmeijer\Transpher\Nostr\Message;
 use rikmeijer\Transpher\Nostr\Event;
-use rikmeijer\Transpher\Filters;
 
 /**
  * Description of Subscriptions
@@ -31,8 +29,8 @@ use rikmeijer\Transpher\Filters;
             return true;
         });
     }
-    static function subscribe(string $subscriptionId, array $prototype, callable $relay) : Filter {
-        $matcher = new Filters($prototype);
+    static function subscribe(Sender $relay, string $subscriptionId, array ...$prototypes) : Subscription {
+        $matcher = new Subscription(...$prototypes);
         self::$subscriptions[$subscriptionId] = if_else($matcher, fn() => $relay, fn() => false);
         return $matcher;
     }

@@ -2,7 +2,7 @@
 
 namespace rikmeijer\Transpher\Nostr\Event;
 use rikmeijer\Transpher\Nostr;
-use rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\Event;
 use rikmeijer\Transpher\Nostr\Rumor;
 

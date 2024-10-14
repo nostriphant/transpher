@@ -1,0 +1,1 @@
+<?php return rikmeijer\Transpher\Relay\Subscription\Filter::since('created_at');

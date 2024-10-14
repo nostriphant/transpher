@@ -2,7 +2,6 @@
 
 namespace rikmeijer\Transpher\Nostr;
 use rikmeijer\Transpher\Nostr;
-use rikmeijer\Transpher\Key;
 
 /**
  * Description of Event

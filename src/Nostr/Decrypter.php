@@ -1,8 +1,6 @@
 <?php
 
 namespace rikmeijer\Transpher\Nostr;
-use rikmeijer\Transpher\Nostr\NIP44;
-use rikmeijer\Transpher\Key;
 
 /**
  * Description of Decrypter

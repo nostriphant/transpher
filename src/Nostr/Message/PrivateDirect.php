@@ -1,7 +1,7 @@
 <?php
 
 namespace rikmeijer\Transpher\Nostr\Message;
-use rikmeijer\Transpher\Key;
+use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\Event\Gift;
 use rikmeijer\Transpher\Nostr\Event\Seal;
 

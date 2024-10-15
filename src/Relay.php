@@ -33,7 +33,7 @@ class Relay {
             switch (strtoupper($message[0])) {
                 case 'EVENT':
                     $incoming = Relay\Incoming\Event::fromMessage($message);
-                    yield from $incoming($this->events);
+                    yield from $incoming()($this->events);
                     break;
 
                 case 'CLOSE':
@@ -43,21 +43,17 @@ class Relay {
                         yield Message::notice($ex->getMessage());
                         break;
                     }
-                    yield from $incoming($this->events);
+                    yield from $incoming()();
                     break;
 
                 case 'REQ':
-                    if (count($message) < 3) {
-                        yield Message::notice('Invalid message');
+                    try {
+                        $incoming = Relay\Incoming\Req::fromMessage($message);
+                    } catch (\InvalidArgumentException $ex) {
+                        yield Message::notice($ex->getMessage());
                         break;
-                    } elseif (empty($message[2])) {
-                        yield Message::closed($message[1], 'Subscription filters are empty');
-                    } else {
-                        $subscription = Subscriptions::subscribe($relay, $message[1], ...array_slice($message, 2));
-                        $subscribed_events = call_user_func($this->events, $subscription);
-                        yield from $subscribed_events($message[1]);
-                        yield Message::eose($message[1]);
                     }
+                    yield from $incoming()($this->events, $relay);
                     break;
 
                 default: 

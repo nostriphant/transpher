@@ -7,7 +7,6 @@
 
 namespace rikmeijer\Transpher\Relay\Incoming;
 use rikmeijer\Transpher\Relay\Incoming;
-use rikmeijer\Transpher\Relay\Store;
 use rikmeijer\Transpher\Relay\Subscriptions;
 use rikmeijer\Transpher\Nostr\Message;
 
@@ -31,8 +30,10 @@ class Close implements Incoming {
     }
 
     #[\Override]
-    public function __invoke(array|Store $events): \Generator {
-        Subscriptions::unsubscribe($this->subscription_id);
-        yield Message::closed($this->subscription_id);
+    public function __invoke(): callable {
+        return function (): \Generator {
+            Subscriptions::unsubscribe($this->subscription_id);
+            yield Message::closed($this->subscription_id);
+        };
     }
 }

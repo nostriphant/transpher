@@ -22,9 +22,11 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
     }
 
     #[\Override]
-    public function __invoke(array|Store $events): \Generator {
-        $events[] = $this->event;
-        Subscriptions::apply($this->event);
-        yield Message::accept($this->event->id);
+    public function __invoke(): callable {
+        return function (array|Store $events): \Generator {
+            $events[] = $this->event;
+            Subscriptions::apply($this->event);
+            yield Message::accept($this->event->id);
+        };
     }
 }

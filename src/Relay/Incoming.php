@@ -9,5 +9,5 @@ namespace rikmeijer\Transpher\Relay;
 interface Incoming {
     static function fromMessage(array $message): self;
 
-    public function __invoke(array|Store $events): \Generator;
+    public function __invoke(): callable;
 }

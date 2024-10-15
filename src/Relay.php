@@ -3,9 +3,9 @@
 namespace rikmeijer\Transpher;
 
 use rikmeijer\Transpher\Nostr\Message;
-use rikmeijer\Transpher\Nostr\Event;
 use rikmeijer\Transpher\Relay\Subscriptions;
 use rikmeijer\Transpher\Relay\Sender;
+use rikmeijer\Transpher\Relay\Store;
 
 /**
  * Description of Server
@@ -21,7 +21,7 @@ class Relay {
     }
     
     
-    public function __construct(private array|\ArrayAccess $events) {
+    public function __construct(private array|Store $events) {
         
     }
     
@@ -30,43 +30,37 @@ class Relay {
         if (is_null($message)) {
             yield Message::notice('Invalid message');
         } else {
-            $type = array_shift($message);
-            switch (strtoupper($type)) {
-                case 'EVENT': 
-                    $event = new Event(...$message[0]);
-                    $this->events[] = $event;
-                    Subscriptions::apply($event);
-                    yield Message::accept($message[0]['id']);
+            switch (strtoupper($message[0])) {
+                case 'EVENT':
+                    $event = Relay\Incoming\Event::fromMessage($message);
+                    yield from $event($this->events);
                     break;
 
                 case 'CLOSE': 
-                    if (count($message) < 1) {
+                    if (count($message) < 2) {
                         yield Message::notice('Missing subscription ID');
                     } else {
-                        Subscriptions::unsubscribe($message[0]);
-                        yield Message::closed($message[0]);
+                        Subscriptions::unsubscribe($message[1]);
+                        yield Message::closed($message[1]);
                     }
                     break;
 
                 case 'REQ':
-                    if (count($message) < 2) {
+                    if (count($message) < 3) {
                         yield Message::notice('Invalid message');
                         break;
-                    } 
-                    
-                    $subscription_id = array_shift($message);
-                    if (empty($message[0])) {
-                        yield Message::closed($subscription_id, 'Subscription filters are empty');
+                    } elseif (empty($message[2])) {
+                        yield Message::closed($message[1], 'Subscription filters are empty');
                     } else {
-                        $subscription = Subscriptions::subscribe($relay, $subscription_id, ...$message);
+                        $subscription = Subscriptions::subscribe($relay, $message[1], ...array_slice($message, 2));
                         $subscribed_events = call_user_func($this->events, $subscription);
-                        yield from $subscribed_events($subscription_id);
-                        yield Message::eose($subscription_id);
+                        yield from $subscribed_events($message[1]);
+                        yield Message::eose($message[1]);
                     }
                     break;
 
                 default: 
-                    yield Message::notice('Message type ' . $type . ' not supported');
+                    yield Message::notice('Message type ' . $message[0] . ' not supported');
                     break;
             }
         }

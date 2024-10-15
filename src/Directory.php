@@ -11,7 +11,7 @@ use rikmeijer\Transpher\Nostr\Event;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Directory implements \ArrayAccess, \Iterator {
+class Directory implements Relay\Store, \Iterator {
 
     private array $events = [];
         

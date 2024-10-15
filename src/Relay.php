@@ -32,17 +32,18 @@ class Relay {
         } else {
             switch (strtoupper($message[0])) {
                 case 'EVENT':
-                    $event = Relay\Incoming\Event::fromMessage($message);
-                    yield from $event($this->events);
+                    $incoming = Relay\Incoming\Event::fromMessage($message);
+                    yield from $incoming($this->events);
                     break;
 
-                case 'CLOSE': 
-                    if (count($message) < 2) {
-                        yield Message::notice('Missing subscription ID');
-                    } else {
-                        Subscriptions::unsubscribe($message[1]);
-                        yield Message::closed($message[1]);
+                case 'CLOSE':
+                    try {
+                        $incoming = Relay\Incoming\Close::fromMessage($message);
+                    } catch (\InvalidArgumentException $ex) {
+                        yield Message::notice($ex->getMessage());
+                        break;
                     }
+                    yield from $incoming($this->events);
                     break;
 
                 case 'REQ':

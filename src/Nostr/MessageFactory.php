@@ -19,8 +19,14 @@ class MessageFactory {
         ));
     }
     
-    static function privateDirect(Key $private_key) : Message\PrivateDirect {
-        return new Message\PrivateDirect($private_key);
+    static function privateDirect(Key $private_key, string $recipient_pubkey, string $message): Message {
+        return new Message(['EVENT', get_object_vars(Event\Gift::wrap($recipient_pubkey, Event\Seal::close($private_key, $recipient_pubkey, new \rikmeijer\Transpher\Nostr\Rumor(
+                                            pubkey: call_user_func($private_key, Key::public()),
+                                            created_at: time(),
+                                            kind: 14,
+                                            content: $message,
+                                            tags: [['p', $recipient_pubkey]]
+                            ))))]);
     }
     
     static function eose(string $subscriptionId): Message {

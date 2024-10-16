@@ -23,8 +23,8 @@ class Client {
     }
     
     public function privateDirectMessage(Key $sender, string $recipient_npub, string $message) {
-        $note = MessageFactory::privateDirect($sender);
-        $this->json($note(Key::convertBech32ToHex($recipient_npub), str_replace('{relay_url}', $this->url, $message)));
+        $note = MessageFactory::privateDirect($sender, Key::convertBech32ToHex($recipient_npub), str_replace('{relay_url}', $this->url, $message));
+        $this->send($note);
     }
     
     public function json(mixed $json) : void {

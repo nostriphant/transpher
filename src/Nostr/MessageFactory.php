@@ -1,6 +1,7 @@
 <?php
 
 namespace rikmeijer\Transpher\Nostr;
+use function \Functional\map;
 
 /**
  * Class to contain Message related functions
@@ -45,12 +46,12 @@ class MessageFactory {
         return new Message(['CLOSED', $subscriptionId, $message]);
     }
     
-    static function close(Message\Subscribe $subscription): Message {
-        return new Message(['CLOSE', $subscription()[1]]);
+    static function close(string $subscriptionId): Message {
+        return new Message(['CLOSE', $subscriptionId]);
     }
     
-    static function subscribe(Message\Subscribe\Filter ...$filters): Message\Subscribe {
-        return new Message\Subscribe(...$filters);
+    static function subscribe(Message\Subscribe\Filter ...$filters): Message {
+        return new Message(array_merge(['REQ', bin2hex(random_bytes(32))], map($filters, fn(Message\Subscribe\Filter $filter) => $filter->conditions)));
     }
     
     static function filter(mixed ...$conditions) {

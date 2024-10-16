@@ -36,7 +36,7 @@ it('can generate a properly signed note', function() {
 
 it('can create a subscribe message with a kinds filter', function() {
     $subscription = Factory::subscribe(
-            Factory::filter(kinds: [1])
+            new \rikmeijer\Transpher\Nostr\Message\Subscribe\Filter(kinds: [1])
     );
     expect($subscription)->toBeCallable();
 
@@ -49,8 +49,8 @@ it('can create a subscribe message with a kinds filter', function() {
 });
 it('can create a subscribe message with multiple filters', function() {
     $subscription = Factory::subscribe(
-            Factory::filter(kinds: [1]),
-            Factory::filter(since: 1724755392)
+            new \rikmeijer\Transpher\Nostr\Message\Subscribe\Filter(kinds: [1]),
+            new \rikmeijer\Transpher\Nostr\Message\Subscribe\Filter(since: 1724755392)
     );
 
     $message = $subscription();
@@ -74,7 +74,7 @@ it('can create a subscribe message with a different filter-conditions', function
     ];
     
     $subscription = Factory::subscribe(
-            Factory::filter(...$conditions)
+            new \rikmeijer\Transpher\Nostr\Message\Subscribe\Filter(...$conditions)
     );
     $message = $subscription();
     expect($message[0])->toBe('REQ');
@@ -90,15 +90,15 @@ it('can create a subscribe message with a different filter-conditions', function
 });
 
 it('does not allow for unknown filters', function () {
-    expect(fn() => Factory::filter(unknown: 1724755392))->toThrow('Unknown named parameter $unknown');
+    expect(fn() => new \rikmeijer\Transpher\Nostr\Message\Subscribe\Filter(unknown: 1724755392))->toThrow('Unknown named parameter $unknown');
 });
 
 
 it('does not allow for unknown filters, merge tags', function() {
     
     $subscription = Factory::subscribe(
-            Factory::filter(kinds: [1]),
-            Factory::filter(tags: ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]])
+            new \rikmeijer\Transpher\Nostr\Message\Subscribe\Filter(kinds: [1]),
+            new \rikmeijer\Transpher\Nostr\Message\Subscribe\Filter(tags: ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]])
     );
     $message = $subscription();
     expect($message)->toHaveLength(4);

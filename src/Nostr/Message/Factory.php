@@ -58,11 +58,7 @@ class Factory {
     static function subscribe(Subscribe\Filter ...$filters): Message {
         return self::message('REQ', bin2hex(random_bytes(32)), ...map($filters, fn(Subscribe\Filter $filter) => $filter->conditions));
     }
-    
-    static function filter(mixed ...$conditions) {
-        return new Subscribe\Filter(...$conditions);
-    }
-    
+
     static function requestedEvent(string $subscriptionId, Event $event): Message {
         return self::message('EVENT', $subscriptionId, get_object_vars($event));
     }

@@ -33,21 +33,21 @@ class Client extends \rikmeijer\TranspherTests\Client {
     static function generic_client() : self {
         return new self();
     }
-    
-    #[\Override]
-    public function json(mixed $value) : void {
+
+
+    public function send(string $text): void {
         $events = [];
         $relay = new \rikmeijer\Transpher\Relay($events);
-        
+
         $relayer = Mockery::mock(\rikmeijer\Transpher\Relay\Sender::class)->allows([
-                '__invoke' => true
+            '__invoke' => true
         ]);
-        
-        foreach ($relay(\rikmeijer\Transpher\Nostr::encode($value), $relayer) as $response) {
+
+        foreach ($relay($text, $relayer) as $response) {
             $this->messages[] = $response;
         }
     }
-    
+
     #[\Override]
     public function receive() : Amp\Websocket\WebsocketMessage {
         return Amp\Websocket\WebsocketMessage::fromText(array_shift($this->messages));
@@ -88,12 +88,11 @@ it('responds with OK on simple events', function () {
     $alice = Client::generic_client();
     $key_alice = Key::generate();
     
-    $note = Factory::rumor($key_alice(Key::public()), 1, 'Hello world!');
-    $signed_note = $note($key_alice);
+    $note = Factory::event($key_alice, 1, 'Hello world!');
 
-    $alice->expectNostrOK($signed_note[1]['id']);
+    $alice->expectNostrOK($note()[1]['id']);
 
-    $alice->json($signed_note);
+    $alice->send($note);
     $alice->start();
 });
 
@@ -103,8 +102,7 @@ it('replies NOTICE Invalid message on non-existing filters', function () {
     $bob = Client::generic_client();
     $key_alice = Key::generate();
 
-    $note = Factory::rumor($key_alice(Key::public()), 1, 'Hello world!');
-    $alice->sendSignedMessage($note($key_alice));
+    $alice->sendSignedMessage(Factory::event($key_alice, 1, 'Hello world!'));
 
     $bob->expectNostrNotice('Invalid message');
     $subscription = Factory::subscribe();
@@ -117,8 +115,7 @@ it('replies CLOSED on empty filters', function () {
     $bob = Client::generic_client();
     $key_alice = Key::generate();
 
-    $note = Factory::rumor($key_alice(Key::public()), 1, 'Hello world!');
-    $alice->sendSignedMessage($note($key_alice));
+    $alice->sendSignedMessage(Factory::event($key_alice, 1, 'Hello world!'));
 
     $subscription = Factory::subscribe();
 

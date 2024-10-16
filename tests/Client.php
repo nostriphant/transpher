@@ -71,9 +71,9 @@ class Client extends \rikmeijer\Transpher\Client {
         }];
     }
     
-    public function sendSignedMessage(array $signed_message) {
-        $this->expectNostrOK($signed_message[1]['id']);
-        $this->json($signed_message);
+    public function sendSignedMessage(Nostr\Message $signed_message) {
+        $this->expectNostrOK($signed_message()[1]['id']);
+        $this->send($signed_message);
         $this->start();
     }
     

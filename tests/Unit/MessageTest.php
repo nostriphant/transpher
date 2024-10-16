@@ -1,12 +1,12 @@
 <?php
 
 use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Nostr\MessageFactory;
 
 it('can generate a properly signed note', function() {
     $private_key = Key::fromHex('435790f13406085d153b10bd9e00a9f977e637f10ce37db5ccfc5d3440c12d6c');
 
-    $note = Message::rumor($private_key(Key::public()), 1, 'Hello world!');
+    $note = MessageFactory::rumor($private_key(Key::public()), 1, 'Hello world!');
     $signed_note = $note($private_key);
 
     $event = $signed_note;
@@ -38,10 +38,10 @@ it('can generate a properly signed note', function() {
 });
 
 it('can create a subscribe message with a kinds filter', function() {
-    $subscription = Message::subscribe();
+    $subscription = MessageFactory::subscribe();
     expect($subscription)->toBeCallable();
                 
-    $message = Message::filter($subscription, kinds:[1])();
+    $message = MessageFactory::filter($subscription, kinds:[1])();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();
     expect(strlen($message[1]) <= 64)->toBeTrue();
@@ -49,9 +49,9 @@ it('can create a subscribe message with a kinds filter', function() {
     expect($message[2]['kinds'])->toBe([1]);
 });
 it('can create a subscribe message with multiple filters', function() {
-    $subscription = Message::subscribe();
-    $filter1 = Message::filter($subscription, kinds:[1]);
-    $filter2 = Message::filter($filter1, since:1724755392);
+    $subscription = MessageFactory::subscribe();
+    $filter1 = MessageFactory::filter($subscription, kinds:[1]);
+    $filter2 = MessageFactory::filter($filter1, since:1724755392);
     
     $message = $filter2();
     expect($message[0])->toBe('REQ');
@@ -73,8 +73,8 @@ it('can create a subscribe message with a different filter-conditions', function
         "limit" => 25
     ];
     
-    $subscription = Message::subscribe();
-    $message = Message::filter($subscription, ...$conditions)();
+    $subscription = MessageFactory::subscribe();
+    $message = MessageFactory::filter($subscription, ...$conditions)();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();
     expect(strlen($message[1]) <= 64)->toBeTrue();
@@ -89,9 +89,9 @@ it('can create a subscribe message with a different filter-conditions', function
 
 it('does not allow for unknown filters', function() {
     
-    $subscription = Message::subscribe();
-    $filter1 = Message::filter($subscription, kinds:[1]);
-    $filter2 = Message::filter($filter1, unknown:1724755392);
+    $subscription = MessageFactory::subscribe();
+    $filter1 = MessageFactory::filter($subscription, kinds:[1]);
+    $filter2 = MessageFactory::filter($filter1, unknown:1724755392);
     
     $message = $filter2();
     expect($message)->toHaveLength(3);
@@ -100,9 +100,9 @@ it('does not allow for unknown filters', function() {
 
 it('does not allow for unknown filters, merge tags', function() {
     
-    $subscription = Message::subscribe();
-    $filter1 = Message::filter($subscription, kinds:[1]);
-    $filter2 = Message::filter($filter1, tags:['#e'=>["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]]);
+    $subscription = MessageFactory::subscribe();
+    $filter1 = MessageFactory::filter($subscription, kinds:[1]);
+    $filter2 = MessageFactory::filter($filter1, tags:['#e'=>["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]]);
     
     $message = $filter2();
     expect($message)->toHaveLength(4);

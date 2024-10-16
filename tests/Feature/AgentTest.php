@@ -2,7 +2,7 @@
 
 use rikmeijer\Transpher\Agent;
 use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Nostr\MessageFactory;
 
 describe('agent', function () : void {
     it('starts relay and sends private direct messsage to relay owner', function () : void {
@@ -17,8 +17,8 @@ describe('agent', function () : void {
         ]);
         
         $alice = \rikmeijer\TranspherTests\Client::client(8085);
-        $subscription = Message::subscribe();
-        $request = Message::filter($subscription, tags: [['#p' => [$alice_key(Key::public())]]])();
+        $subscription = MessageFactory::subscribe();
+        $request = MessageFactory::filter($subscription, tags: [['#p' => [$alice_key(Key::public())]]])();
         $alice->expectNostrPrivateDirectMessage($subscription()[1], $alice_key, 'Hello, I am your agent! The URL of your relay is ws://127.0.0.1:8085');
         $alice->json($request);
         expect($request[2])->toBeArray();

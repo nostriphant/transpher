@@ -7,7 +7,7 @@ namespace rikmeijer\Transpher\Nostr;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Message {
+class MessageFactory {
     
     static function rumor(string $sender_pubkey, int $kind, string $content, array ...$tags) : Message\Rumor {
         return new Message\Rumor(new Rumor(

@@ -1,15 +1,14 @@
 <?php
 
 namespace rikmeijer\Transpher\Nostr\Message\Subscribe;
-use function \Functional\map;
 
 /**
  * Description of Filter
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-readonly class Filter implements Chain {
-    
+readonly class Filter {
+
     const POSSIBLE_FILTERS = ["ids", "authors", "kinds", "since", "until", "limit"];
 
     private array $conditions;
@@ -30,7 +29,6 @@ readonly class Filter implements Chain {
         $this->conditions = $conditions;
     }
     
-    #[\Override]
     public function __invoke(): array {
         return $this->conditions;
     }

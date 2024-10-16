@@ -7,8 +7,8 @@ use function \Functional\map;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-readonly class Subscribe implements Subscribe\Chain {
-    
+readonly class Subscribe {
+
     private string $subscriptionId;
     private array $filters;
 
@@ -17,7 +17,6 @@ readonly class Subscribe implements Subscribe\Chain {
         $this->filters = $filters;
     }
     
-    #[\Override]
     public function __invoke() : array {
         return array_merge(['REQ', $this->subscriptionId], map($this->filters, fn(Subscribe\Filter $filter) => $filter()));
     }

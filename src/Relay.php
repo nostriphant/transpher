@@ -2,7 +2,7 @@
 
 namespace rikmeijer\Transpher;
 
-use rikmeijer\Transpher\Nostr\MessageFactory;
+use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Relay\Subscriptions;
 use rikmeijer\Transpher\Relay\Sender;
 use rikmeijer\Transpher\Relay\Store;
@@ -28,7 +28,7 @@ class Relay {
     public function __invoke(string $payload, Sender $relay) : \Generator {
         $message = \rikmeijer\Transpher\Nostr::decode($payload);
         if (is_null($message)) {
-            yield MessageFactory::notice('Invalid message');
+            yield Factory::notice('Invalid message');
         } else {
             switch (strtoupper($message[0])) {
                 case 'EVENT':
@@ -40,7 +40,7 @@ class Relay {
                     try {
                         $incoming = Relay\Incoming\Close::fromMessage($message);
                     } catch (\InvalidArgumentException $ex) {
-                        yield MessageFactory::notice($ex->getMessage());
+                        yield Factory::notice($ex->getMessage());
                         break;
                     }
                     yield from $incoming()();
@@ -50,14 +50,14 @@ class Relay {
                     try {
                         $incoming = Relay\Incoming\Req::fromMessage($message);
                     } catch (\InvalidArgumentException $ex) {
-                        yield MessageFactory::notice($ex->getMessage());
+                        yield Factory::notice($ex->getMessage());
                         break;
                     }
                     yield from $incoming()($this->events, $relay);
                     break;
 
                 default: 
-                    yield MessageFactory::notice('Message type ' . $message[0] . ' not supported');
+                    yield Factory::notice('Message type ' . $message[0] . ' not supported');
                     break;
             }
         }

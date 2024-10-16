@@ -8,7 +8,7 @@
 namespace rikmeijer\Transpher\Relay\Incoming;
 use rikmeijer\Transpher\Relay\Incoming;
 use rikmeijer\Transpher\Relay\Subscriptions;
-use rikmeijer\Transpher\Nostr\MessageFactory;
+use rikmeijer\Transpher\Nostr\Message\Factory;
 
 /**
  * Description of Close
@@ -33,7 +33,7 @@ class Close implements Incoming {
     public function __invoke(): callable {
         return function (): \Generator {
             Subscriptions::unsubscribe($this->subscription_id);
-            yield MessageFactory::closed($this->subscription_id);
+            yield Factory::closed($this->subscription_id);
         };
     }
 }

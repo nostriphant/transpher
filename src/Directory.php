@@ -3,7 +3,7 @@
 namespace rikmeijer\Transpher;
 use function \Functional\map, \Functional\filter, \Functional\partial_left;
 use rikmeijer\Transpher\Relay\Subscription;
-use rikmeijer\Transpher\Nostr\MessageFactory;
+use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Event;
 
 /**
@@ -23,7 +23,7 @@ class Directory implements Relay\Store, \Iterator {
     }
     
     public function __invoke(Subscription $subscription) : callable {
-        return fn(string $subscriptionId) => map(filter($this->events, $subscription), partial_left([MessageFactory::class, 'requestedEvent'], $subscriptionId));
+        return fn(string $subscriptionId) => map(filter($this->events, $subscription), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
     }
     
     private function file(Event $event) {

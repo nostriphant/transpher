@@ -4,7 +4,7 @@ namespace rikmeijer\Transpher;
 
 use rikmeijer\Transpher\Nostr;
 use function Amp\Websocket\Client\connect;
-use rikmeijer\Transpher\Nostr\MessageFactory;
+use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Key;
 
 
@@ -23,7 +23,7 @@ class Client {
     }
     
     public function privateDirectMessage(Key $sender, string $recipient_npub, string $message) {
-        $note = MessageFactory::privateDirect($sender, Key::convertBech32ToHex($recipient_npub), str_replace('{relay_url}', $this->url, $message));
+        $note = Factory::privateDirect($sender, Key::convertBech32ToHex($recipient_npub), str_replace('{relay_url}', $this->url, $message));
         $this->send($note);
     }
     

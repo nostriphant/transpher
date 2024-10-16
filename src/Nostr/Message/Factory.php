@@ -1,18 +1,24 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr;
+namespace rikmeijer\Transpher\Nostr\Message;
+
 use function \Functional\map;
+use rikmeijer\Transpher\Nostr\Message;
+use rikmeijer\Transpher\Nostr\Event;
+use rikmeijer\Transpher\Nostr\Key;
+use rikmeijer\Transpher\Nostr\Event\Gift;
+use rikmeijer\Transpher\Nostr\Event\Seal;
 
 /**
  * Class to contain Message related functions
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class MessageFactory {
+class Factory {
 
-    static function rumor(string $sender_pubkey, int $kind, string $content, array ...$tags) : Message\Rumor {
-        return new Message\Rumor(new Rumor(
-            pubkey: $sender_pubkey,
+    static function rumor(string $sender_pubkey, int $kind, string $content, array ...$tags): Rumor {
+        return new Rumor(new \rikmeijer\Transpher\Nostr\Rumor(
+                        pubkey: $sender_pubkey,
             created_at: time(), 
             kind: $kind, 
             content: $content,
@@ -21,7 +27,7 @@ class MessageFactory {
     }
     
     static function privateDirect(Key $private_key, string $recipient_pubkey, string $message): Message {
-        return new Message(['EVENT', get_object_vars(Event\Gift::wrap($recipient_pubkey, Event\Seal::close($private_key, $recipient_pubkey, new \rikmeijer\Transpher\Nostr\Rumor(
+        return new Message(['EVENT', get_object_vars(Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, new \rikmeijer\Transpher\Nostr\Rumor(
                                             pubkey: call_user_func($private_key, Key::public()),
                                             created_at: time(),
                                             kind: 14,
@@ -50,12 +56,12 @@ class MessageFactory {
         return new Message(['CLOSE', $subscriptionId]);
     }
     
-    static function subscribe(Message\Subscribe\Filter ...$filters): Message {
-        return new Message(array_merge(['REQ', bin2hex(random_bytes(32))], map($filters, fn(Message\Subscribe\Filter $filter) => $filter->conditions)));
+    static function subscribe(Subscribe\Filter ...$filters): Message {
+        return new Message(array_merge(['REQ', bin2hex(random_bytes(32))], map($filters, fn(Subscribe\Filter $filter) => $filter->conditions)));
     }
     
     static function filter(mixed ...$conditions) {
-        return new Message\Subscribe\Filter(...$conditions);
+        return new Subscribe\Filter(...$conditions);
     }
     
     static function requestedEvent(string $subscriptionId, Event $event): Message {

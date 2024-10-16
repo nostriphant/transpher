@@ -1,7 +1,7 @@
 <?php
 
 use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\MessageFactory;
+use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Relay\InformationDocument;
 
 it('generates a NIP11 Relay Information Document', function() {
@@ -88,7 +88,7 @@ it('responds with OK on simple events', function () {
     $alice = Client::generic_client();
     $key_alice = Key::generate();
     
-    $note = MessageFactory::rumor($key_alice(Key::public()), 1, 'Hello world!');
+    $note = Factory::rumor($key_alice(Key::public()), 1, 'Hello world!');
     $signed_note = $note($key_alice);
 
     $alice->expectNostrOK($signed_note[1]['id']);
@@ -103,11 +103,11 @@ it('replies NOTICE Invalid message on non-existing filters', function () {
     $bob = Client::generic_client();
     $key_alice = Key::generate();
 
-    $note = MessageFactory::rumor($key_alice(Key::public()), 1, 'Hello world!');
+    $note = Factory::rumor($key_alice(Key::public()), 1, 'Hello world!');
     $alice->sendSignedMessage($note($key_alice));
 
     $bob->expectNostrNotice('Invalid message');
-    $subscription = MessageFactory::subscribe();
+    $subscription = Factory::subscribe();
     $bob->json($subscription());
     $bob->start();
 });
@@ -117,10 +117,10 @@ it('replies CLOSED on empty filters', function () {
     $bob = Client::generic_client();
     $key_alice = Key::generate();
 
-    $note = MessageFactory::rumor($key_alice(Key::public()), 1, 'Hello world!');
+    $note = Factory::rumor($key_alice(Key::public()), 1, 'Hello world!');
     $alice->sendSignedMessage($note($key_alice));
 
-    $subscription = MessageFactory::subscribe();
+    $subscription = Factory::subscribe();
 
     $bob->expectNostrClosed($subscription()[1], 'Subscription filters are empty');
     $request = $subscription();

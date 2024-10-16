@@ -2,7 +2,7 @@
 
 namespace rikmeijer\Transpher\Relay\Incoming;
 use rikmeijer\Transpher\Relay\Subscriptions;
-use rikmeijer\Transpher\Nostr\MessageFactory;
+use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Relay\Store;
 
 /**
@@ -26,7 +26,7 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
         return function (array|Store $events): \Generator {
             $events[] = $this->event;
             Subscriptions::apply($this->event);
-            yield MessageFactory::accept($this->event->id);
+            yield Factory::accept($this->event->id);
         };
     }
 }

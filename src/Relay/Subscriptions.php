@@ -3,7 +3,7 @@
 namespace rikmeijer\Transpher\Relay;
 
 use function \Functional\if_else, \Functional\first;
-use rikmeijer\Transpher\Nostr\MessageFactory;
+use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Event;
 
 /**
@@ -24,8 +24,8 @@ use rikmeijer\Transpher\Nostr\Event;
             if ($to === false) {
                 return false;
             }
-            $to(MessageFactory::requestedEvent($subscriptionId, $event));
-            $to(MessageFactory::eose($subscriptionId));
+            $to(Factory::requestedEvent($subscriptionId, $event));
+            $to(Factory::eose($subscriptionId));
             return true;
         });
     }

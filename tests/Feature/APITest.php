@@ -1,7 +1,7 @@
 <?php
 
 use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\MessageFactory;
+use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\TranspherTests\Client;
 
 $main_relay;
@@ -19,16 +19,16 @@ describe('relay', function () {
         $bob = Client::generic_client();
 
         $alice_key = Key::generate();
-        $note1 = MessageFactory::rumor($alice_key(Key::public()), 1, 'Hello worlda!');
+        $note1 = Factory::rumor($alice_key(Key::public()), 1, 'Hello worlda!');
         $alice->sendSignedMessage($note1($alice_key));
 
         $key_charlie = Key::generate();
-        $note2 = MessageFactory::rumor($key_charlie(Key::public()), 1, 'Hello worldi!');
+        $note2 = Factory::rumor($key_charlie(Key::public()), 1, 'Hello worldi!');
         $note2_signed = $note2($key_charlie);
         $alice->sendSignedMessage($note2_signed);
 
-        $subscription = MessageFactory::subscribe(
-                MessageFactory::filter(ids: [$note2_signed[1]['id']])
+        $subscription = Factory::subscribe(
+                Factory::filter(ids: [$note2_signed[1]['id']])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello worldi!');
@@ -42,10 +42,10 @@ describe('relay', function () {
         $bob = Client::generic_client();
 
         $alice_key = Key::generate();
-        $note = MessageFactory::rumor($alice_key(Key::public()), 1, 'Hello world!');
+        $note = Factory::rumor($alice_key(Key::public()), 1, 'Hello world!');
         $alice->sendSignedMessage($note($alice_key));
-        $subscription = MessageFactory::subscribe(
-            MessageFactory::filter(authors: [$alice_key(Key::public())])
+        $subscription = Factory::subscribe(
+            Factory::filter(authors: [$alice_key(Key::public())])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -62,16 +62,16 @@ describe('relay', function () {
         $charlie = Client::generic_client();
 
         $alice_key = Key::generate();
-        $alice_note = MessageFactory::rumor($alice_key(Key::public()), 1, 'Hello world, from Alice!');
+        $alice_note = Factory::rumor($alice_key(Key::public()), 1, 'Hello world, from Alice!');
         $alice->sendSignedMessage($alice_note($alice_key));
         
         $bob_key = Key::generate();
-        $bob_note = MessageFactory::rumor($bob_key(Key::public()), 1, 'Hello world, from Bob!');
+        $bob_note = Factory::rumor($bob_key(Key::public()), 1, 'Hello world, from Bob!');
         $alice->sendSignedMessage($bob_note($bob_key));
         
-        $subscription = MessageFactory::subscribe(
-            MessageFactory::filter(authors: [$alice_key(Key::public())]),
-            MessageFactory::filter(authors: [$bob_key(Key::public())])
+        $subscription = Factory::subscribe(
+            Factory::filter(authors: [$alice_key(Key::public())]),
+            Factory::filter(authors: [$bob_key(Key::public())])
         );
         $charlie->expectNostrEvent($subscription()[1], 'Hello world, from Alice!');
         $charlie->expectNostrEvent($subscription()[1], 'Hello world, from Bob!');
@@ -86,10 +86,10 @@ describe('relay', function () {
         $bob = Client::generic_client();
         $alice_key = Key::generate();
 
-        $note = MessageFactory::rumor($alice_key(Key::public()), 1, 'Hello world!', ['p', 'randomPTag']);
+        $note = Factory::rumor($alice_key(Key::public()), 1, 'Hello world!', ['p', 'randomPTag']);
         $alice->sendSignedMessage($note($alice_key));
-        $subscription = MessageFactory::subscribe(
-                MessageFactory::filter(tags: ['#p' => ['randomPTag']])
+        $subscription = Factory::subscribe(
+                Factory::filter(tags: ['#p' => ['randomPTag']])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -104,11 +104,11 @@ describe('relay', function () {
         $bob = Client::generic_client();
         $alice_key = Key::generate();
 
-        $note = MessageFactory::rumor($alice_key(Key::public()), 1, 'Hello world!');
+        $note = Factory::rumor($alice_key(Key::public()), 1, 'Hello world!');
         $alice->sendSignedMessage($note($alice_key));
 
-        $subscription = MessageFactory::subscribe(
-                MessageFactory::filter(authors: [$alice_key(Key::public())])
+        $subscription = Factory::subscribe(
+                Factory::filter(authors: [$alice_key(Key::public())])
         );
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
@@ -118,7 +118,7 @@ describe('relay', function () {
 
         $bob->expectNostrClosed($subscription()[1], '');
 
-        $request = MessageFactory::close($subscription()[1]);
+        $request = Factory::close($subscription()[1]);
         $bob->send($request);
         $bob->start();
     });
@@ -135,7 +135,7 @@ describe('relay', function () {
 
         $alice_key = Key::generate();
 
-        $note = MessageFactory::rumor($alice_key(Key::public()), 1, 'Hello wirld!');
+        $note = Factory::rumor($alice_key(Key::public()), 1, 'Hello wirld!');
         $alice->sendSignedMessage($note($alice_key));
 
         $status = $server();
@@ -145,8 +145,8 @@ describe('relay', function () {
         $server = \rikmeijer\Transpher\Relay::boot('127.0.0.1:8082', $env);
         
         $bob = Client::client(8082);
-        $subscription = MessageFactory::subscribe(
-                MessageFactory::filter(authors: [$alice_key(Key::public())])
+        $subscription = Factory::subscribe(
+                Factory::filter(authors: [$alice_key(Key::public())])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
@@ -165,11 +165,11 @@ describe('relay', function () {
         $bob = Client::generic_client();
         $alice_key = Key::generate();
         
-        $note = MessageFactory::rumor($alice_key(Key::public()), 3, 'Hello world!');
+        $note = Factory::rumor($alice_key(Key::public()), 3, 'Hello world!');
         $alice->sendSignedMessage($note($alice_key));
 
-        $subscription = MessageFactory::subscribe(
-                MessageFactory::filter(kinds: [3])
+        $subscription = Factory::subscribe(
+                Factory::filter(kinds: [3])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -184,19 +184,19 @@ describe('relay', function () {
         $bob = Client::generic_client();
         $alice_key = Key::generate();
 
-        $subscription = MessageFactory::subscribe(
-                MessageFactory::filter(authors: [$alice_key(Key::public())])
+        $subscription = Factory::subscribe(
+                Factory::filter(authors: [$alice_key(Key::public())])
         );
 
         $bob->expectNostrEose($subscription()[1]);
         $bob->json($subscription());
         $bob->start();
 
-        $note1 = MessageFactory::rumor($alice_key(Key::public()), 1, 'Relayable Hello worlda!');
+        $note1 = Factory::rumor($alice_key(Key::public()), 1, 'Relayable Hello worlda!');
         $alice->sendSignedMessage($note1($alice_key));
 
         $key_charlie = Key::generate();
-        $note2 = MessageFactory::rumor($key_charlie(Key::public()), 1, 'Hello worldi!');
+        $note2 = Factory::rumor($key_charlie(Key::public()), 1, 'Hello worldi!');
         $alice->sendSignedMessage($note2($key_charlie));
 
         $bob->expectNostrEvent($subscription()[1], 'Relayable Hello worlda!');

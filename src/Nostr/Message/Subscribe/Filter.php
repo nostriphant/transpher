@@ -22,7 +22,7 @@ readonly class Filter {
             ?int $limit = null,
             ?array $tags = null
     ) {
-        $conditions = array_filter(get_defined_vars(), fn(string $key) => in_array($key, self::POSSIBLE_FILTERS), ARRAY_FILTER_USE_KEY);
+        $conditions = array_filter(get_defined_vars());
         if (empty($tags) === false) {
             $conditions = array_merge($conditions, $tags);
         }

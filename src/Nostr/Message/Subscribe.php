@@ -1,5 +1,6 @@
 <?php
 namespace rikmeijer\Transpher\Nostr\Message;
+use function \Functional\map;
 
 /**
  * Description of Subscribe
@@ -9,13 +10,15 @@ namespace rikmeijer\Transpher\Nostr\Message;
 readonly class Subscribe implements Subscribe\Chain {
     
     private string $subscriptionId;
-    
-    public function __construct() {
+    private array $filters;
+
+    public function __construct(Subscribe\Filter ...$filters) {
         $this->subscriptionId = bin2hex(random_bytes(32));
+        $this->filters = $filters;
     }
     
     #[\Override]
     public function __invoke() : array {
-        return ['REQ', $this->subscriptionId];
+        return array_merge(['REQ', $this->subscriptionId], map($this->filters, fn(Subscribe\Filter $filter) => $filter()));
     }
 }

@@ -49,12 +49,12 @@ class MessageFactory {
         return new Message(['CLOSE', $subscription()[1]]);
     }
     
-    static function subscribe() : Message\Subscribe {
-        return new Message\Subscribe();
+    static function subscribe(Message\Subscribe\Filter ...$filters): Message\Subscribe {
+        return new Message\Subscribe(...$filters);
     }
     
-    static function filter(Message\Subscribe\Chain $previous, mixed ...$conditions) {
-        return new Message\Subscribe\Filter($previous, ...$conditions);
+    static function filter(mixed ...$conditions) {
+        return new Message\Subscribe\Filter(...$conditions);
     }
     
     static function requestedEvent(string $subscriptionId, Event $event): Message {

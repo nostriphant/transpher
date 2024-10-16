@@ -15,7 +15,6 @@ readonly class Filter implements Chain {
     private array $conditions;
 
     public function __construct(
-            private Chain $previous,
             ?array $ids = null,
             ?array $authors = null,
             ?array $kinds = null,
@@ -33,6 +32,6 @@ readonly class Filter implements Chain {
     
     #[\Override]
     public function __invoke(): array {
-        return array_merge(($this->previous)(), [$this->conditions]);
+        return $this->conditions;
     }
 }

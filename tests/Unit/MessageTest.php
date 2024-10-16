@@ -38,10 +38,12 @@ it('can generate a properly signed note', function() {
 });
 
 it('can create a subscribe message with a kinds filter', function() {
-    $subscription = MessageFactory::subscribe();
+    $subscription = MessageFactory::subscribe(
+            MessageFactory::filter(kinds: [1])
+    );
     expect($subscription)->toBeCallable();
-                
-    $message = MessageFactory::filter($subscription, kinds: [1])();
+
+    $message = $subscription();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();
     expect(strlen($message[1]) <= 64)->toBeTrue();
@@ -49,12 +51,12 @@ it('can create a subscribe message with a kinds filter', function() {
     expect($message[2]['kinds'])->toBe([1]);
 });
 it('can create a subscribe message with multiple filters', function() {
-    $subscription = MessageFactory::subscribe();
-    $filter1 = MessageFactory::filter($subscription, kinds: [1]);
-    $filter2 = MessageFactory::filter($filter1, since: 1724755392);
+    $subscription = MessageFactory::subscribe(
+            MessageFactory::filter(kinds: [1]),
+            MessageFactory::filter(since: 1724755392)
+    );
 
-
-    $message = $filter2();
+    $message = $subscription();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();
     expect(strlen($message[1]) <= 64)->toBeTrue();
@@ -74,8 +76,10 @@ it('can create a subscribe message with a different filter-conditions', function
         "limit" => 25
     ];
     
-    $subscription = MessageFactory::subscribe();
-    $message = MessageFactory::filter($subscription, ...$conditions)();
+    $subscription = MessageFactory::subscribe(
+            MessageFactory::filter(...$conditions)
+    );
+    $message = $subscription();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();
     expect(strlen($message[1]) <= 64)->toBeTrue();
@@ -89,19 +93,17 @@ it('can create a subscribe message with a different filter-conditions', function
 });
 
 it('does not allow for unknown filters', function () {
-    $subscription = MessageFactory::subscribe();
-    expect(fn() => MessageFactory::filter($subscription, unknown: 1724755392))->toThrow('Unknown named parameter $unknown');
+    expect(fn() => MessageFactory::filter(unknown: 1724755392))->toThrow('Unknown named parameter $unknown');
 });
 
 
 it('does not allow for unknown filters, merge tags', function() {
     
-    $subscription = MessageFactory::subscribe();
-    $filter1 = MessageFactory::filter($subscription, kinds: [1]);
-    $filter2 = MessageFactory::filter($filter1, tags: ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]]);
-
-
-    $message = $filter2();
+    $subscription = MessageFactory::subscribe(
+            MessageFactory::filter(kinds: [1]),
+            MessageFactory::filter(tags: ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]])
+    );
+    $message = $subscription();
     expect($message)->toHaveLength(4);
     expect($message[3]['#e'])->toBe(["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]);
     

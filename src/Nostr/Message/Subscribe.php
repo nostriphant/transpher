@@ -18,6 +18,6 @@ readonly class Subscribe {
     }
     
     public function __invoke() : array {
-        return array_merge(['REQ', $this->subscriptionId], map($this->filters, fn(Subscribe\Filter $filter) => $filter()));
+        return array_merge(['REQ', $this->subscriptionId], map($this->filters, fn(Subscribe\Filter $filter) => $filter->conditions));
     }
 }

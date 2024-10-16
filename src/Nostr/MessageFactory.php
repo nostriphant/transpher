@@ -23,20 +23,20 @@ class MessageFactory {
         return new Message\PrivateDirect($private_key);
     }
     
-    static function eose(string $subscriptionId) : array {
-        return ['EOSE', $subscriptionId];
+    static function eose(string $subscriptionId): Message {
+        return new Message(['EOSE', $subscriptionId]);
     }
-    static function ok(string $eventId, bool $accepted, string $message = '') : array {
-        return ['OK', $eventId, $accepted, $message];
+    static function ok(string $eventId, bool $accepted, string $message = ''): Message {
+        return new Message(['OK', $eventId, $accepted, $message]);
     }
-    static function accept(string $eventId, string $message = '') : array {
+    static function accept(string $eventId, string $message = ''): Message {
         return self::ok($eventId, true, $message);
     }
-    static function notice(string $message) : array {
-        return ['NOTICE', $message];
+    static function notice(string $message): Message {
+        return new Message(['NOTICE', $message]);
     }
-    static function closed(string $subscriptionId, string $message = '') : array {
-        return ['CLOSED', $subscriptionId, $message];
+    static function closed(string $subscriptionId, string $message = ''): Message {
+        return new Message(['CLOSED', $subscriptionId, $message]);
     }
     
     static function close(Message\Subscribe $subscription): Message {
@@ -51,7 +51,7 @@ class MessageFactory {
         return new Message\Subscribe\Filter($previous, ...$conditions);
     }
     
-    static function requestedEvent(string $subscriptionId, Event $event) {
-        return ['EVENT', $subscriptionId, get_object_vars($event)];
+    static function requestedEvent(string $subscriptionId, Event $event): Message {
+        return new Message(['EVENT', $subscriptionId, get_object_vars($event)]);
     }
 }

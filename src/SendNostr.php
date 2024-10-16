@@ -16,8 +16,12 @@ readonly class SendNostr implements Sender {
     private function __construct(private string $action, private WebsocketClient $client, private LoggerInterface $log) {}
     
     #[\Override]
-    public function __invoke(mixed $json) : bool {
-        $text = \rikmeijer\Transpher\Nostr::encode($json);
+    public function __invoke(mixed $json): bool {
+        if ($json instanceof Nostr\Message) {
+            $text = $json;
+        } else {
+            $text = \rikmeijer\Transpher\Nostr::encode($json);
+        }
         $this->log->info($this->action . ' message ' . $text);
         $this->client->sendText($text);
         return true;

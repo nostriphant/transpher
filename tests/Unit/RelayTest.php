@@ -44,7 +44,7 @@ class Client extends \rikmeijer\TranspherTests\Client {
         ]);
         
         foreach ($relay(\rikmeijer\Transpher\Nostr::encode($value), $relayer) as $response) {
-            $this->messages[] = \rikmeijer\Transpher\Nostr::encode($response);
+            $this->messages[] = $response;
         }
     }
     

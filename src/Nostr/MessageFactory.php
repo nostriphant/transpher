@@ -8,7 +8,7 @@ namespace rikmeijer\Transpher\Nostr;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 class MessageFactory {
-    
+
     static function rumor(string $sender_pubkey, int $kind, string $content, array ...$tags) : Message\Rumor {
         return new Message\Rumor(new Rumor(
             pubkey: $sender_pubkey,
@@ -39,8 +39,8 @@ class MessageFactory {
         return ['CLOSED', $subscriptionId, $message];
     }
     
-    static function close(Message\Subscribe $subscription) : Message\Subscribe\Close {
-        return new Message\Subscribe\Close($subscription()[1]);
+    static function close(Message\Subscribe $subscription): Message {
+        return new Message(['CLOSE', $subscription()[1]]);
     }
     
     static function subscribe() : Message\Subscribe {

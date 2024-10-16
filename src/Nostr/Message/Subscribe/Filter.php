@@ -10,8 +10,8 @@ use function \Functional\map;
  */
 readonly class Filter implements Chain {
     
-    const POSSIBLE_FILTERS = ["ids", "authors", "kinds", "tags", "since", "until", "limit"];
-    
+    const POSSIBLE_FILTERS = ["ids", "authors", "kinds", "since", "until", "limit"];
+
     private array $conditions;
 
     public function __construct(

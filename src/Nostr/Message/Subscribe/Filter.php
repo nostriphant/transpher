@@ -1,11 +1,7 @@
 <?php
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
- */
-
 namespace rikmeijer\Transpher\Nostr\Message\Subscribe;
+use function \Functional\map;
 
 /**
  * Description of Filter
@@ -17,22 +13,26 @@ readonly class Filter implements Chain {
     const POSSIBLE_FILTERS = ["ids", "authors", "kinds", "tags", "since", "until", "limit"];
     
     private array $conditions;
-    
-    public function __construct(private Chain $previous, mixed ...$conditions) {
+
+    public function __construct(
+            private Chain $previous,
+            ?array $ids = null,
+            ?array $authors = null,
+            ?array $kinds = null,
+            ?int $since = null,
+            ?int $until = null,
+            ?int $limit = null,
+            ?array $tags = null
+    ) {
+        $conditions = array_filter(get_defined_vars(), fn(string $key) => in_array($key, self::POSSIBLE_FILTERS), ARRAY_FILTER_USE_KEY);
+        if (empty($tags) === false) {
+            $conditions = array_merge($conditions, $tags);
+        }
         $this->conditions = $conditions;
     }
     
     #[\Override]
-    public function __invoke() : array {
-        $filtered_conditions = array_filter($this->conditions, fn(string $key) => in_array($key, self::POSSIBLE_FILTERS), ARRAY_FILTER_USE_KEY);
-        if (count($filtered_conditions) === 0) {
-            return ($this->previous)();
-        }
-        if (array_key_exists('tags', $filtered_conditions)) {
-            $tags = $filtered_conditions['tags'];
-            unset($filtered_conditions['tags']);
-            $filtered_conditions = array_merge($filtered_conditions, $tags);
-        }
-        return array_merge(($this->previous)(), [$filtered_conditions]);
+    public function __invoke(): array {
+        return array_merge(($this->previous)(), [$this->conditions]);
     }
 }

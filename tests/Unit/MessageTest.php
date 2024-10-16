@@ -41,7 +41,7 @@ it('can create a subscribe message with a kinds filter', function() {
     $subscription = MessageFactory::subscribe();
     expect($subscription)->toBeCallable();
                 
-    $message = MessageFactory::filter($subscription, kinds:[1])();
+    $message = MessageFactory::filter($subscription, kinds: [1])();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();
     expect(strlen($message[1]) <= 64)->toBeTrue();
@@ -50,9 +50,10 @@ it('can create a subscribe message with a kinds filter', function() {
 });
 it('can create a subscribe message with multiple filters', function() {
     $subscription = MessageFactory::subscribe();
-    $filter1 = MessageFactory::filter($subscription, kinds:[1]);
-    $filter2 = MessageFactory::filter($filter1, since:1724755392);
-    
+    $filter1 = MessageFactory::filter($subscription, kinds: [1]);
+    $filter2 = MessageFactory::filter($filter1, since: 1724755392);
+
+
     $message = $filter2();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();
@@ -87,23 +88,19 @@ it('can create a subscribe message with a different filter-conditions', function
     expect($message[2]['limit'])->toBe(25);
 });
 
-it('does not allow for unknown filters', function() {
-    
+it('does not allow for unknown filters', function () {
     $subscription = MessageFactory::subscribe();
-    $filter1 = MessageFactory::filter($subscription, kinds:[1]);
-    $filter2 = MessageFactory::filter($filter1, unknown:1724755392);
-    
-    $message = $filter2();
-    expect($message)->toHaveLength(3);
+    expect(fn() => MessageFactory::filter($subscription, unknown: 1724755392))->toThrow('Unknown named parameter $unknown');
 });
 
 
 it('does not allow for unknown filters, merge tags', function() {
     
     $subscription = MessageFactory::subscribe();
-    $filter1 = MessageFactory::filter($subscription, kinds:[1]);
-    $filter2 = MessageFactory::filter($filter1, tags:['#e'=>["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]]);
-    
+    $filter1 = MessageFactory::filter($subscription, kinds: [1]);
+    $filter2 = MessageFactory::filter($filter1, tags: ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]]);
+
+
     $message = $filter2();
     expect($message)->toHaveLength(4);
     expect($message[3]['#e'])->toBe(["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]);

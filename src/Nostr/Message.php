@@ -2,14 +2,18 @@
 
 namespace rikmeijer\Transpher\Nostr;
 
-class Message {
+readonly class Message {
 
-    public function __construct(private array $raw) {
-        
+    public mixed $payload;
+
+    public function __construct(public string $type, mixed ...$payload) {
+        $this->payload = $payload;
     }
 
     public function __invoke(): array {
-        return $this->raw;
+        $payload = $this->payload;
+        array_unshift($payload, $this->type);
+        return $payload;
     }
 
     public function __toString(): string {

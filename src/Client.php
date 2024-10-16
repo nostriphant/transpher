@@ -28,8 +28,13 @@ class Client {
     }
     
     public function json(mixed $json) : void {
-        $this->connection->sendText(Nostr::encode($json));
+        $this->send(Nostr::encode($json));
     }
+
+    public function send(string $text): void {
+        $this->connection->sendText($text);
+    }
+
     public function onJson(callable $callback) {
         $this->onjson_callback = $callback;
     }

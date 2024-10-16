@@ -13,4 +13,8 @@ readonly class Close {
     public function __invoke() : array {
         return ['CLOSE', $this->subscriptionId];
     }
+
+    public function __toString(): string {
+        return \rikmeijer\Transpher\Nostr::encode($this());
+    }
 }

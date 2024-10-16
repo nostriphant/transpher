@@ -112,8 +112,8 @@ describe('relay', function () {
 
         $bob->expectNostrClosed($subscription()[1], '');
 
-        $request = Message::close($subscription)();
-        $bob->json($request);
+        $request = Message::close($subscription);
+        $bob->send($request);
         $bob->start();
     });
 

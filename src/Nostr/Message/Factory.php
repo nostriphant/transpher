@@ -8,6 +8,7 @@ use rikmeijer\Transpher\Nostr\Event;
 use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\Event\Gift;
 use rikmeijer\Transpher\Nostr\Event\Seal;
+use rikmeijer\Transpher\Nostr\Subscription\Filter;
 
 class Factory {
 
@@ -55,8 +56,8 @@ class Factory {
         return self::message('CLOSE', $subscriptionId);
     }
     
-    static function subscribe(Subscribe\Filter ...$filters): Message {
-        return self::message('REQ', bin2hex(random_bytes(32)), ...map($filters, fn(Subscribe\Filter $filter) => $filter->conditions));
+    static function subscribe(Filter ...$filters): Message {
+        return self::message('REQ', bin2hex(random_bytes(32)), ...map($filters, fn(Filter $filter) => $filter->conditions));
     }
 
     static function requestedEvent(string $subscriptionId, Event $event): Message {

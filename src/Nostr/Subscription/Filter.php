@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\Message\Subscribe;
+namespace rikmeijer\Transpher\Nostr\Subscription;
 
 readonly class Filter {
 

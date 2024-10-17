@@ -12,6 +12,7 @@ use function Functional\some,
  * @author rmeijer
  */
 class Condition {
+
     private function __construct(private string $type_test, private \Closure $test) {
         
     }

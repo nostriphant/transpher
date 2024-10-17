@@ -7,7 +7,6 @@ use function Functional\some,
              Functional\partial_left;
 use rikmeijer\Transpher\Nostr\Subscription\Filter;
 use rikmeijer\Transpher\Nostr\Event;
-use rikmeijer\Transpher\Relay\Subscription\Condition;
 
 /**
  * Description of Filters

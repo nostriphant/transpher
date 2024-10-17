@@ -1,7 +1,7 @@
 <?php
 
 use rikmeijer\Transpher\Relay\Subscriptions;
-use rikmeijer\Transpher\Relay\Filter;
+use rikmeijer\Transpher\Relay\Filters;
 
 it('adds and  removes a subscription from the subscriptions-closure', function() {
     $subscriptions = new Subscriptions();
@@ -12,7 +12,7 @@ it('adds and  removes a subscription from the subscriptions-closure', function()
             '__invoke' => true
     ]);
     
-    Subscriptions::subscribe($relayer, 'my-awesome-subscription', Filter::make(['id' => '']));
+    Subscriptions::subscribe($relayer, 'my-awesome-subscription', Filters::make(['id' => '']));
     expect($refl_subscriptions->getStaticPropertyValue('subscriptions'))->toHaveCount(1);
     
     Subscriptions::unsubscribe('my-missing-subscription');

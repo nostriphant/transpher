@@ -36,7 +36,7 @@ readonly class Filter {
         return new self(...array_merge(array_diff_key($filter_prototype, $tags), ['tags' => $tags]));
     }
 
-    static function map(array $filter_prototype, callable $to): array {
-        return map(self::fromPrototype($filter_prototype)->conditions, $to);
+    static function map(callable $to): callable {
+        return fn(array $filter_prototype) => map(self::fromPrototype($filter_prototype)->conditions, $to);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\Subscription;
+namespace rikmeijer\Transpher\Relay;
 
 use rikmeijer\Transpher\Nostr\Event;
 use function Functional\some,

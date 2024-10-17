@@ -1,0 +1,1 @@
+<?php return rikmeijer\Transpher\Relay\Condition::since('created_at');

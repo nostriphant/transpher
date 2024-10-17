@@ -1,6 +1,7 @@
 <?php
 
 namespace rikmeijer\Transpher\Nostr\Subscription;
+use function \Functional\map;
 
 readonly class Filter {
 
@@ -21,6 +22,10 @@ readonly class Filter {
         }
         unset($conditions['tags']);
         $this->conditions = $conditions;
+    }
+
+    public function __invoke(callable $callback): array {
+        return map($this->conditions, $callback);
     }
 
     static function fromPrototype(array $filter_prototype): self {

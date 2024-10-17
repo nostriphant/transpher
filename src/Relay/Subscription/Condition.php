@@ -48,8 +48,7 @@ class Condition {
 
     static function map(array $filter_prototypes) {
         return map($filter_prototypes, function (array $filter_prototype) {
-            $filter = Filter::fromPrototype($filter_prototype);
-            return map($filter->conditions, fn($condition, $filter_field) => (require __DIR__ . '/Condition/' . $filter_field . '.php')($condition));
+            return Filter::fromPrototype($filter_prototype)(fn($condition, $filter_field) => (require __DIR__ . '/Condition/' . $filter_field . '.php')($condition));
         });
     }
 }

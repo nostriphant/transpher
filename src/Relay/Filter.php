@@ -2,11 +2,11 @@
 namespace rikmeijer\Transpher\Relay;
 
 use function Functional\some,
-             \Functional\map,
-             \Functional\true,
-             \Functional\partial_left;
-use \rikmeijer\Transpher\Nostr\Event;
-use rikmeijer\Transpher\Relay\Subscription\Conditions;
+             Functional\map,
+             Functional\true,
+             Functional\partial_left;
+use rikmeijer\Transpher\Nostr\Event;
+use rikmeijer\Transpher\Relay\Subscription\Condition;
 
 /**
  * Description of Filters
@@ -18,7 +18,7 @@ readonly class Filter {
     private \Closure $possible_filters;
 
     public function __construct(array ...$filter_prototypes) {
-        $this->possible_filters = partial_left('\Functional\map', Conditions::map($filter_prototypes));
+        $this->possible_filters = partial_left('\Functional\map', Condition::map($filter_prototypes));
     }
     
     public function __invoke(Event $event) : bool {

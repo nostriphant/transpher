@@ -1,2 +1,2 @@
-<?php return rikmeijer\Transpher\Relay\Subscription\Filter::until('created_at');
+<?php return rikmeijer\Transpher\Relay\Subscription\Condition::until('created_at');
 

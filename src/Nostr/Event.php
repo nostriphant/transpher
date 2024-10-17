@@ -2,11 +2,6 @@
 
 namespace rikmeijer\Transpher\Nostr;
 
-/**
- * Description of Event
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 readonly class Event {
 
     public function __construct(

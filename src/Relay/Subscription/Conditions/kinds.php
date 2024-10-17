@@ -1,1 +1,1 @@
-<?php return rikmeijer\Transpher\Relay\Subscription\Filter::scalar('kind');
+<?php return rikmeijer\Transpher\Relay\Subscription\Condition::scalar('kind');

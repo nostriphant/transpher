@@ -1,2 +1,2 @@
-<?php return rikmeijer\Transpher\Relay\Subscription\Filter::tag('p');
+<?php return rikmeijer\Transpher\Relay\Subscription\Condition::tag('p');
 

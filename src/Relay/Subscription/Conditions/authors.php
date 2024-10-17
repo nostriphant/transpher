@@ -1,1 +1,1 @@
-<?php return rikmeijer\Transpher\Relay\Subscription\Filter::scalar('pubkey');
+<?php return rikmeijer\Transpher\Relay\Subscription\Condition::scalar('pubkey');

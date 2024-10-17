@@ -1,1 +1,1 @@
-<?php return rikmeijer\Transpher\Relay\Subscription\Filter::limit();
+<?php return rikmeijer\Transpher\Relay\Subscription\Condition::limit();

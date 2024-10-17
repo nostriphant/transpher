@@ -1,2 +1,2 @@
-<?php return rikmeijer\Transpher\Relay\Subscription\Filter::scalar('id');
+<?php return rikmeijer\Transpher\Relay\Subscription\Condition::scalar('id');
 

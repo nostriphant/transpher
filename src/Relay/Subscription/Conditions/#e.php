@@ -1,1 +1,1 @@
-<?php return rikmeijer\Transpher\Relay\Subscription\Filter::tag('e');
+<?php return rikmeijer\Transpher\Relay\Subscription\Condition::tag('e');

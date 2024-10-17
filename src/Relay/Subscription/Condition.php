@@ -8,7 +8,7 @@ use function Functional\some, Functional\partial_left;
  *
  * @author rmeijer
  */
-class Filter {
+class Condition {
     private function __construct(private string $type_test, private \Closure $test) {
         
     }

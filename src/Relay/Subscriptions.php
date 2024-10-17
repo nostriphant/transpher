@@ -29,8 +29,8 @@ use rikmeijer\Transpher\Nostr\Event;
             return true;
         });
     }
-    static function subscribe(Sender $relay, string $subscriptionId, Filters $matcher): void {
-        self::$subscriptions[$subscriptionId] = if_else($matcher, fn() => $relay, fn() => false);
+    static function subscribe(Sender $relay, string $subscriptionId, Filters $filters): void {
+        self::$subscriptions[$subscriptionId] = if_else($filters, fn() => $relay, fn() => false);
     }
     static function unsubscribe(string $subscriptionId) : void {
         unset(self::$subscriptions[$subscriptionId]);

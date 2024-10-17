@@ -19,6 +19,19 @@ readonly class Filter {
         if (empty($tags) === false) {
             $conditions = \array_merge($conditions, $tags);
         }
+        unset($conditions['tags']);
         $this->conditions = $conditions;
+    }
+
+    static function fromPrototype(array $filter_prototype): self {
+        $tags = array_diff_key($filter_prototype, [
+            'ids' => null,
+            'authors' => null,
+            'kinds' => null,
+            'since' => null,
+            'until' => null,
+            'limit' => null
+        ]);
+        return new self(...array_merge(array_diff_key($filter_prototype, $tags), ['tags' => $tags]));
     }
 }

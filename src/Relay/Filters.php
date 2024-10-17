@@ -14,11 +14,9 @@ use rikmeijer\Transpher\Relay\Subscription\Condition;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 readonly class Filters {
-    
-    private \Closure $possible_filters;
 
-    public function __construct(array ...$filter_prototypes) {
-        $this->possible_filters = partial_left('\Functional\map', Condition::map($filter_prototypes));
+    private function __construct(private \Closure $possible_filters) {
+        
     }
     
     public function __invoke(Event $event) : bool {
@@ -26,6 +24,6 @@ readonly class Filters {
     }
 
     static function make(array ...$filter_prototypes): self {
-        return new self(...$filter_prototypes);
+        return new self(partial_left('\Functional\map', Condition::map($filter_prototypes)));
     }
 }

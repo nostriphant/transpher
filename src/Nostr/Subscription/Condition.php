@@ -1,15 +1,11 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay\Subscription;
+namespace rikmeijer\Transpher\Nostr\Subscription;
 
 use rikmeijer\Transpher\Nostr\Event;
 use function Functional\some,
              Functional\partial_left;
 
-/**
- *
- * @author rmeijer
- */
 class Condition {
 
     private function __construct(private string $type_test, private \Closure $test) {

@@ -2,7 +2,6 @@
 
 namespace rikmeijer\Transpher\Nostr\Subscription;
 use function \Functional\map;
-use rikmeijer\Transpher\Relay\Subscription\Condition;
 
 readonly class Filter {
 

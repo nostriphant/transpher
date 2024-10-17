@@ -4,9 +4,7 @@ namespace rikmeijer\Transpher\Relay\Subscription;
 
 use rikmeijer\Transpher\Nostr\Event;
 use function Functional\some,
-             Functional\partial_left,
-             \Functional\map;
-use rikmeijer\Transpher\Nostr\Subscription\Filter;
+             Functional\partial_left;
 
 /**
  *
@@ -46,9 +44,7 @@ class Condition {
         });
     }
 
-    static function map(array $filter_prototypes) {
-        return map($filter_prototypes, function (array $filter_prototype) {
-            return Filter::fromPrototype($filter_prototype)(fn($condition, $filter_field) => (require __DIR__ . '/Condition/' . $filter_field . '.php')($condition));
-        });
+    static function map() {
+        return fn($condition, $filter_field) => (require __DIR__ . '/Condition/' . $filter_field . '.php')($condition);
     }
 }

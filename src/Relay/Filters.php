@@ -5,6 +5,7 @@ use function Functional\some,
              Functional\map,
              Functional\true,
              Functional\partial_left;
+use rikmeijer\Transpher\Nostr\Subscription\Filter;
 use rikmeijer\Transpher\Nostr\Event;
 use rikmeijer\Transpher\Relay\Subscription\Condition;
 
@@ -24,6 +25,8 @@ readonly class Filters {
     }
 
     static function make(array ...$filter_prototypes): self {
-        return new self(partial_left('\Functional\map', Condition::map($filter_prototypes)));
+        return new self(partial_left('\Functional\map', map($filter_prototypes, function (array $filter_prototype) {
+            return Filter::fromPrototype($filter_prototype)(Condition::map());
+        })));
     }
 }

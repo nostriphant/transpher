@@ -2,6 +2,7 @@
 
 namespace rikmeijer\Transpher\Nostr\Subscription;
 use function \Functional\map;
+use rikmeijer\Transpher\Relay\Subscription\Condition;
 
 readonly class Filter {
 
@@ -28,7 +29,7 @@ readonly class Filter {
         return map($this->conditions, $callback);
     }
 
-    static function fromPrototype(array $filter_prototype): self {
+    static function fromPrototype(array $filter_prototype): array {
         $tags = array_diff_key($filter_prototype, [
             'ids' => null,
             'authors' => null,
@@ -37,6 +38,7 @@ readonly class Filter {
             'until' => null,
             'limit' => null
         ]);
-        return new self(...array_merge(array_diff_key($filter_prototype, $tags), ['tags' => $tags]));
+        $filter = (new self(...array_merge(array_diff_key($filter_prototype, $tags), ['tags' => $tags])));
+        return $filter(Condition::map());
     }
 }

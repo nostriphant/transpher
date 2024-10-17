@@ -29,10 +29,8 @@ use rikmeijer\Transpher\Nostr\Event;
             return true;
         });
     }
-    static function subscribe(Sender $relay, string $subscriptionId, array ...$prototypes) : Subscription {
-        $matcher = Subscription::make(...$prototypes);
+    static function subscribe(Sender $relay, string $subscriptionId, Subscription $matcher): void {
         self::$subscriptions[$subscriptionId] = if_else($matcher, fn() => $relay, fn() => false);
-        return $matcher;
     }
     static function unsubscribe(string $subscriptionId) : void {
         unset(self::$subscriptions[$subscriptionId]);

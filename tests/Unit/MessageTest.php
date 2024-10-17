@@ -2,6 +2,7 @@
 
 use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\Message\Factory;
+use rikmeijer\Transpher\Nostr\Subscription\Filter;
 
 it('can generate a properly signed note', function() {
     $private_key = Key::fromHex('435790f13406085d153b10bd9e00a9f977e637f10ce37db5ccfc5d3440c12d6c');
@@ -36,7 +37,7 @@ it('can generate a properly signed note', function() {
 
 it('can create a subscribe message with a kinds filter', function() {
     $subscription = Factory::subscribe(
-            new \rikmeijer\Transpher\Nostr\Subscription\Filter(kinds: [1])
+            new Filter(kinds: [1])
     );
     expect($subscription)->toBeCallable();
 
@@ -49,8 +50,8 @@ it('can create a subscribe message with a kinds filter', function() {
 });
 it('can create a subscribe message with multiple filters', function() {
     $subscription = Factory::subscribe(
-            new \rikmeijer\Transpher\Nostr\Subscription\Filter(kinds: [1]),
-            new \rikmeijer\Transpher\Nostr\Subscription\Filter(since: 1724755392)
+            new Filter(kinds: [1]),
+            new Filter(since: 1724755392)
     );
 
     $message = $subscription();
@@ -74,7 +75,7 @@ it('can create a subscribe message with a different filter-conditions', function
     ];
     
     $subscription = Factory::subscribe(
-            new \rikmeijer\Transpher\Nostr\Subscription\Filter(...$conditions)
+            new Filter(...$conditions)
     );
     $message = $subscription();
     expect($message[0])->toBe('REQ');
@@ -90,15 +91,15 @@ it('can create a subscribe message with a different filter-conditions', function
 });
 
 it('does not allow for unknown filters', function () {
-    expect(fn() => new \rikmeijer\Transpher\Nostr\Subscription\Filter(unknown: 1724755392))->toThrow('Unknown named parameter $unknown');
+    expect(fn() => new Filter(unknown: 1724755392))->toThrow('Unknown named parameter $unknown');
 });
 
 
 it('does not allow for unknown filters, merge tags', function() {
     
     $subscription = Factory::subscribe(
-            new \rikmeijer\Transpher\Nostr\Subscription\Filter(kinds: [1]),
-            new \rikmeijer\Transpher\Nostr\Subscription\Filter(tags: ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]])
+            new Filter(kinds: [1]),
+            new Filter(tags: ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]])
     );
     $message = $subscription();
     expect($message)->toHaveLength(4);

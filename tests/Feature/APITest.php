@@ -3,6 +3,7 @@
 use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\TranspherTests\Client;
+use rikmeijer\Transpher\Nostr\Subscription\Filter;
 
 $main_relay;
 beforeAll(function() use (&$main_relay) {
@@ -26,7 +27,7 @@ describe('relay', function () {
         $alice->sendSignedMessage($note2);
 
         $subscription = Factory::subscribe(
-                new \rikmeijer\Transpher\Nostr\Subscription\Filter(ids: [$note2()[1]['id']])
+                new Filter(ids: [$note2()[1]['id']])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello worldi!');
@@ -42,7 +43,7 @@ describe('relay', function () {
         $alice_key = Key::generate();
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world!'));
         $subscription = Factory::subscribe(
-            new \rikmeijer\Transpher\Nostr\Subscription\Filter(authors: [$alice_key(Key::public())])
+            new Filter(authors: [$alice_key(Key::public())])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -65,8 +66,8 @@ describe('relay', function () {
         $alice->sendSignedMessage(Factory::event($bob_key, 1, 'Hello world, from Bob!'));
 
         $subscription = Factory::subscribe(
-            new \rikmeijer\Transpher\Nostr\Subscription\Filter(authors: [$alice_key(Key::public())]),
-                new \rikmeijer\Transpher\Nostr\Subscription\Filter(authors: [$bob_key(Key::public())])
+            new Filter(authors: [$alice_key(Key::public())]),
+                new Filter(authors: [$bob_key(Key::public())])
         );
         $charlie->expectNostrEvent($subscription()[1], 'Hello world, from Alice!');
         $charlie->expectNostrEvent($subscription()[1], 'Hello world, from Bob!');
@@ -83,7 +84,7 @@ describe('relay', function () {
 
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world!', ['p', 'randomPTag']));
         $subscription = Factory::subscribe(
-                new \rikmeijer\Transpher\Nostr\Subscription\Filter(tags: ['#p' => ['randomPTag']])
+                new Filter(tags: ['#p' => ['randomPTag']])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -101,7 +102,7 @@ describe('relay', function () {
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world!'));
 
         $subscription = Factory::subscribe(
-                new \rikmeijer\Transpher\Nostr\Subscription\Filter(authors: [$alice_key(Key::public())])
+                new Filter(authors: [$alice_key(Key::public())])
         );
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
@@ -137,7 +138,7 @@ describe('relay', function () {
         
         $bob = Client::client(8082);
         $subscription = Factory::subscribe(
-                new \rikmeijer\Transpher\Nostr\Subscription\Filter(authors: [$alice_key(Key::public())])
+                new Filter(authors: [$alice_key(Key::public())])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
@@ -159,7 +160,7 @@ describe('relay', function () {
         $alice->sendSignedMessage(Factory::event($alice_key, 3, 'Hello world!'));
 
         $subscription = Factory::subscribe(
-                new \rikmeijer\Transpher\Nostr\Subscription\Filter(kinds: [3])
+                new Filter(kinds: [3])
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -175,7 +176,7 @@ describe('relay', function () {
         $alice_key = Key::generate();
 
         $subscription = Factory::subscribe(
-                new \rikmeijer\Transpher\Nostr\Subscription\Filter(authors: [$alice_key(Key::public())])
+                new Filter(authors: [$alice_key(Key::public())])
         );
 
         $bob->expectNostrEose($subscription()[1]);

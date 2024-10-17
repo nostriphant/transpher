@@ -2,7 +2,7 @@
 
 namespace rikmeijer\Transpher;
 use function \Functional\map, \Functional\filter, \Functional\partial_left;
-use rikmeijer\Transpher\Relay\Filters;
+use rikmeijer\Transpher\Nostr\Filters;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Event;
 

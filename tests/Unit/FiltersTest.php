@@ -1,6 +1,6 @@
 <?php
 
-use rikmeijer\Transpher\Relay\Filters;
+use rikmeijer\Transpher\Nostr\Filters;
 use rikmeijer\Transpher\Nostr\Event;
 use rikmeijer\Transpher\Relay\Condition;
 

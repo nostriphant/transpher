@@ -1,7 +1,7 @@
 <?php
 
 use rikmeijer\Transpher\Relay\Subscriptions;
-use rikmeijer\Transpher\Relay\Filters;
+use rikmeijer\Transpher\Nostr\Filters;
 use rikmeijer\Transpher\Relay\Condition;
 
 it('adds and  removes a subscription from the subscriptions-closure', function() {

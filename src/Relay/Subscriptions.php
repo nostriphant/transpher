@@ -5,6 +5,7 @@ namespace rikmeijer\Transpher\Relay;
 use function \Functional\if_else, \Functional\first;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Event;
+use rikmeijer\Transpher\Nostr\Filters;
 
 /**
  * Description of Subscriptions

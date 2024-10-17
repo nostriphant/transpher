@@ -1,18 +1,12 @@
 <?php
-namespace rikmeijer\Transpher\Relay;
+namespace rikmeijer\Transpher\Nostr;
 
 use function Functional\some,
              Functional\map,
              Functional\true,
              Functional\partial_left;
 use rikmeijer\Transpher\Nostr\Subscription\Filter;
-use rikmeijer\Transpher\Nostr\Event;
 
-/**
- * Description of Filters
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 readonly class Filters {
 
     private function __construct(private \Closure $possible_filters) {

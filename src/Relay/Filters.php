@@ -4,8 +4,7 @@ namespace rikmeijer\Transpher\Relay;
 use function Functional\some,
              Functional\map,
              Functional\true,
-             Functional\partial_left,
-             Functional\partial_right;
+             Functional\partial_left;
 use rikmeijer\Transpher\Nostr\Subscription\Filter;
 use rikmeijer\Transpher\Nostr\Event;
 
@@ -24,7 +23,7 @@ readonly class Filters {
         return some(($this->possible_filters)(fn(array $possible_filter) => true(map($possible_filter, fn(callable $subscription_filter) => $subscription_filter($event)))));
     }
 
-    static function make(array ...$filter_prototypes): self {
-        return new self(partial_left('\Functional\map', map($filter_prototypes, Filter::map(Condition::map()))));
+    static function make(callable $to, array ...$filter_prototypes): self {
+        return new self(partial_left('\Functional\map', map($filter_prototypes, Filter::map($to))));
     }
 }

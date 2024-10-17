@@ -16,28 +16,28 @@ function event(array $event) : Event {
 }
 
 it('filters p-tags', function() {
-    $subscription = new Subscription(['#p' => ['RandomPTag']]);
+    $subscription = Subscription::make(['#p' => ['RandomPTag']]);
     
     expect($subscription(event(['tags' => [['p', 'RandomPTag']]])))->toBeTrue();
 });
 
 
 it('filters e-tags', function() {
-    $subscription = new Subscription(['#e' => ['RandomEventId']]);
+    $subscription = Subscription::make(['#e' => ['RandomEventId']]);
     
     expect($subscription(event(['tags' => [['e', 'RandomEventId']]])))->toBeTrue();
 });
 
 it('filters created since', function() {
     $time = time();
-    $subscription = new Subscription(['since' => $time - 100]);
+    $subscription = Subscription::make(['since' => $time - 100]);
     
     expect($subscription(event(['created_at' => $time])))->toBeTrue();
 });
 
 it('filters created until', function() {
     $time = time();
-    $subscription = new Subscription(['until' => $time + 100]);
+    $subscription = Subscription::make(['until' => $time + 100]);
     
     expect($subscription(event(['created_at' => $time])))->toBeTrue();
 });
@@ -45,7 +45,7 @@ it('filters created until', function() {
 
 it('filters maximum number of items', function() {
     $time = time();
-    $subscription = new Subscription(['until' => $time + 100, 'limit' => 5]);
+    $subscription = Subscription::make(['until' => $time + 100, 'limit' => 5]);
     
     expect($subscription(event(['created_at' => $time])))->toBeTrue();
     expect($subscription(event(['created_at' => $time])))->toBeTrue();
@@ -56,7 +56,7 @@ it('filters maximum number of items', function() {
 });
 
 it('handlers multiple filters', function() {
-    $subscription = new Subscription(['#p' => ['RandomPTag']], ['#p' => ['RandomPTag2']]);
+    $subscription = Subscription::make(['#p' => ['RandomPTag']], ['#p' => ['RandomPTag2']]);
     
     expect($subscription(event(['tags' => [['p', 'RandomPTag']]])))->toBeTrue();
     expect($subscription(event(['tags' => [['p', 'RandomPTag2']]])))->toBeTrue();

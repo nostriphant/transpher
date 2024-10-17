@@ -30,7 +30,7 @@ use rikmeijer\Transpher\Nostr\Event;
         });
     }
     static function subscribe(Sender $relay, string $subscriptionId, array ...$prototypes) : Subscription {
-        $matcher = new Subscription(...$prototypes);
+        $matcher = Subscription::make(...$prototypes);
         self::$subscriptions[$subscriptionId] = if_else($matcher, fn() => $relay, fn() => false);
         return $matcher;
     }

@@ -25,11 +25,7 @@ readonly class Filter {
         $this->conditions = $conditions;
     }
 
-    public function __invoke(callable $callback): array {
-        return map($this->conditions, $callback);
-    }
-
-    static function fromPrototype(array $filter_prototype): array {
+    static function map(array $filter_prototype): array {
         $tags = array_diff_key($filter_prototype, [
             'ids' => null,
             'authors' => null,
@@ -39,6 +35,6 @@ readonly class Filter {
             'limit' => null
         ]);
         $filter = (new self(...array_merge(array_diff_key($filter_prototype, $tags), ['tags' => $tags])));
-        return $filter(Condition::map());
+        return map($filter->conditions, Condition::map());
     }
 }

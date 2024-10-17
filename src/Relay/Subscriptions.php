@@ -29,7 +29,7 @@ use rikmeijer\Transpher\Nostr\Event;
             return true;
         });
     }
-    static function subscribe(Sender $relay, string $subscriptionId, Subscription $matcher): void {
+    static function subscribe(Sender $relay, string $subscriptionId, Filter $matcher): void {
         self::$subscriptions[$subscriptionId] = if_else($matcher, fn() => $relay, fn() => false);
     }
     static function unsubscribe(string $subscriptionId) : void {

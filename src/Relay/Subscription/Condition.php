@@ -1,6 +1,7 @@
 <?php
 
 namespace rikmeijer\Transpher\Relay\Subscription;
+
 use rikmeijer\Transpher\Nostr\Event;
 use function Functional\some, Functional\partial_left;
 

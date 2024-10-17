@@ -13,7 +13,7 @@ use rikmeijer\Transpher\Relay\Subscription\Conditions;
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-readonly class Subscription {
+readonly class Filter {
     
     private \Closure $possible_filters;
 

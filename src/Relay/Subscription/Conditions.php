@@ -1,6 +1,7 @@
 <?php
 
 namespace rikmeijer\Transpher\Relay\Subscription;
+
 use function \Functional\map;
 
 readonly class Conditions {

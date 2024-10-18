@@ -21,7 +21,8 @@ class Directory implements Relay\Store, \Iterator {
             $this->events[$event->id] = $event;
         }   
     }
-    
+
+    #[\Override]
     public function __invoke(Filters $subscription) : callable {
         return fn(string $subscriptionId) => map(filter($this->events, $subscription), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
     }

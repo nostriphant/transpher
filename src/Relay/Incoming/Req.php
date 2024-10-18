@@ -6,6 +6,8 @@ use rikmeijer\Transpher\Relay\Store;
 use rikmeijer\Transpher\Relay\Subscriptions;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Relay\Sender;
+use rikmeijer\Transpher\Nostr\Filters;
+use rikmeijer\Transpher\Relay\Condition;
 
 /**
  * Description of Req
@@ -34,8 +36,9 @@ readonly class Req implements Incoming {
             if (count($this->filters) === 0) {
                 yield Factory::closed($this->subscription_id, 'Subscription filters are empty');
             } else {
-                $subscription = Subscriptions::subscribe($relay, $this->subscription_id, Subscription::make(...$this->filters));
-                $subscribed_events = $events($subscription);
+                $filters = Filters::make(Condition::map(), ...$this->filters);
+                Subscriptions::subscribe($relay, $this->subscription_id, $filters);
+                $subscribed_events = $events($filters);
                 yield from $subscribed_events($this->subscription_id);
                 yield Factory::eose($this->subscription_id);
             }

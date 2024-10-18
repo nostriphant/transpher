@@ -36,7 +36,9 @@ class Client extends \rikmeijer\TranspherTests\Client {
 
 
     public function send(string $text): void {
-        $events = [];
+        $events = Mockery::mock(rikmeijer\Transpher\Relay\Store::class)->allows([
+            'offsetSet' => null
+        ]);
         $relay = new \rikmeijer\Transpher\Relay($events);
 
         $relayer = Mockery::mock(\rikmeijer\Transpher\Relay\Sender::class)->allows([

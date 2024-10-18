@@ -2,12 +2,7 @@
 
 namespace rikmeijer\TranspherTests\Unit;
 
-use rikmeijer\Transpher\Nostr\Filters;
-use rikmeijer\Transpher\Nostr\Message\Factory;
 use Amp\Websocket\WebsocketMessage;
-use function \Functional\select,
-             \Functional\map,
-             \Functional\partial_left;
 
 class Client extends \rikmeijer\TranspherTests\Client {
 
@@ -25,37 +20,7 @@ class Client extends \rikmeijer\TranspherTests\Client {
     static function generic_client(): self {
         if (isset(self::$generic_relay) === false) {
             $events = new class implements \rikmeijer\Transpher\Relay\Store {
-
-                private array $events = [];
-
-                #[\Override]
-                public function __invoke(Filters $subscription): callable {
-                    return fn(string $subscriptionId) => map(select($this->events, $subscription), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
-                }
-
-                #[\Override]
-                public function offsetExists(mixed $offset): bool {
-                    return isset($this->events[$offset]);
-                }
-
-                #[\Override]
-                public function offsetGet(mixed $offset): mixed {
-                    return $this->events[$offset];
-                }
-
-                #[\Override]
-                public function offsetSet(mixed $offset, mixed $value): void {
-                    if (isset($offset)) {
-                        $this->events[$offset] = $value;
-                    } else {
-                        $this->events[] = $value;
-                    }
-                }
-
-                #[\Override]
-                public function offsetUnset(mixed $offset): void {
-                    unset($this->events[$offset]);
-                }
+                use \rikmeijer\Transpher\Nostr\EventsStore;
             };
             self::$generic_relay = new \rikmeijer\Transpher\Relay($events);
         }

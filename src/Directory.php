@@ -1,7 +1,9 @@
 <?php
 
 namespace rikmeijer\Transpher;
-use function \Functional\map, \Functional\filter, \Functional\partial_left;
+use function \Functional\map,
+             \Functional\select,
+             \Functional\partial_left;
 use rikmeijer\Transpher\Nostr\Filters;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Event;
@@ -18,13 +20,17 @@ class Directory implements Relay\Store, \Iterator {
     public function __construct(private string $store) {
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {
             $event = include $event_file;
-            $this->events[$event->id] = $event;
+            if (is_array($event)) {
+                $this->events[$event->id] = Event::__set_state($event);
+            } else {
+                $this->events[$event->id] = $event;
+            }
         }   
     }
 
     #[\Override]
     public function __invoke(Filters $subscription) : callable {
-        return fn(string $subscriptionId) => map(filter($this->events, $subscription), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
+        return fn(string $subscriptionId) => map(select($this->events, $subscription), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
     }
     
     private function file(Event $event) {

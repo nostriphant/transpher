@@ -22,7 +22,7 @@ readonly class SendNostr implements Sender {
         } else {
             $text = \rikmeijer\Transpher\Nostr::encode($json);
         }
-        $this->log->info($this->action . ' message ' . $text);
+        $this->log->debug($this->action . ' message ' . $text);
         $this->client->sendText($text);
         return true;
     }

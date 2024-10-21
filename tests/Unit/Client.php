@@ -19,7 +19,8 @@ class Client extends \rikmeijer\TranspherTests\Client {
 
     static function generic_client(): self {
         if (isset(self::$generic_relay) === false) {
-            $events = new class implements \rikmeijer\Transpher\Relay\Store {
+            $events = new class([]) implements \rikmeijer\Transpher\Relay\Store {
+
                 use \rikmeijer\Transpher\Nostr\EventsStore;
             };
             self::$generic_relay = new \rikmeijer\Transpher\Relay($events);

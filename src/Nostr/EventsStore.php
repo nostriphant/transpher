@@ -10,7 +10,9 @@ use function \Functional\select,
 
 trait EventsStore {
 
-    private array $events = [];
+    public function __construct(private array $events) {
+
+    }
 
     public function __invoke(Filters $subscription): callable {
         return fn(string $subscriptionId) => map(select($this->events, $subscription), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));

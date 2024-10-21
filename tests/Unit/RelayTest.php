@@ -242,13 +242,16 @@ it('relays events to Bob, sent after they subscribed on Alices messages', functi
 });
 
 it('sends events to all clients subscribed on author (pubkey), even after restarting the server', function () {
-    $transpher_store = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid();
+    $transpher_store = ROOT_DIR . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . uniqid();
     mkdir($transpher_store);
 
     $alice = Client::persistent_client($transpher_store);
 
     $alice_key = Key::generate();
-    $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello wirld!'));
+    $alice->sendSignedMessage($alice_event = Factory::event($alice_key, 1, 'Hello wirld!'));
+
+    $event_file = $transpher_store . DIRECTORY_SEPARATOR . $alice_event()[1]['id'] . '.php';
+    expect(is_file($event_file))->toBeTrue($event_file);
 
     $bob = Client::persistent_client($transpher_store);
     $subscription = Factory::subscribe(
@@ -260,4 +263,7 @@ it('sends events to all clients subscribed on author (pubkey), even after restar
 
     $bob->json($subscription());
     $bob->start();
+
+    unlink($event_file);
+    rmdir($transpher_store);
 });

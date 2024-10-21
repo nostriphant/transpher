@@ -11,12 +11,12 @@ class Condition {
     private function __construct(private string $type_test, private \Closure $test) {
         
     }
-    public function __invoke(mixed $filter_field) : callable {
-        if (($this->type_test)($filter_field) === false) {
+    public function __invoke(mixed $filter_value): callable {
+        if (($this->type_test)($filter_value) === false) {
             return fn() => true;
         }
         
-        return partial_left($this->test, $filter_field);
+        return partial_left($this->test, $filter_value);
     }
     
     
@@ -41,6 +41,6 @@ class Condition {
     }
 
     static function map() {
-        return fn($condition, $filter_field) => (require __DIR__ . '/Condition/' . $filter_field . '.php')($condition);
+        return fn(mixed $filter_value, string $filter_field) => (require __DIR__ . '/Condition/' . $filter_field . '.php')($filter_value);
     }
 }

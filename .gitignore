@@ -1,5 +1,5 @@
 /nbproject/private/
-/data/*.php
+/data
 /vendor/
 .phpunit.cache
 .env

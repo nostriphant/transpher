@@ -24,7 +24,11 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
     #[\Override]
     public function __invoke(): callable {
         return function (array|Store $events): \Generator {
-            $events[] = $this->event;
+            if (20000 <= $this->event->kind && $this->event->kind < 30000) {
+                // ephemeral, do not store
+            } else {
+                $events[$this->event->id] = $this->event;
+            }
             Subscriptions::apply($this->event);
             yield Factory::accept($this->event->id);
         };

@@ -50,8 +50,9 @@ class Client {
     public function start() : void {
         $this->listening = true;
         while ($this->listening && ($message = $this->receive())) {
-            $payload = $message->buffer();
-            ($this->onjson_callback)([$this, 'ignore'], Nostr::decode($payload));
+            $buffer = $message->buffer();
+            $payload = Nostr::decode($buffer);
+            ($this->onjson_callback)([$this, 'ignore'], $payload);
         }
     }
     

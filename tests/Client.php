@@ -33,8 +33,7 @@ class Client extends \rikmeijer\Transpher\Client {
             expect($message[1]['content'])->toBe($content);
         }];
     }
-    public function expectNostrPrivateDirectMessage(string $subscriptionId, callable $recipient_key, string $message_content) {
-        $this->expectNostrEose($subscriptionId);
+    public function expectNostrPrivateDirectMessage(string $subscriptionId, Nostr\Key $recipient_key, string $message_content) {
         $this->expected_messages[] = ['EVENT', function(callable $stop, array $message) use ($subscriptionId, $recipient_key, $message_content) {
             expect($message[0])->toBe($subscriptionId);
             
@@ -78,7 +77,9 @@ class Client extends \rikmeijer\Transpher\Client {
     }
     
     public function __destruct() {
-        expect($this->expected_messages)->toBeEmpty();
+        if (count($this->expected_messages) > 0) {
+            throw new \Exception('Lingering expected messages: ' . var_Export($this->expected_messages, true));
+        }
     }
     
     public function start(): void {

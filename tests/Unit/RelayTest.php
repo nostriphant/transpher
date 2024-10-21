@@ -267,3 +267,44 @@ it('sends events to all clients subscribed on author (pubkey), even after restar
     unlink($event_file);
     rmdir($transpher_store);
 });
+
+it('relays private direct messsage from alice to bob', function (): void {
+    $transpher_store = ROOT_DIR . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . uniqid();
+    mkdir($transpher_store);
+
+    $alice = Client::persistent_client($transpher_store);
+    $alice_key = Key::generate();
+
+    $bob_key = Key::generate();
+
+    $alice->privateDirectMessage($alice_key, $bob_key(Key::public(Key\Format::BECH32)), 'Hello!!');
+
+    $subscription = Factory::subscribe(
+            new Filter(tags: ['#p' => [$bob_key(Key::public())]])
+    );
+
+    $bob = Client::persistent_client($transpher_store);
+    $bob->expectNostrPrivateDirectMessage($subscription()[1], $bob_key, 'Hello!!');
+    $request = $subscription();
+    expect($request[2])->toBeArray();
+    expect($request[2]['#p'])->toContain($bob_key(Key::public()));
+    $bob->json($request);
+    $bob->start();
+});
+
+it('does not store ephemeral (20000 <= kind < 30000) events', function () {
+    $transpher_store = ROOT_DIR . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . uniqid();
+    mkdir($transpher_store);
+    $alice = Client::persistent_client($transpher_store);
+
+    $alice_key = Key::generate();
+    for ($kind = 20000; $kind < 30000; $kind += 5000) {
+        $alice->sendSignedMessage($alice_event = Factory::event($alice_key, $kind, 'Hello wirld!'));
+        $event_file = $transpher_store . DIRECTORY_SEPARATOR . $alice_event()[1]['id'] . '.php';
+        expect(is_file($event_file))->toBeFalse($kind);
+    }
+    exec('rm -rf ' . $transpher_store . '/*');
+    rmdir($transpher_store);
+
+    unset($alice);
+});

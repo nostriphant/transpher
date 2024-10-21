@@ -33,6 +33,12 @@ class Client extends \rikmeijer\TranspherTests\Client {
     }
 
     #[\Override]
+    public function privateDirectMessage(\rikmeijer\Transpher\Nostr\Key $sender, string $recipient_npub, string $message) {
+        $note = \rikmeijer\Transpher\Nostr\Message\Factory::privateDirect($sender, \rikmeijer\Transpher\Nostr\Key::convertBech32ToHex($recipient_npub), $message);
+        $this->send($note);
+    }
+
+    #[\Override]
     public function send(string $text): void {
         $relayer = new class($this) implements \rikmeijer\Transpher\Relay\Sender {
 
@@ -53,7 +59,7 @@ class Client extends \rikmeijer\TranspherTests\Client {
     }
 
     #[\Override]
-    public function receive(): WebsocketMessage {
-        return WebsocketMessage::fromText(array_shift($this->messages) ?? '');
+    public function receive(): ?WebsocketMessage {
+        return !empty($this->messages) ? WebsocketMessage::fromText(array_shift($this->messages)) : null;
     }
 }

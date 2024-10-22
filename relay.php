@@ -21,7 +21,7 @@ $logger = new Logger('relay-' . $port);
 $logger->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', Level::Debug));
 $logger->pushHandler(new StreamHandler(STDOUT, Level::Info));
 
-$server = SocketHttpServer::createForDirectAccess($logger);
+$server = SocketHttpServer::createForDirectAccess($logger, connectionLimit: 1000);
 $server->expose(new Socket\InternetAddress($ip, $port));
 
 $errorHandler = new DefaultErrorHandler();

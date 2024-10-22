@@ -75,5 +75,15 @@ describe('event storing', function () {
         expect(isset($events['my-original-event']))->toBeFalse();
         expect(isset($events['my-event']))->toBeTrue();
     });
+
+    it('yields a notice for undefined event kinds', function () {
+        $events = Mockery::mock(rikmeijer\Transpher\Relay\Store::class);
+        $incoming = new \rikmeijer\Transpher\Relay\Incoming\Event(Functions::event(['kind' => -1, 'id' => 'undefined-event-kind']));
+        $event = $incoming();
+        foreach ($event($events) as $message) {
+            expect($message()[0])->toBe('NOTICE');
+            expect($message()[1])->toBe('Undefined event kind -1');
+        }
+    });
 });
 

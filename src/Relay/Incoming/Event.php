@@ -30,6 +30,7 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                 case KindClass::REGULAR:
                     $events[$this->event->id] = $this->event;
                     break;
+
                 case KindClass::REPLACEABLE:
                     $replaceable_events = $events(Condition::makeFiltersFromPrototypes([
                         'kinds' => [$this->event->kind],
@@ -40,6 +41,7 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                     }
                     $events[$this->event->id] = $this->event;
                     break;
+
                 case KindClass::EPHEMERAL:
                     break;
 
@@ -54,9 +56,11 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                     }
                     $events[$this->event->id] = $this->event;
                     break;
+
+                case KindClass::UNDEFINED:
                 default:
-                    $events[$this->event->id] = $this->event;
-                    break;
+                    yield Factory::notice('Undefined event kind ' . $this->event->kind);
+                    return;
             }
             Subscriptions::apply($this->event);
             yield Factory::accept($this->event->id);

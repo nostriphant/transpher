@@ -54,5 +54,26 @@ describe('event storing', function () {
         }
         expect($events)->toHaveCount(0);
     });
+
+    it('replaces addressable events, keeping only the last one (based on pubkey, kind and d)', function () {
+        $events = new class([]) implements rikmeijer\Transpher\Relay\Store {
+
+            use \rikmeijer\Transpher\Nostr\EventsStore;
+        };
+
+        $events['my-original-event'] = Functions::event(['kind' => 30000, 'pubkey' => 'my-pubkey', 'tags' => [['d', 'my-d-tag-value']], 'id' => 'my-original-event']);
+        $replacing_event = Functions::event(['kind' => 30000, 'pubkey' => 'my-pubkey', 'tags' => [['d', 'my-d-tag-value']], 'id' => 'my-event']);
+        $incoming = new \rikmeijer\Transpher\Relay\Incoming\Event($replacing_event);
+        $event = $incoming();
+        expect($events)->toHaveCount(1);
+        expect(isset($events['my-original-event']))->toBeTrue();
+        expect(isset($events['my-event']))->toBeFalse();
+        foreach ($event($events) as $message) {
+
+        }
+        expect($events)->toHaveCount(1);
+        expect(isset($events['my-original-event']))->toBeFalse();
+        expect(isset($events['my-event']))->toBeTrue();
+    });
 });
 

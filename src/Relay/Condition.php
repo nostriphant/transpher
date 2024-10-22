@@ -40,11 +40,21 @@ class Condition {
         });
     }
 
-    static function map() {
-        return fn(mixed $filter_value, string $filter_field) => (require __DIR__ . '/Condition/' . $filter_field . '.php')($filter_value);
+    static function map(): callable {
+        return function (mixed $filter_value, string $filter_field) {
+            $directory = __DIR__ . '/Condition/';
+
+            if (is_file($directory . $filter_field . '.php')) {
+                $filter = require __DIR__ . '/Condition/' . $filter_field . '.php';
+            } else {
+                $filter = (require __DIR__ . '/Condition/tags.php')(ltrim($filter_field, '#'));
+            }
+
+            return $filter($filter_value);
+        };
     }
 
-    static function makeFiltersFromPrototypes(array ...$prototypes) {
+    static function makeFiltersFromPrototypes(array ...$prototypes): \rikmeijer\Transpher\Nostr\Filters {
         return \rikmeijer\Transpher\Nostr\Filters::make(self::map(), ...$prototypes);
     }
 }

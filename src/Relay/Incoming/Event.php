@@ -42,6 +42,18 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                     break;
                 case KindClass::EPHEMERAL:
                     break;
+
+                case KindClass::ADDRESSABLE:
+                    $replaceable_events = $events(Condition::makeFiltersFromPrototypes([
+                                'kinds' => [$this->event->kind],
+                                'authors' => [$this->event->pubkey],
+                                '#d' => \rikmeijer\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
+                    ]));
+                    foreach ($replaceable_events as $replaceable_event) {
+                        unset($events[$replaceable_event->id]);
+                    }
+                    $events[$this->event->id] = $this->event;
+                    break;
                 default:
                     $events[$this->event->id] = $this->event;
                     break;

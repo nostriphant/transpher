@@ -3,6 +3,8 @@
 namespace rikmeijer\Transpher\Nostr;
 
 use rikmeijer\Transpher\Nostr\Event\KindClass;
+use function \Functional\select,
+             \Functional\map;
 
 readonly class Event {
 
@@ -31,6 +33,10 @@ readonly class Event {
             30000 <= $event->kind && $event->kind < 40000 => KindClass::ADDRESSABLE,
             default => KindClass::UNDEFINED
         };
+    }
+
+    static function extractTagValues(self $event, string $tag_identifier): array {
+        return map(select($event->tags, fn(array $tag) => $tag[0] === $tag_identifier), fn(array $tag) => $tag[1]);
     }
 
     public static function __set_state(array $properties) : self {

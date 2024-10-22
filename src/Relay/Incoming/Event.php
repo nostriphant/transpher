@@ -26,6 +26,9 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
     public function __invoke(): callable {
         return function (array|Store $events): \Generator {
             switch (\rikmeijer\Transpher\Nostr\Event::determineClass($this->event)) {
+                case KindClass::REGULAR:
+                    $events[$this->event->id] = $this->event;
+                    break;
                 case KindClass::EPHEMERAL:
                     break;
                 default:

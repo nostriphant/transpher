@@ -37,4 +37,8 @@ trait EventsStore {
     public function offsetUnset(mixed $offset): void {
         unset($this->events[$offset]);
     }
+
+    public function count(): int {
+        return count($this->events);
+    }
 }

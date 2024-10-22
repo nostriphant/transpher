@@ -1,12 +1,10 @@
 <?php
 
 use rikmeijer\Transpher\Nostr\NIP44\Padding;
-
-require_once ROOT_DIR . '/tests/Unit/functions.php';
-
+use rikmeijer\TranspherTests\Unit\Functions;
 
 it('calcs padded length correctly', function () {
-    foreach (vectors('nip44')->v2->valid->calc_padded_len as $vector) {
+    foreach (Functions::vectors('nip44')->v2->valid->calc_padded_len as $vector) {
         expect(Padding::calculateLength($vector[0]))->toBe($vector[1]);
     }
 });

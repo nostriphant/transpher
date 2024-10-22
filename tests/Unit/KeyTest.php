@@ -2,6 +2,7 @@
 
 use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\NIP44;
+use rikmeijer\TranspherTests\Unit\Functions;
 
 require_once __DIR__ . '/functions.php';
 
@@ -36,7 +37,7 @@ it('converts between bytes, bech32 and hexidecimal', function() {
 
 it('shared_secret', function () {
     // https://github.com/paulmillr/noble-secp256k1/blob/main/test/wycheproof/ecdh_secp256k1_test.json
-    foreach (vectors('ecdh-secp256k1')->testGroups[0]->tests as $vector) {
+    foreach (Functions::vectors('ecdh-secp256k1')->testGroups[0]->tests as $vector) {
         if ($vector->result === 'valid') {
             $secret = Key::fromHex($vector->private)(Key::sharedSecret(substr($vector->public, 46)));
             expect(str_pad($secret, 64, '0', STR_PAD_LEFT))->toBe($vector->shared);

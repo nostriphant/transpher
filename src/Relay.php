@@ -27,16 +27,11 @@ class Relay {
     public function __invoke(Sender $relay): callable {
         $factory = ($this->factory)($relay);
         return function (string $payload) use ($factory): \Generator {
-            $message = \rikmeijer\Transpher\Nostr::decode($payload);
-            if (is_null($message)) {
-                yield Factory::notice('Invalid message');
-            } else {
-                try {
-                    $incoming = $factory($message);
-                    yield from $incoming();
-                } catch (\InvalidArgumentException $ex) {
-                    yield Factory::notice($ex->getMessage());
-                }
+            try {
+                $incoming = $factory(\rikmeijer\Transpher\Nostr::decode($payload));
+                yield from $incoming();
+            } catch (\InvalidArgumentException $ex) {
+                yield Factory::notice($ex->getMessage());
             }
         };
     }

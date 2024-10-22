@@ -14,7 +14,11 @@ class Nostr {
         return json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
     static function decode(string $json) : mixed {
-        return json_decode($json, true);
+        $object = json_decode($json, true);
+        if (isset($object) === false) {
+            throw new \InvalidArgumentException('Invalid message');
+        }
+        return $object;
     }
     static function encrypt(Key $sender_key, string $recipient_pubkey) : Nostr\Encrypter {
         return new Nostr\Encrypter($sender_key, $recipient_pubkey);

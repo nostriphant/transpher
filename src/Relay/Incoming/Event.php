@@ -31,9 +31,9 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                     $events[$this->event->id] = $this->event;
                     break;
                 case KindClass::REPLACEABLE:
-                    $replaceable_events = $events(\rikmeijer\Transpher\Nostr\Filters::make(Condition::map(), [
-                                'kinds' => [$this->event->kind],
-                                'authors' => [$this->event->pubkey]
+                    $replaceable_events = $events(Condition::makeFiltersFromPrototypes([
+                        'kinds' => [$this->event->kind],
+                        'authors' => [$this->event->pubkey]
                     ]));
                     foreach ($replaceable_events as $replaceable_event) {
                         unset($events[$replaceable_event->id]);

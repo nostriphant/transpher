@@ -43,4 +43,8 @@ class Condition {
     static function map() {
         return fn(mixed $filter_value, string $filter_field) => (require __DIR__ . '/Condition/' . $filter_field . '.php')($filter_value);
     }
+
+    static function makeFiltersFromPrototypes(array ...$prototypes) {
+        return \rikmeijer\Transpher\Nostr\Filters::make(self::map(), ...$prototypes);
+    }
 }

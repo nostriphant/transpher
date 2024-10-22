@@ -4,6 +4,7 @@ namespace rikmeijer\Transpher\Relay\Incoming;
 use rikmeijer\Transpher\Relay\Subscriptions;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Relay\Store;
+use rikmeijer\Transpher\Nostr\Event\KindClass;
 
 /**
  * Description of Event
@@ -24,10 +25,12 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
     #[\Override]
     public function __invoke(): callable {
         return function (array|Store $events): \Generator {
-            if (20000 <= $this->event->kind && $this->event->kind < 30000) {
-                // ephemeral, do not store
-            } else {
-                $events[$this->event->id] = $this->event;
+            switch (\rikmeijer\Transpher\Nostr\Event::determineClass($this->event)) {
+                case KindClass::EPHEMERAL:
+                    break;
+                default:
+                    $events[$this->event->id] = $this->event;
+                    break;
             }
             Subscriptions::apply($this->event);
             yield Factory::accept($this->event->id);

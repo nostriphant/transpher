@@ -8,6 +8,8 @@ use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Relay\Sender;
 use rikmeijer\Transpher\Nostr\Filters;
 use rikmeijer\Transpher\Relay\Condition;
+use function \Functional\map,
+ \Functional\partial_left;
 
 /**
  * Description of Req
@@ -32,13 +34,13 @@ readonly class Req implements Incoming {
 
     #[\Override]
     public function __invoke(): callable {
-        return function (array|Store $events, Sender $relay): \Generator {
+        return function (Store $events, Sender $relay): \Generator {
             if (count($this->filters) === 0) {
                 yield Factory::closed($this->subscription_id, 'Subscription filters are empty');
             } else {
                 $filters = Filters::make(Condition::map(), ...$this->filters);
                 Subscriptions::subscribe($relay, $this->subscription_id, $filters);
-                $subscribed_events = $events($filters);
+                $subscribed_events = fn(string $subscriptionId) => map($events($filters), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
                 yield from $subscribed_events($this->subscription_id);
                 yield Factory::eose($this->subscription_id);
             }

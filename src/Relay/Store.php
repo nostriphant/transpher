@@ -9,5 +9,5 @@ use rikmeijer\Transpher\Nostr\Filters;
  */
 interface Store extends \ArrayAccess, \Countable {
 
-    public function __invoke(Filters $subscription): callable;
+    public function __invoke(Filters $subscription): array;
 }

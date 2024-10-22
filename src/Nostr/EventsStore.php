@@ -3,10 +3,7 @@
 
 namespace rikmeijer\Transpher\Nostr;
 
-use rikmeijer\Transpher\Nostr\Message\Factory;
-use function \Functional\select,
-             \Functional\map,
-             \Functional\partial_left;
+use function \Functional\select;
 
 trait EventsStore {
 
@@ -14,8 +11,8 @@ trait EventsStore {
 
     }
 
-    public function __invoke(Filters $subscription): callable {
-        return fn(string $subscriptionId) => map(select($this->events, $subscription), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
+    public function __invoke(Filters $subscription): array {
+        return select($this->events, $subscription);
     }
 
     public function offsetExists(mixed $offset): bool {

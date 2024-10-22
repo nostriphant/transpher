@@ -9,7 +9,7 @@ it('can handle a Incoming Req', function () {
     ]);
 
     $store = Mockery::mock(\rikmeijer\Transpher\Relay\Store::class);
-    $store->shouldReceive('__invoke')->andReturn(fn(string $subscriptionId) => []);
+    $store->shouldReceive('__invoke')->andReturn([]);
     $expected_messages = ['EOSE'];
     foreach ($handler($store, $relay) as $message) {
         $expected_message = array_shift($expected_messages);

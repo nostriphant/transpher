@@ -21,7 +21,7 @@ class Relay {
     }
     
     
-    public function __construct(private array|Store $events) {
+    public function __construct(private Store $events) {
         
     }
     

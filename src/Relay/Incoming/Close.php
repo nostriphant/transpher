@@ -21,11 +21,13 @@ readonly class Close implements Incoming {
         
     }
 
-    static function fromMessage(array $message): self {
+    #[\Override]
+    static function fromMessage(array $message): callable {
         if (count($message) < 2) {
             throw new \InvalidArgumentException('Missing subscription ID');
         }
-        return new self($message[1]);
+
+        return fn(): self => new self($message[1]);
     }
 
     #[\Override]

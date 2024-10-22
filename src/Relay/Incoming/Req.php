@@ -23,11 +23,13 @@ readonly class Req implements Incoming {
         $this->filters = array_filter($filters);
     }
 
-    static function fromMessage(array $message, Store $events, Sender $relay): self {
+    #[\Override]
+    static function fromMessage(array $message): callable {
         if (count($message) < 3) {
             throw new \InvalidArgumentException('Invalid message');
         }
-        return new self($events, $relay, ...array_slice($message, 1));
+
+        return fn(Store $events, Sender $relay): self => new self($events, $relay, ...array_slice($message, 1));
     }
 
     #[\Override]

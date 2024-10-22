@@ -7,19 +7,15 @@ use rikmeijer\Transpher\Relay\Store;
 use rikmeijer\Transpher\Nostr\Event\KindClass;
 use rikmeijer\Transpher\Relay\Condition;
 
-/**
- * Description of Event
- *
- * @author rmeijer
- */
 readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
 
     public function __construct(private Store $events, private \rikmeijer\Transpher\Nostr\Event $event) {
         
     }
 
-    static function fromMessage(array $message, Store $events): self {
-        return new self($events, new \rikmeijer\Transpher\Nostr\Event(...$message[1]));
+    #[\Override]
+    static function fromMessage(array $message): callable {
+        return fn(Store $events): self => new self($events, new \rikmeijer\Transpher\Nostr\Event(...$message[1]));
     }
 
     #[\Override]

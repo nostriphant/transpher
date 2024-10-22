@@ -34,10 +34,12 @@ readonly class Factory {
                     throw new \InvalidArgumentException('Message type ' . $message[0] . ' not supported');
             }
 
-            yield from $incoming([
-                        'events' => $this->events,
-                        'relay' => $relay
-            ]);
+            $context = new Context(
+                    events: $this->events,
+                    relay: $relay
+            );
+
+            yield from $incoming($context);
         };
     }
 }

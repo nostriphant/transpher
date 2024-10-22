@@ -33,13 +33,13 @@ readonly class Req implements Incoming {
     }
 
     #[\Override]
-    public function __invoke(array $context): \Generator {
+    public function __invoke(Context $context): \Generator {
         if (count($this->filters) === 0) {
             yield Factory::closed($this->subscription_id, 'Subscription filters are empty');
         } else {
             $filters = Condition::makeFiltersFromPrototypes(...$this->filters);
-            Subscriptions::subscribe($context['relay'], $this->subscription_id, $filters);
-            $subscribed_events = fn(string $subscriptionId) => map($context['events']($filters), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
+            Subscriptions::subscribe($context->relay, $this->subscription_id, $filters);
+            $subscribed_events = fn(string $subscriptionId) => map(($context->events)($filters), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
             yield from $subscribed_events($this->subscription_id);
             yield Factory::eose($this->subscription_id);
         }

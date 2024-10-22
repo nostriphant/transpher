@@ -31,7 +31,7 @@ readonly class Close implements Incoming {
     }
 
     #[\Override]
-    public function __invoke(array $context): \Generator {
+    public function __invoke(Context $context): \Generator {
         Subscriptions::unsubscribe($this->subscription_id);
         yield Factory::closed($this->subscription_id);
     }

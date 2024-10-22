@@ -21,4 +21,11 @@ class Functions {
                     'tags' => []
                         ], $event));
     }
+
+    static function context(array $context) {
+        return new \rikmeijer\Transpher\Relay\Incoming\Context(...array_merge([
+                    'events' => \Mockery::mock(\rikmeijer\Transpher\Relay\Store::class),
+            'relay' => \Mockery::mock(\rikmeijer\Transpher\Relay\Sender::class)
+        ], $context));
+    }
 }

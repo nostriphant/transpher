@@ -1,4 +1,5 @@
 <?php
+use rikmeijer\TranspherTests\Unit\Functions;
 
 it('can handle a Incoming Req', function () {
     $relay = Mockery::mock(\rikmeijer\Transpher\Relay\Sender::class)->allows([
@@ -10,7 +11,7 @@ it('can handle a Incoming Req', function () {
 
     $incoming = new rikmeijer\Transpher\Relay\Incoming\Req('some-subscription-id', ['ids' => ['abdcd']]);
     $expected_messages = ['EOSE'];
-    foreach ($incoming(['events' => $store, 'relay' => $relay]) as $message) {
+    foreach ($incoming(Functions::context(['events' => $store, 'relay' => $relay])) as $message) {
         $expected_message = array_shift($expected_messages);
         expect($message->type)->toBe($expected_message);
     }

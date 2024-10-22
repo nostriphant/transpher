@@ -11,7 +11,7 @@ describe('event storing', function () {
         $incoming = new \rikmeijer\Transpher\Relay\Incoming\Event(Functions::event(['kind' => 1, 'id' => 'my-event']));
         expect($events)->toHaveCount(0);
         expect(isset($events['my-event']))->toBeFalse();
-        foreach ($incoming(['events' => $events]) as $message) {
+        foreach ($incoming(Functions::context(['events' => $events])) as $message) {
             
         }
         expect($events)->toHaveCount(1);
@@ -30,7 +30,7 @@ describe('event storing', function () {
         expect($events)->toHaveCount(1);
         expect(isset($events['my-original-event']))->toBeTrue();
         expect(isset($events['my-event']))->toBeFalse();
-        foreach ($incoming(['events' => $events]) as $message) {
+        foreach ($incoming(Functions::context(['events' => $events])) as $message) {
             
         }
         expect($events)->toHaveCount(1);
@@ -50,7 +50,7 @@ describe('event storing', function () {
         expect($events)->toHaveCount(1);
         expect(isset($events['a']))->toBeTrue();
         expect(isset($events['b']))->toBeFalse();
-        foreach ($incoming(['events' => $events]) as $message) {
+        foreach ($incoming(Functions::context(['events' => $events])) as $message) {
             
         }
         expect($events)->toHaveCount(1);
@@ -66,7 +66,7 @@ describe('event storing', function () {
         $incoming = new \rikmeijer\Transpher\Relay\Incoming\Event(Functions::event(['kind' => 20000, 'id' => 'my-event']));
         expect($events)->toHaveCount(0);
         expect($events)->not()->toHaveKey('my-event');
-        foreach ($incoming(['events' => $events]) as $message) {
+        foreach ($incoming(Functions::context(['events' => $events])) as $message) {
             
         }
         expect($events)->toHaveCount(0);
@@ -84,7 +84,7 @@ describe('event storing', function () {
         expect($events)->toHaveCount(1);
         expect(isset($events['my-original-event']))->toBeTrue();
         expect(isset($events['my-event']))->toBeFalse();
-        foreach ($incoming(['events' => $events]) as $message) {
+        foreach ($incoming(Functions::context(['events' => $events])) as $message) {
             
         }
         expect($events)->toHaveCount(1);
@@ -95,7 +95,7 @@ describe('event storing', function () {
     it('yields a notice for undefined event kinds', function () {
         $events = Mockery::mock(rikmeijer\Transpher\Relay\Store::class);
         $incoming = new \rikmeijer\Transpher\Relay\Incoming\Event(Functions::event(['kind' => -1, 'id' => 'undefined-event-kind']));
-        foreach ($incoming(['events' => $events]) as $message) {
+        foreach ($incoming(Functions::context(['events' => $events])) as $message) {
             expect($message()[0])->toBe('NOTICE');
             expect($message()[1])->toBe('Undefined event kind -1');
         }

@@ -18,26 +18,26 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
     }
 
     #[\Override]
-    public function __invoke(array $context): \Generator {
+    public function __invoke(Context $context): \Generator {
         $replaceable_events = [];
         switch (\rikmeijer\Transpher\Nostr\Event::determineClass($this->event)) {
             case KindClass::REGULAR:
-                $context['events'][$this->event->id] = $this->event;
+                $context->events[$this->event->id] = $this->event;
                 break;
 
             case KindClass::REPLACEABLE:
-                $replaceable_events = ($context['events'])(Condition::makeFiltersFromPrototypes([
+                $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
                             'kinds' => [$this->event->kind],
                             'authors' => [$this->event->pubkey]
                 ]));
 
-                $context['events'][$this->event->id] = $this->event;
+                $context->events[$this->event->id] = $this->event;
                 foreach ($replaceable_events as $replaceable_event) {
                     $replace_id = $replaceable_event->id;
                     if ($replaceable_event->created_at === $this->event->created_at) {
                         $replace_id = max($replaceable_event->id, $this->event->id);
                     }
-                    unset($context['events'][$replace_id]);
+                    unset($context->events[$replace_id]);
                 }
                 break;
 
@@ -45,15 +45,15 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                 break;
 
             case KindClass::ADDRESSABLE:
-                $replaceable_events = ($context['events'])(Condition::makeFiltersFromPrototypes([
+                $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
                             'kinds' => [$this->event->kind],
                             'authors' => [$this->event->pubkey],
                             '#d' => \rikmeijer\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
                 ]));
 
-                $context['events'][$this->event->id] = $this->event;
+                $context->events[$this->event->id] = $this->event;
                 foreach ($replaceable_events as $replaceable_event) {
-                    unset($context['events'][$replaceable_event->id]);
+                    unset($context->events[$replaceable_event->id]);
                 }
                 break;
 

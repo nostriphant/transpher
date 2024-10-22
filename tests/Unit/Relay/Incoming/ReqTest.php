@@ -8,9 +8,9 @@ it('can handle a Incoming Req', function () {
     $store = Mockery::mock(\rikmeijer\Transpher\Relay\Store::class);
     $store->shouldReceive('__invoke')->andReturn([]);
 
-    $incoming = new rikmeijer\Transpher\Relay\Incoming\Req($store, $relay, 'some-subscription-id', ['ids' => ['abdcd']]);
+    $incoming = new rikmeijer\Transpher\Relay\Incoming\Req('some-subscription-id', ['ids' => ['abdcd']]);
     $expected_messages = ['EOSE'];
-    foreach ($incoming() as $message) {
+    foreach ($incoming(['events' => $store, 'relay' => $relay]) as $message) {
         $expected_message = array_shift($expected_messages);
         expect($message->type)->toBe($expected_message);
     }

@@ -22,16 +22,16 @@ readonly class Close implements Incoming {
     }
 
     #[\Override]
-    static function fromMessage(array $message): callable {
+    static function fromMessage(array $message): self {
         if (count($message) < 2) {
             throw new \InvalidArgumentException('Missing subscription ID');
         }
 
-        return fn(): self => new self($message[1]);
+        return new self($message[1]);
     }
 
     #[\Override]
-    public function __invoke(): \Generator {
+    public function __invoke(array $context): \Generator {
         Subscriptions::unsubscribe($this->subscription_id);
         yield Factory::closed($this->subscription_id);
     }

@@ -19,22 +19,25 @@ readonly class Factory {
         return function (array $message) use ($relay): \Generator {
             switch (strtoupper($message[0])) {
                 case 'EVENT':
-                    $incoming = Event::fromMessage($message)($this->events);
+                    $incoming = Event::fromMessage($message);
                     break;
 
                 case 'CLOSE':
-                    $incoming = Close::fromMessage($message)();
+                    $incoming = Close::fromMessage($message);
                     break;
 
                 case 'REQ':
-                    $incoming = Req::fromMessage($message)($this->events, $relay);
+                    $incoming = Req::fromMessage($message);
                     break;
 
                 default:
                     throw new \InvalidArgumentException('Message type ' . $message[0] . ' not supported');
             }
 
-            yield from $incoming();
+            yield from $incoming([
+                        'events' => $this->events,
+                        'relay' => $relay
+            ]);
         };
     }
 }

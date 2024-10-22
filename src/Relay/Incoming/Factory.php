@@ -11,12 +11,8 @@ use rikmeijer\Transpher\Relay\Sender;
  */
 readonly class Factory {
 
-    public function __construct(private Store $events) {
-        
-    }
-
-    public function __invoke(Sender $relay): callable {
-        return function (array $message) use ($relay): \Generator {
+    static function make(Context $context): callable {
+        return function (array $message) use ($context): \Generator {
             switch (strtoupper($message[0])) {
                 case 'EVENT':
                     $incoming = Event::fromMessage($message);
@@ -33,11 +29,6 @@ readonly class Factory {
                 default:
                     throw new \InvalidArgumentException('Message type ' . $message[0] . ' not supported');
             }
-
-            $context = new Context(
-                    events: $this->events,
-                    relay: $relay
-            );
 
             yield from $incoming($context);
         };

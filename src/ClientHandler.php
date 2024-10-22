@@ -9,7 +9,7 @@ use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\WebsocketClient;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
-
+use rikmeijer\Transpher\Relay\Incoming\Context;
 
 /**
  * Description of ClientHandler
@@ -34,7 +34,10 @@ readonly class ClientHandler implements WebsocketClientHandler {
         foreach ($client as $message) {
             $payload = (string)$message;
             $this->log->debug('Received message: ' . $payload);
-            $handler = ($this->relay)(SendNostr::relay($client, $this->log));
+
+            $handler = ($this->relay)(new Context(
+                    relay: SendNostr::relay($client, $this->log)
+            ));
             each($handler($payload), SendNostr::reply($client, $this->log));
         }
     }

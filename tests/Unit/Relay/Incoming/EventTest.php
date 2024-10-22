@@ -40,6 +40,27 @@ describe('event storing', function () {
         expect(isset($events['my-event']))->toBeTrue();
     });
 
+    it('replaces replaceble events, keeping the first one in case of same timestamp (based on pubkey & kind)', function () {
+        $events = new class([]) implements rikmeijer\Transpher\Relay\Store {
+
+            use \rikmeijer\Transpher\Nostr\EventsStore;
+        };
+
+        $events['a'] = Functions::event(['kind' => 0, 'pubkey' => 'my-pubkey', 'id' => 'a']);
+        $replacing_event = Functions::event(['kind' => 0, 'pubkey' => 'my-pubkey', 'id' => 'b']);
+        $incoming = new \rikmeijer\Transpher\Relay\Incoming\Event($replacing_event);
+        $event = $incoming();
+        expect($events)->toHaveCount(1);
+        expect(isset($events['a']))->toBeTrue();
+        expect(isset($events['b']))->toBeFalse();
+        foreach ($event($events) as $message) {
+
+        }
+        expect($events)->toHaveCount(1);
+        expect(isset($events['a']))->toBeTrue();
+        expect(isset($events['b']))->toBeFalse();
+    });
+
     it('stores no ephemeral events', function () {
         $events = new class([]) implements rikmeijer\Transpher\Relay\Store {
 

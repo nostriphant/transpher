@@ -37,7 +37,15 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                         'kinds' => [$this->event->kind],
                         'authors' => [$this->event->pubkey]
                     ]));
+
                     $events[$this->event->id] = $this->event;
+                    foreach ($replaceable_events as $replaceable_event) {
+                        $replace_id = $replaceable_event->id;
+                        if ($replaceable_event->created_at === $this->event->created_at) {
+                            $replace_id = max($replaceable_event->id, $this->event->id);
+                        }
+                        unset($events[$replace_id]);
+                    }
                     break;
 
                 case KindClass::EPHEMERAL:
@@ -49,17 +57,17 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                                 'authors' => [$this->event->pubkey],
                                 '#d' => \rikmeijer\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
                     ]));
+
                     $events[$this->event->id] = $this->event;
+                    foreach ($replaceable_events as $replaceable_event) {
+                        unset($events[$replaceable_event->id]);
+                    }
                     break;
 
                 case KindClass::UNDEFINED:
                 default:
                     yield Factory::notice('Undefined event kind ' . $this->event->kind);
                     return;
-            }
-
-            foreach ($replaceable_events as $replaceable_event) {
-                unset($events[$replaceable_event->id]);
             }
             Subscriptions::apply($this->event);
             yield Factory::accept($this->event->id);

@@ -35,7 +35,7 @@ $store_path = ROOT_DIR . '/data';
 is_dir($store_path) || mkdir($store_path);
 $events = new rikmeijer\Transpher\Directory($store_path);
 
-$relay = new \rikmeijer\Transpher\Relay($events);
+$relay = new \rikmeijer\Transpher\Relay(new \rikmeijer\Transpher\Relay\Incoming\Factory($events));
 $clientHandler = new ClientHandler($relay, $logger, new WebsocketClientGateway());
 
 $router = new Router($server, $logger, $errorHandler);

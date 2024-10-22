@@ -34,8 +34,7 @@ readonly class ClientHandler implements WebsocketClientHandler {
         foreach ($client as $message) {
             $payload = (string)$message;
             $this->log->debug('Received message: ' . $payload);
-            $relay = SendNostr::relay($client, $this->log);
-            each(($this->relay)($payload, $relay), SendNostr::reply($client, $this->log));
+            each(($this->relay)(SendNostr::relay($client, $this->log))($payload), SendNostr::reply($client, $this->log));
         }
     }
 }

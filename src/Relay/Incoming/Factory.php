@@ -9,22 +9,27 @@ use rikmeijer\Transpher\Relay\Sender;
  *
  * @author rmeijer
  */
-class Factory {
+readonly class Factory {
 
+    public function __construct(private Store $events) {
+        
+    }
 
-    static function fromMessage(array $message, Store $events, Sender $relay): \rikmeijer\Transpher\Relay\Incoming {
-        switch (strtoupper($message[0])) {
-            case 'EVENT':
-                return Event::fromMessage($message)($events);
+    public function __invoke(Sender $relay): callable {
+        return function (array $message) use ($relay): \rikmeijer\Transpher\Relay\Incoming {
+            switch (strtoupper($message[0])) {
+                case 'EVENT':
+                    return Event::fromMessage($message)($this->events);
 
-            case 'CLOSE':
-                return Close::fromMessage($message)();
+                case 'CLOSE':
+                    return Close::fromMessage($message)();
 
-            case 'REQ':
-                return Req::fromMessage($message)($events, $relay);
+                case 'REQ':
+                    return Req::fromMessage($message)($this->events, $relay);
 
-            default:
-                throw new \InvalidArgumentException('Message type ' . $message[0] . ' not supported');
-        }
+                default:
+                    throw new \InvalidArgumentException('Message type ' . $message[0] . ' not supported');
+            }
+        };
     }
 }

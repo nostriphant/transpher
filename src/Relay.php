@@ -20,22 +20,24 @@ class Relay {
     }
     
     
-    public function __construct(private Store $events) {
+    public function __construct(private Relay\Incoming\Factory $factory) {
         
     }
     
-    public function __invoke(string $payload, Sender $relay) : \Generator {
-        $message = \rikmeijer\Transpher\Nostr::decode($payload);
-        if (is_null($message)) {
-            yield Factory::notice('Invalid message');
-        } else {
-            try {
-                $incoming = Relay\Incoming\Factory::fromMessage($message, $this->events, $relay);
-                yield from $incoming();
-            } catch (\InvalidArgumentException $ex) {
-                yield Factory::notice($ex->getMessage());
+    public function __invoke(Sender $relay): callable {
+        $factory = ($this->factory)($relay);
+        return function (string $payload) use ($factory): \Generator {
+            $message = \rikmeijer\Transpher\Nostr::decode($payload);
+            if (is_null($message)) {
+                yield Factory::notice('Invalid message');
+            } else {
+                try {
+                    $incoming = $factory($message);
+                    yield from $incoming();
+                } catch (\InvalidArgumentException $ex) {
+                    yield Factory::notice($ex->getMessage());
+                }
             }
-
-        }
+        };
     }
 }

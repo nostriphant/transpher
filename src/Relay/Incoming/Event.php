@@ -26,6 +26,7 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
     #[\Override]
     public function __invoke(): callable {
         return function (Store $events): \Generator {
+            $replaceable_events = [];
             switch (\rikmeijer\Transpher\Nostr\Event::determineClass($this->event)) {
                 case KindClass::REGULAR:
                     $events[$this->event->id] = $this->event;
@@ -36,9 +37,6 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                         'kinds' => [$this->event->kind],
                         'authors' => [$this->event->pubkey]
                     ]));
-                    foreach ($replaceable_events as $replaceable_event) {
-                        unset($events[$replaceable_event->id]);
-                    }
                     $events[$this->event->id] = $this->event;
                     break;
 
@@ -51,9 +49,6 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                                 'authors' => [$this->event->pubkey],
                                 '#d' => \rikmeijer\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
                     ]));
-                    foreach ($replaceable_events as $replaceable_event) {
-                        unset($events[$replaceable_event->id]);
-                    }
                     $events[$this->event->id] = $this->event;
                     break;
 
@@ -61,6 +56,10 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                 default:
                     yield Factory::notice('Undefined event kind ' . $this->event->kind);
                     return;
+            }
+
+            foreach ($replaceable_events as $replaceable_event) {
+                unset($events[$replaceable_event->id]);
             }
             Subscriptions::apply($this->event);
             yield Factory::accept($this->event->id);

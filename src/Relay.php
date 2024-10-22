@@ -3,7 +3,6 @@
 namespace rikmeijer\Transpher;
 
 use rikmeijer\Transpher\Nostr\Message\Factory;
-use rikmeijer\Transpher\Relay\Subscriptions;
 use rikmeijer\Transpher\Relay\Sender;
 use rikmeijer\Transpher\Relay\Store;
 
@@ -30,36 +29,13 @@ class Relay {
         if (is_null($message)) {
             yield Factory::notice('Invalid message');
         } else {
-            switch (strtoupper($message[0])) {
-                case 'EVENT':
-                    $incoming = Relay\Incoming\Event::fromMessage($message);
-                    yield from $incoming()($this->events);
-                    break;
-
-                case 'CLOSE':
-                    try {
-                        $incoming = Relay\Incoming\Close::fromMessage($message);
-                    } catch (\InvalidArgumentException $ex) {
-                        yield Factory::notice($ex->getMessage());
-                        break;
-                    }
-                    yield from $incoming()();
-                    break;
-
-                case 'REQ':
-                    try {
-                        $incoming = Relay\Incoming\Req::fromMessage($message);
-                    } catch (\InvalidArgumentException $ex) {
-                        yield Factory::notice($ex->getMessage());
-                        break;
-                    }
-                    yield from $incoming()($this->events, $relay);
-                    break;
-
-                default: 
-                    yield Factory::notice('Message type ' . $message[0] . ' not supported');
-                    break;
+            try {
+                $incoming = Relay\Incoming\Factory::fromMessage($message, $this->events, $relay);
+                yield from $incoming();
+            } catch (\InvalidArgumentException $ex) {
+                yield Factory::notice($ex->getMessage());
             }
+
         }
     }
 }

@@ -15,13 +15,12 @@ use rikmeijer\Transpher\Nostr\Message\Factory;
  *
  * @author rmeijer
  */
-class Close implements Incoming {
+readonly class Close implements Incoming {
 
     public function __construct(private string $subscription_id) {
         
     }
 
-    #[\Override]
     static function fromMessage(array $message): self {
         if (count($message) < 2) {
             throw new \InvalidArgumentException('Missing subscription ID');
@@ -30,10 +29,8 @@ class Close implements Incoming {
     }
 
     #[\Override]
-    public function __invoke(): callable {
-        return function (): \Generator {
-            Subscriptions::unsubscribe($this->subscription_id);
-            yield Factory::closed($this->subscription_id);
-        };
+    public function __invoke(): \Generator {
+        Subscriptions::unsubscribe($this->subscription_id);
+        yield Factory::closed($this->subscription_id);
     }
 }

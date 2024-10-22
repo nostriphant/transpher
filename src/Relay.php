@@ -4,13 +4,7 @@ namespace rikmeijer\Transpher;
 
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Relay\Sender;
-use rikmeijer\Transpher\Relay\Store;
 
-/**
- * Description of Server
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 class Relay {
     
     static function boot(string $address, array $env) : Process {
@@ -28,8 +22,7 @@ class Relay {
         $factory = ($this->factory)($relay);
         return function (string $payload) use ($factory): \Generator {
             try {
-                $incoming = $factory(\rikmeijer\Transpher\Nostr::decode($payload));
-                yield from $incoming();
+                yield from $factory(\rikmeijer\Transpher\Nostr::decode($payload));
             } catch (\InvalidArgumentException $ex) {
                 yield Factory::notice($ex->getMessage());
             }

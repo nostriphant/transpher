@@ -16,20 +16,25 @@ readonly class Factory {
     }
 
     public function __invoke(Sender $relay): callable {
-        return function (array $message) use ($relay): \rikmeijer\Transpher\Relay\Incoming {
+        return function (array $message) use ($relay): \Generator {
             switch (strtoupper($message[0])) {
                 case 'EVENT':
-                    return Event::fromMessage($message)($this->events);
+                    $incoming = Event::fromMessage($message)($this->events);
+                    break;
 
                 case 'CLOSE':
-                    return Close::fromMessage($message)();
+                    $incoming = Close::fromMessage($message)();
+                    break;
 
                 case 'REQ':
-                    return Req::fromMessage($message)($this->events, $relay);
+                    $incoming = Req::fromMessage($message)($this->events, $relay);
+                    break;
 
                 default:
                     throw new \InvalidArgumentException('Message type ' . $message[0] . ' not supported');
             }
+
+            yield from $incoming();
         };
     }
 }

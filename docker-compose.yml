@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: docker/relay.Dockerfile
+      image: rikmeijer84/transpher-relay
     ports:
       - "${RELAY_PORT}:80"
     volumes:
@@ -19,6 +20,7 @@ services:
     build:
       context: .
       dockerfile: docker/agent.Dockerfile
+      image: rikmeijer84/transpher-agent
     volumes:
       - logs:/app/logs
     environment:

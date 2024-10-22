@@ -27,11 +27,16 @@
     <!-- Target: build docker image                      -->
     <!-- ============================================  -->
     <target name="build" depends="test">
-        <property name="docker_tag" value="rikmeijer84/transpher:latest" override="true" />
+        <property name="docket_relay_tag" value="rikmeijer84/transpher-relay:latest" override="true" />
+        <property name="docket_agent_tag" value="rikmeijer84/transpher-agent:latest" override="true" />
         
-        <echo msg="Building docker images ${docker_tag}..." />
+        <echo msg="Building docker image ${docket_relay_tag}..." />
         <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">
-            <arg line="build --platform linux/amd64,linux/arm64  -t ${docker_tag} ."/>
+            <arg line="build --platform linux/amd64,linux/arm64 -f docker/relay.Dockerfile  -t ${docket_relay_tag} ."/>
+        </exec>
+        <echo msg="Building docker image ${docket_agent_tag}..." />
+        <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">
+            <arg line="build --platform linux/amd64,linux/arm64 -f docker/agent.Dockerfile  -t ${docket_agent_tag} ."/>
         </exec>
     </target>
 
@@ -39,18 +44,21 @@
     <!-- (DEFAULT)  Target: dist                       -->
     <!-- ============================================  -->
     <target name="run" depends="build">
-        <echo msg="Run container with image ${docker_tag}..." />
+        <echo msg="Run containers..." />
         
         <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">
-            <arg line="run --rm -p 8000:80 ${docker_tag}"/>
+            <arg line="compose up"/>
         </exec>
     </target>
     
     <target name="dist" depends="build">
-        <echo msg="Pushing docker image ${docker_tag}..." />
-
+        <echo msg="Pushing docker image ${docket_relay_tag}..." />
         <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">
-            <arg line="push ${docker_tag}"/>
+            <arg line="push ${docket_relay_tag}"/>
+        </exec>
+        <echo msg="Pushing docker image ${docket_agent_tag}" />
+        <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">
+            <arg line="push ${docket_agent_tag}"/>
         </exec>
     </target>
 </project>

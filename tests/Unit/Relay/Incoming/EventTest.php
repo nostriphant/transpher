@@ -6,7 +6,7 @@ describe('event storing', function () {
     it('stores all regular events', function () {
         $events = new class([]) implements rikmeijer\Transpher\Relay\Store {
 
-            use \rikmeijer\Transpher\Nostr\EventsStore;
+            use \rikmeijer\Transpher\Nostr\Store;
         };
         $incoming = new \rikmeijer\Transpher\Relay\Incoming\Event(Functions::event(['kind' => 1, 'id' => 'my-event']));
         expect($events)->toHaveCount(0);
@@ -21,7 +21,7 @@ describe('event storing', function () {
     it('replaces replaceble events, keeping only the last one (based on pubkey & kind)', function () {
         $events = new class([]) implements rikmeijer\Transpher\Relay\Store {
 
-            use \rikmeijer\Transpher\Nostr\EventsStore;
+            use \rikmeijer\Transpher\Nostr\Store;
         };
 
         $events['my-original-event'] = Functions::event(['kind' => 0, 'pubkey' => 'my-pubkey', 'id' => 'my-original-event']);
@@ -41,7 +41,7 @@ describe('event storing', function () {
     it('replaces replaceble events, keeping the first one in case of same timestamp (based on pubkey & kind)', function () {
         $events = new class([]) implements rikmeijer\Transpher\Relay\Store {
 
-            use \rikmeijer\Transpher\Nostr\EventsStore;
+            use \rikmeijer\Transpher\Nostr\Store;
         };
 
         $events['a'] = Functions::event(['kind' => 0, 'pubkey' => 'my-pubkey', 'id' => 'a']);
@@ -61,7 +61,7 @@ describe('event storing', function () {
     it('stores no ephemeral events', function () {
         $events = new class([]) implements rikmeijer\Transpher\Relay\Store {
 
-            use \rikmeijer\Transpher\Nostr\EventsStore;
+            use \rikmeijer\Transpher\Nostr\Store;
         };
         $incoming = new \rikmeijer\Transpher\Relay\Incoming\Event(Functions::event(['kind' => 20000, 'id' => 'my-event']));
         expect($events)->toHaveCount(0);
@@ -75,7 +75,7 @@ describe('event storing', function () {
     it('replaces addressable events, keeping only the last one (based on pubkey, kind and d)', function () {
         $events = new class([]) implements rikmeijer\Transpher\Relay\Store {
 
-            use \rikmeijer\Transpher\Nostr\EventsStore;
+            use \rikmeijer\Transpher\Nostr\Store;
         };
 
         $events['my-original-event'] = Functions::event(['kind' => 30000, 'pubkey' => 'my-pubkey', 'tags' => [['d', 'my-d-tag-value']], 'id' => 'my-original-event']);

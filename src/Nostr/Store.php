@@ -5,7 +5,7 @@ namespace rikmeijer\Transpher\Nostr;
 
 use function \Functional\select;
 
-trait EventsStore {
+trait Store {
 
     public function __construct(private array $events) {
 

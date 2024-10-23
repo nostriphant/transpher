@@ -11,7 +11,7 @@ use rikmeijer\Transpher\Nostr\Event;
  */
 class Directory implements Relay\Store {
 
-    use Nostr\EventsStore {
+    use Nostr\Store {
         offsetSet as eventsOffsetSet;
         offsetUnset as eventsOffsetUnset;
         __construct as eventsConstructor;

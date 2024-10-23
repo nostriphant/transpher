@@ -33,7 +33,7 @@ $store_path = ROOT_DIR . '/data';
 is_dir($store_path) || mkdir($store_path);
 $events = new rikmeijer\Transpher\Directory($store_path);
 
-$clientHandler = new \rikmeijer\Transpher\Relay(new \rikmeijer\Transpher\Relay\Incoming\Context(events: $events), $logger);
+$clientHandler = new \rikmeijer\Transpher\Relay($events, $logger);
 
 $router = new Router($server, $logger, $errorHandler);
 $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler)));

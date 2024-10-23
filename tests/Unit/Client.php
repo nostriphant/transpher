@@ -15,7 +15,10 @@ class Client extends \rikmeijer\TranspherTests\Client {
     }
 
     static function persistent_client(string $store): self {
-        return new self(new \rikmeijer\Transpher\Relay(new Context(events: new \rikmeijer\Transpher\Directory($store))));
+        return new self(new \rikmeijer\Transpher\Relay(
+                        new Context(events: new \rikmeijer\Transpher\Directory($store)),
+                        \Mockery::mock(\Psr\Log\LoggerInterface::class)
+                ));
     }
 
     static function generic_client(): self {
@@ -24,7 +27,10 @@ class Client extends \rikmeijer\TranspherTests\Client {
 
                 use \rikmeijer\Transpher\Nostr\EventsStore;
             };
-            self::$generic_relay = new \rikmeijer\Transpher\Relay(new \rikmeijer\Transpher\Relay\Incoming\Context(events: $events));
+            self::$generic_relay = new \rikmeijer\Transpher\Relay(
+                    new \rikmeijer\Transpher\Relay\Incoming\Context(events: $events),
+                    \Mockery::mock(\Psr\Log\LoggerInterface::class)
+            );
         }
         return new self(self::$generic_relay);
     }

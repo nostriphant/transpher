@@ -7,7 +7,6 @@ use Amp\Http\Server\Router;
 use Amp\Http\Server\SocketHttpServer;
 use Amp\Socket;
 use Amp\Websocket\Server\Websocket;
-use Amp\Websocket\Server\WebsocketClientGateway;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -35,8 +34,7 @@ $store_path = ROOT_DIR . '/data';
 is_dir($store_path) || mkdir($store_path);
 $events = new rikmeijer\Transpher\Directory($store_path);
 
-$relay = new \rikmeijer\Transpher\Relay(new \rikmeijer\Transpher\Relay\Incoming\Context(events: $events));
-$clientHandler = new ClientHandler($relay, $logger, new WebsocketClientGateway());
+$clientHandler = new \rikmeijer\Transpher\Relay(new \rikmeijer\Transpher\Relay\Incoming\Context(events: $events), $logger);
 
 $router = new Router($server, $logger, $errorHandler);
 $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler)));

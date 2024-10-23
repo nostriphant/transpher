@@ -17,7 +17,7 @@ class Client extends \rikmeijer\TranspherTests\Client {
     static function persistent_client(string $store): self {
         return new self(new \rikmeijer\Transpher\Relay(
                         new Context(events: new \rikmeijer\Transpher\Directory($store)),
-                        \Mockery::mock(\Psr\Log\LoggerInterface::class)
+                        \Mockery::spy(\Psr\Log\LoggerInterface::class)
                 ));
     }
 
@@ -29,7 +29,7 @@ class Client extends \rikmeijer\TranspherTests\Client {
             };
             self::$generic_relay = new \rikmeijer\Transpher\Relay(
                     new \rikmeijer\Transpher\Relay\Incoming\Context(events: $events),
-                    \Mockery::mock(\Psr\Log\LoggerInterface::class)
+                    \Mockery::spy(\Psr\Log\LoggerInterface::class)
             );
         }
         return new self(self::$generic_relay);
@@ -60,11 +60,20 @@ class Client extends \rikmeijer\TranspherTests\Client {
             }
         };
 
-        foreach (($this->relay)(new Context(
-                        relay: $relayer
-        ))($text) as $response) {
-            $this->messages[] = $response;
-        }
+        $websocket_client = \Mockery::mock(\Amp\Websocket\WebsocketClient::class);
+        $websocket_client->allows([
+            'getId' => 10203,
+            'onClose' => null,
+            'getIterator' => new \ArrayIterator([$text])
+        ]);
+        $websocket_client->shouldReceive('sendText')->andReturnUsing(function (string $text) {
+            $this->messages[] = $text;
+        });
+
+        $request = new \Amp\Http\Server\Request(\Mockery::mock(\Amp\Http\Server\Driver\Client::class), 'GET', \Mockery::mock(\Psr\Http\Message\UriInterface::class));
+        $response = new \Amp\Http\Server\Response();
+
+        $this->relay->handleClient($websocket_client, $request, $response);
     }
 
     #[\Override]

@@ -11,7 +11,6 @@ use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use function Amp\trapSignal;
-use rikmeijer\Transpher\ClientHandler;
 use rikmeijer\Transpher\RequestHandler;
 
 list($ip, $port) = explode(":", $_SERVER['argv'][1]);

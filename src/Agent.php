@@ -12,11 +12,7 @@ use rikmeijer\Transpher\Nostr\Key;
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
 readonly class Agent {
-    static function boot(int $port, array $env) : Process {
-        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'agent.php', $port];
-        return new Process('agent-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Client connecting to ws://127.0.0.1'));
-    }
-    
+
     public function __construct(private Client $client, #[\SensitiveParameter] private Key $key, private string $relay_owner_npub) {
     }
     

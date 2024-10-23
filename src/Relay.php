@@ -6,14 +6,7 @@ use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Relay\Incoming\Context;
 
 class Relay {
-    
-    static function boot(string $address, array $env) : Process {
-        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $address];
-        list($ip, $port) = explode(':', $address);
-        return new Process('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http://127.0.0.1:'.$port.'/'));
-    }
-    
-    
+
     public function __construct(private Context $context) {
         
     }

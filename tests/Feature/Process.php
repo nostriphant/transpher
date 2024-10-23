@@ -1,12 +1,7 @@
 <?php
 
-namespace rikmeijer\Transpher;
+namespace rikmeijer\TranspherTests\Feature;
 
-/**
- * Description of Process
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 readonly class Process {
     
     private mixed $process;

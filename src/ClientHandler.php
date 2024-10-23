@@ -35,10 +35,12 @@ readonly class ClientHandler implements WebsocketClientHandler {
             $payload = (string)$message;
             $this->log->debug('Received message: ' . $payload);
 
+            $wrapped_client = SendNostr::send($client, $this->log);
+
             $handler = ($this->relay)(new Context(
-                    relay: SendNostr::relay($client, $this->log)
+                    relay: $wrapped_client
             ));
-            each($handler($payload), SendNostr::reply($client, $this->log));
+            each($handler($payload), $wrapped_client);
         }
     }
 }

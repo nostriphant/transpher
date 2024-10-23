@@ -33,23 +33,18 @@ readonly class Relay implements WebsocketClientHandler {
         foreach ($client as $message) {
             $payload = (string) $message;
             $this->log->debug('Received message: ' . $payload);
-
             $wrapped_client = SendNostr::send($client, $this->log);
+            try {
 
-            $context = Context::merge(new Context(
-                            relay: $wrapped_client
-                    ), $this->context);
+                $context = Context::merge(new Context(
+                                relay: $wrapped_client
+                        ), $this->context);
 
-            $factory = Relay\Incoming\Factory::make($context);
-            $handler = function (string $payload) use ($factory): \Generator {
-                try {
-                    yield from $factory(\rikmeijer\Transpher\Nostr::decode($payload));
-                } catch (\InvalidArgumentException $ex) {
-                    yield Factory::notice($ex->getMessage());
-                }
-            };
-
-            each($handler($payload), $wrapped_client);
+                $factory = Relay\Incoming\Factory::make($context);
+                each($factory(\rikmeijer\Transpher\Nostr::decode($payload)), $wrapped_client);
+            } catch (\InvalidArgumentException $ex) {
+                $wrapped_client(Factory::notice($ex->getMessage()));
+            }
         }
     }
 }

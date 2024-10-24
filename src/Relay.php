@@ -35,18 +35,20 @@ readonly class Relay implements WebsocketClientHandler {
             $payload = (string) $message;
             $this->log->debug('Received message: ' . $payload);
             $wrapped_client = SendNostr::send($client, $this->log);
-            try {
-                $context = new Context(
-                        events: $this->store,
-                        relay: $wrapped_client
-                );
+            self::handle($payload, new Context(
+                            events: $this->store,
+                            relay: $wrapped_client
+            ));
+        }
+    }
 
-                $incoming = Relay\Incoming\Factory::make(\rikmeijer\Transpher\Nostr::decode($payload));
-
-                each($incoming($context), $wrapped_client);
-            } catch (\InvalidArgumentException $ex) {
-                $wrapped_client(Factory::notice($ex->getMessage()));
-            }
+    static function handle(string $payload, Context $context) {
+        try {
+            $message = \rikmeijer\Transpher\Nostr::decode($payload);
+            $incoming = Relay\Incoming\Factory::make($message);
+            each($incoming($context), $context->relay);
+        } catch (\InvalidArgumentException $ex) {
+            ($context->relay)(Factory::notice($ex->getMessage()));
         }
     }
 }

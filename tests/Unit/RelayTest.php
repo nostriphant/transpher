@@ -25,16 +25,6 @@ it('generates a NIP11 Relay Information Document', function() {
     
 });
 
-it('responds with a NOTICE on null message', function () {
-    $alice = Client::generic_client();
-
-    $alice->expectNostrNotice('Invalid message');
-
-    $alice->json(null);
-    $alice->start();
-});
-
-
 it('responds with a NOTICE on missing subscription-id with close request', function () {
     $alice = Client::generic_client();
 

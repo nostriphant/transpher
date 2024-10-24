@@ -3,8 +3,8 @@
 use rikmeijer\Transpher\Relay\Incoming\Context;
 use rikmeijer\Transpher\Relay;
 
-it('accepts a kind 1 event and answers with OK', function () {
-    $context = new Context(
+function context(): Context {
+    return new Context(
             events: new class([]) implements rikmeijer\Transpher\Relay\Store {
 
                 use \rikmeijer\Transpher\Nostr\Store;
@@ -20,18 +20,35 @@ it('accepts a kind 1 event and answers with OK', function () {
                 }
             }
     );
+}
+
+expect()->extend('toHaveReceived', function (array $expected_messages) {
+    expect($this->value->messages)->toHaveCount(count($expected_messages));
+    foreach ($this->value->messages as $message) {
+        expect($message())->toBe(array_shift($expected_messages));
+    }
+});
+
+it('accepts a kind 1 event and answers with OK', function () {
+    $context = context();
 
     $sender_key = \rikmeijer\Transpher\Nostr\Key::generate();
     $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
 
     Relay::handle($event, $context);
 
-    $expected = [
-        ['OK', $event()[1]['id'], true, '']
-    ];
 
-    expect($context->relay->messages)->toHaveCount(count($expected));
-    foreach ($context->relay->messages as $message) {
-        expect($message())->toBe(array_shift($expected));
-    }
+    expect($context->relay)->toHaveReceived([
+        ['OK', $event()[1]['id'], true, '']
+    ]);
+});
+
+it('responds with a NOTICE on null message', function () {
+    $context = context();
+
+    Relay::handle('null', $context);
+
+    expect($context->relay)->toHaveReceived([
+        ['NOTICE', 'Invalid message']
+    ]);
 });

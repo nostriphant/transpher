@@ -5,6 +5,7 @@ use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Subscription\Filter;
 use rikmeijer\TranspherTests\Unit\Client;
+use function Pest\context;
 
 describe('REQ', function () {
     it('replies NOTICE Invalid message on non-existing filters', function () {

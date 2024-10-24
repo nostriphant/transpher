@@ -1,6 +1,7 @@
 <?php
 
 use rikmeijer\Transpher\Relay;
+use function Pest\context;
 
 describe('generic (https://nips.nostr.com/1#from-relay-to-client-sending-events-and-notices)', function () {
     it('responds with a NOTICE on null message', function () {

@@ -2,6 +2,7 @@
 
 use rikmeijer\Transpher\Relay;
 use rikmeijer\Transpher\Nostr\Key;
+use function Pest\context;
 
 describe('EVENT', function () {
     it('accepts a kind 1 and answers with OK', function () {

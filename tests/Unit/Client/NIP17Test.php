@@ -5,7 +5,6 @@ use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Subscription\Filter;
 use rikmeijer\TranspherTests\Unit\Client;
 
-
 it('relays private direct messsage from alice to bob', function (): void {
     $transpher_store = ROOT_DIR . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . uniqid();
     mkdir($transpher_store);

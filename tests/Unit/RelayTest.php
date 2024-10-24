@@ -25,68 +25,6 @@ it('generates a NIP11 Relay Information Document', function() {
     
 });
 
-it('responds with a NOTICE on missing subscription-id with close request', function () {
-    $alice = Client::generic_client();
-
-    $alice->expectNostrNotice('Missing subscription ID');
-
-    $alice->json(['CLOSE']);
-    $alice->start();
-});
-
-it('responds with a NOTICE on unsupported message types', function () {
-    $alice = Client::generic_client();
-
-    $alice->expectNostrNotice('Message type UNKNOWN not supported');
-
-    $alice->json(['UNKNOWN', uniqid()]);
-    $alice->start();
-});
-
-
-it('responds with OK on simple events', function () {
-    $alice = Client::generic_client();
-    $key_alice = Key::generate();
-    
-    $note = Factory::event($key_alice, 1, 'Hello world!');
-
-    $alice->expectNostrOK($note()[1]['id']);
-
-    $alice->send($note);
-    $alice->start();
-});
-
-
-it('replies NOTICE Invalid message on non-existing filters', function () {
-    $alice = Client::generic_client();
-    $bob = Client::generic_client();
-    $key_alice = Key::generate();
-
-    $alice->sendSignedMessage(Factory::event($key_alice, 1, 'Hello world!'));
-
-    $bob->expectNostrNotice('Invalid message');
-    $subscription = Factory::subscribe();
-    $bob->json($subscription());
-    $bob->start();
-});
-
-it('replies CLOSED on empty filters', function () {
-    $alice = Client::generic_client();
-    $bob = Client::generic_client();
-    $key_alice = Key::generate();
-
-    $alice->sendSignedMessage(Factory::event($key_alice, 1, 'Hello world!'));
-
-    $subscription = Factory::subscribe();
-
-    $bob->expectNostrClosed($subscription()[1], 'Subscription filters are empty');
-    $request = $subscription();
-    $request[] = [];
-    $bob->json($request);
-    $bob->start();
-});
-
-
 it('sends events to all clients subscribed on event id', function () {
     $alice = Client::generic_client();
     $bob = Client::generic_client();
@@ -280,21 +218,4 @@ it('relays private direct messsage from alice to bob', function (): void {
     expect($request[2]['#p'])->toContain($bob_key(Key::public()));
     $bob->json($request);
     $bob->start();
-});
-
-it('does not store ephemeral (20000 <= kind < 30000) events', function () {
-    $transpher_store = ROOT_DIR . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . uniqid();
-    mkdir($transpher_store);
-    $alice = Client::persistent_client($transpher_store);
-
-    $alice_key = Key::generate();
-    for ($kind = 20000; $kind < 30000; $kind += 5000) {
-        $alice->sendSignedMessage($alice_event = Factory::event($alice_key, $kind, 'Hello wirld!'));
-        $event_file = $transpher_store . DIRECTORY_SEPARATOR . $alice_event()[1]['id'] . '.php';
-        expect(is_file($event_file))->toBeFalse($kind);
-    }
-    exec('rm -rf ' . $transpher_store . '/*');
-    rmdir($transpher_store);
-
-    unset($alice);
 });

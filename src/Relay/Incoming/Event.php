@@ -53,7 +53,11 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
 
                 $context->events[$this->event->id] = $this->event;
                 foreach ($replaceable_events as $replaceable_event) {
-                    unset($context->events[$replaceable_event->id]);
+                    $replace_id = $replaceable_event->id;
+                    if ($replaceable_event->created_at === $this->event->created_at) {
+                        $replace_id = max($replaceable_event->id, $this->event->id);
+                    }
+                    unset($context->events[$replace_id]);
                 }
                 break;
 

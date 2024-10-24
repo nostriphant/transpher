@@ -17,13 +17,17 @@ class Factory {
     }
 
     static function event(Key $sender_key, int $kind, string $content, array ...$tags): Message {
+        return self::eventAt($sender_key, $kind, $content, time(), ...$tags);
+    }
+
+    static function eventAt(Key $sender_key, int $kind, string $content, int $at, array ...$tags): Message {
         return self::message('EVENT', get_object_vars((new \rikmeijer\Transpher\Nostr\Rumor(
                                         pubkey: $sender_key(Key::public()),
-                            created_at: time(),
-                            kind: $kind,
-                            content: $content,
-                            tags: $tags
-                    ))($sender_key)));
+                                        created_at: $at,
+                                        kind: $kind,
+                                        content: $content,
+                                        tags: $tags
+                                ))($sender_key)));
     }
 
     static function privateDirect(Key $private_key, string $recipient_pubkey, string $message): Message {

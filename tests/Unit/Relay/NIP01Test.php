@@ -29,26 +29,29 @@ expect()->extend('toHaveReceived', function (array $expected_messages) {
     }
 });
 
-it('accepts a kind 1 event and answers with OK', function () {
-    $context = context();
+describe('generic', function () {
+    it('responds with a NOTICE on null message', function () {
+        $context = context();
 
-    $sender_key = \rikmeijer\Transpher\Nostr\Key::generate();
-    $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
+        Relay::handle('null', $context);
 
-    Relay::handle($event, $context);
-
-
-    expect($context->relay)->toHaveReceived([
-        ['OK', $event()[1]['id'], true, '']
-    ]);
+        expect($context->relay)->toHaveReceived([
+            ['NOTICE', 'Invalid message']
+        ]);
+    });
 });
 
-it('responds with a NOTICE on null message', function () {
-    $context = context();
+describe('EVENT', function() {
+    it('accepts a kind 1 event and answers with OK', function () {
+        $context = context();
 
-    Relay::handle('null', $context);
+        $sender_key = \rikmeijer\Transpher\Nostr\Key::generate();
+        $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
 
-    expect($context->relay)->toHaveReceived([
-        ['NOTICE', 'Invalid message']
-    ]);
+        Relay::handle($event, $context);
+
+        expect($context->relay)->toHaveReceived([
+            ['OK', $event()[1]['id'], true, '']
+        ]);
+    });
 });

@@ -1,4 +1,5 @@
 <?php
+
 use rikmeijer\Transpher\Nostr\Event;
 use rikmeijer\Transpher\Nostr\Event\KindClass;
 use function \Pest\event;

@@ -1,33 +1,7 @@
 <?php
 
-use rikmeijer\Transpher\Relay\Incoming\Context;
 use rikmeijer\Transpher\Relay;
-
-function context(): Context {
-    return new Context(
-            events: new class([]) implements rikmeijer\Transpher\Relay\Store {
-
-                use \rikmeijer\Transpher\Nostr\Store;
-            },
-            relay: new class implements rikmeijer\Transpher\Relay\Sender {
-
-                public array $messages = [];
-
-                #[\Override]
-                public function __invoke(mixed $json): bool {
-                    $this->messages[] = $json;
-                    return true;
-                }
-            }
-    );
-}
-
-expect()->extend('toHaveReceived', function (array $expected_messages) {
-    expect($this->value->messages)->toHaveCount(count($expected_messages));
-    foreach ($this->value->messages as $message) {
-        expect($message())->toBe(array_shift($expected_messages));
-    }
-});
+use rikmeijer\Transpher\Nostr\Key;
 
 describe('generic (https://nips.nostr.com/1#from-relay-to-client-sending-events-and-notices)', function () {
     it('responds with a NOTICE on null message', function () {
@@ -35,9 +9,9 @@ describe('generic (https://nips.nostr.com/1#from-relay-to-client-sending-events-
 
         Relay::handle('null', $context);
 
-        expect($context->relay)->toHaveReceived([
-            ['NOTICE', 'Invalid message']
-        ]);
+        expect($context->relay)->toHaveReceived(
+                ['NOTICE', 'Invalid message']
+        );
     });
 
     it('responds with a NOTICE on unsupported message types', function () {
@@ -45,9 +19,9 @@ describe('generic (https://nips.nostr.com/1#from-relay-to-client-sending-events-
 
         Relay::handle('["UNKNOWN"]', $context);
 
-        expect($context->relay)->toHaveReceived([
-            ['NOTICE', 'Message type UNKNOWN not supported']
-        ]);
+        expect($context->relay)->toHaveReceived(
+                ['NOTICE', 'Message type UNKNOWN not supported']
+        );
     });
 });
 
@@ -59,9 +33,9 @@ describe('EVENT', function() {
         $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
         Relay::handle($event, $context);
 
-        expect($context->relay)->toHaveReceived([
-            ['OK', $event()[1]['id'], true, '']
-        ]);
+        expect($context->relay)->toHaveReceived(
+                ['OK', $event()[1]['id'], true, '']
+        );
     });
 });
 
@@ -71,18 +45,45 @@ describe('REQ', function () {
 
         Relay::handle(json_encode(['REQ']), $context);
 
-        expect($context->relay)->toHaveReceived([
-            ['NOTICE', 'Invalid message']
-        ]);
+        expect($context->relay)->toHaveReceived(
+                ['NOTICE', 'Invalid message']
+        );
     });
     it('replies CLOSED on empty filters', function () {
         $context = context();
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), []]), $context);
 
-        expect($context->relay)->toHaveReceived([
-            ['CLOSED', $id, 'Subscription filters are empty']
-        ]);
+        expect($context->relay)->toHaveReceived(
+                ['CLOSED', $id, 'Subscription filters are empty']
+        );
+    });
+    it('can handle a subscription request, for non existing events', function () {
+        $context = context();
+
+        Relay::handle(json_encode(['REQ', $id = uniqid(), ['ids' => ['abdcd']]]), $context);
+
+        expect($context->relay)->toHaveReceived(
+                ['EOSE', $id]
+        );
+    });
+
+    it('can handle a subscription request, for existing events', function () {
+        $context = context();
+
+        $sender_key = \rikmeijer\Transpher\Nostr\Key::generate();
+        $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
+        Relay::handle($event, $context);
+
+        Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
+
+        expect($context->relay)->toHaveReceived(
+                ['OK'],
+                ['EVENT', $id, function(array $event) {
+                    expect($event['content'])->toBe('Hello World');
+                }],
+                ['EOSE', $id]
+        );
     });
 });
 
@@ -92,9 +93,9 @@ describe('CLOSE', function () {
 
         Relay::handle(json_encode(['CLOSE']), $context);
 
-        expect($context->relay)->toHaveReceived([
-            ['NOTICE', 'Missing subscription ID']
-        ]);
+        expect($context->relay)->toHaveReceived(
+                ['NOTICE', 'Missing subscription ID']
+        );
     });
 });
 
@@ -109,9 +110,9 @@ describe('Kinds (https://nips.nostr.com/1#kinds)', function () {
         $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, -1, 'Hello World');
         Relay::handle($event, $context);
 
-        expect($context->relay)->toHaveReceived([
-            ['NOTICE', 'Undefined event kind -1']
-        ]);
+        expect($context->relay)->toHaveReceived(
+                ['NOTICE', 'Undefined event kind -1']
+        );
     });
 
     it('stores regular (1000 <= n < 10000) events', function () {

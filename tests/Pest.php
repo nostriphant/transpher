@@ -29,6 +29,25 @@ expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
 
+expect()->extend('toHaveReceived', function (array ...$expected_messages) {
+    expect($this->value->messages)->toHaveCount(func_num_args());
+    foreach ($this->value->messages as $message) {
+        $expected_message = array_shift($expected_messages);
+        foreach ($message() as $part) {
+            if (count($expected_message) === 0) {
+                continue;
+            }
+
+            $expected_part = array_shift($expected_message);
+            if (is_callable($expected_part)) {
+                $expected_part($part);
+            } else {
+                expect($part)->toBe($expected_part);
+            }
+        }
+    }
+});
+
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -40,7 +59,23 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
-{
-    // ..
+use rikmeijer\Transpher\Relay\Incoming\Context;
+
+function context(array $events = []): Context {
+    return new Context(
+            events: new class($events) implements rikmeijer\Transpher\Relay\Store {
+
+                use \rikmeijer\Transpher\Nostr\Store;
+            },
+            relay: new class implements rikmeijer\Transpher\Relay\Sender {
+
+                public array $messages = [];
+
+                #[\Override]
+                public function __invoke(mixed $json): bool {
+                    $this->messages[] = $json;
+                    return true;
+                }
+            }
+    );
 }

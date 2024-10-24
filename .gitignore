@@ -1,6 +1,6 @@
 /nbproject/private/
-/data
+/data/*
+/logs/*
 /vendor/
 .phpunit.cache
 .env
-*.log

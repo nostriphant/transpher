@@ -49,11 +49,10 @@ readonly class Key {
 
     static function verify(string $pubkey, string $signature, string $message): bool {
         $reporting = set_error_handler(fn() => null);
-        $verification = false;
         try {
             $verification = (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->verify($pubkey, $signature, $message);
         } catch (\Throwable $e) {
-            
+            $verification = false;
         }
         set_error_handler($reporting);
         return $verification;

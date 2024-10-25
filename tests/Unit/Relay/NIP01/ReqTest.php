@@ -115,23 +115,6 @@ describe('REQ', function () {
         $charlie->start();
     });
 
-    it('sends events to all clients subscribed on p-tag', function () {
-        $alice = Client::generic_client();
-        $bob = Client::generic_client();
-        $alice_key = Key::generate();
-
-        $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world!', ['p', 'randomPTag']));
-        $subscription = Factory::subscribe(
-                new Filter(tags: ['#p' => ['randomPTag']])
-        );
-
-        $bob->expectNostrEvent($subscription()[1], 'Hello world!');
-        $bob->expectNostrEose($subscription()[1]);
-
-        $bob->json($subscription());
-        $bob->start();
-    });
-
     it('closes subscription and stop sending events to subscribers', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();

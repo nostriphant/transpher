@@ -47,6 +47,18 @@ readonly class Key {
         return fn(string $private_key) => (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->sign($private_key, $message)['signature'];
     }
 
+    static function verify(string $pubkey, string $signature, string $message): bool {
+        $reporting = set_error_handler(fn() => null);
+        $verification = false;
+        try {
+            $verification = (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->verify($pubkey, $signature, $message);
+        } catch (\Throwable $e) {
+            
+        }
+        set_error_handler($reporting);
+        return $verification;
+    }
+
     static function sharedSecret(#[\SensitiveParameter] string $recipient_pubkey) {
         return function (#[\SensitiveParameter] string $private_key) use ($recipient_pubkey): bool|string {
             $ec = self::curve();

@@ -19,54 +19,58 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
 
     #[\Override]
     public function __invoke(Context $context): \Generator {
-        $replaceable_events = [];
-        switch (\rikmeijer\Transpher\Nostr\Event::determineClass($this->event)) {
-            case KindClass::REGULAR:
-                $context->events[$this->event->id] = $this->event;
-                break;
+        if (\rikmeijer\Transpher\Nostr\Event::verify($this->event) === false) {
+            yield Factory::ok($this->event->id, false, 'invalid:signature is wrong');
+        } else {
+            $replaceable_events = [];
+            switch (\rikmeijer\Transpher\Nostr\Event::determineClass($this->event)) {
+                case KindClass::REGULAR:
+                    $context->events[$this->event->id] = $this->event;
+                    break;
 
-            case KindClass::REPLACEABLE:
-                $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
-                            'kinds' => [$this->event->kind],
-                            'authors' => [$this->event->pubkey]
-                ]));
+                case KindClass::REPLACEABLE:
+                    $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
+                                'kinds' => [$this->event->kind],
+                                'authors' => [$this->event->pubkey]
+                    ]));
 
-                $context->events[$this->event->id] = $this->event;
-                foreach ($replaceable_events as $replaceable_event) {
-                    $replace_id = $replaceable_event->id;
-                    if ($replaceable_event->created_at === $this->event->created_at) {
-                        $replace_id = max($replaceable_event->id, $this->event->id);
+                    $context->events[$this->event->id] = $this->event;
+                    foreach ($replaceable_events as $replaceable_event) {
+                        $replace_id = $replaceable_event->id;
+                        if ($replaceable_event->created_at === $this->event->created_at) {
+                            $replace_id = max($replaceable_event->id, $this->event->id);
+                        }
+                        unset($context->events[$replace_id]);
                     }
-                    unset($context->events[$replace_id]);
-                }
-                break;
+                    break;
 
-            case KindClass::EPHEMERAL:
-                break;
+                case KindClass::EPHEMERAL:
+                    break;
 
-            case KindClass::ADDRESSABLE:
-                $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
-                            'kinds' => [$this->event->kind],
-                            'authors' => [$this->event->pubkey],
-                            '#d' => \rikmeijer\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
-                ]));
+                case KindClass::ADDRESSABLE:
+                    $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
+                                'kinds' => [$this->event->kind],
+                                'authors' => [$this->event->pubkey],
+                                '#d' => \rikmeijer\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
+                    ]));
 
-                $context->events[$this->event->id] = $this->event;
-                foreach ($replaceable_events as $replaceable_event) {
-                    $replace_id = $replaceable_event->id;
-                    if ($replaceable_event->created_at === $this->event->created_at) {
-                        $replace_id = max($replaceable_event->id, $this->event->id);
+                    $context->events[$this->event->id] = $this->event;
+                    foreach ($replaceable_events as $replaceable_event) {
+                        $replace_id = $replaceable_event->id;
+                        if ($replaceable_event->created_at === $this->event->created_at) {
+                            $replace_id = max($replaceable_event->id, $this->event->id);
+                        }
+                        unset($context->events[$replace_id]);
                     }
-                    unset($context->events[$replace_id]);
-                }
-                break;
+                    break;
 
-            case KindClass::UNDEFINED:
-            default:
-                yield Factory::notice('Undefined event kind ' . $this->event->kind);
-                return;
+                case KindClass::UNDEFINED:
+                default:
+                    yield Factory::notice('Undefined event kind ' . $this->event->kind);
+                    return;
+            }
+            Subscriptions::apply($this->event);
+            yield Factory::accept($this->event->id);
         }
-        Subscriptions::apply($this->event);
-        yield Factory::accept($this->event->id);
     }
 }

@@ -23,7 +23,7 @@ class Client {
     }
     
     public function privateDirectMessage(Key $sender, string $recipient_npub, string $message) {
-        $note = Factory::privateDirect($sender, Key::convertBech32ToHex($recipient_npub), str_replace('{relay_url}', $this->url, $message));
+        $note = Factory::privateDirect($sender, Nostr\Bech32::fromNpub($recipient_npub), str_replace('{relay_url}', $this->url, $message));
         $this->send($note);
     }
     

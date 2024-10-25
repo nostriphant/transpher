@@ -17,14 +17,6 @@ it('converts between bytes, bech32 and hexidecimal', function() {
     $private_key_hex = '67dea2ed018072d675f5415ecfaed7d2597555e202d85b3d65ea4e58d2d92ffa';
     $private_key_bech32 = 'nsec1vl029mgpspedva04g90vltkh6fvh240zqtv9k0t9af8935ke9laqsnlfe5';
 
-    expect(Key::convertBech32ToHex($public_key_bech32))->toBe($public_key_hex);
-
-    expect(Key::convertHexToBech32($public_key_hex, 'npub'))->toBe($public_key_bech32);
-
-    expect(Key::convertBech32ToHex($private_key_bech32))->toBe($private_key_hex);
-
-    expect(Key::convertHexToBech32($private_key_hex, 'nsec'))->toBe($private_key_bech32);
-    
     $key = Key::fromBech32($private_key_bech32);
     expect($key(fn() => func_get_arg(0)))->toBe($private_key_hex);
     expect($key(Key::public(\rikmeijer\Transpher\Nostr\Key\Format::BECH32)))->toBe($public_key_bech32);

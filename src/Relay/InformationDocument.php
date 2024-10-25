@@ -15,7 +15,7 @@ class InformationDocument {
             "description" => $description,
             "pubkey" => Key::convertBech32ToHex($npub),
             "contact" => $contact,
-            "supported_nips" => [1, 11],
+            "supported_nips" => [1, 11, 12, 16, 20, 33],
             "software" => 'Transpher',
             "version" => 'dev'
         ];

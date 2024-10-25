@@ -30,7 +30,6 @@ namespace {
     });
 
     expect()->extend('toHaveReceived', function (array ...$expected_messages) {
-        expect($this->value->messages)->toHaveCount(func_num_args());
         foreach ($this->value->messages as $message) {
             $expected_message = array_shift($expected_messages);
             foreach ($message() as $part) {
@@ -46,6 +45,7 @@ namespace {
                 }
             }
         }
+        expect($this->value->messages)->toHaveCount(func_num_args());
     });
 }
 

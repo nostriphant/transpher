@@ -2,13 +2,14 @@
 
 use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\TranspherTests\Feature\Functions;
+use rikmeijer\Transpher\Relay\InformationDocument;
 
 describe('relay', function () {
     it('sends an information document (NIP-11), when on a HTTP request', function() {
         $owner_key = Key::generate();
         $agent_key = Key::generate();
         
-        $relay = Functions::bootRelay('127.0.0.1:8087', [
+        $relay = Functions::bootRelay('127.0.0.1:8087', $env = [
             'AGENT_NSEC' => $agent_key(Key::private(\rikmeijer\Transpher\Nostr\Key\Format::BECH32)),
             'RELAY_URL' => 'ws://127.0.0.1:8087',
             'RELAY_OWNER_NPUB' => $owner_key(Key::public(\rikmeijer\Transpher\Nostr\Key\Format::BECH32)), 
@@ -27,15 +28,7 @@ describe('relay', function () {
         $response = \rikmeijer\Transpher\Nostr::decode($responseText);
 
         expect($response)->not()->toBeNull($responseText);
-        expect($response)->toBe([
-             "name" => 'Really relay',
-             "description" => 'This is my dev relay',
-             "pubkey" => $owner_key(Key::public(\rikmeijer\Transpher\Nostr\Key\Format::HEXIDECIMAL)),
-             "contact" => "nostr@rikmeijer.nl",
-             "supported_nips" => [1, 11],
-             "software" => 'Transpher',
-             "version" => 'dev'
-        ]);
+        expect($response)->toBe(InformationDocument::generate($env['RELAY_NAME'], $env['RELAY_DESCRIPTION'], $env['RELAY_OWNER_NPUB'], $env['RELAY_CONTACT']));
 
         $relay();
     });

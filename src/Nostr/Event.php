@@ -39,6 +39,10 @@ readonly class Event {
         return map(select($event->tags, fn(array $tag) => $tag[0] === $tag_identifier), fn(array $tag) => $tag[1]);
     }
 
+    static function verify(self $event): bool {
+        return Key::verify($event->pubkey, $event->sig, $event->id);
+    }
+
     public static function __set_state(array $properties) : self {
         return new Event(...$properties);
     }

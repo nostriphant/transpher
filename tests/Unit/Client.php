@@ -41,7 +41,7 @@ class Client extends \rikmeijer\TranspherTests\Client {
 
     #[\Override]
     public function privateDirectMessage(\rikmeijer\Transpher\Nostr\Key $sender, string $recipient_npub, string $message) {
-        $note = \rikmeijer\Transpher\Nostr\Message\Factory::privateDirect($sender, \rikmeijer\Transpher\Nostr\Key::convertBech32ToHex($recipient_npub), $message);
+        $note = \rikmeijer\Transpher\Nostr\Message\Factory::privateDirect($sender, \rikmeijer\Transpher\Nostr\Bech32::fromNpub($recipient_npub), $message);
         $this->send($note);
     }
 

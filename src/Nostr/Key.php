@@ -30,7 +30,7 @@ readonly class Key {
         return new self($private_key);
     }
     static function fromBech32(#[\SensitiveParameter] string $private_key) : callable {
-        return new static(self::convertBech32ToHex($private_key));
+        return new static(Bech32::fromNsec($private_key));
     }
 
     static function curve(): EC {
@@ -49,11 +49,10 @@ readonly class Key {
 
     static function verify(string $pubkey, string $signature, string $message): bool {
         $reporting = set_error_handler(fn() => null);
-        $verification = false;
         try {
             $verification = (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->verify($pubkey, $signature, $message);
         } catch (\Throwable $e) {
-            
+            $verification = false;
         }
         set_error_handler($reporting);
         return $verification;
@@ -75,50 +74,15 @@ readonly class Key {
     static function public(Key\Format $format = Key\Format::HEXIDECIMAL): callable {
         return fn (#[\SensitiveParameter] string $private_key): string => match ($format) {
             Key\Format::BINARY => hex2bin(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2)),
-            Key\Format::BECH32 => self::convertHexToBech32(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2), 'npub'),
+            Key\Format::BECH32 => Bech32::toNpub(substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2)),
             Key\Format::HEXIDECIMAL => substr(self::curve()->keyFromPrivate($private_key)->getPublic(true, 'hex'), 2),
-        };
+                };
     }
     static function private(Key\Format $format = Key\Format::HEXIDECIMAL): callable {
         return fn (#[\SensitiveParameter] string $private_key): string => match ($format) {
             Key\Format::BINARY => hex2bin($private_key),
-            Key\Format::BECH32 => self::convertHexToBech32($private_key, 'nsec'),
-            Key\Format::HEXIDECIMAL => $private_key,
+            Key\Format::BECH32 => Bech32::toNsec($private_key),
+                    Key\Format::HEXIDECIMAL => $private_key,
         };
-    }
-    
-
-    static function convertBech32ToHex(#[\SensitiveParameter] string $bech32_key) : string {
-        $str = '';
-        try {
-            $decoded = decode($bech32_key);
-            $data = $decoded[1];
-            $bytes = convertBits($data, count($data), 5, 8, false);
-            foreach ($bytes as $item) {
-                $str .= str_pad(dechex($item), 2, '0', STR_PAD_LEFT);
-            }
-        } catch (Bech32Exception) {
-            
-        }
-
-        return $str;
-    }
-
-    static function convertHexToBech32(#[\SensitiveParameter] string $hex_key, string $prefix) {
-        $str = '';
-
-        try {
-            $dec = [];
-            $split = str_split($hex_key, 2);
-            foreach ($split as $item) {
-                $dec[] = hexdec($item);
-            }
-            $bytes = convertBits($dec, count($dec), 8, 5);
-            $str = encode($prefix, $bytes);
-        } catch (Bech32Exception) {
-            
-        }
-
-        return $str;
     }
 }

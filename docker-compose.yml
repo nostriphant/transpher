@@ -10,7 +10,7 @@ services:
       local:
         ipv4_address: 10.8.0.8
     env_file:
-      - .env
+      - stack.env
     restart: unless-stopped
       
   agent:
@@ -21,9 +21,9 @@ services:
       local:
         ipv4_address: 10.8.0.6
     env_file:
-      - .env
+      - stack.env
     depends_on:
-        - relay
+      - relay
     restart: unless-stopped
 
 networks:

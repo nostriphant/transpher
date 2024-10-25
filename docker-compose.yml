@@ -9,6 +9,9 @@ services:
     volumes:
       - logs:/app/logs
       - data:/app/data
+    networks:
+      local:
+        ipv4_address: 10.8.0.8
     env_file:
       - .env
     restart: unless-stopped
@@ -20,12 +23,25 @@ services:
       dockerfile: docker/agent.Dockerfile
     volumes:
       - logs:/app/logs
+    networks:
+      local:
+        ipv4_address: 10.8.0.6
     env_file:
       - .env
     depends_on:
         - relay
     restart: unless-stopped
-    
+
+networks:
+  local:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+    ipam:
+      config:
+        - subnet: 10.8.0.0/16
+          gateway: 10.8.0.1
+
 volumes:
   data:
     driver: local

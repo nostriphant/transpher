@@ -1,5 +1,7 @@
 services:
   relay:
+    container_name: transpher_relay
+    hostname: transpher_relay
     #image: rikmeijer84/transpher-relay
     build:
       context: .
@@ -18,6 +20,8 @@ services:
       
   agent:
     #image: rikmeijer84/transpher-agent
+    container_name: transpher_agent
+    hostname: transpher_agent
     build:
       context: .
       dockerfile: docker/agent.Dockerfile
@@ -29,7 +33,7 @@ services:
     env_file:
       - .env
     depends_on:
-        - relay
+      - relay
     restart: unless-stopped
 
 networks:

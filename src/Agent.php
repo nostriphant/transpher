@@ -22,8 +22,8 @@ readonly class Agent {
         $this->client->privateDirectMessage($this->key, $this->relay_owner_npub, 'Hello, I am your agent! The URL of your relay is {relay_url}');
         
         $log->info('Listening to relay...');
-        $this->client->start();
-        
+        $this->client->start(0);
+
         return fn() => $this->client->stop();
     }
 }

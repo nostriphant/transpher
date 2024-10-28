@@ -8,11 +8,6 @@ use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Key;
 
 
-/**
- * Description of Client
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 class Client {
 
     private bool $listening = false;
@@ -42,14 +37,14 @@ class Client {
     private \Amp\Websocket\Client\WebsocketConnection $connection;
     private \Closure $onjson_callback;
     
-    public function receive() : ?\Amp\Websocket\WebsocketMessage {
-        return $this->connection->receive();
+    public function receive(int $timeout): ?\Amp\Websocket\WebsocketMessage {
+        return $this->connection->receive($timeout > 0 ? new \Amp\TimeoutCancellation($timeout) : null);
     }
     
     
-    public function start() : void {
+    public function start(int $timeout): void {
         $this->listening = true;
-        while ($this->listening && ($message = $this->receive())) {
+        while ($this->listening && ($message = $this->receive($timeout))) {
             $buffer = $message->buffer();
             $payload = Nostr::decode($buffer);
             ($this->onjson_callback)([$this, 'ignore'], $payload);

@@ -1,6 +1,5 @@
 <?php
 
-use rikmeijer\Transpher\Agent;
 use rikmeijer\Transpher\Nostr\Key;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Subscription\Filter;

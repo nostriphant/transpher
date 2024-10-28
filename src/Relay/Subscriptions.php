@@ -2,39 +2,29 @@
 
 namespace rikmeijer\Transpher\Relay;
 
-use function \Functional\if_else, \Functional\first;
-use rikmeijer\Transpher\Nostr\Message\Factory;
-use rikmeijer\Transpher\Nostr\Event;
-use rikmeijer\Transpher\Nostr\Filters;
+class Subscriptions {
 
-/**
- * Description of Subscriptions
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
- class Subscriptions {
-    
-    private static array $subscriptions = [];
+    public function __construct(private array &$subscriptions) {
+        
+    }
 
-    static function apply(Event $event): bool {
-        if (empty(self::$subscriptions)) {
-            return false;
-        }
-        return null !== first(self::$subscriptions, function(callable $subscription, string $subscriptionId) use ($event) {
-            $to = $subscription($event);
-            if ($to === false) {
-                return false;
-            }
-            $to(Factory::requestedEvent($subscriptionId, $event));
-            $to(Factory::eose($subscriptionId));
-            return true;
-        });
+    public function __invoke(mixed ...$args): mixed {
+        return match (true) {
+            $args[0] instanceof \Closure => self::apply($this->subscriptions, $args[0]),
+            is_string($args[0]) && count($args) === 1 => self::unsubscribe($this->subscriptions, $args[0]),
+            is_string($args[0]) => self::subscribe($this->subscriptions, $args[0], $args[1]),
+        };
     }
-    static function subscribe(Sender $relay, string $subscriptionId, Filters $filters): void {
-        self::$subscriptions[$subscriptionId] = if_else($filters, fn() => $relay, fn() => false);
+
+    static function apply(array &$subscriptions, callable $applier): mixed {
+        return array_find($subscriptions, $applier);
     }
-    static function unsubscribe(string $subscriptionId) : void {
-        unset(self::$subscriptions[$subscriptionId]);
+
+    static function subscribe(array &$subscriptions, string $subscription_id, callable $matcher): void {
+        $subscriptions[$subscription_id] = $matcher;
     }
-    
+
+    static function unsubscribe(array &$subscriptions, string $subscription_id): void {
+        unset($subscriptions[$subscription_id]);
+    }
 }

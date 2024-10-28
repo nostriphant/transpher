@@ -63,8 +63,9 @@ namespace Pest {
 
     use rikmeijer\Transpher\Relay\Incoming\Context;
 
-    function context(array $events = []): Context {
+    function context(array $events = [], array &$subscriptions = []): Context {
         return new Context(
+                subscriptions: new \rikmeijer\Transpher\Relay\Subscriptions($subscriptions),
                 events: new class($events) implements \rikmeijer\Transpher\Relay\Store {
 
                     use \rikmeijer\Transpher\Nostr\Store;

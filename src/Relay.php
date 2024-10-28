@@ -16,12 +16,18 @@ use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\SendNostr;
 use rikmeijer\Transpher\Relay\Store;
 
-readonly class Relay implements WebsocketClientHandler {
+class Relay implements WebsocketClientHandler {
+
+    private Context $context;
+
+    private array $subscriptions = [];
 
     public function __construct(private Store $store,
             private LoggerInterface $log,
             private WebsocketGateway $gateway = new WebsocketClientGateway()) {
-        
+        $this->context = new Context(
+                events: $this->store,
+        );
     }
 
     #[\Override]
@@ -31,14 +37,15 @@ readonly class Relay implements WebsocketClientHandler {
             Response $response,
     ): void {
         $this->gateway->addClient($client);
+        $wrapped_client = SendNostr::send($client, $this->log);
+        $client_context = Context::merge(new Context(
+                        subscriptions: new Relay\Subscriptions($this->subscriptions),
+                        relay: $wrapped_client
+                ), $this->context);
         foreach ($client as $message) {
             $payload = (string) $message;
             $this->log->debug('Received message: ' . $payload);
-            $wrapped_client = SendNostr::send($client, $this->log);
-            self::handle($payload, new Context(
-                            events: $this->store,
-                            relay: $wrapped_client
-            ));
+            self::handle($payload, $client_context);
         }
     }
 

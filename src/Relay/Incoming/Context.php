@@ -4,16 +4,21 @@ namespace rikmeijer\Transpher\Relay\Incoming;
 
 use function \Functional\map;
 
-readonly class Context {
+class Context {
 
     public function __construct(
-            public ?\rikmeijer\Transpher\Relay\Store $events = null,
-            public ?\rikmeijer\Transpher\Relay\Sender $relay = null
+            readonly public ?\rikmeijer\Transpher\Relay\Subscriptions $subscriptions = null,
+            readonly public ?\rikmeijer\Transpher\Relay\Store $events = null,
+            readonly public ?\rikmeijer\Transpher\Relay\Sender $relay = null
     ) {
         
     }
 
     static function merge(Context $context, Context ...$contexts) {
-        return new self(...array_merge(array_filter(get_object_vars($context)), ...map($contexts, fn(Context $context) => array_filter(get_object_vars($context)))));
+        return new self(...array_merge(self::filterProperties($context), ...map($contexts, [__CLASS__, 'filterProperties'])));
+    }
+
+    static function filterProperties(Context $context) {
+        return array_filter(get_object_vars($context));
     }
 }

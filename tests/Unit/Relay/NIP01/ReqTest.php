@@ -7,6 +7,8 @@ use rikmeijer\Transpher\Nostr\Subscription\Filter;
 use rikmeijer\TranspherTests\Unit\Client;
 use function Pest\context;
 
+afterEach(fn() => Client::generic_client(true));
+
 describe('REQ', function () {
     it('replies NOTICE Invalid message on non-existing filters', function () {
         $context = context();

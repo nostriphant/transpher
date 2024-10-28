@@ -1,7 +1,8 @@
 <?php
 
 namespace rikmeijer\Transpher\Relay\Incoming;
-use rikmeijer\Transpher\Relay\Subscriptions;
+
+use function \Functional\first;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 use rikmeijer\Transpher\Nostr\Event\KindClass;
 use rikmeijer\Transpher\Relay\Condition;
@@ -69,7 +70,18 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                     yield Factory::notice('Undefined event kind ' . $this->event->kind);
                     return;
             }
-            Subscriptions::apply($this->event);
+
+            if (empty($context->subscriptions) === false) {
+                ($context->subscriptions)(function (callable $subscription, string $subscriptionId) {
+                    $to = $subscription($this->event);
+                    if ($to === false) {
+                        return false;
+                    }
+                    $to(Factory::requestedEvent($subscriptionId, $this->event));
+                    $to(Factory::eose($subscriptionId));
+                    return true;
+                });
+            }
             yield Factory::accept($this->event->id);
         }
     }

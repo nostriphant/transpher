@@ -21,8 +21,8 @@ class Client extends \rikmeijer\TranspherTests\Client {
                 ));
     }
 
-    static function generic_client(): self {
-        if (isset(self::$generic_relay) === false) {
+    static function generic_client(bool $reset = false): self {
+        if ($reset || isset(self::$generic_relay) === false) {
             $events = new class([]) implements \rikmeijer\Transpher\Relay\Store {
 
                 use \rikmeijer\Transpher\Nostr\Store;
@@ -77,7 +77,7 @@ class Client extends \rikmeijer\TranspherTests\Client {
     }
 
     #[\Override]
-    public function receive(): ?WebsocketMessage {
+    public function receive(int $timeout): ?WebsocketMessage {
         return !empty($this->messages) ? WebsocketMessage::fromText(array_shift($this->messages)) : null;
     }
 }

@@ -81,8 +81,8 @@ class Client extends \rikmeijer\Transpher\Client {
             throw new \Exception('Lingering expected messages: ' . var_Export($this->expected_messages, true));
         }
     }
-    
-    public function start(): void {
+
+    public function start(int $timeout = 5): void {
         $this->onJson(function(callable $stop, array $message) {
             $expected_message = array_shift($this->expected_messages);
             expect(array_shift($message))->toBe($expected_message[0], 'Message type checks out');
@@ -93,6 +93,6 @@ class Client extends \rikmeijer\Transpher\Client {
             }
         });
         
-        parent::start();
+        parent::start($timeout);
     }
 }

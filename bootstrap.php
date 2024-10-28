@@ -9,3 +9,23 @@ $dotenv_file = ROOT_DIR . '/.env';
 is_file($dotenv_file) || touch($dotenv_file);
 $dotenv = Dotenv\Dotenv::createMutable(dirname($dotenv_file));
 $dotenv->load();
+
+if (function_exists('array_find') === false) {
+
+    /**
+     * PHP 8.4 compat
+     * @param array $array
+     * @param callable $callback
+     * @return mixed
+     */
+    function array_find(array $array, callable $callback): mixed {
+        foreach ($array as $key => $value) {
+            if ($callback($value, $key)) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
+}

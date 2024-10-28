@@ -1,13 +1,7 @@
 <?php
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
- */
-
 namespace rikmeijer\Transpher\Relay\Incoming;
 use rikmeijer\Transpher\Relay\Incoming;
-use rikmeijer\Transpher\Relay\Subscriptions;
 use rikmeijer\Transpher\Nostr\Message\Factory;
 
 /**
@@ -32,7 +26,7 @@ readonly class Close implements Incoming {
 
     #[\Override]
     public function __invoke(Context $context): \Generator {
-        Subscriptions::unsubscribe($this->subscription_id);
+        ($context->subscriptions)($this->subscription_id);
         yield Factory::closed($this->subscription_id);
     }
 }

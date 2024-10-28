@@ -11,9 +11,14 @@
         <echo msg="Making directory ./build" />
         <mkdir dir="./build" />
         <delete>
-            <fileset dir="./data">
+            <fileset dir="data">
                 <include name="*.php" />
             </fileset>
+        </delete>
+        <delete>
+            <dirset dir="data">
+                <include name="./**" />
+            </dirset>
         </delete>
     </target>
     

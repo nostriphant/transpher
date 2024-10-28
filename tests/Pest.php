@@ -46,6 +46,7 @@ namespace {
             }
         }
         expect($this->value->messages)->toHaveCount(func_num_args());
+        $this->value->messages = [];
     });
 }
 

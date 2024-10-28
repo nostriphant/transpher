@@ -159,26 +159,32 @@ describe('REQ', function () {
     });
 
     it('relays events to Bob, sent after they subscribed on Alices messages', function () {
-        $alice = Client::generic_client();
-        $bob = Client::generic_client();
+
+        $context = context();
+
         $alice_key = Key::generate();
 
-        $subscription = Factory::subscribe(
-                new Filter(authors: [$alice_key(Key::public())])
+        Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$alice_key(Key::public())]]]), $context);
+        expect($context->relay)->toHaveReceived(
+                ['EOSE', $id]
         );
 
-        $bob->expectNostrEose($subscription()[1]);
-        $bob->json($subscription());
-        $bob->start();
-
-        $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Relayable Hello worlda!'));
-
         $key_charlie = Key::generate();
-        $alice->sendSignedMessage(Factory::event($key_charlie, 1, 'Hello worldi!'));
+        $event_charlie = \rikmeijer\Transpher\Nostr\Message\Factory::event($key_charlie, 1, 'Hello world!');
+        Relay::handle($event_charlie, $context);
+        expect($context->relay)->toHaveReceived(
+                ['OK']
+        );
 
-        $bob->expectNostrEvent($subscription()[1], 'Relayable Hello worlda!');
-        $bob->expectNostrEose($subscription()[1]);
-        $bob->start();
+        $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Relayable Hello worlda!');
+        Relay::handle($event, $context);
+        expect($context->relay)->toHaveReceived(
+                ['EVENT', $id, function (array $event) {
+                        expect($event['content'])->toBe('Relayable Hello worlda!');
+                    }],
+                ['EOSE', $id],
+                ['OK'], // this is buggy, because relay and client in context are the same atm
+        );
     });
 
     it('sends events to all clients subscribed on author (pubkey), even after restarting the server', function () {

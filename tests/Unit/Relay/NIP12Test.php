@@ -21,11 +21,12 @@ describe('REQ', function () {
             $sender_key = Key::generate();
             $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
             Relay::handle($message, $context);
+            expect($context->reply)->toHaveReceived(
+                    ['OK']
+            );
 
             Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
-
-            expect($context->relay)->toHaveReceived(
-                    ['OK'],
+            expect($context->reply)->toHaveReceived(
                     ['EVENT', $id, function (array $event) {
                             expect($event['content'])->toBe('Hello World');
                         }],
@@ -41,17 +42,20 @@ describe('REQ', function () {
         $tag_value = uniqid();
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
+        expect($context->reply)->toHaveReceived(
+                ['EOSE', $id],
+        );
 
         $sender_key = Key::generate();
         $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
         Relay::handle($message, $context);
-
         expect($context->relay)->toHaveReceived(
-                ['EOSE', $id],
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
                     }],
                 ['EOSE', $id],
+        );
+        expect($context->reply)->toHaveReceived(
                 ['OK']
         );
     });
@@ -68,7 +72,7 @@ describe('REQ', function () {
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
 
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
                     }],

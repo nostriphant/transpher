@@ -40,7 +40,8 @@ class Relay implements WebsocketClientHandler {
         $wrapped_client = SendNostr::send($client, $this->log);
         $client_context = Context::merge(new Context(
                         subscriptions: new Relay\Subscriptions($this->subscriptions),
-                        relay: $wrapped_client
+                        relay: $wrapped_client,
+                        reply: $wrapped_client
                 ), $this->context);
         foreach ($client as $message) {
             $payload = (string) $message;
@@ -53,9 +54,9 @@ class Relay implements WebsocketClientHandler {
         try {
             $message = \rikmeijer\Transpher\Nostr::decode($payload);
             $incoming = Relay\Incoming\Factory::make($message);
-            each($incoming($context), $context->relay);
+            each($incoming($context), $context->reply);
         } catch (\InvalidArgumentException $ex) {
-            ($context->relay)(Factory::notice($ex->getMessage()));
+            ($context->reply)(Factory::notice($ex->getMessage()));
         }
     }
 }

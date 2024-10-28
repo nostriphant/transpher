@@ -9,7 +9,7 @@ describe('CLOSE', function () {
 
         Relay::handle(json_encode(['CLOSE']), $context);
 
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['NOTICE', 'Missing subscription ID']
         );
     });

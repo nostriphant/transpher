@@ -63,6 +63,19 @@ namespace {
 namespace Pest {
 
     use nostriphant\Transpher\Relay\Incoming\Context;
+    use nostriphant\Transpher\Nostr\Key;
+
+    function key(string $nsec): Key {
+        return Key::fromBech32($nsec);
+    }
+
+    function key_sender(): Key {
+        return key('nsec15udyzkfk7twhpdmhu5syc4lqm7dxmll0jxeu0rq65f89gaewx0ps89derx');
+    }
+
+    function key_recipient(): Key {
+        return key('nsec1dm444kv7gug4ge7sjms8c8ym3dqhdz44x3jhq0mcq9eqftw9krxqymj9qk');
+    }
 
     function context(array $events = [], array &$subscriptions = []): Context {
         return new Context(

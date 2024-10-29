@@ -10,7 +10,7 @@ use function Pest\context;
  */
 it('stores regular (1000 <= n < 10000) events', function () {
     $context = context();
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     for ($kind = 1000; $kind < 10000; $kind += 5000) {
         $event = Factory::event($sender_key, $kind, 'Hello World');
         Relay::handle($event, $context);
@@ -20,7 +20,7 @@ it('stores regular (1000 <= n < 10000) events', function () {
 });
 
 it('stores regular (4 <= n < 45) events', function () {
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     for ($kind = 4; $kind < 45; $kind++) {
         $context = context();
         $event = Factory::event($sender_key, $kind, 'Hello World');
@@ -34,7 +34,7 @@ it('stores regular (4 <= n < 45) events', function () {
 
 it('stores regular (n == 1 || n == 2) events', function () {
     $context = context();
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     for ($kind = 1; $kind < 3; $kind++) {
         $event = Factory::event($sender_key, $kind, 'Hello World');
         Relay::handle($event, $context);
@@ -46,7 +46,7 @@ it('stores regular (n == 1 || n == 2) events', function () {
 it('replaces replaceable (10000 <= n < 20000) events, keeping only the last one (based on pubkey & kind)', function () {
     $context = context();
 
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     for ($kind = 10000; $kind < 20000; $kind += 5000) {
         $original_event = Factory::event($sender_key, $kind, 'Hello World');
         Relay::handle($original_event, $context);
@@ -64,7 +64,7 @@ it('replaces replaceable (10000 <= n < 20000) events, keeping only the last one 
 it('keeps replaceable (10000 <= n < 20000) events, when same created_at with lowest id (based on pubkey & kind)', function () {
     $context = context();
 
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     for ($kind = 10000; $kind < 20000; $kind += 5000) {
         $time = time();
         $event1 = Factory::eventAt($sender_key, $kind, 'Hello World', $time);
@@ -91,7 +91,7 @@ it('keeps replaceable (10000 <= n < 20000) events, when same created_at with low
 it('replaces replaceable (n == 0) events, keeping only the last one (based on pubkey & kind)', function () {
     $context = context();
     $kind = 0;
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     $original_event = Factory::event($sender_key, $kind, 'Hello World');
     Relay::handle($original_event, $context);
 
@@ -106,7 +106,7 @@ it('replaces replaceable (n == 0) events, keeping only the last one (based on pu
 it('keeps replaceable (n == 0) events, when same created_at with lowest id (based on pubkey & kind)', function () {
     $context = context();
     $kind = 0;
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     $time = time();
     $event1 = Factory::eventAt($sender_key, $kind, 'Hello World', $time);
     $event2 = Factory::eventAt($sender_key, $kind, 'Updated: hello World', $time);
@@ -131,7 +131,7 @@ it('keeps replaceable (n == 0) events, when same created_at with lowest id (base
 it('does not store ephemeral (20000 <= kind < 30000) events', function () {
     $context = context();
 
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     for ($kind = 20000; $kind < 30000; $kind += 5000) {
         $event = Factory::event($sender_key, $kind, 'Hello World');
         Relay::handle($event, $context);

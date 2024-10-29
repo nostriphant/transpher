@@ -10,9 +10,9 @@ it('relays private direct messsage from alice to bob', function (): void {
     mkdir($transpher_store);
 
     $alice = Client::persistent_client($transpher_store);
-    $alice_key = Key::generate();
+    $alice_key = \Pest\key_sender();;
 
-    $bob_key = Key::generate();
+    $bob_key = \Pest\key_recipient();
 
     $alice->privateDirectMessage($alice_key, $bob_key(Key::public(Key\Format::BECH32)), 'Hello!!');
 

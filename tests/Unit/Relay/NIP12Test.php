@@ -1,7 +1,6 @@
 <?php
 
 use nostriphant\Transpher\Relay;
-use nostriphant\Transpher\Nostr\Key;
 use function Pest\context;
 
 /**
@@ -18,7 +17,7 @@ describe('REQ', function () {
         it('sends events to all clients subscribed on ' . $tag . '-tag', function () use ($tag, $tag_value) {
             $context = context();
 
-            $sender_key = Key::generate();
+            $sender_key = \Pest\key_sender();;
             $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
             Relay::handle($message, $context);
             expect($context->reply)->toHaveReceived(
@@ -46,7 +45,7 @@ describe('REQ', function () {
                 ['EOSE', $id],
         );
 
-        $sender_key = Key::generate();
+        $sender_key = \Pest\key_sender();;
         $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
         Relay::handle($message, $context);
         expect($context->relay)->toHaveReceived(
@@ -63,7 +62,7 @@ describe('REQ', function () {
     it('sends events to all clients subscribed on p after restarting the server', function () {
         $tag = 'p';
         $tag_value = uniqid();
-        $sender_key = Key::generate();
+        $sender_key = \Pest\key_sender();;
         $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
 
         $context = context([

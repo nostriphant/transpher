@@ -10,7 +10,7 @@ use function Pest\context;
 it('accepts a kind 1 and answers with OK', function () {
     $context = context();
 
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
     Relay::handle($message, $context);
 
@@ -22,7 +22,7 @@ it('accepts a kind 1 and answers with OK', function () {
 it('rejects a kind 1 and answers with OK, false, when signature is wrong', function () {
     $context = context();
 
-    $sender_key = Key::generate();
+    $sender_key = \Pest\key_sender();;
     $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
     $message_raw = $message();
     $message_raw[1]['sig'] = 'improper signature here';

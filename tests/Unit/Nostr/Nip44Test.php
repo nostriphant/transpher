@@ -14,9 +14,9 @@ function openKey(string $key): \Elliptic\EC\KeyPair {
 
 describe('NIP-44 v2', function () {
     it('Nostr class wraps around NIP44 implementation', function() {
-        $recipient_key = Key::generate();
-        $sender_key = Key::generate();
-        
+        $recipient_key = \Pest\key_recipient();
+        $sender_key = \Pest\key_sender();;
+
         $encrypter = Nostr::encrypt($sender_key, $recipient_key(Key::public(Nostr\Key\Format::BINARY)));
         $encrypted = $encrypter('Hello World!');
         

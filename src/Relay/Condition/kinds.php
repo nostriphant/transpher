@@ -1,1 +1,1 @@
-<?php return rikmeijer\Transpher\Relay\Condition::scalar('kind');
+<?php return nostriphant\Transpher\Relay\Condition::scalar('kind');

@@ -1,7 +1,7 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay;
-use rikmeijer\Transpher\Nostr\Filters;
+namespace nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Filters;
 
 /**
  *

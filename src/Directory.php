@@ -1,8 +1,8 @@
 <?php
 
-namespace rikmeijer\Transpher;
+namespace nostriphant\Transpher;
 
-use rikmeijer\Transpher\Nostr\Event;
+use nostriphant\Transpher\Nostr\Event;
 
 /**
  * Description of Directory

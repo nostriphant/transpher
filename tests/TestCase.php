@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\TranspherTests;
+namespace nostriphant\TranspherTests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 

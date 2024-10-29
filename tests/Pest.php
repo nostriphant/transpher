@@ -62,16 +62,16 @@ namespace {
 */
 namespace Pest {
 
-    use rikmeijer\Transpher\Relay\Incoming\Context;
+    use nostriphant\Transpher\Relay\Incoming\Context;
 
     function context(array $events = [], array &$subscriptions = []): Context {
         return new Context(
-                subscriptions: new \rikmeijer\Transpher\Relay\Subscriptions($subscriptions),
-                events: new class($events) implements \rikmeijer\Transpher\Relay\Store {
+                subscriptions: new \nostriphant\Transpher\Relay\Subscriptions($subscriptions),
+                events: new class($events) implements \nostriphant\Transpher\Relay\Store {
 
-                    use \rikmeijer\Transpher\Nostr\Store;
+                    use \nostriphant\Transpher\Nostr\Store;
                 },
-                relay: new class implements \rikmeijer\Transpher\Relay\Sender {
+                relay: new class implements \nostriphant\Transpher\Relay\Sender {
 
                     public array $messages = [];
 
@@ -81,7 +81,7 @@ namespace Pest {
                         return true;
                     }
                 },
-                reply: new class implements \rikmeijer\Transpher\Relay\Sender {
+                reply: new class implements \nostriphant\Transpher\Relay\Sender {
 
                     public array $messages = [];
 
@@ -98,7 +98,7 @@ namespace Pest {
         return json_decode(file_get_contents(__DIR__ . '/vectors/' . $name . '.json'), false);
     }
 
-    use rikmeijer\Transpher\Nostr\Event;
+    use nostriphant\Transpher\Nostr\Event;
 
     function event(array $event): Event {
         return new Event(...array_merge([

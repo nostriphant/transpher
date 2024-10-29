@@ -1,7 +1,7 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\NIP44;
-use rikmeijer\Transpher\Nostr\NIP44\Primitives;
+namespace nostriphant\Transpher\Nostr\NIP44;
+use nostriphant\Transpher\Nostr\NIP44\Primitives;
 
 /**
  * Description of Pad

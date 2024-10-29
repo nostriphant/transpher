@@ -1,7 +1,7 @@
 <?php
 
-use rikmeijer\Transpher\Relay;
-use rikmeijer\Transpher\Nostr\Key;
+use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Key;
 use function Pest\context;
 
 /**
@@ -19,7 +19,7 @@ describe('REQ', function () {
             $context = context();
 
             $sender_key = Key::generate();
-            $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
+            $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
             Relay::handle($message, $context);
             expect($context->reply)->toHaveReceived(
                     ['OK']
@@ -47,7 +47,7 @@ describe('REQ', function () {
         );
 
         $sender_key = Key::generate();
-        $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
+        $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
         Relay::handle($message, $context);
         expect($context->relay)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
@@ -64,10 +64,10 @@ describe('REQ', function () {
         $tag = 'p';
         $tag_value = uniqid();
         $sender_key = Key::generate();
-        $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
+        $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
 
         $context = context([
-            new \rikmeijer\Transpher\Nostr\Event(...$message()[1])
+            new \nostriphant\Transpher\Nostr\Event(...$message()[1])
         ]);
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);

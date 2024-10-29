@@ -1,9 +1,9 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr;
+namespace nostriphant\Transpher\Nostr;
 
-use rikmeijer\Transpher\Nostr\NIP44\Primitives;
-use rikmeijer\Transpher\Nostr\NIP44\Padding;
+use nostriphant\Transpher\Nostr\NIP44\Primitives;
+use nostriphant\Transpher\Nostr\NIP44\Padding;
 
 /**
  * Description of NIP44

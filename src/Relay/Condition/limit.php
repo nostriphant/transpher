@@ -1,1 +1,1 @@
-<?php return rikmeijer\Transpher\Relay\Condition::limit();
+<?php return nostriphant\Transpher\Relay\Condition::limit();

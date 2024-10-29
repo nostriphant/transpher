@@ -5,7 +5,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
  */
 
-namespace rikmeijer\Transpher\Nostr\Event;
+namespace nostriphant\Transpher\Nostr\Event;
 
 /**
  * Description of KindClass

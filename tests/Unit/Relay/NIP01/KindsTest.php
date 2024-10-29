@@ -1,8 +1,8 @@
 <?php
 
-use rikmeijer\Transpher\Relay;
-use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\Message\Factory;
+use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\Message\Factory;
 use function Pest\context;
 
 describe('Kinds (https://nips.nostr.com/1#kinds)', function () {

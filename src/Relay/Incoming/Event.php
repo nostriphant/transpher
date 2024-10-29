@@ -1,30 +1,30 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay\Incoming;
+namespace nostriphant\Transpher\Relay\Incoming;
 
 use function \Functional\first;
-use rikmeijer\Transpher\Nostr\Message\Factory;
-use rikmeijer\Transpher\Nostr\Event\KindClass;
-use rikmeijer\Transpher\Relay\Condition;
+use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\Transpher\Nostr\Event\KindClass;
+use nostriphant\Transpher\Relay\Condition;
 
-readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
+readonly class Event implements \nostriphant\Transpher\Relay\Incoming {
 
-    public function __construct(private \rikmeijer\Transpher\Nostr\Event $event) {
+    public function __construct(private \nostriphant\Transpher\Nostr\Event $event) {
         
     }
 
     #[\Override]
     static function fromMessage(array $message): self {
-        return new self(new \rikmeijer\Transpher\Nostr\Event(...$message[1]));
+        return new self(new \nostriphant\Transpher\Nostr\Event(...$message[1]));
     }
 
     #[\Override]
     public function __invoke(Context $context): \Generator {
-        if (\rikmeijer\Transpher\Nostr\Event::verify($this->event) === false) {
+        if (\nostriphant\Transpher\Nostr\Event::verify($this->event) === false) {
             yield Factory::ok($this->event->id, false, 'invalid:signature is wrong');
         } else {
             $replaceable_events = [];
-            switch (\rikmeijer\Transpher\Nostr\Event::determineClass($this->event)) {
+            switch (\nostriphant\Transpher\Nostr\Event::determineClass($this->event)) {
                 case KindClass::REGULAR:
                     $context->events[$this->event->id] = $this->event;
                     switch ($this->event->kind) {
@@ -95,7 +95,7 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                     $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
                                 'kinds' => [$this->event->kind],
                                 'authors' => [$this->event->pubkey],
-                                '#d' => \rikmeijer\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
+                                '#d' => \nostriphant\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
                     ]));
 
                     $context->events[$this->event->id] = $this->event;

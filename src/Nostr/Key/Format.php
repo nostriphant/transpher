@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\Key;
+namespace nostriphant\Transpher\Nostr\Key;
 
 /**
  * Description of Format

@@ -1,20 +1,20 @@
 <?php
 
-namespace rikmeijer\Transpher;
+namespace nostriphant\Transpher;
 
 use function \Functional\each;
 use \Psr\Log\LoggerInterface;
-use \rikmeijer\Transpher\Relay;
+use \nostriphant\Transpher\Relay;
 use Amp\Websocket\Server\WebsocketClientHandler;
 use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\Server\WebsocketClientGateway;
 use Amp\Websocket\WebsocketClient;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
-use rikmeijer\Transpher\Relay\Incoming\Context;
-use rikmeijer\Transpher\Nostr\Message\Factory;
-use rikmeijer\Transpher\SendNostr;
-use rikmeijer\Transpher\Relay\Store;
+use nostriphant\Transpher\Relay\Incoming\Context;
+use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\Transpher\SendNostr;
+use nostriphant\Transpher\Relay\Store;
 
 class Relay implements WebsocketClientHandler {
 
@@ -52,7 +52,7 @@ class Relay implements WebsocketClientHandler {
 
     static function handle(string $payload, Context $context) {
         try {
-            $message = \rikmeijer\Transpher\Nostr::decode($payload);
+            $message = \nostriphant\Transpher\Nostr::decode($payload);
             $incoming = Relay\Incoming\Factory::make($message);
             each($incoming($context), $context->reply);
         } catch (\InvalidArgumentException $ex) {

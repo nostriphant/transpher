@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\NIP44;
+namespace nostriphant\Transpher\Nostr\NIP44;
 use \phpseclib3\Crypt\ChaCha20 as libChaCha20;
 /**
  * Description of ChaCha20

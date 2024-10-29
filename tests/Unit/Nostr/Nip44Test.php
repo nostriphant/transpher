@@ -1,10 +1,10 @@
 <?php
 
-use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\NIP44;
-use rikmeijer\Transpher\Nostr\NIP44\Hash;
-use rikmeijer\Transpher\Nostr;
-use rikmeijer\Transpher\Nostr\NIP44\MessageKeys;
+use nostriphant\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\NIP44;
+use nostriphant\Transpher\Nostr\NIP44\Hash;
+use nostriphant\Transpher\Nostr;
+use nostriphant\Transpher\Nostr\NIP44\MessageKeys;
 use function \Pest\vectors;
 
 function openKey(string $key): \Elliptic\EC\KeyPair {

@@ -1,2 +1,2 @@
-<?php return rikmeijer\Transpher\Relay\Condition::scalar('id');
+<?php return nostriphant\Transpher\Relay\Condition::scalar('id');
 

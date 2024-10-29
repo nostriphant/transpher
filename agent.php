@@ -2,8 +2,8 @@
 
 require_once __DIR__ . '/bootstrap.php';
 
-use rikmeijer\Transpher\Client;
-use rikmeijer\Transpher\Nostr\Key;
+use nostriphant\Transpher\Client;
+use nostriphant\Transpher\Nostr\Key;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -15,7 +15,7 @@ $log->pushHandler(new StreamHandler(STDOUT), Level::Info);
 
 $relay_url = $_SERVER['RELAY_URL'];
 $log->info('Client connecting to ' . $relay_url);
-$agent = new rikmeijer\Transpher\Agent(
+$agent = new nostriphant\Transpher\Agent(
     new Client($relay_url),
     Key::fromBech32($_SERVER['AGENT_NSEC']),
     $_SERVER['RELAY_OWNER_NPUB']

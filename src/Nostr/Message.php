@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr;
+namespace nostriphant\Transpher\Nostr;
 
 readonly class Message {
 
@@ -17,6 +17,6 @@ readonly class Message {
     }
 
     public function __toString(): string {
-        return \rikmeijer\Transpher\Nostr::encode($this());
+        return \nostriphant\Transpher\Nostr::encode($this());
     }
 }

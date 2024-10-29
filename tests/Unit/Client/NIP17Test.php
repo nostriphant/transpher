@@ -1,9 +1,9 @@
 <?php
 
-use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\Message\Factory;
-use rikmeijer\Transpher\Nostr\Subscription\Filter;
-use rikmeijer\TranspherTests\Unit\Client;
+use nostriphant\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\Transpher\Nostr\Subscription\Filter;
+use nostriphant\TranspherTests\Unit\Client;
 
 it('relays private direct messsage from alice to bob', function (): void {
     $transpher_store = ROOT_DIR . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . uniqid();

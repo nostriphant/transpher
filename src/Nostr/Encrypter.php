@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr;
+namespace nostriphant\Transpher\Nostr;
 
 /**
  * Description of Encrypter

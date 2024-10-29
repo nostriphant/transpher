@@ -1,10 +1,10 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\Event;
-use rikmeijer\Transpher\Nostr;
-use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\Rumor;
-use rikmeijer\Transpher\Nostr\Event;
+namespace nostriphant\Transpher\Nostr\Event;
+use nostriphant\Transpher\Nostr;
+use nostriphant\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\Rumor;
+use nostriphant\Transpher\Nostr\Event;
 
 /**
  * Works with NIP-59 kind 13 events

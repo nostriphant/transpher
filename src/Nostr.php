@@ -1,7 +1,7 @@
 <?php
 
-namespace rikmeijer\Transpher;
-use rikmeijer\Transpher\Nostr\Key;
+namespace nostriphant\Transpher;
+use nostriphant\Transpher\Nostr\Key;
 
 /**
  * Description of Nostr

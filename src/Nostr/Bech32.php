@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr;
+namespace nostriphant\Transpher\Nostr;
 
 use function BitWasp\Bech32\convertBits;
 use function BitWasp\Bech32\decode;

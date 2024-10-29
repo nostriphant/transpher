@@ -1,15 +1,15 @@
 <?php
 
-namespace rikmeijer\TranspherTests;
+namespace nostriphant\TranspherTests;
 
-use rikmeijer\Transpher\Nostr;
+use nostriphant\Transpher\Nostr;
 
 /**
  * Description of Client
  *
  * @author Rik Meijer <hello@rikmeijer.nl>
  */
-class Client extends \rikmeijer\Transpher\Client {
+class Client extends \nostriphant\Transpher\Client {
 
     private $expected_messages = [];
     

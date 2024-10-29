@@ -1,10 +1,10 @@
 <?php
 
-namespace rikmeijer\Transpher;
-use rikmeijer\Transpher\Client;
+namespace nostriphant\Transpher;
+use nostriphant\Transpher\Client;
 use Psr\Log\LoggerInterface;
-use rikmeijer\Transpher\Nostr\Key\Format;
-use rikmeijer\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\Key\Format;
+use nostriphant\Transpher\Nostr\Key;
 
 /**
  * Description of Agent

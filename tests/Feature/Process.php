@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\TranspherTests\Feature;
+namespace nostriphant\TranspherTests\Feature;
 
 readonly class Process {
     

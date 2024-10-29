@@ -1,7 +1,7 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr;
-use rikmeijer\Transpher\Nostr;
+namespace nostriphant\Transpher\Nostr;
+use nostriphant\Transpher\Nostr;
 
 /**
  * Description of Event

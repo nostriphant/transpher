@@ -1,6 +1,6 @@
 <?php
 
-use rikmeijer\Transpher\Relay;
+use nostriphant\Transpher\Relay;
 use function Pest\context;
 
 describe('CLOSE', function () {

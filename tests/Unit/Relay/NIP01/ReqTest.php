@@ -1,10 +1,10 @@
 <?php
 
-use rikmeijer\Transpher\Relay;
-use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\Message\Factory;
-use rikmeijer\Transpher\Nostr\Subscription\Filter;
-use rikmeijer\TranspherTests\Unit\Client;
+use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\Transpher\Nostr\Subscription\Filter;
+use nostriphant\TranspherTests\Unit\Client;
 use function Pest\context;
 
 afterEach(fn() => Client::generic_client(true));
@@ -42,7 +42,7 @@ describe('REQ', function () {
         $context = context();
 
         $sender_key = Key::generate();
-        $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
+        $event = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
         Relay::handle($event, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']
@@ -171,13 +171,13 @@ describe('REQ', function () {
         );
 
         $key_charlie = Key::generate();
-        $event_charlie = \rikmeijer\Transpher\Nostr\Message\Factory::event($key_charlie, 1, 'Hello world!');
+        $event_charlie = \nostriphant\Transpher\Nostr\Message\Factory::event($key_charlie, 1, 'Hello world!');
         Relay::handle($event_charlie, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']
         );
 
-        $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Relayable Hello worlda!');
+        $event = \nostriphant\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Relayable Hello worlda!');
         Relay::handle($event, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']

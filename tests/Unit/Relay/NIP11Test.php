@@ -1,6 +1,6 @@
 <?php
 
-use rikmeijer\Transpher\Relay\InformationDocument;
+use nostriphant\Transpher\Relay\InformationDocument;
 
 it('generates Relay Information Document', function () {
 

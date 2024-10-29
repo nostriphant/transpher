@@ -1,10 +1,10 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay\Incoming;
+namespace nostriphant\Transpher\Relay\Incoming;
 
 readonly class Factory {
 
-    static function make(array $message): \rikmeijer\Transpher\Relay\Incoming {
+    static function make(array $message): \nostriphant\Transpher\Relay\Incoming {
         switch (strtoupper($message[0])) {
             case 'EVENT':
                 $incoming = Event::fromMessage($message);

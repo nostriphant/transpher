@@ -1,6 +1,6 @@
 services:
   relay:
-    image: rikmeijer84/transpher-relay
+    image: nostriphant/transpher-relay
     ports:
       - "${RELAY_PORT}:80"
     volumes:
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
       
   agent:
-    image: rikmeijer84/transpher-agent
+    image: nostriphant/transpher-agent
     volumes:
       - logs:/app/logs
     networks:

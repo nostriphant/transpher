@@ -1,8 +1,8 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay;
+namespace nostriphant\Transpher\Relay;
 
-use rikmeijer\Transpher\Nostr\Event;
+use nostriphant\Transpher\Nostr\Event;
 use function Functional\some,
              Functional\partial_left;
 
@@ -54,7 +54,7 @@ class Condition {
         };
     }
 
-    static function makeFiltersFromPrototypes(array ...$prototypes): \rikmeijer\Transpher\Nostr\Filters {
-        return \rikmeijer\Transpher\Nostr\Filters::make(self::map(), ...$prototypes);
+    static function makeFiltersFromPrototypes(array ...$prototypes): \nostriphant\Transpher\Nostr\Filters {
+        return \nostriphant\Transpher\Nostr\Filters::make(self::map(), ...$prototypes);
     }
 }

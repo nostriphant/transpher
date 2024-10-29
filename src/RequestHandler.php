@@ -1,12 +1,12 @@
 <?php
 
-namespace rikmeijer\Transpher;
+namespace nostriphant\Transpher;
 use Amp\Http\HttpStatus;
 use Amp\Websocket\Server\Websocket;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\RequestHandler as IRequestHandler;
 use Amp\Http\Server\Response;
-use \rikmeijer\Transpher\Relay\InformationDocument;
+use \nostriphant\Transpher\Relay\InformationDocument;
 
 /**
  * Description of RequestHandler

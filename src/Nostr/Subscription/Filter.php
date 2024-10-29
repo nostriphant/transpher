@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\Subscription;
+namespace nostriphant\Transpher\Nostr\Subscription;
 use function \Functional\map;
 
 readonly class Filter {

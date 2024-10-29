@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\NIP44;
+namespace nostriphant\Transpher\Nostr\NIP44;
 
 /**
  * Description of HMACAad

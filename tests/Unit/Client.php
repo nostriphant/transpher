@@ -1,33 +1,33 @@
 <?php
 
-namespace rikmeijer\TranspherTests\Unit;
+namespace nostriphant\TranspherTests\Unit;
 
 use Amp\Websocket\WebsocketMessage;
-use rikmeijer\Transpher\Relay\Incoming\Context;
+use nostriphant\Transpher\Relay\Incoming\Context;
 
-class Client extends \rikmeijer\TranspherTests\Client {
+class Client extends \nostriphant\TranspherTests\Client {
 
-    static \rikmeijer\Transpher\Relay $generic_relay;
+    static \nostriphant\Transpher\Relay $generic_relay;
     private $messages = [];
 
-    public function __construct(private \rikmeijer\Transpher\Relay $relay) {
+    public function __construct(private \nostriphant\Transpher\Relay $relay) {
         
     }
 
     static function persistent_client(string $store): self {
-        return new self(new \rikmeijer\Transpher\Relay(
-                        new \rikmeijer\Transpher\Directory($store),
+        return new self(new \nostriphant\Transpher\Relay(
+                        new \nostriphant\Transpher\Directory($store),
                         \Mockery::spy(\Psr\Log\LoggerInterface::class)
                 ));
     }
 
     static function generic_client(bool $reset = false): self {
         if ($reset || isset(self::$generic_relay) === false) {
-            $events = new class([]) implements \rikmeijer\Transpher\Relay\Store {
+            $events = new class([]) implements \nostriphant\Transpher\Relay\Store {
 
-                use \rikmeijer\Transpher\Nostr\Store;
+                use \nostriphant\Transpher\Nostr\Store;
             };
-            self::$generic_relay = new \rikmeijer\Transpher\Relay(
+            self::$generic_relay = new \nostriphant\Transpher\Relay(
                     $events,
                     \Mockery::spy(\Psr\Log\LoggerInterface::class)
             );
@@ -40,14 +40,14 @@ class Client extends \rikmeijer\TranspherTests\Client {
     }
 
     #[\Override]
-    public function privateDirectMessage(\rikmeijer\Transpher\Nostr\Key $sender, string $recipient_npub, string $message) {
-        $note = \rikmeijer\Transpher\Nostr\Message\Factory::privateDirect($sender, \rikmeijer\Transpher\Nostr\Bech32::fromNpub($recipient_npub), $message);
+    public function privateDirectMessage(\nostriphant\Transpher\Nostr\Key $sender, string $recipient_npub, string $message) {
+        $note = \nostriphant\Transpher\Nostr\Message\Factory::privateDirect($sender, \nostriphant\Transpher\Nostr\Bech32::fromNpub($recipient_npub), $message);
         $this->send($note);
     }
 
     #[\Override]
     public function send(string $text): void {
-        $relayer = new class($this) implements \rikmeijer\Transpher\Relay\Sender {
+        $relayer = new class($this) implements \nostriphant\Transpher\Relay\Sender {
 
             public function __construct(private Client $client) {
 

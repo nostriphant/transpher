@@ -1,6 +1,6 @@
 <?php
 
-use rikmeijer\Transpher\SendNostr;
+use nostriphant\Transpher\SendNostr;
 
 it('can provide a Nostr-reply callable', function() {
     $client = Mockery::mock(\Amp\Websocket\WebsocketClient::class);

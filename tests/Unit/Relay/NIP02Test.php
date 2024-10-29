@@ -1,8 +1,8 @@
 <?php
 
-use rikmeijer\Transpher\Relay;
-use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\Message\Factory;
+use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\Message\Factory;
 use function Pest\context;
 
 it('replaces replaceable (n == 3; follow list) events, keeping only the last one (based on pubkey & kind)', function () {

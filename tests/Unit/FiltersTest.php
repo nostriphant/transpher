@@ -1,6 +1,6 @@
 <?php
 
-use rikmeijer\Transpher\Relay\Condition;
+use nostriphant\Transpher\Relay\Condition;
 use function \Pest\event;
 
 it('filters p-tags', function() {

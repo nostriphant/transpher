@@ -1,3 +1,3 @@
 <?php
 
-return fn(string $tag_identifier) => rikmeijer\Transpher\Relay\Condition::tag($tag_identifier);
+return fn(string $tag_identifier) => nostriphant\Transpher\Relay\Condition::tag($tag_identifier);

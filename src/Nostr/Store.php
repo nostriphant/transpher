@@ -1,7 +1,7 @@
 <?php
 
 
-namespace rikmeijer\Transpher\Nostr;
+namespace nostriphant\Transpher\Nostr;
 
 use function \Functional\select;
 

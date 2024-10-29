@@ -1,10 +1,10 @@
 <?php
 
-namespace rikmeijer\Transpher;
+namespace nostriphant\Transpher;
 
 use Amp\Websocket\WebsocketClient;
 use Psr\Log\LoggerInterface;
-use rikmeijer\Transpher\Relay\Sender;
+use nostriphant\Transpher\Relay\Sender;
 
 /**
  * Description of Reply
@@ -20,7 +20,7 @@ readonly class SendNostr implements Sender {
         if ($json instanceof Nostr\Message) {
             $text = $json;
         } else {
-            $text = \rikmeijer\Transpher\Nostr::encode($json);
+            $text = \nostriphant\Transpher\Nostr::encode($json);
         }
         $this->log->debug($this->action . ' message ' . $text);
         $this->client->sendText($text);

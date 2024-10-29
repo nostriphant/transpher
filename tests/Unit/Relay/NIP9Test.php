@@ -1,8 +1,8 @@
 <?php
 
-use rikmeijer\Transpher\Relay;
-use rikmeijer\Transpher\Nostr\Key;
-use rikmeijer\Transpher\Nostr\Message;
+use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\Message;
 use function Pest\context;
 
 $references = [
@@ -16,7 +16,7 @@ foreach ($references as $tag => $value_callback) {
         $context = context();
 
         $sender_key = Key::generate();
-        $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
+        $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
         $referenced_value = $value_callback($message);
 
         Relay::handle($message, $context);
@@ -32,7 +32,7 @@ foreach ($references as $tag => $value_callback) {
                 ['EOSE', $subscription_id]
         );
 
-        $delete_event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 5, 'sent by accident', [$tag, $referenced_value]);
+        $delete_event = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 5, 'sent by accident', [$tag, $referenced_value]);
         Relay::handle($delete_event, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK', $delete_event()[1]['id'], true]
@@ -55,7 +55,7 @@ foreach ($references as $tag => $value_callback) {
         $context = context();
 
         $sender_key = Key::generate();
-        $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
+        $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
         $referenced_value = $value_callback($message);
 
         Relay::handle($message, $context);
@@ -71,7 +71,7 @@ foreach ($references as $tag => $value_callback) {
                 ['EOSE', $subscription_id]
         );
 
-        $delete_event = \rikmeijer\Transpher\Nostr\Message\Factory::event(Key::generate(), 5, 'sent by accident', [$tag, $referenced_value]);
+        $delete_event = \nostriphant\Transpher\Nostr\Message\Factory::event(Key::generate(), 5, 'sent by accident', [$tag, $referenced_value]);
         Relay::handle($delete_event, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK', $delete_event()[1]['id'], true]
@@ -94,7 +94,7 @@ it('When an a tag is used, relays SHOULD delete all versions of the replaceable 
     $context = context();
 
     $sender_key = Key::generate();
-    $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
+    $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
 
     Relay::handle($message, $context);
     expect($context->reply)->toHaveReceived(
@@ -109,7 +109,7 @@ it('When an a tag is used, relays SHOULD delete all versions of the replaceable 
             ['EOSE', $subscription_id]
     );
 
-    $delete_event = \rikmeijer\Transpher\Nostr\Message\Factory::eventAt($sender_key, 5, 'sent by accident', time() - 60, ['a', $message()[1]['kind'] . ':' . $message()[1]['pubkey'] . ':a-random-d-tag']);
+    $delete_event = \nostriphant\Transpher\Nostr\Message\Factory::eventAt($sender_key, 5, 'sent by accident', time() - 60, ['a', $message()[1]['kind'] . ':' . $message()[1]['pubkey'] . ':a-random-d-tag']);
     Relay::handle($delete_event, $context);
     expect($context->reply)->toHaveReceived(
             ['OK', $delete_event()[1]['id'], true]

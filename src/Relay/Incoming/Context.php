@@ -1,16 +1,16 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay\Incoming;
+namespace nostriphant\Transpher\Relay\Incoming;
 
 use function \Functional\map;
 
 class Context {
 
     public function __construct(
-            readonly public ?\rikmeijer\Transpher\Relay\Subscriptions $subscriptions = null,
-            readonly public ?\rikmeijer\Transpher\Relay\Store $events = null,
-            readonly public ?\rikmeijer\Transpher\Relay\Sender $relay = null,
-            readonly public ?\rikmeijer\Transpher\Relay\Sender $reply = null
+            readonly public ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null,
+            readonly public ?\nostriphant\Transpher\Relay\Store $events = null,
+            readonly public ?\nostriphant\Transpher\Relay\Sender $relay = null,
+            readonly public ?\nostriphant\Transpher\Relay\Sender $reply = null
     ) {
         
     }

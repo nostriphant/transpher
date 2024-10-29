@@ -1,8 +1,8 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay\Incoming;
-use rikmeijer\Transpher\Relay\Incoming;
-use rikmeijer\Transpher\Nostr\Message\Factory;
+namespace nostriphant\Transpher\Relay\Incoming;
+use nostriphant\Transpher\Relay\Incoming;
+use nostriphant\Transpher\Nostr\Message\Factory;
 
 /**
  * Description of Close

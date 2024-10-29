@@ -1,7 +1,7 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\Message;
-use rikmeijer\Transpher\Nostr\Key;
+namespace nostriphant\Transpher\Nostr\Message;
+use nostriphant\Transpher\Nostr\Key;
 
 /**
  * Description of Event
@@ -10,7 +10,7 @@ use rikmeijer\Transpher\Nostr\Key;
  */
 readonly class Rumor {
     
-    public function __construct(private \rikmeijer\Transpher\Nostr\Rumor $event) {}
+    public function __construct(private \nostriphant\Transpher\Nostr\Rumor $event) {}
     public function __invoke(Key $private_key) : array {
         return ['EVENT', get_object_vars(($this->event)($private_key))];
     }

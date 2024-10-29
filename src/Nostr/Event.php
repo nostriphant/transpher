@@ -1,8 +1,8 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr;
+namespace nostriphant\Transpher\Nostr;
 
-use rikmeijer\Transpher\Nostr\Event\KindClass;
+use nostriphant\Transpher\Nostr\Event\KindClass;
 use function \Functional\select,
              \Functional\map;
 

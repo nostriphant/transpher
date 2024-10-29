@@ -1,11 +1,11 @@
 <?php
-namespace rikmeijer\Transpher\Nostr;
+namespace nostriphant\Transpher\Nostr;
 
 use function Functional\some,
              Functional\map,
              Functional\true,
              Functional\partial_left;
-use rikmeijer\Transpher\Nostr\Subscription\Filter;
+use nostriphant\Transpher\Nostr\Subscription\Filter;
 
 readonly class Filters {
 

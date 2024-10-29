@@ -1,9 +1,9 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay\Incoming;
-use rikmeijer\Transpher\Relay\Incoming;
-use rikmeijer\Transpher\Nostr\Message\Factory;
-use rikmeijer\Transpher\Relay\Condition;
+namespace nostriphant\Transpher\Relay\Incoming;
+use nostriphant\Transpher\Relay\Incoming;
+use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\Transpher\Relay\Condition;
 use function \Functional\map,
  \Functional\partial_left,
              \Functional\if_else;

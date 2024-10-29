@@ -1,1 +1,1 @@
-<?php return rikmeijer\Transpher\Relay\Condition::scalar('pubkey');
+<?php return nostriphant\Transpher\Relay\Condition::scalar('pubkey');

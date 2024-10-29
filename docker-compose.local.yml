@@ -2,7 +2,7 @@ services:
   relay:
     container_name: transpher_relay
     hostname: transpher_relay
-    #image: rikmeijer84/transpher-relay
+    #image: nostriphant/transpher-relay
     build:
       context: .
       dockerfile: docker/relay.Dockerfile
@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
       
   agent:
-    #image: rikmeijer84/transpher-agent
+    #image: nostriphant/transpher-agent
     container_name: transpher_agent
     hostname: transpher_agent
     build:

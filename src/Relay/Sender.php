@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Relay;
+namespace nostriphant\Transpher\Relay;
 
 interface Sender {
     

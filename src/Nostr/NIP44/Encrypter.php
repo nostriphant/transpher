@@ -1,6 +1,6 @@
 <?php
 
-namespace rikmeijer\Transpher\Nostr\NIP44;
+namespace nostriphant\Transpher\Nostr\NIP44;
 
 /**
  * Description of Encrypter
@@ -12,7 +12,7 @@ readonly class Encrypter {
     private ChaCha20 $chacha;
     private HMACAad $hmac;
     
-    public function __construct(\rikmeijer\Transpher\Nostr\NIP44\MessageKeys $keys, private string $salt) {
+    public function __construct(\nostriphant\Transpher\Nostr\NIP44\MessageKeys $keys, private string $salt) {
         if (strlen($salt) !== 32) {
             throw \InvalidArgumentException('Salt to short, 32 bytes required');
         }

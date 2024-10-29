@@ -1,11 +1,11 @@
 <?php
 
-namespace rikmeijer\Transpher;
+namespace nostriphant\Transpher;
 
-use rikmeijer\Transpher\Nostr;
+use nostriphant\Transpher\Nostr;
 use function Amp\Websocket\Client\connect;
-use rikmeijer\Transpher\Nostr\Message\Factory;
-use rikmeijer\Transpher\Nostr\Key;
+use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\Transpher\Nostr\Key;
 
 
 class Client {

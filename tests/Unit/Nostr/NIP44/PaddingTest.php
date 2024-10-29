@@ -1,6 +1,6 @@
 <?php
 
-use rikmeijer\Transpher\Nostr\NIP44\Padding;
+use nostriphant\Transpher\Nostr\NIP44\Padding;
 use function Pest\vectors;
 
 it('calcs padded length correctly', function () {

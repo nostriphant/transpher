@@ -15,7 +15,7 @@ describe('REQ', function () {
 
         Relay::handle(json_encode(['REQ']), $context);
 
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['NOTICE', 'Invalid message']
         );
     });
@@ -24,7 +24,7 @@ describe('REQ', function () {
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), []]), $context);
 
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['CLOSED', $id, 'Subscription filters are empty']
         );
     });
@@ -33,7 +33,7 @@ describe('REQ', function () {
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), ['ids' => ['abdcd']]]), $context);
 
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['EOSE', $id]
         );
     });
@@ -44,11 +44,12 @@ describe('REQ', function () {
         $sender_key = Key::generate();
         $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
         Relay::handle($event, $context);
+        expect($context->reply)->toHaveReceived(
+                ['OK']
+        );
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
-
-        expect($context->relay)->toHaveReceived(
-                ['OK'],
+        expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
                     }],
@@ -165,25 +166,27 @@ describe('REQ', function () {
         $alice_key = Key::generate();
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$alice_key(Key::public())]]]), $context);
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['EOSE', $id]
         );
 
         $key_charlie = Key::generate();
         $event_charlie = \rikmeijer\Transpher\Nostr\Message\Factory::event($key_charlie, 1, 'Hello world!');
         Relay::handle($event_charlie, $context);
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['OK']
         );
 
         $event = \rikmeijer\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Relayable Hello worlda!');
         Relay::handle($event, $context);
+        expect($context->reply)->toHaveReceived(
+                ['OK']
+        );
         expect($context->relay)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Relayable Hello worlda!');
                     }],
-                ['EOSE', $id],
-                ['OK'], // this is buggy, because relay and client in context are the same atm
+                ['EOSE', $id]
         );
     });
 

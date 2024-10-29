@@ -20,14 +20,12 @@ it('stores regular (1000 <= n < 10000) events', function () {
 });
 
 it('stores regular (4 <= n < 45) events', function () {
-
     $sender_key = Key::generate();
     for ($kind = 4; $kind < 45; $kind++) {
         $context = context();
         $event = Factory::event($sender_key, $kind, 'Hello World');
         Relay::handle($event, $context);
-
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['OK', $event()[1]['id'], true, '']
         );
         expect(isset($context->events[$event()[1]['id']]))->toBeTrue();

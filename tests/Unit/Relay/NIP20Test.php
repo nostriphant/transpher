@@ -14,7 +14,7 @@ it('accepts a kind 1 and answers with OK', function () {
     $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
     Relay::handle($message, $context);
 
-    expect($context->relay)->toHaveReceived(
+    expect($context->reply)->toHaveReceived(
             ['OK', $message()[1]['id'], true, '']
     );
 });
@@ -28,7 +28,7 @@ it('rejects a kind 1 and answers with OK, false, when signature is wrong', funct
     $message_raw[1]['sig'] = 'improper signature here';
     Relay::handle(json_encode($message_raw), $context);
 
-    expect($context->relay)->toHaveReceived(
+    expect($context->reply)->toHaveReceived(
             ['OK', $message()[1]['id'], false, 'invalid:signature is wrong']
     );
 });

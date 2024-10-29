@@ -9,7 +9,8 @@ class Context {
     public function __construct(
             readonly public ?\rikmeijer\Transpher\Relay\Subscriptions $subscriptions = null,
             readonly public ?\rikmeijer\Transpher\Relay\Store $events = null,
-            readonly public ?\rikmeijer\Transpher\Relay\Sender $relay = null
+            readonly public ?\rikmeijer\Transpher\Relay\Sender $relay = null,
+            readonly public ?\rikmeijer\Transpher\Relay\Sender $reply = null
     ) {
         
     }

@@ -9,7 +9,7 @@ describe('generic (https://nips.nostr.com/1#from-relay-to-client-sending-events-
 
         Relay::handle('null', $context);
 
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['NOTICE', 'Invalid message']
         );
     });
@@ -19,7 +19,7 @@ describe('generic (https://nips.nostr.com/1#from-relay-to-client-sending-events-
 
         Relay::handle('["UNKNOWN"]', $context);
 
-        expect($context->relay)->toHaveReceived(
+        expect($context->reply)->toHaveReceived(
                 ['NOTICE', 'Message type UNKNOWN not supported']
         );
     });

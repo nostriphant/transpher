@@ -32,8 +32,8 @@
     <!-- Target: build docker image                      -->
     <!-- ============================================  -->
     <target name="build" depends="test">
-        <property name="docket_relay_tag" value="rikmeijer84/transpher-relay:latest" override="true" />
-        <property name="docket_agent_tag" value="rikmeijer84/transpher-agent:latest" override="true" />
+        <property name="docket_relay_tag" value="nostriphant/transpher-relay:latest" override="true" />
+        <property name="docket_agent_tag" value="nostriphant/transpher-agent:latest" override="true" />
         
         <echo msg="Building docker image ${docket_relay_tag}..." />
         <exec executable="/usr/local/bin/docker" passthru="true" checkreturn="true">

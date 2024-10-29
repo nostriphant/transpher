@@ -29,11 +29,26 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                     $context->events[$this->event->id] = $this->event;
                     switch ($this->event->kind) {
                         case 5:
-                            $event_ids = array_map(fn(array $tag) => $tag[1], array_filter($this->event->tags, fn(array $tag) => $tag[0] === 'e'));
-                            $removable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
-                                        'authors' => [$this->event->pubkey],
-                                        'ids' => $event_ids
-                            ]));
+                            $prototypes = [];
+                            $possible_references = [
+                                'e' => 'ids',
+                                'k' => 'kinds'
+                            ];
+                            foreach ($possible_references as $possible_reference => $possible_filter_field) {
+                                $values = array_filter($this->event->tags, fn(array $tag) => $tag[0] === $possible_reference);
+                                if (empty($values)) {
+                                    continue;
+                                }
+
+                                $prototypes[] = [
+                                    'authors' => [$this->event->pubkey],
+                                    $possible_filter_field => array_map(fn(array $tag) => $tag[1], $values)
+                                ];
+                            }
+                            if (empty($prototypes)) {
+                                break;
+                            }
+                            $removable_events = ($context->events)(Condition::makeFiltersFromPrototypes(...$prototypes));
                             foreach ($removable_events as $removable_event_id => $removable_event) {
                                 unset($context->events[$removable_event_id]);
                             }

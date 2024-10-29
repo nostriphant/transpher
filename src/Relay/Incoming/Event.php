@@ -36,6 +36,7 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                                 'a' => fn(array $tags): array => array_map(fn(array $address) => [
                                     'kinds' => [$address[0]],
                                     'authors' => [$address[1]],
+                                    'until' => $this->event->created_at,
                                     '#d' => [$address[2]]
                                         ], array_map(fn(array $tag) => explode(':', $tag[1]), $tags))
                             ];

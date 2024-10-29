@@ -32,22 +32,37 @@ readonly class Event implements \rikmeijer\Transpher\Relay\Incoming {
                             $prototypes = [];
                             $possible_references = [
                                 'e' => 'ids',
-                                'k' => 'kinds'
+                                'k' => 'kinds',
+                                'a' => fn(array $tags): array => array_map(fn(array $address) => [
+                                    'kinds' => [$address[0]],
+                                    'authors' => [$address[1]],
+                                    '#d' => [$address[2]]
+                                        ], array_map(fn(array $tag) => explode(':', $tag[1]), $tags))
                             ];
                             foreach ($possible_references as $possible_reference => $possible_filter_field) {
-                                $values = array_filter($this->event->tags, fn(array $tag) => $tag[0] === $possible_reference);
-                                if (empty($values)) {
+                                $tags = array_filter($this->event->tags, fn(array $tag) => $tag[0] === $possible_reference);
+                                if (empty($tags)) {
                                     continue;
                                 }
 
-                                $prototypes[] = [
-                                    'authors' => [$this->event->pubkey],
-                                    $possible_filter_field => array_map(fn(array $tag) => $tag[1], $values)
-                                ];
+                                if (is_string($possible_filter_field)) {
+                                    $prototypes[] = [
+                                        'authors' => [$this->event->pubkey],
+                                        $possible_filter_field => array_map(fn(array $tag) => $tag[1], $tags)
+                                    ];
+                                } elseif (is_callable($possible_filter_field)) {
+                                    $prototypes = array_merge($prototypes, $possible_filter_field($tags));
+                                }
                             }
+
                             if (empty($prototypes)) {
                                 break;
+                            } elseif (count(array_filter($prototypes, fn(array $prototype) => $prototype['authors'][0] !== $this->event->pubkey)) > 0) {
+                                break;
                             }
+
+
+
                             $removable_events = ($context->events)(Condition::makeFiltersFromPrototypes(...$prototypes));
                             foreach ($removable_events as $removable_event_id => $removable_event) {
                                 unset($context->events[$removable_event_id]);

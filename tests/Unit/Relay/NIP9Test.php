@@ -7,7 +7,8 @@ use function Pest\context;
 
 $references = [
     'e' => fn(Message $message) => $message()[1]['id'],
-    'k' => fn(Message $message) => $message()[1]['kind']
+    'k' => fn(Message $message) => $message()[1]['kind'],
+    'a' => fn(Message $message) => $message()[1]['kind'] . ':' . $message()[1]['pubkey'] . ':a-random-d-tag'
 ];
 
 foreach ($references as $tag => $value_callback) {
@@ -15,7 +16,7 @@ foreach ($references as $tag => $value_callback) {
         $context = context();
 
         $sender_key = Key::generate();
-        $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
+        $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
         $referenced_value = $value_callback($message);
 
         Relay::handle($message, $context);
@@ -54,7 +55,7 @@ foreach ($references as $tag => $value_callback) {
         $context = context();
 
         $sender_key = Key::generate();
-        $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
+        $message = \rikmeijer\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
         $referenced_value = $value_callback($message);
 
         Relay::handle($message, $context);

@@ -1,0 +1,14 @@
+name: CI
+
+on: [push]
+
+jobs:
+  distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Phing Distribute
+        uses: phingofficial/phing-github-action@main
+        with:
+            targets: dist

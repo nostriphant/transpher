@@ -15,7 +15,7 @@ class InformationDocument {
             "description" => $description,
             "pubkey" => \rikmeijer\Transpher\Nostr\Bech32::fromNpub($npub),
             "contact" => $contact,
-            "supported_nips" => [1, 2, 11, 12, 16, 20, 33],
+            "supported_nips" => [1, 2, 9, 11, 12, 16, 20, 33],
             "software" => 'Transpher',
             "version" => 'dev'
         ];

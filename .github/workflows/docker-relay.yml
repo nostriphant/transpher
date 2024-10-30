@@ -1,4 +1,4 @@
-name: Generate & Push docker containers
+name: Generate & Push docker RELAY containers
 
 on:
   push:

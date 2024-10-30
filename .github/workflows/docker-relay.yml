@@ -7,7 +7,7 @@ on:
       - completed
 
 env:
-  REGISTRY_IMAGE: nostriphant/transpher-relay:latest
+  REGISTRY_IMAGE: nostriphant/transpher-relay
 
 jobs:
   build:
@@ -52,6 +52,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
           file: docker/relay.Dockerfile
+          tags: ${{ env.REGISTRY_IMAGE }}:latest
       
       - name: Export digest
         run: |

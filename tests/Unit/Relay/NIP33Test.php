@@ -1,7 +1,6 @@
 <?php
 
 use nostriphant\Transpher\Relay;
-use nostriphant\Transpher\Nostr\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use function Pest\context;
 

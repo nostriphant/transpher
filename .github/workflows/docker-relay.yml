@@ -1,7 +1,10 @@
 name: Generate & Push docker RELAY containers
 
 on:
-  push:
+  workflow_run:
+    workflows: [Tests]
+    types:
+      - completed
 
 env:
   REGISTRY_IMAGE: nostriphant/transpher-relay:latest

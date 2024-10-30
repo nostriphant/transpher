@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  REGISTRY_IMAGE: nostriphant/transpher-relay
+  REGISTRY_IMAGE: nostriphant/transpher-relay:latest
 
 jobs:
   build:

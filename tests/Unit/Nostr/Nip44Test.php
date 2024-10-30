@@ -46,83 +46,72 @@ describe('NIP-44 v2', function () {
             expect(bin2hex((new Hash($salt))($key)))->toBe('06a6b88c5853361a06104c9ceb35b45cef760014904671014a193f40c15fc244');
         });
 
-        it('get_conversation_key', function () {
+        it('get_conversation_key', function ($vector) {
             //https://github.com/paulmillr/nip44/blob/main/javascript/test/nip44.vectors.json
-            foreach (vectors('nip44')->v2->valid->get_conversation_key as $vector) {
-                $privkey = Key::fromHex($vector->sec1);
-                $key = new NIP44\ConversationKey($privkey, hex2bin($vector->pub2));
-                expect(''.$key)->not()->toBeFalse();
-                expect(bin2hex($key))->toBe($vector->conversation_key, $vector->note??'');
-            }
-        });
-        it('gets message keys', function () {
-            $conversation_key = hex2bin(vectors('nip44')->v2->valid->get_message_keys->conversation_key);
-            expect($conversation_key)->not()->toBeEmpty();
-            $message_key_maker = new MessageKeys($conversation_key);
-            foreach (vectors('nip44')->v2->valid->get_message_keys->keys as $vector) {
-                $expected = [
-                    $vector->chacha_key,
-                    $vector->chacha_nonce,
-                    $vector->hmac_key
-                ];
-                foreach ($message_key_maker(hex2bin($vector->nonce), 32, 12, 32) as $key) {
-                    expect(bin2hex($key))->toBe(array_shift($expected));
-                }
-            }
-        });
+            $privkey = Key::fromHex($vector->sec1);
+            $key = new NIP44\ConversationKey($privkey, hex2bin($vector->pub2));
+            expect('' . $key)->not()->toBeFalse();
+            expect(bin2hex($key))->toBe($vector->conversation_key, $vector->note ?? '');
+        })->with(vectors('nip44')->v2->valid->get_conversation_key);
 
-        it('can encrypt & decrypt', function () {
-            foreach (vectors('nip44')->v2->valid->encrypt_decrypt as $vector) {
-                $key = Key::fromHex($vector->sec2);
-                $pub2 = $key(Key::public());
-
-                $privkey = Key::fromHex($vector->sec1);
-                $conversation_key = new NIP44\ConversationKey($privkey, hex2bin($pub2));
-                expect(bin2hex(''.$conversation_key))->toBe($vector->conversation_key);
-                $keys = $conversation_key();
-                
-                expect(NIP44::decrypt($vector->payload, $keys))->toBe($vector->plaintext, 'Unable to properly decrypt vector payload');
-
-                $payload = NIP44::encrypt($vector->plaintext, $keys, hex2bin($vector->nonce));
-                expect(NIP44::decrypt($payload, $keys))->toBe($vector->plaintext, 'Unable to properly decrypt self encrypted payload');
-
-                expect($payload)->toBe($vector->payload, 'Unable to properly encrypt vector message');
+        $message_keys = vectors('nip44')->v2->valid->get_message_keys;
+        $conversation_key = hex2bin($message_keys->conversation_key);
+        expect($conversation_key)->not()->toBeEmpty();
+        $message_key_maker = new MessageKeys($conversation_key);
+        it('gets message keys', function ($vector) use ($message_key_maker) {
+            $expected = [
+                $vector->chacha_key,
+                $vector->chacha_nonce,
+                $vector->hmac_key
+            ];
+            foreach ($message_key_maker(hex2bin($vector->nonce), 32, 12, 32) as $key) {
+                expect(bin2hex($key))->toBe(array_shift($expected));
             }
-        });
-        
-        
-        it('can encrypt & decrypt long messages', function () {
-            foreach (vectors('nip44')->v2->valid->encrypt_decrypt_long_msg as $vector) {
-                $plaintext = str_repeat($vector->pattern, $vector->repeat);
-                expect(hash('sha256', $plaintext))->toBe($vector->plaintext_sha256);
-                $keys = new MessageKeys(hex2bin($vector->conversation_key));
-                
-                $payload = NIP44::encrypt($plaintext, $keys, hex2bin($vector->nonce));
-                expect(hash('sha256', $payload))->toBe($vector->payload_sha256, 'Unable to properly encrypt long text');
-                
-                expect(NIP44::decrypt($payload, $keys))->toBe($plaintext, 'Unable to properly decrypt self encrypted payload');
-            }
-        });
+        })->with(vectors('nip44')->v2->valid->get_message_keys->keys);
+
+        it('can encrypt & decrypt', function ($vector) {
+            $key = Key::fromHex($vector->sec2);
+            $pub2 = $key(Key::public());
+
+            $privkey = Key::fromHex($vector->sec1);
+            $conversation_key = new NIP44\ConversationKey($privkey, hex2bin($pub2));
+            expect(bin2hex('' . $conversation_key))->toBe($vector->conversation_key);
+            $keys = $conversation_key();
+
+            expect(NIP44::decrypt($vector->payload, $keys))->toBe($vector->plaintext, 'Unable to properly decrypt vector payload');
+
+            $payload = NIP44::encrypt($vector->plaintext, $keys, hex2bin($vector->nonce));
+            expect(NIP44::decrypt($payload, $keys))->toBe($vector->plaintext, 'Unable to properly decrypt self encrypted payload');
+
+            expect($payload)->toBe($vector->payload, 'Unable to properly encrypt vector message');
+        })->with(vectors('nip44')->v2->valid->encrypt_decrypt);
+
+        it('can encrypt & decrypt long messages', function ($vector) {
+            $plaintext = str_repeat($vector->pattern, $vector->repeat);
+            expect(hash('sha256', $plaintext))->toBe($vector->plaintext_sha256);
+            $keys = new MessageKeys(hex2bin($vector->conversation_key));
+
+            $payload = NIP44::encrypt($plaintext, $keys, hex2bin($vector->nonce));
+            expect(hash('sha256', $payload))->toBe($vector->payload_sha256, 'Unable to properly encrypt long text');
+
+            expect(NIP44::decrypt($payload, $keys))->toBe($plaintext, 'Unable to properly decrypt self encrypted payload');
+        })->with(vectors('nip44')->v2->valid->encrypt_decrypt_long_msg);
     });
     
     
   describe('invalid', function() {
-    it('encrypt_msg_lengths', function() {
-      foreach (vectors('nip44')->v2->invalid->encrypt_msg_lengths as $vector) {
-                expect(fn() => NIP44::encrypt(str_repeat('a', $vector), new MessageKeys(random_bytes(32)), ''))->toThrow(\InvalidArgumentException::class, message: $vector);
-      }
+    it('encrypt_msg_lengths', function ($vector) {
+            expect(fn() => NIP44::encrypt(str_repeat('a', $vector), new MessageKeys(random_bytes(32)), ''))->toThrow(\InvalidArgumentException::class, message: $vector);
+        })->with(vectors('nip44')->v2->invalid->encrypt_msg_lengths);
+
+        it('decrypt', function ($vector) {
+            expect(fn() => NIP44::decrypt($vector->payload, new MessageKeys(hex2bin($vector->conversation_key))))->toThrow(\InvalidArgumentException::class, message: $vector->note);
+        })->with(vectors('nip44')->v2->invalid->decrypt);
+
+        it('get_conversation_key', function ($vector) {
+            $privkey = Key::fromHex($vector->sec1);
+            expect(fn() => $privkey(Key::sharedSecret($vector->pub2)))->toThrow(\InvalidArgumentException::class, message: $vector->note);
+        })->with(vectors('nip44')->v2->invalid->get_conversation_key);
     });
-    it('decrypt', function() {
-      foreach (vectors('nip44')->v2->invalid->decrypt as $vector) {
-                expect(fn() => NIP44::decrypt($vector->payload, new MessageKeys(hex2bin($vector->conversation_key))))->toThrow(\InvalidArgumentException::class, message: $vector->note);
-      }
-    });
-    it('get_conversation_key', function() {
-      foreach (vectors('nip44')->v2->invalid->get_conversation_key as $vector) {
-                $privkey = Key::fromHex($vector->sec1);
-        expect(fn() => $privkey(Key::sharedSecret($vector->pub2)))->toThrow(\InvalidArgumentException::class, message: $vector->note);
-      }
-    });
-  });
 });
 

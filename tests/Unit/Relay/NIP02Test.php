@@ -7,7 +7,7 @@ use function Pest\context;
 it('replaces replaceable (n == 3; follow list) events, keeping only the last one (based on pubkey & kind)', function () {
     $context = context();
     $kind = 3;
-    $sender_key = \Pest\key_sender();;
+    $sender_key = \Pest\key_sender();
     $original_event = Factory::event($sender_key, $kind, 'Hello World');
     Relay::handle($original_event, $context);
 
@@ -23,7 +23,7 @@ it('replaces replaceable (n == 3; follow list) events, keeping only the last one
 it('keeps replaceable (n == 3; follow list) events, when same created_at with lowest id (based on pubkey & kind)', function () {
     $context = context();
     $kind = 3;
-    $sender_key = \Pest\key_sender();;
+    $sender_key = \Pest\key_sender();
     $time = time();
     $event1 = Factory::eventAt($sender_key, $kind, 'Hello World', $time);
     $event2 = Factory::eventAt($sender_key, $kind, 'Updated: hello World', $time);

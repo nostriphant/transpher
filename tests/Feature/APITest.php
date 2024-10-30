@@ -6,7 +6,7 @@ use nostriphant\Transpher\Relay\InformationDocument;
 
 describe('relay', function () {
     it('sends an information document (NIP-11), when on a HTTP request', function() {
-        $owner_key = \Pest\key_sender();;
+        $owner_key = \Pest\key_sender();
         $agent_key = \Pest\key_recipient();
 
         $relay = Functions::bootRelay('127.0.0.1:8087', $env = [

@@ -54,7 +54,7 @@ foreach ($references as $tag => $value_callback) {
     it('SHOULD NOT delete or stop publishing any referenced (' . $tag . ') events that have an different pubkey as the deletion request.', function () use ($tag, $value_callback) {
         $context = context();
 
-        $sender_key = \Pest\key_sender();;
+        $sender_key = \Pest\key_sender();
         $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
         $referenced_value = $value_callback($message);
 
@@ -93,7 +93,7 @@ foreach ($references as $tag => $value_callback) {
 it('When an a tag is used, relays SHOULD delete all versions of the replaceable event up to the created_at timestamp of the deletion request event.', function () {
     $context = context();
 
-    $sender_key = \Pest\key_sender();;
+    $sender_key = \Pest\key_sender();
     $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
 
     Relay::handle($message, $context);

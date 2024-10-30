@@ -41,7 +41,7 @@ describe('REQ', function () {
     it('can handle a subscription request, for existing events', function () {
         $context = context();
 
-        $sender_key = \Pest\key_sender();;
+        $sender_key = \Pest\key_sender();
         $event = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
         Relay::handle($event, $context);
         expect($context->reply)->toHaveReceived(
@@ -61,7 +61,7 @@ describe('REQ', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 
-        $alice_key = \Pest\key_sender();;
+        $alice_key = \Pest\key_sender();
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello worlda!'));
 
         $key_charlie = \Pest\key_recipient();
@@ -82,7 +82,7 @@ describe('REQ', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
 
-        $alice_key = \Pest\key_sender();;
+        $alice_key = \Pest\key_sender();
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world!'));
         $subscription = Factory::subscribe(
                 new Filter(authors: [$alice_key(Key::public())])
@@ -100,7 +100,7 @@ describe('REQ', function () {
         $bob = Client::generic_client();
         $charlie = Client::generic_client();
 
-        $alice_key = \Pest\key_sender();;
+        $alice_key = \Pest\key_sender();
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world, from Alice!'));
 
         $bob_key = \Pest\key_recipient();
@@ -121,7 +121,7 @@ describe('REQ', function () {
     it('closes subscription and stop sending events to subscribers', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
-        $alice_key = \Pest\key_sender();;
+        $alice_key = \Pest\key_sender();
 
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world!'));
 
@@ -144,7 +144,7 @@ describe('REQ', function () {
     it('sends events to all clients subscribed on kind', function () {
         $alice = Client::generic_client();
         $bob = Client::generic_client();
-        $alice_key = \Pest\key_sender();;
+        $alice_key = \Pest\key_sender();
 
         $alice->sendSignedMessage(Factory::event($alice_key, 3, 'Hello world!'));
 
@@ -163,7 +163,7 @@ describe('REQ', function () {
 
         $context = context();
 
-        $alice_key = \Pest\key_sender();;
+        $alice_key = \Pest\key_sender();
 
         Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$alice_key(Key::public())]]]), $context);
         expect($context->reply)->toHaveReceived(
@@ -196,7 +196,7 @@ describe('REQ', function () {
 
         $alice = Client::persistent_client($transpher_store);
 
-        $alice_key = \Pest\key_sender();;
+        $alice_key = \Pest\key_sender();
         $alice->sendSignedMessage($alice_event = Factory::event($alice_key, 1, 'Hello wirld!'));
 
         $event_file = $transpher_store . DIRECTORY_SEPARATOR . $alice_event()[1]['id'] . '.php';

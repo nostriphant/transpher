@@ -11,7 +11,7 @@ use function Pest\context;
 it('replaces addressable (30000 <= n < 40000) events, keeping only the last one (based on pubkey, kind and d)', function () {
     $context = context();
 
-    $sender_key = \Pest\key_sender();;
+    $sender_key = \Pest\key_sender();
     for ($kind = 30000; $kind < 40000; $kind += rand(100, 5000)) {
         $original_event = Factory::event($sender_key, $kind, 'Hello World', ['d', 'my-d-tag-value']);
         Relay::handle($original_event, $context);
@@ -28,7 +28,7 @@ it('replaces addressable (30000 <= n < 40000) events, keeping only the last one 
 it('keeps addressable (30000 <= n < 40000) events, when same created_at with lowest id (based on pubkey, kind and d)', function () {
     $context = context();
 
-    $sender_key = \Pest\key_sender();;
+    $sender_key = \Pest\key_sender();
     for ($kind = 30000; $kind < 40000; $kind += 5000) {
         $time = time();
         $event1 = Factory::eventAt($sender_key, $kind, 'Hello World', $time, ['d', 'my-d-tag-value']);

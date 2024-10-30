@@ -7,33 +7,28 @@ use function Pest\context;
  * https://github.com/nostr-protocol/nips/commit/72bb8a128b2d7d3c2c654644cd68d0d0fe58a3b1#diff-8986f5dd399909df0ccb047d3bb1056061e74dcf25bc80af1cd52decf9358340
  */
 describe('REQ', function () {
+    it('sends events to all clients subscribed on tag', function ($tag, $tag_value) {
+        $context = context();
 
-    $tags = [
-        'p' => 'randomPTag',
-        'e' => 'randomETag',
-        'r' => 'randomRTag'
-    ];
-    foreach ($tags as $tag => $tag_value) {
-        it('sends events to all clients subscribed on ' . $tag . '-tag', function () use ($tag, $tag_value) {
-            $context = context();
+        $sender_key = \Pest\key_sender();
+        $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
+        Relay::handle($message, $context);
+        expect($context->reply)->toHaveReceived(
+                ['OK']
+        );
 
-            $sender_key = \Pest\key_sender();
-            $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
-            Relay::handle($message, $context);
-            expect($context->reply)->toHaveReceived(
-                    ['OK']
-            );
-
-            Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
-            expect($context->reply)->toHaveReceived(
-                    ['EVENT', $id, function (array $event) {
-                            expect($event['content'])->toBe('Hello World');
-                        }],
-                    ['EOSE', $id]
-            );
-        });
-    }
-
+        Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
+        expect($context->reply)->toHaveReceived(
+                ['EVENT', $id, function (array $event) {
+                        expect($event['content'])->toBe('Hello World');
+                    }],
+                ['EOSE', $id]
+        );
+    })->with([
+        ['p', 'randomPTag'],
+        ['e', 'randomETag'],
+        ['r', 'randomRTag']
+    ]);
 
     it('relays events to Bob, sent after they subscribed on Alices messages', function () {
         $context = context();

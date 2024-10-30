@@ -52,6 +52,7 @@ readonly class Key {
         try {
             $verification = (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->verify($pubkey, $signature, $message);
         } catch (\Throwable $e) {
+            file_append_contents(ROOT_DIR . '/logs/errors.log', $e->getFile() . '@' . $e->getLine() . ': ' . $e->getMessage() . '( ' . $signature . '  )' . PHP_EOL);
             $verification = false;
         }
         set_error_handler($reporting);

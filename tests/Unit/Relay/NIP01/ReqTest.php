@@ -95,27 +95,40 @@ describe('REQ', function () {
         $bob->start();
     });
 
-    it('sends events to Charly who uses two filters in their subscription', function () {
-        $alice = Client::generic_client();
-        $bob = Client::generic_client();
-        $charlie = Client::generic_client();
+    it('sends events to Charlie who uses two filters in their subscription', function () {
+        $context = context();
 
         $alice_key = \Pest\key_sender();
-        $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world, from Alice!'));
-
-        $bob_key = \Pest\key_recipient();
-        $alice->sendSignedMessage(Factory::event($bob_key, 1, 'Hello world, from Bob!'));
-
-        $subscription = Factory::subscribe(
-                new Filter(authors: [$alice_key(Key::public())]),
-                new Filter(authors: [$bob_key(Key::public())])
+        $event_alice = \nostriphant\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Hello world, from Alice!');
+        Relay::handle($event_alice, $context);
+        expect($context->reply)->toHaveReceived(
+                ['OK']
         );
-        $charlie->expectNostrEvent($subscription()[1], 'Hello world, from Alice!');
-        $charlie->expectNostrEvent($subscription()[1], 'Hello world, from Bob!');
-        $charlie->expectNostrEose($subscription()[1]);
 
-        $charlie->json($subscription());
-        $charlie->start();
+        $bob_key = Key::generate();
+        $event_bob = \nostriphant\Transpher\Nostr\Message\Factory::event($bob_key, 1, 'Hello world, from Bob!');
+        Relay::handle($event_bob, $context);
+        expect($context->reply)->toHaveReceived(
+                ['OK']
+        );
+
+        Relay::handle(json_encode([
+            'REQ',
+            $id = uniqid(), [
+                'authors' => [$alice_key(Key::public())]
+            ], [
+                'authors' => [$bob_key(Key::public())]
+    ]]), $context);
+
+        expect($context->reply)->toHaveReceived(
+                ['EVENT', $id, function (array $event) {
+                        expect($event['content'])->toBe('Hello world, from Alice!');
+                    }],
+                ['EVENT', $id, function (array $event) {
+                        expect($event['content'])->toBe('Hello world, from Bob!');
+                    }],
+                ['EOSE', $id]
+        );
     });
 
     it('closes subscription and stop sending events to subscribers', function () {

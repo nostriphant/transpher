@@ -1,7 +1,6 @@
 <?php
 
 use nostriphant\Transpher\Relay;
-use nostriphant\Transpher\Nostr\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use function Pest\context;
 
@@ -25,6 +24,7 @@ it('stores regular (4 <= n < 45) events', function () {
         $context = context();
         $event = Factory::event($sender_key, $kind, 'Hello World');
         Relay::handle($event, $context);
+
         expect($context->reply)->toHaveReceived(
                 ['OK', $event()[1]['id'], true, '']
         );

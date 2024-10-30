@@ -41,7 +41,7 @@ namespace {
                 if (is_callable($expected_part)) {
                     $expected_part($part);
                 } else {
-                    expect($part)->toBe($expected_part);
+                    expect($part)->toBe($expected_part, var_export($message(), true));
                 }
             }
         }

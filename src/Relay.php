@@ -50,7 +50,7 @@ class Relay implements WebsocketClientHandler {
         }
     }
 
-    static function handle(string $payload, Context $context) {
+    static function handle(string $payload, Context $context): void {
         try {
             $message = \nostriphant\Transpher\Nostr::decode($payload);
             $incoming = Relay\Incoming\Factory::make($message);

@@ -57,6 +57,6 @@ class Relay implements WebsocketClientHandler {
 
     static function handle(Nostr\Message $message, Context $context): void {
         $incoming = new Relay\Incoming($context);
-        each($incoming(...$message()), $context->reply);
+        each($incoming($message), $context->reply);
     }
 }

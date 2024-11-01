@@ -8,13 +8,14 @@ use nostriphant\Transpher\Relay\Condition;
 
 readonly class Event {
 
-    private \nostriphant\Transpher\Relay\Store $events;
-    private \nostriphant\Transpher\Relay\Subscriptions $subscriptions;
+    
     private \nostriphant\Transpher\Nostr\Event $event;
 
-    public function __construct(Context $context, array $message) {
-        $this->events = $context->events;
-        $this->subscriptions = $context->subscriptions;
+    public function __construct(
+            private \nostriphant\Transpher\Relay\Store $events,
+            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
+            array $message
+    ) {
         $this->event = new \nostriphant\Transpher\Nostr\Event(...$message[1]);
     }
 

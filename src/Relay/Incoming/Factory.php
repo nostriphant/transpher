@@ -12,15 +12,15 @@ readonly class Factory {
         $message = \nostriphant\Transpher\Nostr::decode($payload);
         switch (strtoupper($message[0])) {
             case 'EVENT':
-                $incoming = new Event($this->context, $message);
+                $incoming = new Event($this->context->events, $this->context->subscriptions, $message);
                 break;
 
             case 'CLOSE':
-                $incoming = new Close($this->context, $message);
+                $incoming = new Close($this->context->subscriptions, $message);
                 break;
 
             case 'REQ':
-                $incoming = new Req($this->context, $message);
+                $incoming = new Req($this->context->events, $this->context->subscriptions, $this->context->relay, $message);
                 break;
 
             default:

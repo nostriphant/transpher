@@ -15,20 +15,18 @@ use function \Functional\map,
  */
 readonly class Req {
 
-    private \nostriphant\Transpher\Relay\Store $events;
-    private \nostriphant\Transpher\Relay\Subscriptions $subscriptions;
-    private \nostriphant\Transpher\Relay\Sender $relay;
     private string $subscription_id;
     private array $filters;
 
-    public function __construct(Context $context, array $message) {
+    public function __construct(
+            private \nostriphant\Transpher\Relay\Store $events,
+            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
+            private \nostriphant\Transpher\Relay\Sender $relay,
+            array $message
+    ) {
         if (count($message) < 3) {
             throw new \InvalidArgumentException('Invalid message');
         }
-
-        $this->events = $context->events;
-        $this->subscriptions = $context->subscriptions;
-        $this->relay = $context->relay;
 
         $this->subscription_id = $message[1];
         $this->filters = array_filter(array_slice($message, 2));

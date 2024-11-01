@@ -11,15 +11,13 @@ use nostriphant\Transpher\Nostr\Message\Factory;
  */
 readonly class Close {
 
-    private \nostriphant\Transpher\Relay\Subscriptions $subscriptions;
     private string $subscription_id;
 
-    public function __construct(Context $context, array $message) {
+    public function __construct(private \nostriphant\Transpher\Relay\Subscriptions $subscriptions, array $message) {
         if (count($message) < 2) {
             throw new \InvalidArgumentException('Missing subscription ID');
         }
 
-        $this->subscriptions = $context->subscriptions;
         $this->subscription_id = $message[1];
     }
 

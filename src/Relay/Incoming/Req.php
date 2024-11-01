@@ -8,11 +8,6 @@ use function \Functional\map,
  \Functional\partial_left,
              \Functional\if_else;
 
-/**
- * Description of Req
- *
- * @author rmeijer
- */
 readonly class Req implements Type {
 
     public function __construct(
@@ -25,22 +20,20 @@ readonly class Req implements Type {
     }
 
     #[\Override]
-    public function __invoke(array $message): \Generator {
-        if (count($message) < 3) {
+    public function __invoke(array $payload): \Generator {
+        if (count($payload) < 2) {
             throw new \InvalidArgumentException('Invalid message');
         }
 
-        $subscription_id = $message[1];
-        $filter_prototypes = array_filter(array_slice($message, 2));
+        $filter_prototypes = array_filter(array_slice($payload, 1));
 
         if (count($filter_prototypes) === 0) {
-            yield Factory::closed($subscription_id, 'Subscription filters are empty');
+            yield Factory::closed($payload[0], 'Subscription filters are empty');
         } else {
             $filters = Condition::makeFiltersFromPrototypes(...$filter_prototypes);
-            ($this->subscriptions)($subscription_id, if_else($filters, fn() => $this->relay, fn() => false));
-            $subscribed_events = fn(string $subscriptionId) => map(($this->events)($filters), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
-            yield from $subscribed_events($subscription_id);
-            yield Factory::eose($subscription_id);
+            ($this->subscriptions)($payload[0], if_else($filters, fn() => $this->relay, fn() => false));
+            yield from map(($this->events)($filters), partial_left([Factory::class, 'requestedEvent'], $payload[0]));
+            yield Factory::eose($payload[0]);
         }
     }
 }

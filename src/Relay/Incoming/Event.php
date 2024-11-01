@@ -16,8 +16,8 @@ readonly class Event implements Type {
     }
 
     #[\Override]
-    public function __invoke(array $message): \Generator {
-        $event = new \nostriphant\Transpher\Nostr\Event(...$message[1]);
+    public function __invoke(array $payload): \Generator {
+        $event = new \nostriphant\Transpher\Nostr\Event(...$payload[0]);
 
         if (\nostriphant\Transpher\Nostr\Event::verify($event) === false) {
             yield Factory::ok($event->id, false, 'invalid:signature is wrong');

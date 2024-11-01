@@ -12,15 +12,15 @@ readonly class Factory {
         $message = \nostriphant\Transpher\Nostr::decode($payload);
         switch (strtoupper($message[0])) {
             case 'EVENT':
-                $incoming = Event::fromMessage($message);
+                $incoming = new Event($message);
                 break;
 
             case 'CLOSE':
-                $incoming = Close::fromMessage($message);
+                $incoming = new Close($message);
                 break;
 
             case 'REQ':
-                $incoming = Req::fromMessage($message);
+                $incoming = new Req($message);
                 break;
 
             default:

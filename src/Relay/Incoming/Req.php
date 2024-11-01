@@ -1,7 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher\Relay\Incoming;
-use nostriphant\Transpher\Relay\Incoming;
+
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Relay\Condition;
 use function \Functional\map,
@@ -13,24 +13,20 @@ use function \Functional\map,
  *
  * @author rmeijer
  */
-readonly class Req implements Incoming {
+readonly class Req {
 
+    private string $subscription_id;
     private array $filters;
 
-    public function __construct(private string $subscription_id, array ...$filters) {
-        $this->filters = array_filter($filters);
-    }
-
-    #[\Override]
-    static function fromMessage(array $message): self {
+    public function __construct(array $message) {
         if (count($message) < 3) {
             throw new \InvalidArgumentException('Invalid message');
         }
 
-        return new self(...array_slice($message, 1));
+        $this->subscription_id = $message[1];
+        $this->filters = array_filter(array_slice($message, 2));
     }
 
-    #[\Override]
     public function __invoke(Context $context): \Generator {
         if (count($this->filters) === 0) {
             yield Factory::closed($this->subscription_id, 'Subscription filters are empty');

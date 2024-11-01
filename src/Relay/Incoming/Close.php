@@ -1,7 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher\Relay\Incoming;
-use nostriphant\Transpher\Relay\Incoming;
+
 use nostriphant\Transpher\Nostr\Message\Factory;
 
 /**
@@ -9,22 +9,17 @@ use nostriphant\Transpher\Nostr\Message\Factory;
  *
  * @author rmeijer
  */
-readonly class Close implements Incoming {
+readonly class Close {
+    private string $subscription_id;
 
-    public function __construct(private string $subscription_id) {
-        
-    }
-
-    #[\Override]
-    static function fromMessage(array $message): self {
+    public function __construct(array $message) {
         if (count($message) < 2) {
             throw new \InvalidArgumentException('Missing subscription ID');
         }
 
-        return new self($message[1]);
+        $this->subscription_id = $message[1];
     }
 
-    #[\Override]
     public function __invoke(Context $context): \Generator {
         ($context->subscriptions)($this->subscription_id);
         yield Factory::closed($this->subscription_id);

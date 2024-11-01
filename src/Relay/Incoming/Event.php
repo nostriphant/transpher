@@ -6,18 +6,14 @@ use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Event\KindClass;
 use nostriphant\Transpher\Relay\Condition;
 
-readonly class Event implements \nostriphant\Transpher\Relay\Incoming {
+readonly class Event {
 
-    public function __construct(private \nostriphant\Transpher\Nostr\Event $event) {
-        
+    private \nostriphant\Transpher\Nostr\Event $event;
+
+    public function __construct(array $message) {
+        $this->event = new \nostriphant\Transpher\Nostr\Event(...$message[1]);
     }
 
-    #[\Override]
-    static function fromMessage(array $message): self {
-        return new self(new \nostriphant\Transpher\Nostr\Event(...$message[1]));
-    }
-
-    #[\Override]
     public function __invoke(Context $context): \Generator {
         if (\nostriphant\Transpher\Nostr\Event::verify($this->event) === false) {
             yield Factory::ok($this->event->id, false, 'invalid:signature is wrong');

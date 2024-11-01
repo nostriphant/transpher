@@ -18,8 +18,7 @@ it('SHOULD delete or stop publishing any referenced events that have an identica
     $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
     $referenced_value = $value_callback($message);
 
-    $recipient = \Pest\handle($message, $context);
-    expect($recipient)->toHaveReceived(
+    expect(\Pest\handle($message, $context))->toHaveReceived(
             ['OK']
     );
 
@@ -32,8 +31,7 @@ it('SHOULD delete or stop publishing any referenced events that have an identica
     );
 
     $delete_event = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 5, 'sent by accident', [$tag, $referenced_value]);
-    $recipient = \Pest\handle($delete_event, $context);
-    expect($recipient)->toHaveReceived(
+    expect(\Pest\handle($delete_event, $context))->toHaveReceived(
             ['OK', $delete_event()[1]['id'], true]
     );
 

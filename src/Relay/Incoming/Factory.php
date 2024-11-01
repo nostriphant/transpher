@@ -4,7 +4,12 @@ namespace nostriphant\Transpher\Relay\Incoming;
 
 readonly class Factory {
 
-    static function make(array $message): \nostriphant\Transpher\Relay\Incoming {
+    public function __construct(private Context $context) {
+        
+    }
+
+    public function __invoke(string $payload): \Generator {
+        $message = \nostriphant\Transpher\Nostr::decode($payload);
         switch (strtoupper($message[0])) {
             case 'EVENT':
                 $incoming = Event::fromMessage($message);
@@ -22,6 +27,6 @@ readonly class Factory {
                 throw new \InvalidArgumentException('Message type ' . $message[0] . ' not supported');
         }
 
-        return $incoming;
+        yield from $incoming($this->context);
     }
 }

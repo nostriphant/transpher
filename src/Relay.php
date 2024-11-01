@@ -51,10 +51,9 @@ class Relay implements WebsocketClientHandler {
     }
 
     static function handle(string $payload, Context $context): void {
+        $factory = new Relay\Incoming\Factory($context);
         try {
-            $message = \nostriphant\Transpher\Nostr::decode($payload);
-            $incoming = Relay\Incoming\Factory::make($message);
-            each($incoming($context), $context->reply);
+            each($factory($payload), $context->reply);
         } catch (\InvalidArgumentException $ex) {
             ($context->reply)(Factory::notice($ex->getMessage()));
         }

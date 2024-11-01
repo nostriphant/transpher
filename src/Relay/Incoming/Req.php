@@ -15,33 +15,32 @@ use function \Functional\map,
  */
 readonly class Req implements Type {
 
-    private string $subscription_id;
-    private array $filters;
-
     public function __construct(
             private \nostriphant\Transpher\Relay\Store $events,
             private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
             private \nostriphant\Transpher\Relay\Sender $relay,
-            array $message
+            
     ) {
+        
+    }
+
+    #[\Override]
+    public function __invoke(array $message): \Generator {
         if (count($message) < 3) {
             throw new \InvalidArgumentException('Invalid message');
         }
 
-        $this->subscription_id = $message[1];
-        $this->filters = array_filter(array_slice($message, 2));
-    }
+        $subscription_id = $message[1];
+        $filter_prototypes = array_filter(array_slice($message, 2));
 
-    #[\Override]
-    public function __invoke(): \Generator {
-        if (count($this->filters) === 0) {
-            yield Factory::closed($this->subscription_id, 'Subscription filters are empty');
+        if (count($filter_prototypes) === 0) {
+            yield Factory::closed($subscription_id, 'Subscription filters are empty');
         } else {
-            $filters = Condition::makeFiltersFromPrototypes(...$this->filters);
-            ($this->subscriptions)($this->subscription_id, if_else($filters, fn() => $this->relay, fn() => false));
+            $filters = Condition::makeFiltersFromPrototypes(...$filter_prototypes);
+            ($this->subscriptions)($subscription_id, if_else($filters, fn() => $this->relay, fn() => false));
             $subscribed_events = fn(string $subscriptionId) => map(($this->events)($filters), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
-            yield from $subscribed_events($this->subscription_id);
-            yield Factory::eose($this->subscription_id);
+            yield from $subscribed_events($subscription_id);
+            yield Factory::eose($subscription_id);
         }
     }
 }

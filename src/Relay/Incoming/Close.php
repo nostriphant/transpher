@@ -11,19 +11,18 @@ use nostriphant\Transpher\Nostr\Message\Factory;
  */
 readonly class Close implements Type {
 
-    private string $subscription_id;
+    public function __construct(private \nostriphant\Transpher\Relay\Subscriptions $subscriptions) {
+        
+    }
 
-    public function __construct(private \nostriphant\Transpher\Relay\Subscriptions $subscriptions, array $message) {
+    #[\Override]
+    public function __invoke(array $message): \Generator {
         if (count($message) < 2) {
             throw new \InvalidArgumentException('Missing subscription ID');
         }
 
-        $this->subscription_id = $message[1];
-    }
-
-    #[\Override]
-    public function __invoke(): \Generator {
-        ($this->subscriptions)($this->subscription_id);
-        yield Factory::closed($this->subscription_id);
+        $subscription_id = $message[1];
+        ($this->subscriptions)($subscription_id);
+        yield Factory::closed($subscription_id);
     }
 }

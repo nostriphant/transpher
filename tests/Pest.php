@@ -77,22 +77,25 @@ namespace Pest {
         return key('nsec1dm444kv7gug4ge7sjms8c8ym3dqhdz44x3jhq0mcq9eqftw9krxqymj9qk');
     }
 
-    function context(array $events = [], array &$subscriptions = []): Context {
+    function relay(): \nostriphant\Transpher\Relay\Sender {
+        return new class implements \nostriphant\Transpher\Relay\Sender {
+
+            public array $messages = [];
+
+            #[\Override]
+            public function __invoke(mixed $json): bool {
+                $this->messages[] = $json;
+                return true;
+            }
+        };
+    }
+
+    function context(array $events = [], array &$subscriptions = [], ?\nostriphant\Transpher\Relay\Sender $relay = null): Context {
         return new Context(
-                subscriptions: new \nostriphant\Transpher\Relay\Subscriptions($subscriptions),
+                subscriptions: new \nostriphant\Transpher\Relay\Subscriptions($subscriptions, $relay ?? relay()),
                 events: new class($events) implements \nostriphant\Transpher\Relay\Store {
 
                     use \nostriphant\Transpher\Nostr\Store;
-                },
-                relay: new class implements \nostriphant\Transpher\Relay\Sender {
-
-                    public array $messages = [];
-
-                    #[\Override]
-                    public function __invoke(mixed $json): bool {
-                        $this->messages[] = $json;
-                        return true;
-                    }
                 }
         );
     }

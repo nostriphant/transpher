@@ -31,7 +31,8 @@ describe('REQ', function () {
     ]);
 
     it('relays events to Bob, sent after they subscribed on Alices messages', function () {
-        $context = context();
+        $relay = \Pest\relay();
+        $context = context(relay: $relay);
         $tag = 'p';
         $tag_value = uniqid();
 
@@ -43,7 +44,7 @@ describe('REQ', function () {
         $sender_key = \Pest\key_sender();
         $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
         $recipient = \Pest\handle($message, $context);
-        expect($context->relay)->toHaveReceived(
+        expect($relay)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
                     }],

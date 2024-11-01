@@ -173,7 +173,8 @@ describe('REQ', function () {
 
     it('relays events to Bob, sent after they subscribed on Alices messages', function () {
 
-        $context = context();
+        $relay = \Pest\relay();
+        $context = context(relay: $relay);
 
         $alice_key = \Pest\key_sender();
 
@@ -194,7 +195,7 @@ describe('REQ', function () {
         expect($recipient)->toHaveReceived(
                 ['OK']
         );
-        expect($context->relay)->toHaveReceived(
+        expect($relay)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Relayable Hello worlda!');
                     }],

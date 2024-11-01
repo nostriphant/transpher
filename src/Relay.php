@@ -40,8 +40,7 @@ class Relay implements WebsocketClientHandler {
         $this->gateway->addClient($client);
         $wrapped_client = SendNostr::send($client, $this->log);
         $client_context = Context::merge(new Context(
-                        subscriptions: new Relay\Subscriptions($this->subscriptions),
-                        relay: $wrapped_client
+                        subscriptions: new Relay\Subscriptions($this->subscriptions, $wrapped_client)
                 ), $this->context);
         foreach ($client as $message) {
             $payload = (string) $message;

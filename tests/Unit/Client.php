@@ -3,7 +3,6 @@
 namespace nostriphant\TranspherTests\Unit;
 
 use Amp\Websocket\WebsocketMessage;
-use nostriphant\Transpher\Relay\Incoming\Context;
 
 class Client extends \nostriphant\TranspherTests\Client {
 

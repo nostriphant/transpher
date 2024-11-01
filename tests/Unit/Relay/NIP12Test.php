@@ -17,7 +17,7 @@ describe('REQ', function () {
                 ['OK']
         );
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
         expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -35,7 +35,7 @@ describe('REQ', function () {
         $tag = 'p';
         $tag_value = uniqid();
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
         expect($context->reply)->toHaveReceived(
                 ['EOSE', $id],
         );
@@ -64,7 +64,7 @@ describe('REQ', function () {
             new \nostriphant\Transpher\Nostr\Event(...$message()[1])
         ]);
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {

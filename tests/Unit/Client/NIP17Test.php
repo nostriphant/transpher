@@ -20,7 +20,7 @@ it('relays private direct messsage from alice to bob', function (): void {
             ['OK']
     );
 
-    Relay::handle(json_encode(['REQ', $subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]]), $context);
+    Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), $context);
     expect($context->reply)->toHaveReceived(
             ['EVENT', $subscriptionId, function (array $gift) use ($bob_key) {
                     expect($gift['kind'])->toBe(1059);

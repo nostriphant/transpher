@@ -13,7 +13,7 @@ describe('REQ', function () {
     it('replies NOTICE Invalid message on non-existing filters', function () {
         $context = context();
 
-        Relay::handle(json_encode(['REQ']), $context);
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ'), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['NOTICE', 'Invalid message']
@@ -22,7 +22,7 @@ describe('REQ', function () {
     it('replies CLOSED on empty filters', function () {
         $context = context();
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), []]), $context);
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), []), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['CLOSED', $id, 'Subscription filters are empty']
@@ -31,7 +31,7 @@ describe('REQ', function () {
     it('can handle a subscription request, for non existing events', function () {
         $context = context();
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['ids' => ['abdcd']]]), $context);
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['ids' => ['abdcd']]), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['EOSE', $id]
@@ -48,7 +48,7 @@ describe('REQ', function () {
                 ['OK']
         );
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
         expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -112,13 +112,13 @@ describe('REQ', function () {
                 ['OK']
         );
 
-        Relay::handle(json_encode([
-            'REQ',
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message(
+                        'REQ',
             $id = uniqid(), [
                 'authors' => [$alice_key(Key::public())]
             ], [
                 'authors' => [$bob_key(Key::public())]
-    ]]), $context);
+    ]), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
@@ -178,7 +178,7 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$alice_key(Key::public())]]]), $context);
+        Relay::handle(new nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['authors' => [$alice_key(Key::public())]]), $context);
         expect($context->reply)->toHaveReceived(
                 ['EOSE', $id]
         );

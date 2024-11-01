@@ -18,9 +18,10 @@ readonly class Close implements Type {
     #[\Override]
     public function __invoke(array $payload): \Generator {
         if (count($payload) < 1) {
-            throw new \InvalidArgumentException('Missing subscription ID');
+            yield Factory::notice('Missing subscription ID');
+        } else {
+            ($this->subscriptions)($payload[0]);
+            yield Factory::closed($payload[0]);
         }
-        ($this->subscriptions)($payload[0]);
-        yield Factory::closed($payload[0]);
     }
 }

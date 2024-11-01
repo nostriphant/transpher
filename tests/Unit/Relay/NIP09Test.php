@@ -23,7 +23,7 @@ it('SHOULD delete or stop publishing any referenced events that have an identica
             ['OK']
     );
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
+    Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
     expect($context->reply)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
@@ -40,7 +40,7 @@ it('SHOULD delete or stop publishing any referenced events that have an identica
     expect(isset($context->events[$delete_event()[1]['id']]))->toBeTrue();
     expect(isset($context->events[$message()[1]['id']]))->toBeFalse();
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
+    Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
     expect($context->reply)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('sent by accident');
@@ -62,7 +62,7 @@ it('SHOULD NOT delete or stop publishing any referenced events that have an diff
             ['OK']
     );
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
+    Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
     expect($context->reply)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
@@ -79,7 +79,7 @@ it('SHOULD NOT delete or stop publishing any referenced events that have an diff
     expect(isset($context->events[$delete_event()[1]['id']]))->toBeTrue();
     expect(isset($context->events[$message()[1]['id']]))->toBeTrue();
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
+    Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
     expect($context->reply)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
@@ -99,7 +99,7 @@ it('When an a tag is used, relays SHOULD delete all versions of the replaceable 
             ['OK']
     );
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
+    Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
     expect($context->reply)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
@@ -116,7 +116,7 @@ it('When an a tag is used, relays SHOULD delete all versions of the replaceable 
     expect(isset($context->events[$delete_event()[1]['id']]))->toBeTrue();
     expect(isset($context->events[$message()[1]['id']]))->toBeTrue();
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())], 'kinds' => [1]]]), $context);
+    Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())], 'kinds' => [1]]), $context);
     expect($context->reply)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');

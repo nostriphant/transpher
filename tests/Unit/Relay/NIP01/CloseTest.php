@@ -7,7 +7,7 @@ describe('CLOSE', function () {
     it('responds with a NOTICE on missing subscription-id', function () {
         $context = context();
 
-        Relay::handle(json_encode(['CLOSE']), $context);
+        Relay::handle(new \nostriphant\Transpher\Nostr\Message('CLOSE'), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['NOTICE', 'Missing subscription ID']

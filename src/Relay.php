@@ -47,16 +47,16 @@ class Relay implements WebsocketClientHandler {
         foreach ($client as $message) {
             $payload = (string) $message;
             $this->log->debug('Received message: ' . $payload);
-            self::handle($payload, $client_context);
+            try {
+                self::handle(new Nostr\Message(...\nostriphant\Transpher\Nostr::decode($payload)), $client_context);
+            } catch (\InvalidArgumentException $ex) {
+                $wrapped_client(Factory::notice($ex->getMessage()));
+            }
         }
     }
 
-    static function handle(string $payload, Context $context): void {
-        try {
-            $incoming = new Relay\Incoming($context);
-            each($incoming(...\nostriphant\Transpher\Nostr::decode($payload)), $context->reply);
-        } catch (\InvalidArgumentException $ex) {
-            ($context->reply)(Factory::notice($ex->getMessage()));
-        }
+    static function handle(Nostr\Message $message, Context $context): void {
+        $incoming = new Relay\Incoming($context);
+        each($incoming(...$message()), $context->reply);
     }
 }

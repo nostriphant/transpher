@@ -62,8 +62,11 @@ namespace {
 */
 namespace Pest {
 
-    use nostriphant\Transpher\Relay\Incoming\Context;
     use nostriphant\Transpher\Nostr\Key;
+    use nostriphant\Transpher\Nostr\Event;
+    use nostriphant\Transpher\Nostr\Message;
+    use nostriphant\Transpher\Relay\Incoming;
+    use nostriphant\Transpher\Relay\Sender;
 
     function key(string $nsec): Key {
         return Key::fromBech32($nsec);
@@ -77,8 +80,8 @@ namespace Pest {
         return key('nsec1dm444kv7gug4ge7sjms8c8ym3dqhdz44x3jhq0mcq9eqftw9krxqymj9qk');
     }
 
-    function relay(): \nostriphant\Transpher\Relay\Sender {
-        return new class implements \nostriphant\Transpher\Relay\Sender {
+    function relay(): Sender {
+        return new class implements Sender {
 
             public array $messages = [];
 
@@ -90,21 +93,25 @@ namespace Pest {
         };
     }
 
-    function context(array $events = [], array &$subscriptions = [], ?\nostriphant\Transpher\Relay\Sender $relay = null): Context {
-        return new Context(
-                subscriptions: new \nostriphant\Transpher\Relay\Subscriptions($subscriptions, $relay ?? relay()),
-                events: new class($events) implements \nostriphant\Transpher\Relay\Store {
+    function subscriptions(array &$subscriptions = [], ?Sender $relay = null) {
+        return new \nostriphant\Transpher\Relay\Subscriptions($subscriptions, $relay ?? relay());
+    }
 
-                    use \nostriphant\Transpher\Nostr\Store;
-                }
-        );
+    function store(array $events = []) {
+        return new class($events) implements \nostriphant\Transpher\Relay\Store {
+
+            use \nostriphant\Transpher\Nostr\Store;
+        };
+    }
+
+    function incoming(?\nostriphant\Transpher\Relay\Store $store = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null) {
+        return new Incoming($store ?? store(), $subscriptions ?? subscriptions());
     }
 
     function vectors(string $name): object {
         return json_decode(file_get_contents(__DIR__ . '/vectors/' . $name . '.json'), false);
     }
 
-    use nostriphant\Transpher\Nostr\Event;
 
     function event(array $event): Event {
         return new Event(...array_merge([
@@ -118,12 +125,8 @@ namespace Pest {
                         ], $event));
     }
 
-    use nostriphant\Transpher\Nostr\Message;
-    use nostriphant\Transpher\Relay\Incoming;
-
-    function handle(Message $message, Context $context): \nostriphant\Transpher\Relay\Sender {
-        $incoming = new Incoming($context);
-        \Functional\each($incoming($message), $to = new class implements \nostriphant\Transpher\Relay\Sender {
+    function handle(Message $message, ?Incoming $incoming = null): Sender {
+        \Functional\each(($incoming ?? incoming())($message), $to = new class implements \nostriphant\Transpher\Relay\Sender {
 
                     public array $messages = [];
 

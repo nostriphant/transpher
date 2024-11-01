@@ -1,27 +1,26 @@
 <?php
 
-use nostriphant\Transpher\Relay;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Key;
-use function Pest\context;
+use function Pest\incoming;
 
 /**
  * https://github.com/nostr-protocol/nips/commit/72bb8a128b2d7d3c2c654644cd68d0d0fe58a3b1#diff-13387ea5b220b50dc20daca792c07b3b3d2b278dcafc8f134e4369468cab6440
  */
 it('replaces addressable (30000 <= n < 40000) events, keeping only the last one (based on pubkey, kind and d)', function () {
     function replaceAddressable(Key $sender_key, int $kind) {
-        $context = context();
+        $store = \Pest\store();
 
         $original_event = Factory::event($sender_key, $kind, 'Hello World', ['d', 'my-d-tag-value']);
-        $recipient = \Pest\handle($original_event, $context);
+        $recipient = \Pest\handle($original_event, incoming(store: $store));
 
-        expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
+        expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
         $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100, ['d', 'my-d-tag-value']);
-        $recipient = \Pest\handle($updated_event, $context);
+        $recipient = \Pest\handle($updated_event, incoming(store: $store));
 
-        expect(isset($context->events[$original_event()[1]['id']]))->ToBeFalse();
-        expect(isset($context->events[$updated_event()[1]['id']]))->toBeTrue();
+        expect(isset($store[$original_event()[1]['id']]))->ToBeFalse();
+        expect(isset($store[$updated_event()[1]['id']]))->toBeTrue();
     }
 
     $sender_key = \Pest\key_sender();
@@ -31,7 +30,7 @@ it('replaces addressable (30000 <= n < 40000) events, keeping only the last one 
 });
 it('keeps addressable (30000 <= n < 40000) events, when same created_at with lowest id (based on pubkey, kind and d)', function () {
     function keepAddressable(Key $sender_key, int $kind) {
-        $context = context();
+        $store = \Pest\store();
 
         $time = time();
         $event1 = Factory::eventAt($sender_key, $kind, 'Hello World', $time, ['d', 'my-d-tag-value']);
@@ -44,14 +43,14 @@ it('keeps addressable (30000 <= n < 40000) events, when same created_at with low
             $updated_event = $event1;
         }
 
-        $recipient = \Pest\handle($original_event, $context);
+        $recipient = \Pest\handle($original_event, incoming(store: $store));
 
-        expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
+        expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
-        $recipient = \Pest\handle($updated_event, $context);
+        $recipient = \Pest\handle($updated_event, incoming(store: $store));
 
-        expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
-        expect(isset($context->events[$updated_event()[1]['id']]))->toBeFalse();
+        expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
+        expect(isset($store[$updated_event()[1]['id']]))->toBeFalse();
     }
 
     $sender_key = \Pest\key_sender();

@@ -9,7 +9,7 @@ use nostriphant\Transpher\Nostr\Message\Factory;
  *
  * @author rmeijer
  */
-readonly class Close {
+readonly class Close implements Type {
 
     private string $subscription_id;
 
@@ -21,6 +21,7 @@ readonly class Close {
         $this->subscription_id = $message[1];
     }
 
+    #[\Override]
     public function __invoke(): \Generator {
         ($this->subscriptions)($this->subscription_id);
         yield Factory::closed($this->subscription_id);

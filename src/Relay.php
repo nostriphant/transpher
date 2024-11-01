@@ -2,6 +2,7 @@
 
 namespace nostriphant\Transpher;
 
+
 use function \Functional\each;
 use \Psr\Log\LoggerInterface;
 use \nostriphant\Transpher\Relay;
@@ -51,9 +52,9 @@ class Relay implements WebsocketClientHandler {
     }
 
     static function handle(string $payload, Context $context): void {
-        $factory = new Relay\Incoming\Factory($context);
         try {
-            each($factory($payload), $context->reply);
+            $incoming = new Relay\Incoming($context);
+            each($incoming(\nostriphant\Transpher\Nostr::decode($payload)), $context->reply);
         } catch (\InvalidArgumentException $ex) {
             ($context->reply)(Factory::notice($ex->getMessage()));
         }

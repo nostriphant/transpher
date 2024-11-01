@@ -13,7 +13,7 @@ use function \Functional\map,
  *
  * @author rmeijer
  */
-readonly class Req {
+readonly class Req implements Type {
 
     private string $subscription_id;
     private array $filters;
@@ -32,6 +32,7 @@ readonly class Req {
         $this->filters = array_filter(array_slice($message, 2));
     }
 
+    #[\Override]
     public function __invoke(): \Generator {
         if (count($this->filters) === 0) {
             yield Factory::closed($this->subscription_id, 'Subscription filters are empty');

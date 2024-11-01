@@ -6,9 +6,8 @@ use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Event\KindClass;
 use nostriphant\Transpher\Relay\Condition;
 
-readonly class Event {
+readonly class Event implements Type {
 
-    
     private \nostriphant\Transpher\Nostr\Event $event;
 
     public function __construct(
@@ -19,6 +18,7 @@ readonly class Event {
         $this->event = new \nostriphant\Transpher\Nostr\Event(...$message[1]);
     }
 
+    #[\Override]
     public function __invoke(): \Generator {
         if (\nostriphant\Transpher\Nostr\Event::verify($this->event) === false) {
             yield Factory::ok($this->event->id, false, 'invalid:signature is wrong');

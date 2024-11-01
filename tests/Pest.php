@@ -93,16 +93,6 @@ namespace Pest {
                         $this->messages[] = $json;
                         return true;
                     }
-                },
-                reply: new class implements \nostriphant\Transpher\Relay\Sender {
-
-                    public array $messages = [];
-
-                    #[\Override]
-                    public function __invoke(mixed $json): bool {
-                        $this->messages[] = $json;
-                        return true;
-                    }
                 }
         );
     }

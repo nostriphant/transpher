@@ -15,13 +15,12 @@ it('relays private direct messsage from alice to bob', function (): void {
     $bob_key = \Pest\key_recipient();
     $event = \nostriphant\Transpher\Nostr\Message\Factory::privateDirect($alice_key, $bob_key(Key::public(Key\Format::HEXIDECIMAL)), 'Hello!!');
 
-    \Pest\handle($event, $context);
-    expect($context->reply)->toHaveReceived(
+    expect(\Pest\handle($event, $context))->toHaveReceived(
             ['OK']
     );
 
-    \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), $context);
+    expect($recipient)->toHaveReceived(
             ['EVENT', $subscriptionId, function (array $gift) use ($bob_key) {
                     expect($gift['kind'])->toBe(1059);
 

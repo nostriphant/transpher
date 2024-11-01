@@ -128,9 +128,19 @@ namespace Pest {
     use nostriphant\Transpher\Nostr\Message;
     use nostriphant\Transpher\Relay\Incoming;
 
-    function handle(Message $message, Context $context) {
+    function handle(Message $message, Context $context): \nostriphant\Transpher\Relay\Sender {
         $incoming = new Incoming($context);
-        \Functional\each($incoming($message), $context->reply);
+        \Functional\each($incoming($message), $to = new class implements \nostriphant\Transpher\Relay\Sender {
+
+                    public array $messages = [];
+
+                    #[\Override]
+                    public function __invoke(mixed $json): bool {
+                        $this->messages[] = $json;
+                        return true;
+                    }
+                });
+        return $to;
     }
 
 }

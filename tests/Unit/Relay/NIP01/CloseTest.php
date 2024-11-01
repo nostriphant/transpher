@@ -7,9 +7,9 @@ describe('CLOSE', function () {
     it('responds with a NOTICE on missing subscription-id', function () {
         $context = context();
 
-        \Pest\handle(new \nostriphant\Transpher\Nostr\Message('CLOSE'), $context);
+        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('CLOSE'), $context);
 
-        expect($context->reply)->toHaveReceived(
+        expect($recipient)->toHaveReceived(
                 ['NOTICE', 'Missing subscription ID']
         );
     });

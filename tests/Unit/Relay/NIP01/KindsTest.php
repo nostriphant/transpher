@@ -12,7 +12,7 @@ describe('Kinds (https://nips.nostr.com/1#kinds)', function () {
 
         $sender_key = \Pest\key_sender();
         $event = Factory::event($sender_key, -1, 'Hello World');
-        Relay::handle($event, $context);
+        \Pest\handle($event, $context);
 
         expect($context->reply)->toHaveReceived(
                 ['NOTICE', 'Undefined event kind -1']

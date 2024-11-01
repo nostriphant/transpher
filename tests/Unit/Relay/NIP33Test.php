@@ -13,12 +13,12 @@ it('replaces addressable (30000 <= n < 40000) events, keeping only the last one 
         $context = context();
 
         $original_event = Factory::event($sender_key, $kind, 'Hello World', ['d', 'my-d-tag-value']);
-        Relay::handle($original_event, $context);
+        \Pest\handle($original_event, $context);
 
         expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
 
         $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100, ['d', 'my-d-tag-value']);
-        Relay::handle($updated_event, $context);
+        \Pest\handle($updated_event, $context);
 
         expect(isset($context->events[$original_event()[1]['id']]))->ToBeFalse();
         expect(isset($context->events[$updated_event()[1]['id']]))->toBeTrue();
@@ -44,11 +44,11 @@ it('keeps addressable (30000 <= n < 40000) events, when same created_at with low
             $updated_event = $event1;
         }
 
-        Relay::handle($original_event, $context);
+        \Pest\handle($original_event, $context);
 
         expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
 
-        Relay::handle($updated_event, $context);
+        \Pest\handle($updated_event, $context);
 
         expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
         expect(isset($context->events[$updated_event()[1]['id']]))->toBeFalse();

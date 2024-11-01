@@ -125,4 +125,12 @@ namespace Pest {
                         ], $event));
     }
 
+    use nostriphant\Transpher\Nostr\Message;
+    use nostriphant\Transpher\Relay\Incoming;
+
+    function handle(Message $message, Context $context) {
+        $incoming = new Incoming($context);
+        \Functional\each($incoming($message), $context->reply);
+    }
+
 }

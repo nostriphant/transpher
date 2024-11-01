@@ -12,12 +12,12 @@ describe('REQ', function () {
 
         $sender_key = \Pest\key_sender();
         $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
-        Relay::handle($message, $context);
+        \Pest\handle($message, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']
         );
 
-        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
+        \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
         expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -35,14 +35,14 @@ describe('REQ', function () {
         $tag = 'p';
         $tag_value = uniqid();
 
-        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
+        \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
         expect($context->reply)->toHaveReceived(
                 ['EOSE', $id],
         );
 
         $sender_key = \Pest\key_sender();
         $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
-        Relay::handle($message, $context);
+        \Pest\handle($message, $context);
         expect($context->relay)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -64,7 +64,7 @@ describe('REQ', function () {
             new \nostriphant\Transpher\Nostr\Event(...$message()[1])
         ]);
 
-        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
+        \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {

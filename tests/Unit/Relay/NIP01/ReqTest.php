@@ -13,7 +13,7 @@ describe('REQ', function () {
     it('replies NOTICE Invalid message on non-existing filters', function () {
         $context = context();
 
-        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ'), $context);
+        \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ'), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['NOTICE', 'Invalid message']
@@ -22,7 +22,7 @@ describe('REQ', function () {
     it('replies CLOSED on empty filters', function () {
         $context = context();
 
-        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), []), $context);
+        \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), []), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['CLOSED', $id, 'Subscription filters are empty']
@@ -31,7 +31,7 @@ describe('REQ', function () {
     it('can handle a subscription request, for non existing events', function () {
         $context = context();
 
-        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['ids' => ['abdcd']]), $context);
+        \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['ids' => ['abdcd']]), $context);
 
         expect($context->reply)->toHaveReceived(
                 ['EOSE', $id]
@@ -43,12 +43,12 @@ describe('REQ', function () {
 
         $sender_key = \Pest\key_sender();
         $event = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
-        Relay::handle($event, $context);
+        \Pest\handle($event, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']
         );
 
-        Relay::handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
+        \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
         expect($context->reply)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -100,19 +100,19 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
         $event_alice = \nostriphant\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Hello world, from Alice!');
-        Relay::handle($event_alice, $context);
+        \Pest\handle($event_alice, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']
         );
 
         $bob_key = Key::generate();
         $event_bob = \nostriphant\Transpher\Nostr\Message\Factory::event($bob_key, 1, 'Hello world, from Bob!');
-        Relay::handle($event_bob, $context);
+        \Pest\handle($event_bob, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']
         );
 
-        Relay::handle(new \nostriphant\Transpher\Nostr\Message(
+        \Pest\handle(new \nostriphant\Transpher\Nostr\Message(
                         'REQ',
             $id = uniqid(), [
                 'authors' => [$alice_key(Key::public())]
@@ -178,20 +178,20 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
 
-        Relay::handle(new nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['authors' => [$alice_key(Key::public())]]), $context);
+        \Pest\handle(new nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['authors' => [$alice_key(Key::public())]]), $context);
         expect($context->reply)->toHaveReceived(
                 ['EOSE', $id]
         );
 
         $key_charlie = \Pest\key_recipient();
         $event_charlie = \nostriphant\Transpher\Nostr\Message\Factory::event($key_charlie, 1, 'Hello world!');
-        Relay::handle($event_charlie, $context);
+        \Pest\handle($event_charlie, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']
         );
 
         $event = \nostriphant\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Relayable Hello worlda!');
-        Relay::handle($event, $context);
+        \Pest\handle($event, $context);
         expect($context->reply)->toHaveReceived(
                 ['OK']
         );

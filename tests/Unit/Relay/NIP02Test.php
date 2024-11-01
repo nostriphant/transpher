@@ -9,12 +9,12 @@ it('replaces replaceable (n == 3; follow list) events, keeping only the last one
     $kind = 3;
     $sender_key = \Pest\key_sender();
     $original_event = Factory::event($sender_key, $kind, 'Hello World');
-    Relay::handle($original_event, $context);
+    \Pest\handle($original_event, $context);
 
     expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
 
     $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100);
-    Relay::handle($updated_event, $context);
+    \Pest\handle($updated_event, $context);
 
     expect(isset($context->events[$original_event()[1]['id']]))->ToBeFalse();
     expect(isset($context->events[$updated_event()[1]['id']]))->toBeTrue();
@@ -35,11 +35,11 @@ it('keeps replaceable (n == 3; follow list) events, when same created_at with lo
         $updated_event = $event1;
     }
 
-    Relay::handle($original_event, $context);
+    \Pest\handle($original_event, $context);
 
     expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
 
-    Relay::handle($updated_event, $context);
+    \Pest\handle($updated_event, $context);
 
     expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
     expect(isset($context->events[$updated_event()[1]['id']]))->toBeFalse();

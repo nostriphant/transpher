@@ -12,7 +12,7 @@ it('stores regular (1000 <= n < 10000) events', function () {
     for ($kind = 1000; $kind < 10000; $kind += 5000) {
         $context = context();
         $event = Factory::event($sender_key, $kind, 'Hello World');
-        Relay::handle($event, $context);
+        \Pest\handle($event, $context);
 
         expect(isset($context->events[$event()[1]['id']]))->toBeTrue();
     }
@@ -23,7 +23,7 @@ it('stores regular (4 <= n < 45) events', function () {
     for ($kind = 4; $kind < 45; $kind++) {
         $context = context();
         $event = Factory::event($sender_key, $kind, 'Hello World');
-        Relay::handle($event, $context);
+        \Pest\handle($event, $context);
 
         expect($context->reply)->toHaveReceived(
                 ['OK', $event()[1]['id'], true, '']
@@ -37,7 +37,7 @@ it('stores regular (n == 1 || n == 2) events', function () {
     for ($kind = 1; $kind < 3; $kind++) {
         $context = context();
         $event = Factory::event($sender_key, $kind, 'Hello World');
-        Relay::handle($event, $context);
+        \Pest\handle($event, $context);
 
         expect(isset($context->events[$event()[1]['id']]))->toBeTrue();
     }
@@ -49,12 +49,12 @@ it('replaces replaceable (10000 <= n < 20000) events, keeping only the last one 
         $context = context();
 
         $original_event = Factory::event($sender_key, $kind, 'Hello World');
-        Relay::handle($original_event, $context);
+        \Pest\handle($original_event, $context);
 
         expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
 
         $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100);
-        Relay::handle($updated_event, $context);
+        \Pest\handle($updated_event, $context);
 
         expect(isset($context->events[$original_event()[1]['id']]))->ToBeFalse();
         expect(isset($context->events[$updated_event()[1]['id']]))->toBeTrue();
@@ -77,11 +77,11 @@ it('keeps replaceable (10000 <= n < 20000) events, when same created_at with low
             $updated_event = $event1;
         }
 
-        Relay::handle($original_event, $context);
+        \Pest\handle($original_event, $context);
 
         expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
 
-        Relay::handle($updated_event, $context);
+        \Pest\handle($updated_event, $context);
 
         expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
         expect(isset($context->events[$updated_event()[1]['id']]))->toBeFalse();
@@ -93,12 +93,12 @@ it('replaces replaceable (n == 0) events, keeping only the last one (based on pu
     $kind = 0;
     $sender_key = \Pest\key_sender();
     $original_event = Factory::event($sender_key, $kind, 'Hello World');
-    Relay::handle($original_event, $context);
+    \Pest\handle($original_event, $context);
 
     expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
 
     $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100);
-    Relay::handle($updated_event, $context);
+    \Pest\handle($updated_event, $context);
 
     expect(isset($context->events[$original_event()[1]['id']]))->ToBeFalse();
     expect(isset($context->events[$updated_event()[1]['id']]))->toBeTrue();
@@ -118,11 +118,11 @@ it('keeps replaceable (n == 0) events, when same created_at with lowest id (base
         $updated_event = $event1;
     }
 
-    Relay::handle($original_event, $context);
+    \Pest\handle($original_event, $context);
 
     expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
 
-    Relay::handle($updated_event, $context);
+    \Pest\handle($updated_event, $context);
 
     expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
     expect(isset($context->events[$updated_event()[1]['id']]))->toBeFalse();
@@ -134,7 +134,7 @@ it('does not store ephemeral (20000 <= kind < 30000) events', function () {
         $context = context();
 
         $event = Factory::event($sender_key, $kind, 'Hello World');
-        Relay::handle($event, $context);
+        \Pest\handle($event, $context);
 
         expect(isset($context->events[$event()[1]['id']]))->toBeFalse();
     }

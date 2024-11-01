@@ -1,6 +1,5 @@
 <?php
 
-use nostriphant\Transpher\Relay;
 use nostriphant\Transpher\Nostr\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Subscription\Filter;
@@ -22,7 +21,7 @@ describe('REQ', function () {
     it('replies CLOSED on empty filters', function () {
         $context = context();
 
-        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), []), $context);
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), []), $context);
 
         expect($recipient)->toHaveReceived(
                 ['CLOSED', $id, 'Subscription filters are empty']
@@ -31,7 +30,7 @@ describe('REQ', function () {
     it('can handle a subscription request, for non existing events', function () {
         $context = context();
 
-        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['ids' => ['abdcd']]), $context);
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['ids' => ['abdcd']]), $context);
 
         expect($recipient)->toHaveReceived(
                 ['EOSE', $id]
@@ -48,7 +47,7 @@ describe('REQ', function () {
                 ['OK']
         );
 
-        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['authors' => [$sender_key(Key::public())]]), $context);
         expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');

@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Message\Factory;
 use function Pest\context;
 
 /**
@@ -17,7 +17,7 @@ describe('REQ', function () {
                 ['OK']
         );
 
-        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
         expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -35,7 +35,7 @@ describe('REQ', function () {
         $tag = 'p';
         $tag_value = uniqid();
 
-        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
         expect($recipient)->toHaveReceived(
                 ['EOSE', $id],
         );
@@ -64,7 +64,7 @@ describe('REQ', function () {
             new \nostriphant\Transpher\Nostr\Event(...$message()[1])
         ]);
 
-        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), $context);
 
         expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {

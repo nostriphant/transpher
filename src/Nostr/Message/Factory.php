@@ -49,6 +49,11 @@ class Factory {
     static function accept(string $eventId, string $message = ''): Message {
         return self::ok($eventId, true, $message);
     }
+
+    static function req(string $subscription_id, array ...$filters) {
+        return self::message('REQ', $subscription_id, ...$filters);
+    }
+
     static function notice(string $message): Message {
         return self::message('NOTICE', $message);
     }
@@ -61,7 +66,7 @@ class Factory {
     }
     
     static function subscribe(Filter ...$filters): Message {
-        return self::message('REQ', bin2hex(random_bytes(32)), ...map($filters, fn(Filter $filter) => $filter->conditions));
+        return self::req(bin2hex(random_bytes(32)), ...map($filters, fn(Filter $filter) => $filter->conditions));
     }
 
     static function requestedEvent(string $subscriptionId, Event $event): Message {

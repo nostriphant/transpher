@@ -1,7 +1,7 @@
 <?php
 
 use nostriphant\Transpher\Nostr\Key;
-use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Event\Gift;
 use nostriphant\Transpher\Nostr\Event\Seal;
 use function \Pest\context;
@@ -19,7 +19,7 @@ it('relays private direct messsage from alice to bob', function (): void {
             ['OK']
     );
 
-    $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ', $subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), $context);
+    $recipient = \Pest\handle(Factory::req($subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), $context);
     expect($recipient)->toHaveReceived(
             ['EVENT', $subscriptionId, function (array $gift) use ($bob_key) {
                     expect($gift['kind'])->toBe(1059);

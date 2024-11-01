@@ -15,25 +15,32 @@ use function \Functional\map,
  */
 readonly class Req {
 
+    private \nostriphant\Transpher\Relay\Store $events;
+    private \nostriphant\Transpher\Relay\Subscriptions $subscriptions;
+    private \nostriphant\Transpher\Relay\Sender $relay;
     private string $subscription_id;
     private array $filters;
 
-    public function __construct(array $message) {
+    public function __construct(Context $context, array $message) {
         if (count($message) < 3) {
             throw new \InvalidArgumentException('Invalid message');
         }
+
+        $this->events = $context->events;
+        $this->subscriptions = $context->subscriptions;
+        $this->relay = $context->relay;
 
         $this->subscription_id = $message[1];
         $this->filters = array_filter(array_slice($message, 2));
     }
 
-    public function __invoke(Context $context): \Generator {
+    public function __invoke(): \Generator {
         if (count($this->filters) === 0) {
             yield Factory::closed($this->subscription_id, 'Subscription filters are empty');
         } else {
             $filters = Condition::makeFiltersFromPrototypes(...$this->filters);
-            ($context->subscriptions)($this->subscription_id, if_else($filters, fn() => $context->relay, fn() => false));
-            $subscribed_events = fn(string $subscriptionId) => map(($context->events)($filters), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
+            ($this->subscriptions)($this->subscription_id, if_else($filters, fn() => $this->relay, fn() => false));
+            $subscribed_events = fn(string $subscriptionId) => map(($this->events)($filters), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
             yield from $subscribed_events($this->subscription_id);
             yield Factory::eose($this->subscription_id);
         }

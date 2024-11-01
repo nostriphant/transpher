@@ -12,21 +12,21 @@ readonly class Factory {
         $message = \nostriphant\Transpher\Nostr::decode($payload);
         switch (strtoupper($message[0])) {
             case 'EVENT':
-                $incoming = new Event($message);
+                $incoming = new Event($this->context, $message);
                 break;
 
             case 'CLOSE':
-                $incoming = new Close($message);
+                $incoming = new Close($this->context, $message);
                 break;
 
             case 'REQ':
-                $incoming = new Req($message);
+                $incoming = new Req($this->context, $message);
                 break;
 
             default:
                 throw new \InvalidArgumentException('Message type ' . $message[0] . ' not supported');
         }
 
-        yield from $incoming($this->context);
+        yield from $incoming();
     }
 }

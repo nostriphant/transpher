@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Relay\Incoming;
 
-use function \Functional\first;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Event\KindClass;
 use nostriphant\Transpher\Relay\Condition;

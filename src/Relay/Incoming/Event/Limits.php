@@ -14,7 +14,8 @@ readonly class Limits {
             int $created_at_lower_delta = (60 * 60 * 24),
             int $created_at_upper_delta = (60 * 15),
             ?array $kind_whitelist = null,
-            ?array $kind_blacklist = null
+            ?array $kind_blacklist = null,
+            ?int $content_maxlength = null
     ) {
         $checks = [
             'signature is wrong' => fn(Event $event): bool => Event::verify($event) === false
@@ -31,6 +32,9 @@ readonly class Limits {
         }
         if (isset($kind_blacklist)) {
             $checks['event kind is blacklisted'] = fn(Event $event): bool => in_array($event->kind, $kind_blacklist);
+        }
+        if (isset($content_maxlength)) {
+            $checks['content is longer than ' . $content_maxlength . ' bytes'] = fn(Event $event): bool => mb_strlen($event->content) > $content_maxlength;
         }
 
         $this->checks = $checks;

@@ -26,3 +26,16 @@ it('can be configured for event kinds to always deny. Leave empty to allow any.'
     $limit = $limits(\Pest\rumor(kind: 2, pubkey: \Pest\pubkey_sender())(\Pest\key_sender()));
     expect($limit->result)->toBe(Result::ACCEPTED, $limit->reason ?? '');
 });
+
+
+it('can be configured for event content max limit.', function () {
+    $limits = new Limits(
+            content_maxlength: 10
+    );
+
+    $limit = $limits(\Pest\rumor(kind: 1, content: str_repeat('a', 11), pubkey: \Pest\pubkey_sender())(\Pest\key_sender()));
+    expect($limit->result)->toBe(Result::REJECTED, $limit->reason ?? 'content is longer than 10 bytes');
+
+    $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender())(\Pest\key_sender()));
+    expect($limit->result)->toBe(Result::ACCEPTED, $limit->reason ?? '');
+});

@@ -11,7 +11,7 @@ readonly class Event implements Type {
     public function __construct(
             private \nostriphant\Transpher\Relay\Store $events,
             private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
-            private Event\Constraints $constraints = new Event\Constraints()
+            private Event\Limits $constraints = new Event\Limits()
     ) {
         
     }

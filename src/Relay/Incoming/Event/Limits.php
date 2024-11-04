@@ -6,7 +6,7 @@ use nostriphant\Transpher\Relay\Incoming\Constraint;
 use nostriphant\Transpher\Nostr\Event;
 use nostriphant\Transpher\Nostr\Event\KindClass;
 
-readonly class Constraints {
+readonly class Limits {
 
     public function __construct(
             private int $created_at_lower_delta = (60 * 60 * 24),

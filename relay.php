@@ -33,7 +33,7 @@ $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data';
 is_dir($store_path) || mkdir($store_path);
 $events = new nostriphant\Transpher\Directory($store_path);
 
-$clientHandler = new \nostriphant\Transpher\Relay($events, $logger);
+$clientHandler = new \nostriphant\Transpher\Relay(new \nostriphant\Transpher\Relay\Incoming($events), $logger);
 
 $router = new Router($server, $logger, $errorHandler);
 $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler)));

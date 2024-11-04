@@ -104,8 +104,8 @@ namespace Pest {
         };
     }
 
-    function incoming(?\nostriphant\Transpher\Relay\Store $store = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null) {
-        return new Incoming($store ?? store(), $subscriptions ?? subscriptions());
+    function incoming(?\nostriphant\Transpher\Relay\Store $store = null) {
+        return new Incoming($store ?? store());
     }
 
     function vectors(string $name): object {
@@ -125,8 +125,8 @@ namespace Pest {
                         ], $event));
     }
 
-    function handle(Message $message, ?Incoming $incoming = null): Sender {
-        \Functional\each(($incoming ?? incoming())($message), $to = new class implements \nostriphant\Transpher\Relay\Sender {
+    function handle(Message $message, ?Incoming $incoming = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null): Sender {
+        \Functional\each(($incoming ?? incoming())($subscriptions ?? subscriptions(), $message), $to = new class implements \nostriphant\Transpher\Relay\Sender {
 
                     public array $messages = [];
 

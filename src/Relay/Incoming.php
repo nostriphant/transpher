@@ -8,15 +8,15 @@ use nostriphant\Transpher\Nostr\Message;
 
 readonly class Incoming {
 
-    public function __construct(private Store $events, private Subscriptions $subscriptions) {
+    public function __construct(private Store $events) {
         
     }
 
-    public function __invoke(Message $message): \Generator {
+    public function __invoke(Subscriptions $subscriptions, Message $message): \Generator {
         yield from (match (strtoupper($message->type)) {
-                    'EVENT' => new Incoming\Event($this->events, $this->subscriptions),
-                    'CLOSE' => new Incoming\Close($this->subscriptions),
-                    'REQ' => new Incoming\Req($this->events, $this->subscriptions),
+                    'EVENT' => new Incoming\Event($this->events, $subscriptions),
+                    'CLOSE' => new Incoming\Close($subscriptions),
+                    'REQ' => new Incoming\Req($this->events, $subscriptions),
                     default => new Incoming\Unknown($message->type)
                 })($message->payload);
     }

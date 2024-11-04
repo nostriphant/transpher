@@ -39,14 +39,14 @@ describe('REQ', function () {
         $tag = 'p';
         $tag_value = uniqid();
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: $store, subscriptions: $subscriptions));
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: $store), subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['EOSE', $id],
         );
 
         $sender_key = \Pest\key_sender();
         $message = Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
-        $recipient = \Pest\handle($message, incoming(store: $store, subscriptions: $subscriptions));
+        $recipient = \Pest\handle($message, incoming(store: $store), subscriptions: $subscriptions);
         expect($relay)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');

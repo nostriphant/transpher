@@ -100,14 +100,14 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
         $event_alice = Factory::event($alice_key, 1, 'Hello world, from Alice!');
-        $recipient = \Pest\handle($event_alice, incoming(store: $store, subscriptions: $subscriptions));
+        $recipient = \Pest\handle($event_alice, incoming(store: $store), subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
         $bob_key = Key::generate();
         $event_bob = Factory::event($bob_key, 1, 'Hello world, from Bob!');
-        $recipient = \Pest\handle($event_bob, incoming(store: $store, subscriptions: $subscriptions));
+        $recipient = \Pest\handle($event_bob, incoming(store: $store), subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['OK']
         );
@@ -116,7 +116,7 @@ describe('REQ', function () {
                     'authors' => [$alice_key(Key::public())]
             ], [
                 'authors' => [$bob_key(Key::public())]
-        ]), incoming(store: $store, subscriptions: $subscriptions));
+        ]), incoming(store: $store), subscriptions: $subscriptions);
 
         expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
@@ -177,7 +177,7 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['authors' => [$alice_key(Key::public())]]), incoming(store: $store, subscriptions: $subscriptions));
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['authors' => [$alice_key(Key::public())]]), incoming(store: $store), subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['EOSE', $id]
         );
@@ -190,7 +190,7 @@ describe('REQ', function () {
         );
 
         $event = Factory::event($alice_key, 1, 'Relayable Hello worlda!');
-        $recipient = \Pest\handle($event, incoming(store: $store, subscriptions: $subscriptions));
+        $recipient = \Pest\handle($event, incoming(store: $store), subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['OK']
         );

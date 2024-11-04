@@ -22,10 +22,7 @@ class Client extends \nostriphant\TranspherTests\Client {
 
     static function generic_client(bool $reset = false): self {
         if ($reset || isset(self::$generic_relay) === false) {
-            $events = new class([]) implements \nostriphant\Transpher\Relay\Store {
-
-                use \nostriphant\Transpher\Nostr\Store;
-            };
+            $events = \Pest\store([]);
             self::$generic_relay = new \nostriphant\Transpher\Relay(
                     $events,
                     \Mockery::spy(\Psr\Log\LoggerInterface::class)

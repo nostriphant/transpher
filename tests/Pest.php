@@ -100,7 +100,7 @@ namespace Pest {
     function store(array $events = []) {
         return new class($events) implements \nostriphant\Transpher\Relay\Store {
 
-            use \nostriphant\Transpher\Nostr\Store;
+            use \nostriphant\Transpher\Relay\Store\Memory;
         };
     }
 

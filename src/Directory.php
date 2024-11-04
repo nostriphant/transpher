@@ -4,14 +4,9 @@ namespace nostriphant\Transpher;
 
 use nostriphant\Transpher\Nostr\Event;
 
-/**
- * Description of Directory
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 class Directory implements Relay\Store {
 
-    use Nostr\Store {
+    use Relay\Store\Memory {
         offsetSet as eventsOffsetSet;
         offsetUnset as eventsOffsetUnset;
         __construct as eventsConstructor;

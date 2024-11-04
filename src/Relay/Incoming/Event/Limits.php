@@ -41,7 +41,7 @@ readonly class Limits {
 
             $content_maxlength_check = fn(Event $event): bool => mb_strlen($event->content) > $content_maxlength[0];
             if (count($content_maxlength) === 2) {
-                $content_maxlength_check = fn(Event $event): bool => $event->kind === $content_maxlength[1] && $content_maxlength_check($event);
+                $content_maxlength_check = fn(Event $event): bool => $event->kind === (int) $content_maxlength[1] && $content_maxlength_check($event);
             } elseif (count($content_maxlength) === 3) {
                 $content_maxlength_check = fn(Event $event): bool => in_range($event->kind, $content_maxlength[1], $content_maxlength[2]) && $content_maxlength_check($event);
             }
@@ -49,6 +49,25 @@ readonly class Limits {
         }
 
         $this->checks = $checks;
+    }
+
+    static function fromEnv(): self {
+        $arguments = [];
+        $environment_variables = getenv(null);
+        foreach ((new \ReflectionMethod(__CLASS__, '__construct'))->getParameters() as $parameter) {
+            $parameter_name = $parameter->getName();
+            $env_var_name = 'LIMIT_EVENT_' . strtoupper($parameter_name);
+            if (isset($environment_variables[$env_var_name]) === false) {
+                continue;
+            }
+
+            if (str_contains($parameter->getType(), 'array')) {
+                $arguments[$parameter_name] = explode(',', $environment_variables[$env_var_name]);
+            } else {
+                $arguments[$parameter_name] = $environment_variables[$env_var_name];
+            }
+        }
+        return new self(...$arguments);
     }
 
     private static function secondsTohuman(int $amount): string {

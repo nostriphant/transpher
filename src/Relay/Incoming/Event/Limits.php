@@ -11,7 +11,8 @@ readonly class Limits {
     public function __construct(
             private int $created_at_lower_delta = (60 * 60 * 24),
             private int $created_at_upper_delta = (60 * 15),
-            private ?array $kind_whitelist = null
+            private ?array $kind_whitelist = null,
+            private ?array $kind_blacklist = null
     ) {
 
     }
@@ -47,6 +48,8 @@ readonly class Limits {
         } elseif (Event::determineClass($event) !== KindClass::REGULAR && ($now - $this->created_at_lower_delta > $event->created_at || $event->created_at > $now + $this->created_at_upper_delta)) {
             return Constraint::reject('the event created_at field is out of the acceptable range (-' . self::secondsTohuman($this->created_at_lower_delta) . ', +' . self::secondsTohuman($this->created_at_upper_delta) . ') for this relay');
         } elseif (isset($this->kind_whitelist) && in_array($event->kind, $this->kind_whitelist) === false) {
+            return Constraint::reject('event kind is not whitelisted');
+        } elseif (isset($this->kind_blacklist) && in_array($event->kind, $this->kind_blacklist) === true) {
             return Constraint::reject('event kind is not whitelisted');
         }
         return Constraint::accept();

@@ -34,14 +34,18 @@ readonly class Limits {
             $checks['event kind is blacklisted'] = fn(Event $event): bool => in_array($event->kind, $kind_blacklist);
         }
 
-        if (is_int($content_maxlength)) {
-            $checks['content is longer than ' . $content_maxlength . ' bytes'] = fn(Event $event): bool => mb_strlen($event->content) > $content_maxlength;
-        } elseif (is_array($content_maxlength) === false) {
-            
-        } elseif (count($content_maxlength) === 2) {
-            $checks['content is longer than ' . $content_maxlength[0] . ' bytes'] = fn(Event $event): bool => $event->kind === $content_maxlength[1] && mb_strlen($event->content) > $content_maxlength[0];
-        } elseif (count($content_maxlength) === 3) {
-            $checks['content is longer than ' . $content_maxlength[0] . ' bytes'] = fn(Event $event): bool => in_range($event->kind, $content_maxlength[1], $content_maxlength[2]) && mb_strlen($event->content) > $content_maxlength[0];
+        if (isset($content_maxlength)) {
+            if (is_int($content_maxlength)) {
+                $content_maxlength = [$content_maxlength];
+            }
+
+            $content_maxlength_check = fn(Event $event): bool => mb_strlen($event->content) > $content_maxlength[0];
+            if (count($content_maxlength) === 2) {
+                $content_maxlength_check = fn(Event $event): bool => $event->kind === $content_maxlength[1] && $content_maxlength_check($event);
+            } elseif (count($content_maxlength) === 3) {
+                $content_maxlength_check = fn(Event $event): bool => in_range($event->kind, $content_maxlength[1], $content_maxlength[2]) && $content_maxlength_check($event);
+            }
+            $checks['content is longer than ' . $content_maxlength[0] . ' bytes'] = $content_maxlength_check;
         }
 
         $this->checks = $checks;

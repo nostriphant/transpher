@@ -76,8 +76,16 @@ namespace Pest {
         return key('nsec15udyzkfk7twhpdmhu5syc4lqm7dxmll0jxeu0rq65f89gaewx0ps89derx');
     }
 
+    function pubkey_sender(Key\Format $format = Key\Format::HEXIDECIMAL): string {
+        return key_sender()(Key::public($format));
+    }
+
     function key_recipient(): Key {
         return key('nsec1dm444kv7gug4ge7sjms8c8ym3dqhdz44x3jhq0mcq9eqftw9krxqymj9qk');
+    }
+
+    function pubkey_recipient(Key\Format $format = Key\Format::HEXIDECIMAL): string {
+        return key_recipient()(Key::public($format));
     }
 
     function relay(): Sender {
@@ -112,6 +120,15 @@ namespace Pest {
         return json_decode(file_get_contents(__DIR__ . '/vectors/' . $name . '.json'), false);
     }
 
+    function rumor(?int $created_at = null, ?string $pubkey = '', ?int $kind = 0, ?string $content = '', ?array $tags = []): \nostriphant\Transpher\Nostr\Rumor {
+        return new \nostriphant\Transpher\Nostr\Rumor(
+                $created_at ?? time(),
+                $pubkey,
+                $kind,
+                $content,
+                $tags
+        );
+    }
 
     function event(array $event): Event {
         return new Event(...array_merge([

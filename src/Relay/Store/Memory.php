@@ -1,11 +1,12 @@
 <?php
 
 
-namespace nostriphant\Transpher\Nostr;
+namespace nostriphant\Transpher\Relay\Store;
 
 use function \Functional\select;
+use nostriphant\Transpher\Nostr\Filters;
 
-trait Store {
+trait Memory {
 
     public function __construct(private array $events) {
 

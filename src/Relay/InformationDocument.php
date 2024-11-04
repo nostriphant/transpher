@@ -15,7 +15,7 @@ class InformationDocument {
             "description" => $description,
             "pubkey" => \nostriphant\Transpher\Nostr\Bech32::fromNpub($npub),
             "contact" => $contact,
-            "supported_nips" => [1, 2, 9, 11, 12, 16, 20, 33],
+            "supported_nips" => [1, 2, 9, 11, 12, 16, 20, 22, 33],
             "software" => 'Transpher',
             "version" => 'dev'
         ];

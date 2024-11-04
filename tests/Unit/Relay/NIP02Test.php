@@ -1,27 +1,28 @@
 <?php
 
-use nostriphant\Transpher\Relay;
 use nostriphant\Transpher\Nostr\Message\Factory;
-use function Pest\context;
+use function Pest\incoming;
 
 it('replaces replaceable (n == 3; follow list) events, keeping only the last one (based on pubkey & kind)', function () {
-    $context = context();
+    $store = \Pest\store();
+
     $kind = 3;
     $sender_key = \Pest\key_sender();
     $original_event = Factory::event($sender_key, $kind, 'Hello World');
-    Relay::handle($original_event, $context);
+    $recipient = \Pest\handle($original_event, incoming(store: $store));
 
-    expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
+    expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
     $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100);
-    Relay::handle($updated_event, $context);
+    $recipient = \Pest\handle($updated_event, incoming(store: $store));
 
-    expect(isset($context->events[$original_event()[1]['id']]))->ToBeFalse();
-    expect(isset($context->events[$updated_event()[1]['id']]))->toBeTrue();
+    expect(isset($store[$original_event()[1]['id']]))->ToBeFalse();
+    expect(isset($store[$updated_event()[1]['id']]))->toBeTrue();
 });
 
 it('keeps replaceable (n == 3; follow list) events, when same created_at with lowest id (based on pubkey & kind)', function () {
-    $context = context();
+    $store = \Pest\store();
+
     $kind = 3;
     $sender_key = \Pest\key_sender();
     $time = time();
@@ -35,12 +36,12 @@ it('keeps replaceable (n == 3; follow list) events, when same created_at with lo
         $updated_event = $event1;
     }
 
-    Relay::handle($original_event, $context);
+    $recipient = \Pest\handle($original_event, incoming(store: $store));
 
-    expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
+    expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
-    Relay::handle($updated_event, $context);
+    $recipient = \Pest\handle($updated_event, incoming(store: $store));
 
-    expect(isset($context->events[$original_event()[1]['id']]))->toBeTrue();
-    expect(isset($context->events[$updated_event()[1]['id']]))->toBeFalse();
+    expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
+    expect(isset($store[$updated_event()[1]['id']]))->toBeFalse();
 });

@@ -3,6 +3,7 @@
 namespace nostriphant\TranspherTests;
 
 use nostriphant\Transpher\Nostr;
+use nostriphant\Transpher\Nostr\Message;
 
 /**
  * Description of Client
@@ -22,23 +23,23 @@ class Client extends \nostriphant\Transpher\Client {
     }
     
     public function expectNostrOK(string $eventId) {
-        $this->expected_messages[] = ['OK', function (array $message) use ($eventId) {
-                expect($message[0])->toBe($eventId);
-            expect($message[1])->toBeTrue();
-        }];
+        $this->expected_messages[] = ['OK', function (array $payload) use ($eventId) {
+                expect($payload[0])->toBe($eventId);
+                expect($payload[1])->toBeTrue();
+            }];
     }
     public function expectNostrEvent(string $subscriptionId, string $content) {
-        $this->expected_messages[] = ['EVENT', function (array $message) use ($subscriptionId, $content) {
-                expect($message[0])->toBe($subscriptionId);
-            expect($message[1]['content'])->toBe($content);
-        }];
+        $this->expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $content) {
+                expect($payload[0])->toBe($subscriptionId);
+                expect($payload[1]['content'])->toBe($content);
+            }];
     }
     public function expectNostrPrivateDirectMessage(string $subscriptionId, Nostr\Key $recipient_key, string $message_content) {
-        $this->expected_messages[] = ['EVENT', function (array $message) use ($subscriptionId, $recipient_key, $message_content) {
-                expect($message[0])->toBe($subscriptionId);
-            
-            $gift = $message[1];
-            expect($gift['kind'])->toBe(1059);
+        $this->expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $message_content) {
+                expect($payload[0])->toBe($subscriptionId);
+
+                $gift = $payload[1];
+                expect($gift['kind'])->toBe(1059);
             
             $seal = Nostr\Event\Gift::unwrap($recipient_key, $gift['pubkey'], $gift['content']);
             expect($seal['kind'])->toBe(13);
@@ -54,20 +55,20 @@ class Client extends \nostriphant\Transpher\Client {
         $this->expectNostrEose($subscriptionId);
     }
     public function expectNostrEose(string $subscriptionId) {
-        $this->expected_messages[] = ['EOSE', function (array $message) use ($subscriptionId) {
-                expect($message[0])->toBe($subscriptionId);
-        }];
+        $this->expected_messages[] = ['EOSE', function (array $payload) use ($subscriptionId) {
+                expect($payload[0])->toBe($subscriptionId);
+            }];
     }
     public function expectNostrNotice(string $expectedMessage) {
-        $this->expected_messages[] = ['NOTICE', function (array $message) use ($expectedMessage) {
-                expect($message[0])->toBe($expectedMessage);
-        }];
+        $this->expected_messages[] = ['NOTICE', function (array $payload) use ($expectedMessage) {
+                expect($payload[0])->toBe($expectedMessage);
+            }];
     }
     public function expectNostrClosed(string $subscriptionId, string $expected_message) {
-        $this->expected_messages[] = ['CLOSED', function (array $message) use ($subscriptionId, $expected_message) {
-                expect($message[0])->toBe($subscriptionId);
-            expect($message[1])->toBe($expected_message);
-        }];
+        $this->expected_messages[] = ['CLOSED', function (array $payload) use ($subscriptionId, $expected_message) {
+                expect($payload[0])->toBe($subscriptionId);
+                expect($payload[1])->toBe($expected_message);
+            }];
     }
     
     public function sendSignedMessage(Nostr\Message $signed_message) {
@@ -83,10 +84,10 @@ class Client extends \nostriphant\Transpher\Client {
     }
 
     public function start(int $timeout = 5): void {
-        $this->onJson(function (callable $stop, array $message) {
+        $this->onJson(function (callable $stop, Message $message) {
             $expected_message = array_shift($this->expected_messages);
-            expect(array_shift($message))->toBe($expected_message[0], 'Message type checks out');
-            $expected_message[1]($message);
+            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+            $expected_message[1]($message->payload);
 
             if (count($this->expected_messages) === 0) {
                 $stop();

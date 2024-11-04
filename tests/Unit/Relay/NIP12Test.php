@@ -1,24 +1,25 @@
 <?php
 
-use nostriphant\Transpher\Relay;
-use function Pest\context;
+use nostriphant\Transpher\Nostr\Message\Factory;
+use function Pest\incoming,
+             Pest\store;
 
 /**
  * https://github.com/nostr-protocol/nips/commit/72bb8a128b2d7d3c2c654644cd68d0d0fe58a3b1#diff-8986f5dd399909df0ccb047d3bb1056061e74dcf25bc80af1cd52decf9358340
  */
 describe('REQ', function () {
     it('sends events to all clients subscribed on tag', function ($tag, $tag_value) {
-        $context = context();
+        $store = \Pest\store();
 
         $sender_key = \Pest\key_sender();
-        $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
-        Relay::handle($message, $context);
-        expect($context->reply)->toHaveReceived(
+        $message = Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
+        $recipient = \Pest\handle($message, incoming(store: $store));
+        expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
-        expect($context->reply)->toHaveReceived(
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: $store));
+        expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
                     }],
@@ -31,25 +32,28 @@ describe('REQ', function () {
     ]);
 
     it('relays events to Bob, sent after they subscribed on Alices messages', function () {
-        $context = context();
+        $relay = \Pest\relay();
+        $store = \Pest\store();
+        $subscriptions = \Pest\subscriptions(relay: $relay);
+
         $tag = 'p';
         $tag_value = uniqid();
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
-        expect($context->reply)->toHaveReceived(
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: $store), subscriptions: $subscriptions);
+        expect($recipient)->toHaveReceived(
                 ['EOSE', $id],
         );
 
         $sender_key = \Pest\key_sender();
-        $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
-        Relay::handle($message, $context);
-        expect($context->relay)->toHaveReceived(
+        $message = Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
+        $recipient = \Pest\handle($message, incoming(store: $store), subscriptions: $subscriptions);
+        expect($relay)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
                     }],
                 ['EOSE', $id],
         );
-        expect($context->reply)->toHaveReceived(
+        expect($recipient)->toHaveReceived(
                 ['OK']
         );
     });
@@ -58,15 +62,13 @@ describe('REQ', function () {
         $tag = 'p';
         $tag_value = uniqid();
         $sender_key = \Pest\key_sender();
-        $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
+        $message = Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
 
-        $context = context([
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: store([
             new \nostriphant\Transpher\Nostr\Event(...$message()[1])
-        ]);
+        ])));
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['#' . $tag => [$tag_value]]]), $context);
-
-        expect($context->reply)->toHaveReceived(
+        expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
                     }],

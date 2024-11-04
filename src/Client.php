@@ -46,7 +46,7 @@ class Client {
         $this->listening = true;
         while ($this->listening && ($message = $this->receive($timeout))) {
             $buffer = $message->buffer();
-            $payload = Nostr::decode($buffer);
+            $payload = Nostr\Message::decode($buffer);
             ($this->onjson_callback)([$this, 'ignore'], $payload);
         }
     }

@@ -1,27 +1,24 @@
 <?php
 
 use nostriphant\Transpher\Nostr\Key;
-use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Event\Gift;
 use nostriphant\Transpher\Nostr\Event\Seal;
-use function \Pest\context;
+use function Pest\incoming;
 
 it('relays private direct messsage from alice to bob', function (): void {
-
-    $context = context();
-
+    $store = \Pest\store();
     $alice_key = \Pest\key_sender();
 
     $bob_key = \Pest\key_recipient();
-    $event = \nostriphant\Transpher\Nostr\Message\Factory::privateDirect($alice_key, $bob_key(Key::public(Key\Format::HEXIDECIMAL)), 'Hello!!');
+    $event = Factory::privateDirect($alice_key, $bob_key(Key::public(Key\Format::HEXIDECIMAL)), 'Hello!!');
 
-    Relay::handle($event, $context);
-    expect($context->reply)->toHaveReceived(
+    expect(\Pest\handle($event, incoming(store: $store)))->toHaveReceived(
             ['OK']
     );
 
-    Relay::handle(json_encode(['REQ', $subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]]), $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle(Factory::req($subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['EVENT', $subscriptionId, function (array $gift) use ($bob_key) {
                     expect($gift['kind'])->toBe(1059);
 

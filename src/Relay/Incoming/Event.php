@@ -2,92 +2,96 @@
 
 namespace nostriphant\Transpher\Relay\Incoming;
 
-use function \Functional\first;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Event\KindClass;
 use nostriphant\Transpher\Relay\Condition;
 
-readonly class Event implements \nostriphant\Transpher\Relay\Incoming {
+readonly class Event implements Type {
 
-    public function __construct(private \nostriphant\Transpher\Nostr\Event $event) {
+    public function __construct(
+            private \nostriphant\Transpher\Relay\Store $events,
+            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
+            private Event\Limits $constraints = new Event\Limits()
+    ) {
         
     }
 
     #[\Override]
-    static function fromMessage(array $message): self {
-        return new self(new \nostriphant\Transpher\Nostr\Event(...$message[1]));
-    }
+    public function __invoke(array $payload): \Generator {
+        $event = new \nostriphant\Transpher\Nostr\Event(...$payload[0]);
+        $constraint = ($this->constraints)($event);
+        switch ($constraint->result) {
+            case Constraint\Result::REJECTED:
+                yield Factory::ok($event->id, false, 'invalid:' . $constraint->reason);
+                break;
 
-    #[\Override]
-    public function __invoke(Context $context): \Generator {
-        if (\nostriphant\Transpher\Nostr\Event::verify($this->event) === false) {
-            yield Factory::ok($this->event->id, false, 'invalid:signature is wrong');
-        } else {
-            $replaceable_events = [];
-            switch (\nostriphant\Transpher\Nostr\Event::determineClass($this->event)) {
-                case KindClass::REGULAR:
-                    $context->events[$this->event->id] = $this->event;
-                    $kindClass = __CLASS__ . '\\Kind' . $this->event->kind;
-                    if (class_exists($kindClass)) {
-                        $incoming_kind = new $kindClass($this->event);
-                        $incoming_kind($context->events);
-                    }
-                    break;
-
-                case KindClass::REPLACEABLE:
-                    $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
-                                'kinds' => [$this->event->kind],
-                                'authors' => [$this->event->pubkey]
-                    ]));
-
-                    $context->events[$this->event->id] = $this->event;
-                    foreach ($replaceable_events as $replaceable_event) {
-                        $replace_id = $replaceable_event->id;
-                        if ($replaceable_event->created_at === $this->event->created_at) {
-                            $replace_id = max($replaceable_event->id, $this->event->id);
+            case Constraint\Result::ACCEPTED:
+                $replaceable_events = [];
+                switch (\nostriphant\Transpher\Nostr\Event::determineClass($event)) {
+                    case KindClass::REGULAR:
+                        $this->events[$event->id] = $event;
+                        $kindClass = __CLASS__ . '\\Kind' . $event->kind;
+                        if (class_exists($kindClass)) {
+                            $incoming_kind = new $kindClass($event);
+                            $incoming_kind($this->events);
                         }
-                        unset($context->events[$replace_id]);
-                    }
-                    break;
+                        break;
 
-                case KindClass::EPHEMERAL:
-                    break;
+                    case KindClass::REPLACEABLE:
+                        $replaceable_events = ($this->events)(Condition::makeFiltersFromPrototypes([
+                                    'kinds' => [$event->kind],
+                                    'authors' => [$event->pubkey]
+                        ]));
 
-                case KindClass::ADDRESSABLE:
-                    $replaceable_events = ($context->events)(Condition::makeFiltersFromPrototypes([
-                                'kinds' => [$this->event->kind],
-                                'authors' => [$this->event->pubkey],
-                                '#d' => \nostriphant\Transpher\Nostr\Event::extractTagValues($this->event, 'd')
-                    ]));
-
-                    $context->events[$this->event->id] = $this->event;
-                    foreach ($replaceable_events as $replaceable_event) {
-                        $replace_id = $replaceable_event->id;
-                        if ($replaceable_event->created_at === $this->event->created_at) {
-                            $replace_id = max($replaceable_event->id, $this->event->id);
+                        $this->events[$event->id] = $event;
+                        foreach ($replaceable_events as $replaceable_event) {
+                            $replace_id = $replaceable_event->id;
+                            if ($replaceable_event->created_at === $event->created_at) {
+                                $replace_id = max($replaceable_event->id, $event->id);
+                            }
+                            unset($this->events[$replace_id]);
                         }
-                        unset($context->events[$replace_id]);
-                    }
-                    break;
+                        break;
 
-                case KindClass::UNDEFINED:
-                default:
-                    yield Factory::notice('Undefined event kind ' . $this->event->kind);
-                    return;
-            }
+                    case KindClass::EPHEMERAL:
+                        break;
 
-            if (empty($context->subscriptions) === false) {
-                ($context->subscriptions)(function (callable $subscription, string $subscriptionId) {
-                    $to = $subscription($this->event);
-                    if ($to === false) {
-                        return false;
-                    }
-                    $to(Factory::requestedEvent($subscriptionId, $this->event));
-                    $to(Factory::eose($subscriptionId));
-                    return true;
-                });
-            }
-            yield Factory::accept($this->event->id);
+                    case KindClass::ADDRESSABLE:
+                        $replaceable_events = ($this->events)(Condition::makeFiltersFromPrototypes([
+                                    'kinds' => [$event->kind],
+                                    'authors' => [$event->pubkey],
+                                    '#d' => \nostriphant\Transpher\Nostr\Event::extractTagValues($event, 'd')
+                        ]));
+
+                        $this->events[$event->id] = $event;
+                        foreach ($replaceable_events as $replaceable_event) {
+                            $replace_id = $replaceable_event->id;
+                            if ($replaceable_event->created_at === $event->created_at) {
+                                $replace_id = max($replaceable_event->id, $event->id);
+                            }
+                            unset($this->events[$replace_id]);
+                        }
+                        break;
+
+                    case KindClass::UNDEFINED:
+                    default:
+                        yield Factory::notice('Undefined event kind ' . $event->kind);
+                        return;
+                }
+
+                if (empty($this->subscriptions) === false) {
+                    ($this->subscriptions)(function (callable $subscription, string $subscriptionId) use ($event) {
+                        $to = $subscription($event);
+                        if ($to === false) {
+                            return false;
+                        }
+                        $to(Factory::requestedEvent($subscriptionId, $event));
+                        $to(Factory::eose($subscriptionId));
+                        return true;
+                    });
+                }
+                yield Factory::accept($event->id);
+                break;
         }
     }
 }

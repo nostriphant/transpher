@@ -1,9 +1,10 @@
 <?php
 
-use nostriphant\Transpher\Relay;
+use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Key;
 use nostriphant\Transpher\Nostr\Message;
-use function Pest\context;
+use function Pest\store,
+             Pest\incoming;
 
 $references = [
     ['e', fn(Message $message) => $message()[1]['id']],
@@ -12,36 +13,34 @@ $references = [
 ];
 
 it('SHOULD delete or stop publishing any referenced events that have an identical pubkey as the deletion request.', function ($tag, $value_callback) {
-    $context = context();
+    $store = store();
 
     $sender_key = \Pest\key_sender();
-    $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
+    $message = Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
     $referenced_value = $value_callback($message);
 
-    Relay::handle($message, $context);
-    expect($context->reply)->toHaveReceived(
+    expect(\Pest\handle($message, incoming(store: $store)))->toHaveReceived(
             ['OK']
     );
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle(Factory::req($subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
                 }],
             ['EOSE', $subscription_id]
     );
 
-    $delete_event = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 5, 'sent by accident', [$tag, $referenced_value]);
-    Relay::handle($delete_event, $context);
-    expect($context->reply)->toHaveReceived(
+    $delete_event = Factory::event($sender_key, 5, 'sent by accident', [$tag, $referenced_value]);
+    expect(\Pest\handle($delete_event, incoming(store: $store)))->toHaveReceived(
             ['OK', $delete_event()[1]['id'], true]
     );
 
-    expect(isset($context->events[$delete_event()[1]['id']]))->toBeTrue();
-    expect(isset($context->events[$message()[1]['id']]))->toBeFalse();
+    expect(isset($store[$delete_event()[1]['id']]))->toBeTrue();
+    expect(isset($store[$message()[1]['id']]))->toBeFalse();
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle(Factory::req($subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('sent by accident');
                     expect($event['kind'])->toBe(5);
@@ -51,36 +50,36 @@ it('SHOULD delete or stop publishing any referenced events that have an identica
 })->with($references);
 
 it('SHOULD NOT delete or stop publishing any referenced events that have an different pubkey as the deletion request.', function ($tag, $value_callback) {
-    $context = context();
+    $store = store();
 
     $sender_key = \Pest\key_sender();
-    $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
+    $message = Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
     $referenced_value = $value_callback($message);
 
-    Relay::handle($message, $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle($message, incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['OK']
     );
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle(Factory::req($subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
                 }],
             ['EOSE', $subscription_id]
     );
 
-    $delete_event = \nostriphant\Transpher\Nostr\Message\Factory::event(Key::generate(), 5, 'sent by accident', [$tag, $referenced_value]);
-    Relay::handle($delete_event, $context);
-    expect($context->reply)->toHaveReceived(
+    $delete_event = Factory::event(Key::generate(), 5, 'sent by accident', [$tag, $referenced_value]);
+    $recipient = \Pest\handle($delete_event, incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['OK', $delete_event()[1]['id'], true]
     );
 
-    expect(isset($context->events[$delete_event()[1]['id']]))->toBeTrue();
-    expect(isset($context->events[$message()[1]['id']]))->toBeTrue();
+    expect(isset($store[$delete_event()[1]['id']]))->toBeTrue();
+    expect(isset($store[$message()[1]['id']]))->toBeTrue();
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle(Factory::req($subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
                 }],
@@ -89,35 +88,35 @@ it('SHOULD NOT delete or stop publishing any referenced events that have an diff
 })->with($references);
 
 it('When an a tag is used, relays SHOULD delete all versions of the replaceable event up to the created_at timestamp of the deletion request event.', function () {
-    $context = context();
+    $store = store();
 
     $sender_key = \Pest\key_sender();
-    $message = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
+    $message = Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
 
-    Relay::handle($message, $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle($message, incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['OK']
     );
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle(Factory::req($subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
                 }],
             ['EOSE', $subscription_id]
     );
 
-    $delete_event = \nostriphant\Transpher\Nostr\Message\Factory::eventAt($sender_key, 5, 'sent by accident', time() - 60, ['a', $message()[1]['kind'] . ':' . $message()[1]['pubkey'] . ':a-random-d-tag']);
-    Relay::handle($delete_event, $context);
-    expect($context->reply)->toHaveReceived(
+    $delete_event = Factory::eventAt($sender_key, 5, 'sent by accident', time() - 60, ['a', $message()[1]['kind'] . ':' . $message()[1]['pubkey'] . ':a-random-d-tag']);
+    $recipient = \Pest\handle($delete_event, incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['OK', $delete_event()[1]['id'], true]
     );
 
-    expect(isset($context->events[$delete_event()[1]['id']]))->toBeTrue();
-    expect(isset($context->events[$message()[1]['id']]))->toBeTrue();
+    expect(isset($store[$delete_event()[1]['id']]))->toBeTrue();
+    expect(isset($store[$message()[1]['id']]))->toBeTrue();
 
-    Relay::handle(json_encode(['REQ', $subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())], 'kinds' => [1]]]), $context);
-    expect($context->reply)->toHaveReceived(
+    $recipient = \Pest\handle(Factory::req($subscription_id = uniqid(), ['authors' => [$sender_key(Key::public())], 'kinds' => [1]]), incoming(store: $store));
+    expect($recipient)->toHaveReceived(
             ['EVENT', $subscription_id, function (array $event) {
                     expect($event['content'])->toBe('Hello World');
                 }],

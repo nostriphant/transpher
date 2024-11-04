@@ -19,4 +19,8 @@ readonly class Message {
     public function __toString(): string {
         return \nostriphant\Transpher\Nostr::encode($this());
     }
+
+    static function decode(string $json): self {
+        return new self(...\nostriphant\Transpher\Nostr::decode($json));
+    }
 }

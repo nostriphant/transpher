@@ -14,7 +14,7 @@ it('generates Relay Information Document', function () {
         "description" => 'Some interesting description goes here',
         "pubkey" => 'c0bb181bc39c4e59768805bbc5bdd34c508f14b01a298d63be4510d97417ce01',
         "contact" => 'transpher@nostriphant.dev',
-        "supported_nips" => [1, 2, 9, 11, 12, 16, 20, 33],
+        "supported_nips" => [1, 2, 9, 11, 12, 16, 20, 22, 33],
         "software" => 'Transpher',
         "version" => 'dev'
     ]);

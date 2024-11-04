@@ -3,7 +3,6 @@
 namespace nostriphant\TranspherTests\Unit;
 
 use Amp\Websocket\WebsocketMessage;
-use nostriphant\Transpher\Relay\Incoming\Context;
 
 class Client extends \nostriphant\TranspherTests\Client {
 
@@ -16,19 +15,15 @@ class Client extends \nostriphant\TranspherTests\Client {
 
     static function persistent_client(string $store): self {
         return new self(new \nostriphant\Transpher\Relay(
-                        new \nostriphant\Transpher\Directory($store),
+                        \Pest\incoming(new \nostriphant\Transpher\Directory($store)),
                         \Mockery::spy(\Psr\Log\LoggerInterface::class)
                 ));
     }
 
     static function generic_client(bool $reset = false): self {
         if ($reset || isset(self::$generic_relay) === false) {
-            $events = new class([]) implements \nostriphant\Transpher\Relay\Store {
-
-                use \nostriphant\Transpher\Nostr\Store;
-            };
             self::$generic_relay = new \nostriphant\Transpher\Relay(
-                    $events,
+                    \Pest\incoming(),
                     \Mockery::spy(\Psr\Log\LoggerInterface::class)
             );
         }

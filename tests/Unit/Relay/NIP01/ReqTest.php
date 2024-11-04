@@ -1,55 +1,54 @@
 <?php
 
-use nostriphant\Transpher\Relay;
 use nostriphant\Transpher\Nostr\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Subscription\Filter;
 use nostriphant\TranspherTests\Unit\Client;
-use function Pest\context;
+use function Pest\incoming;
 
 afterEach(fn() => Client::generic_client(true));
 
 describe('REQ', function () {
     it('replies NOTICE Invalid message on non-existing filters', function () {
-        $context = context();
+        
 
-        Relay::handle(json_encode(['REQ']), $context);
+        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ'));
 
-        expect($context->reply)->toHaveReceived(
+        expect($recipient)->toHaveReceived(
                 ['NOTICE', 'Invalid message']
         );
     });
     it('replies CLOSED on empty filters', function () {
-        $context = context();
+        
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), []]), $context);
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), []));
 
-        expect($context->reply)->toHaveReceived(
+        expect($recipient)->toHaveReceived(
                 ['CLOSED', $id, 'Subscription filters are empty']
         );
     });
     it('can handle a subscription request, for non existing events', function () {
-        $context = context();
+        
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['ids' => ['abdcd']]]), $context);
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['ids' => ['abdcd']]));
 
-        expect($context->reply)->toHaveReceived(
+        expect($recipient)->toHaveReceived(
                 ['EOSE', $id]
         );
     });
 
     it('can handle a subscription request, for existing events', function () {
-        $context = context();
+        $store = \Pest\store();
 
         $sender_key = \Pest\key_sender();
-        $event = \nostriphant\Transpher\Nostr\Message\Factory::event($sender_key, 1, 'Hello World');
-        Relay::handle($event, $context);
-        expect($context->reply)->toHaveReceived(
+        $event = Factory::event($sender_key, 1, 'Hello World');
+        $recipient = \Pest\handle($event, incoming(store: $store));
+        expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$sender_key(Key::public())]]]), $context);
-        expect($context->reply)->toHaveReceived(
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
+        expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
                     }],
@@ -96,31 +95,30 @@ describe('REQ', function () {
     });
 
     it('sends events to Charlie who uses two filters in their subscription', function () {
-        $context = context();
+        $store = \Pest\store();
+        $subscriptions = \Pest\subscriptions();
 
         $alice_key = \Pest\key_sender();
-        $event_alice = \nostriphant\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Hello world, from Alice!');
-        Relay::handle($event_alice, $context);
-        expect($context->reply)->toHaveReceived(
+        $event_alice = Factory::event($alice_key, 1, 'Hello world, from Alice!');
+        $recipient = \Pest\handle($event_alice, incoming(store: $store), subscriptions: $subscriptions);
+        expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
         $bob_key = Key::generate();
-        $event_bob = \nostriphant\Transpher\Nostr\Message\Factory::event($bob_key, 1, 'Hello world, from Bob!');
-        Relay::handle($event_bob, $context);
-        expect($context->reply)->toHaveReceived(
+        $event_bob = Factory::event($bob_key, 1, 'Hello world, from Bob!');
+        $recipient = \Pest\handle($event_bob, incoming(store: $store), subscriptions: $subscriptions);
+        expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
-        Relay::handle(json_encode([
-            'REQ',
-            $id = uniqid(), [
-                'authors' => [$alice_key(Key::public())]
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), [
+                    'authors' => [$alice_key(Key::public())]
             ], [
                 'authors' => [$bob_key(Key::public())]
-    ]]), $context);
+        ]), incoming(store: $store), subscriptions: $subscriptions);
 
-        expect($context->reply)->toHaveReceived(
+        expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello world, from Alice!');
                     }],
@@ -173,29 +171,30 @@ describe('REQ', function () {
     });
 
     it('relays events to Bob, sent after they subscribed on Alices messages', function () {
-
-        $context = context();
+        $store = \Pest\store();
+        $relay = \Pest\relay();
+        $subscriptions = \Pest\subscriptions(relay: $relay);
 
         $alice_key = \Pest\key_sender();
 
-        Relay::handle(json_encode(['REQ', $id = uniqid(), ['authors' => [$alice_key(Key::public())]]]), $context);
-        expect($context->reply)->toHaveReceived(
+        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['authors' => [$alice_key(Key::public())]]), incoming(store: $store), subscriptions: $subscriptions);
+        expect($recipient)->toHaveReceived(
                 ['EOSE', $id]
         );
 
         $key_charlie = \Pest\key_recipient();
-        $event_charlie = \nostriphant\Transpher\Nostr\Message\Factory::event($key_charlie, 1, 'Hello world!');
-        Relay::handle($event_charlie, $context);
-        expect($context->reply)->toHaveReceived(
+        $event_charlie = Factory::event($key_charlie, 1, 'Hello world!');
+        $recipient = \Pest\handle($event_charlie, incoming(store: $store));
+        expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
-        $event = \nostriphant\Transpher\Nostr\Message\Factory::event($alice_key, 1, 'Relayable Hello worlda!');
-        Relay::handle($event, $context);
-        expect($context->reply)->toHaveReceived(
+        $event = Factory::event($alice_key, 1, 'Relayable Hello worlda!');
+        $recipient = \Pest\handle($event, incoming(store: $store), subscriptions: $subscriptions);
+        expect($recipient)->toHaveReceived(
                 ['OK']
         );
-        expect($context->relay)->toHaveReceived(
+        expect($relay)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Relayable Hello worlda!');
                     }],

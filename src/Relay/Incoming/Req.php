@@ -1,45 +1,36 @@
 <?php
 
 namespace nostriphant\Transpher\Relay\Incoming;
-use nostriphant\Transpher\Relay\Incoming;
+
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Relay\Condition;
 use function \Functional\map,
- \Functional\partial_left,
-             \Functional\if_else;
+ \Functional\partial_left;
 
-/**
- * Description of Req
- *
- * @author rmeijer
- */
-readonly class Req implements Incoming {
+readonly class Req implements Type {
 
-    private array $filters;
-
-    public function __construct(private string $subscription_id, array ...$filters) {
-        $this->filters = array_filter($filters);
+    public function __construct(
+            private \nostriphant\Transpher\Relay\Store $events,
+            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
+    ) {
+        
     }
 
     #[\Override]
-    static function fromMessage(array $message): self {
-        if (count($message) < 3) {
-            throw new \InvalidArgumentException('Invalid message');
-        }
-
-        return new self(...array_slice($message, 1));
-    }
-
-    #[\Override]
-    public function __invoke(Context $context): \Generator {
-        if (count($this->filters) === 0) {
-            yield Factory::closed($this->subscription_id, 'Subscription filters are empty');
+    public function __invoke(array $payload): \Generator {
+        if (count($payload) < 2) {
+            yield Factory::notice('Invalid message');
         } else {
-            $filters = Condition::makeFiltersFromPrototypes(...$this->filters);
-            ($context->subscriptions)($this->subscription_id, if_else($filters, fn() => $context->relay, fn() => false));
-            $subscribed_events = fn(string $subscriptionId) => map(($context->events)($filters), partial_left([Factory::class, 'requestedEvent'], $subscriptionId));
-            yield from $subscribed_events($this->subscription_id);
-            yield Factory::eose($this->subscription_id);
+            $filter_prototypes = array_filter(array_slice($payload, 1));
+
+            if (count($filter_prototypes) === 0) {
+                yield Factory::closed($payload[0], 'Subscription filters are empty');
+            } else {
+                $filters = Condition::makeFiltersFromPrototypes(...$filter_prototypes);
+                ($this->subscriptions)($payload[0], $filters);
+                yield from map(($this->events)($filters), partial_left([Factory::class, 'requestedEvent'], $payload[0]));
+                yield Factory::eose($payload[0]);
+            }
         }
     }
 }

@@ -1,15 +1,10 @@
 <?php
 
-use nostriphant\Transpher\Relay;
-use function Pest\context;
-
 describe('CLOSE', function () {
     it('responds with a NOTICE on missing subscription-id', function () {
-        $context = context();
+        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('CLOSE'));
 
-        Relay::handle(json_encode(['CLOSE']), $context);
-
-        expect($context->reply)->toHaveReceived(
+        expect($recipient)->toHaveReceived(
                 ['NOTICE', 'Missing subscription ID']
         );
     });

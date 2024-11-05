@@ -44,3 +44,9 @@ it('SHOULD deny more subscriptions than 10 per client, by default', function () 
     $recipient_past = \Pest\handle($message_past = Factory::req('subscription11-id', ['ids' => ['sdsd']]), subscriptions: $subscriptions);
     expect($recipient_past)->toHaveReceived(['CLOSED', 'subscription11-id', 'max number of subscriptions per client (10) reached']);
 });
+
+
+it('SHOULD deny more filters than 10 per subscription, by default', function () {
+    $recipient_past = \Pest\handle($message_past = Factory::req('subscription-id', ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']]));
+    expect($recipient_past)->toHaveReceived(['CLOSED', 'subscription-id', 'max number of filters per subscription (10) reached']);
+});

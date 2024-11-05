@@ -22,14 +22,14 @@ readonly class Req implements Type {
         if (count($payload) < 2) {
             yield Factory::notice('Invalid message');
         } else {
-            $constraint = ($this->limits)($this->subscriptions);
+            $filter_prototypes = array_filter(array_slice($payload, 1));
+            $constraint = ($this->limits)($this->subscriptions, $filter_prototypes);
             switch ($constraint->result) {
                 case Constraint\Result::REJECTED:
                     yield Factory::closed($payload[0], $constraint->reason);
                     break;
 
                 case Constraint\Result::ACCEPTED:
-                    $filter_prototypes = array_filter(array_slice($payload, 1));
 
                     if (count($filter_prototypes) === 0) {
                         yield Factory::closed($payload[0], 'Subscription filters are empty');

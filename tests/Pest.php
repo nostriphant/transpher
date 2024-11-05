@@ -101,8 +101,8 @@ namespace Pest {
         };
     }
 
-    function subscriptions(array &$subscriptions = [], ?Sender $relay = null) {
-        return new \nostriphant\Transpher\Relay\Subscriptions($subscriptions, $relay ?? relay());
+    function subscriptions(?Sender $relay = null) {
+        return new \nostriphant\Transpher\Relay\Subscriptions($relay ?? relay());
     }
 
     function store(array $events = []) {

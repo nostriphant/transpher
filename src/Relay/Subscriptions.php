@@ -7,12 +7,15 @@ use \nostriphant\Transpher\Relay\Sender;
 
 class Subscriptions {
 
-    public function __construct(private array &$subscriptions, private Sender $relay) {
+    private array $subscriptions = [];
+
+    public function __construct(private Sender $relay) {
         
     }
 
     public function __invoke(mixed ...$args): mixed {
         return match (true) {
+            func_num_args() === 0 => count($this->subscriptions),
             $args[0] instanceof \Closure => self::apply($this->subscriptions, $args[0]),
             is_string($args[0]) && count($args) === 1 => self::unsubscribe($this->subscriptions, $args[0]),
             is_string($args[0]) => self::subscribe($this->subscriptions, $this->relay, $args[0], $args[1]),

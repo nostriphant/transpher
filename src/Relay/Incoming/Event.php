@@ -11,7 +11,7 @@ readonly class Event implements Type {
     public function __construct(
             private \nostriphant\Transpher\Relay\Store $events,
             private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
-            private Event\Limits $constraints = new Event\Limits()
+            private \nostriphant\Transpher\Relay\Limits $limits
     ) {
         
     }
@@ -19,7 +19,7 @@ readonly class Event implements Type {
     #[\Override]
     public function __invoke(array $payload): \Generator {
         $event = new \nostriphant\Transpher\Nostr\Event(...$payload[0]);
-        $constraint = ($this->constraints)($event);
+        $constraint = ($this->limits)($event);
         switch ($constraint->result) {
             case Constraint\Result::REJECTED:
                 yield Factory::ok($event->id, false, 'invalid:' . $constraint->reason);

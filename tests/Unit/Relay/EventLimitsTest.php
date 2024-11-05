@@ -4,17 +4,17 @@ use nostriphant\Transpher\Relay\Incoming\Event\Limits;
 use nostriphant\Transpher\Relay\Incoming\Constraint\Result;
 
 it('SHOULD ignore created_at limits for regular events', function () {
-    $limits = new Limits();
+    $limits = Limits::construct();
 
     $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() - (60 * 60 * 24) - 5)(\Pest\key_sender()));
     expect($limit->result)->toBe(Result::ACCEPTED, $limit->reason ?? '');
 
     $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() + (60 * 15) + 5)(\Pest\key_sender()));
     expect($limit->result)->toBe(Result::ACCEPTED, $limit->reason ?? '');
-})->with();
+});
 
 it('SHOULD send the client an OK result saying the event was not stored for the created_at timestamp not being within the permitted limits.', function (int $kind) {
-    $limits = new Limits();
+    $limits = Limits::construct();
 
     $limit = $limits(\Pest\rumor(kind: $kind, pubkey: \Pest\pubkey_sender(), created_at: time() - (60 * 60 * 24) - 5)(\Pest\key_sender()));
     expect($limit->result)->toBe(Result::REJECTED);
@@ -30,7 +30,7 @@ it('SHOULD send the client an OK result saying the event was not stored for the 
 ]);
 
 it('can be configured for event kinds to always allow. Leave empty to allow any.', function () {
-    $limits = new Limits(
+    $limits = Limits::construct(
             kind_whitelist: [1]
     );
 
@@ -43,7 +43,7 @@ it('can be configured for event kinds to always allow. Leave empty to allow any.
 });
 
 it('can be configured for event kinds to always deny. Leave empty to allow any.', function () {
-    $limits = new Limits(
+    $limits = Limits::construct(
             kind_blacklist: [1]
     );
 
@@ -57,7 +57,7 @@ it('can be configured for event kinds to always deny. Leave empty to allow any.'
 
 
 it('can be configured for event content max limit.', function () {
-    $limits = new Limits(
+    $limits = Limits::construct(
             content_maxlength: 10
     );
 
@@ -71,7 +71,7 @@ it('can be configured for event content max limit.', function () {
 
 
 it('can be configured for event content max limit, only for a certain event kind.', function () {
-    $limits = new Limits(
+    $limits = Limits::construct(
             content_maxlength: [10, 1]
     );
 
@@ -85,7 +85,7 @@ it('can be configured for event content max limit, only for a certain event kind
 
 
 it('can be configured for event content max limit, only for certain event kinds.', function () {
-    $limits = new Limits(
+    $limits = Limits::construct(
             content_maxlength: [10, 1, 5]
     );
 
@@ -123,7 +123,7 @@ it('SHOULD ignore created_at limits through env-vars for regular events', functi
 
     $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() + 16)(\Pest\key_sender()));
     expect($limit->result)->toBe(Result::ACCEPTED, $limit->reason ?? '');
-})->with();
+});
 
 it('SHOULD send the client an OK result saying the event was not stored for the created_at timestamp not being within the permitted limits through env-vars.', function (int $kind) {
     putenv('LIMIT_EVENT_CREATED_AT_LOWER_DELTA=60');

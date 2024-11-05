@@ -13,6 +13,9 @@ readonly class Limits {
     ): \nostriphant\Transpher\Relay\Limits {
         $checks = [];
 
+        if ($max_filters_per_subscription > 0) {
+            $checks['subscription filters are empty'] = fn(Subscriptions $subscriptions, array $filter_prototypes) => count($filter_prototypes) === 0;
+        }
         if ($max_per_client > 0) {
             $checks['max number of subscriptions per client (' . $max_per_client . ') reached'] = fn(Subscriptions $subscriptions) => $subscriptions() >= $max_per_client;
         }

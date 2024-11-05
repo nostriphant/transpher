@@ -24,7 +24,7 @@ describe('REQ', function () {
         $recipient = \Pest\handle(Factory::req($id = uniqid(), []));
 
         expect($recipient)->toHaveReceived(
-                ['CLOSED', $id, 'Subscription filters are empty']
+                ['CLOSED', $id, 'subscription filters are empty']
         );
     });
     it('can handle a subscription request, for non existing events', function () {

@@ -30,15 +30,10 @@ readonly class Req implements Type {
                     break;
 
                 case Constraint\Result::ACCEPTED:
-
-                    if (count($filter_prototypes) === 0) {
-                        yield Factory::closed($payload[0], 'Subscription filters are empty');
-                    } else {
-                        $filters = Condition::makeFiltersFromPrototypes(...$filter_prototypes);
-                        ($this->subscriptions)($payload[0], $filters);
-                        yield from map(($this->events)($filters), partial_left([Factory::class, 'requestedEvent'], $payload[0]));
-                        yield Factory::eose($payload[0]);
-                    }
+                    $filters = Condition::makeFiltersFromPrototypes(...$filter_prototypes);
+                    ($this->subscriptions)($payload[0], $filters);
+                    yield from map(($this->events)($filters), partial_left([Factory::class, 'requestedEvent'], $payload[0]));
+                    yield Factory::eose($payload[0]);
                     break;
             }
         }

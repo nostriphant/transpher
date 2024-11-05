@@ -14,9 +14,9 @@ readonly class Incoming {
 
     public function __invoke(Subscriptions $subscriptions, Message $message): \Generator {
         yield from (match (strtoupper($message->type)) {
-                    'EVENT' => new Incoming\Event($this->events, $subscriptions, Incoming\Event\Limits::fromEnv()),
+                    'EVENT' => new Incoming\Event($this->events, $subscriptions, Limits::fromEnv(Incoming\Event\Limits::class)),
                     'CLOSE' => new Incoming\Close($subscriptions),
-                    'REQ' => new Incoming\Req($this->events, $subscriptions, Incoming\Req\Limits::fromEnv()),
+                    'REQ' => new Incoming\Req($this->events, $subscriptions, Limits::fromEnv(Incoming\Req\Limits::class)),
                     default => new Incoming\Unknown($message->type)
                 })($message->payload);
     }

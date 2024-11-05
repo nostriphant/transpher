@@ -6,7 +6,7 @@ use nostriphant\Transpher\Relay\Incoming\Constraint\Result;
 it('has a maximum number of subscriptions per connected client. Defaults to 10. Disabled when set to zero.', function () {
     $subscriptions = \Pest\subscriptions();
 
-    $limits = new Limits(max_per_client: 1);
+    $limits = Limits::construct(max_per_client: 1);
 
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 

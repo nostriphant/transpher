@@ -8,15 +8,14 @@ use nostriphant\Transpher\Nostr\Event\KindClass;
 
 readonly class Limits {
 
-    private array $checks;
-
-    public function __construct(
+    static function construct(
             int $created_at_lower_delta = (60 * 60 * 24),
             int $created_at_upper_delta = (60 * 15),
             ?array $kind_whitelist = null,
             ?array $kind_blacklist = null,
             null|int|array $content_maxlength = null
-    ) {
+    ): \nostriphant\Transpher\Relay\Limits {
+        
         $checks = [
             'signature is wrong' => fn(Event $event): bool => Event::verify($event) === false
         ];
@@ -48,26 +47,11 @@ readonly class Limits {
             $checks['content is longer than ' . $content_maxlength[0] . ' bytes'] = $content_maxlength_check;
         }
 
-        $this->checks = $checks;
+        return new \nostriphant\Transpher\Relay\Limits($checks);
     }
 
-    static function fromEnv(): self {
-        $arguments = [];
-        $environment_variables = getenv(null);
-        foreach ((new \ReflectionMethod(__CLASS__, '__construct'))->getParameters() as $parameter) {
-            $parameter_name = $parameter->getName();
-            $env_var_name = 'LIMIT_EVENT_' . strtoupper($parameter_name);
-            if (isset($environment_variables[$env_var_name]) === false) {
-                continue;
-            }
-
-            if (str_contains($parameter->getType(), 'array')) {
-                $arguments[$parameter_name] = explode(',', $environment_variables[$env_var_name]);
-            } else {
-                $arguments[$parameter_name] = $environment_variables[$env_var_name];
-            }
-        }
-        return new self(...$arguments);
+    static function fromEnv(): \nostriphant\Transpher\Relay\Limits {
+        return \nostriphant\Transpher\Relay\Limits::fromEnv(__CLASS__);
     }
 
     private static function secondsTohuman(int $amount): string {
@@ -92,14 +76,5 @@ readonly class Limits {
         }
 
         return join(', ', $human);
-    }
-
-    public function __invoke(Event $event): Constraint {
-        foreach ($this->checks as $reason => $check) {
-            if ($check($event)) {
-                return Constraint::reject($reason);
-            }
-        }
-        return Constraint::accept();
     }
 }

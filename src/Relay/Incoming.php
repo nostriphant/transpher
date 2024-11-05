@@ -16,7 +16,7 @@ readonly class Incoming {
         yield from (match (strtoupper($message->type)) {
                     'EVENT' => new Incoming\Event($this->events, $subscriptions, Incoming\Event\Limits::fromEnv()),
                     'CLOSE' => new Incoming\Close($subscriptions),
-                    'REQ' => new Incoming\Req($this->events, $subscriptions),
+                    'REQ' => new Incoming\Req($this->events, $subscriptions, Incoming\Req\Limits::fromEnv()),
                     default => new Incoming\Unknown($message->type)
                 })($message->payload);
     }

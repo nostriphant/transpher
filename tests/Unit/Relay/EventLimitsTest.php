@@ -11,7 +11,7 @@ it('SHOULD ignore created_at limits for regular events', function () {
 
     $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() + (60 * 15) + 5)(\Pest\key_sender()));
     expect($limit->result)->toBe(Result::ACCEPTED, $limit->reason ?? '');
-})->with();
+});
 
 it('SHOULD send the client an OK result saying the event was not stored for the created_at timestamp not being within the permitted limits.', function (int $kind) {
     $limits = Limits::construct();
@@ -123,7 +123,7 @@ it('SHOULD ignore created_at limits through env-vars for regular events', functi
 
     $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() + 16)(\Pest\key_sender()));
     expect($limit->result)->toBe(Result::ACCEPTED, $limit->reason ?? '');
-})->with();
+});
 
 it('SHOULD send the client an OK result saying the event was not stored for the created_at timestamp not being within the permitted limits through env-vars.', function (int $kind) {
     putenv('LIMIT_EVENT_CREATED_AT_LOWER_DELTA=60');

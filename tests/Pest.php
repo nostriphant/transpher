@@ -32,13 +32,13 @@ namespace {
     expect()->extend('toHaveReceived', function (array ...$expected_messages) {
         foreach ($this->value->messages as $message) {
             $expected_message = array_shift($expected_messages);
-            foreach ($message() as $part) {
+            foreach ($message() as $pos => $part) {
                 if (count($expected_message) === 0) {
                     continue;
                 }
 
                 $expected_part = array_shift($expected_message);
-                if (is_callable($expected_part)) {
+                if ($pos > 0 && is_callable($expected_part)) {
                     $expected_part($part);
                 } else {
                     expect($part)->toBe($expected_part, var_export($message(), true));

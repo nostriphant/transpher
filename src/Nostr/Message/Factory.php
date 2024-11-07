@@ -54,6 +54,14 @@ class Factory {
         return self::message('REQ', $subscription_id, ...$filters);
     }
 
+    static function countRequest(string $subscription_id, array ...$filters) {
+        return self::message('COUNT', $subscription_id, ...$filters);
+    }
+
+    static function countResponse(string $subscription_id, int $count) {
+        return self::message('COUNT', $subscription_id, ['count' => $count]);
+    }
+
     static function notice(string $message): Message {
         return self::message('NOTICE', $message);
     }

@@ -17,6 +17,7 @@ readonly class Incoming {
                     'EVENT' => new Incoming\Event($this->events, $subscriptions, Limits::fromEnv(Incoming\Event\Limits::class)),
                     'CLOSE' => new Incoming\Close($subscriptions),
                     'REQ' => new Incoming\Req($this->events, $subscriptions, Limits::fromEnv(Incoming\Req\Limits::class)),
+                    'COUNT' => new Incoming\Count($this->events, Limits::fromEnv(Incoming\Count\Limits::class)),
                     default => new Incoming\Unknown($message->type)
                 })($message->payload);
     }

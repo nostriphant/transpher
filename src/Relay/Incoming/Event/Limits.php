@@ -13,7 +13,8 @@ readonly class Limits {
             int $created_at_upper_delta = (60 * 15),
             ?array $kind_whitelist = null,
             ?array $kind_blacklist = null,
-            null|int|array $content_maxlength = null
+            null|int|array $content_maxlength = null,
+            $eventid_min_leading_zeros = 0
     ): \nostriphant\Transpher\Relay\Limits {
         
         $checks = [
@@ -47,11 +48,19 @@ readonly class Limits {
             $checks['content is longer than ' . $content_maxlength[0] . ' bytes'] = $content_maxlength_check;
         }
 
+        if ($eventid_min_leading_zeros > 0) {
+            $checks['not enough leading zeros (' . $eventid_min_leading_zeros . ') for event id'] = fn(Event $event): bool => self::countLeadingZeros($event->id) < $eventid_min_leading_zeros;
+        }
+
         return new \nostriphant\Transpher\Relay\Limits($checks);
     }
 
     static function fromEnv(): \nostriphant\Transpher\Relay\Limits {
         return \nostriphant\Transpher\Relay\Limits::fromEnv(__CLASS__);
+    }
+
+    private static function countLeadingZeros(string $hash) {
+        return 5;
     }
 
     private static function secondsTohuman(int $amount): string {

@@ -49,7 +49,7 @@ readonly class Limits {
         }
 
         if ($eventid_min_leading_zeros > 0) {
-            $checks['not enough leading zeros (' . $eventid_min_leading_zeros . ') for event id'] = fn(Event $event): bool => self::countLeadingZeros($event->id) < $eventid_min_leading_zeros;
+            $checks['not enough leading zeros (' . $eventid_min_leading_zeros . ') for event id'] = fn(Event $event): bool => self::calculateLeadingZeros($event->id) < $eventid_min_leading_zeros;
         }
 
         return new \nostriphant\Transpher\Relay\Limits($checks);
@@ -59,8 +59,26 @@ readonly class Limits {
         return \nostriphant\Transpher\Relay\Limits::fromEnv(__CLASS__);
     }
 
-    private static function countLeadingZeros(string $hash) {
-        return 5;
+    static function calculateLeadingZeros(string $hex) {
+        if (!ctype_xdigit($hex)) {
+            throw new InvalidArgumentException("Not a hexidecimal number");
+        }
+
+        $binary = '';
+        foreach (str_split($hex) as $hexChar) {
+            $binary .= str_pad(base_convert($hexChar, 16, 2), 4, '0', STR_PAD_LEFT);
+        }
+
+        $leadingZeros = 0;
+        for ($i = 0; $i < strlen($binary); $i++) {
+            if ($binary[$i] === '0') {
+                $leadingZeros++;
+            } else {
+                break;
+            }
+        }
+
+        return $leadingZeros;
     }
 
     private static function secondsTohuman(int $amount): string {

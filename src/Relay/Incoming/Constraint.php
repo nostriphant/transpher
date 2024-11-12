@@ -6,28 +6,21 @@ readonly class Constraint {
 
     private function __construct(
             public Constraint\Result $result,
-            public ?string $reason = null
+            public \Closure $callback,
+            public ?string $reason = null,
     ) {
         
     }
 
     static function accept(): self {
-        return new self(Constraint\Result::ACCEPTED);
+        return new self(Constraint\Result::ACCEPTED, (fn(array $callbacks) => yield from $callbacks['accepted']()));
     }
 
     static function reject(string $reason): self {
-        return new self(Constraint\Result::REJECTED, $reason);
+        return new self(Constraint\Result::REJECTED, (fn(array $callbacks) => yield from $callbacks['rejected']($reason)), $reason);
     }
 
-    public function __invoke(callable $accepted, callable $rejected) {
-        switch ($this->result) {
-            case Constraint\Result::ACCEPTED:
-                yield from $accepted();
-                break;
-
-            case Constraint\Result::REJECTED:
-                yield from $rejected($this->reason);
-                break;
-        }
+    public function __invoke(callable ...$callbacks) {
+        yield from ($this->callback)($callbacks);
     }
 }

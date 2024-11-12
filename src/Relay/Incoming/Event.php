@@ -20,8 +20,8 @@ readonly class Event implements Type {
         $event = new \nostriphant\Transpher\Nostr\Event(...$payload[0]);
         $constraint = ($this->limits)($event);
         yield from $constraint(
-                        fn() => yield from ($this->accepted)($event),
-                        fn(string $reason) => yield Factory::ok($event->id, false, 'invalid:' . $reason)
+                        accepted: fn() => yield from ($this->accepted)($event),
+                        rejected: fn(string $reason) => yield Factory::ok($event->id, false, 'invalid:' . $reason)
                 );
     }
 }

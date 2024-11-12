@@ -33,11 +33,15 @@ class Kind1063 implements Kind {
         $remote_handle = fopen($urls[0], 'r');
 
         $x = Event::extractTagValues($event, 'x');
-        $local_handle = fopen($this->files . '/' . $x[0], 'w');
+        $local_file = $this->files . '/' . $x[0];
+        $local_handle = fopen($local_file, 'w');
         while ($buffer = fread($remote_handle, 512)) {
             fwrite($local_handle, $buffer);
         }
         fclose($remote_handle);
         fclose($local_handle);
+
+        mkdir($local_file . '.events');
+        touch($local_file . '.events/' . $event->id);
     }
 }

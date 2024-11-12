@@ -6,11 +6,11 @@ use function Pest\incoming;
 
 it('downloads NIP-94 files (kind 1063) into a data folder', function () {
     $file = tempnam(sys_get_temp_dir(), 'file');
-    file_put_contents($file, 'Hello world 2!');
+    file_put_contents($file, uniqid());
     $hash = hash_file('sha256', $file);
 
-    unlink(ROOT_DIR . '/data/files/' . $hash);
     expect(ROOT_DIR . '/data/files/' . $hash)->not()->toBeFile();
+    expect(ROOT_DIR . '/data/files/' . $hash . '.events')->not()->toBeDirectory();
 
     $sender_key = \Pest\key_sender();
     $message = Factory::event($sender_key, 1063, 'File caption with the description of its contents',
@@ -25,6 +25,8 @@ it('downloads NIP-94 files (kind 1063) into a data folder', function () {
     );
 
     expect(ROOT_DIR . '/data/files/' . $hash)->toBeFile();
+    expect(ROOT_DIR . '/data/files/' . $hash . '.events')->toBeDirectory();
+    expect(ROOT_DIR . '/data/files/' . $hash . '.events/' . $message()[1]['id'])->toBeFile();
 });
 
 it('refuses NIP-94 files with missing url-tag', function () {

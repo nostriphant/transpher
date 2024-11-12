@@ -3,6 +3,7 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Nostr\Event;
+use nostriphant\Transpher\Relay\Incoming\Constraint;
 
 class Kind1063 implements Kind {
 
@@ -12,12 +13,15 @@ class Kind1063 implements Kind {
     }
 
     #[\Override]
-    static function validate(\nostriphant\Transpher\Nostr\Event $event): \nostriphant\Transpher\Relay\Incoming\Constraint {
-        $urls = Event::extractTagValues($event, 'url');
-        if (empty($urls)) {
-            return \nostriphant\Transpher\Relay\Incoming\Constraint::reject('missing url-tag');
+    static function validate(Event $event): Constraint {
+        if (Event::hasTag($event, 'url') === false) {
+            return Constraint::reject('missing url-tag');
+        } elseif (Event::hasTag($event, 'x') === false) {
+            return Constraint::reject('missing x-tag');
+        } elseif (Event::hasTag($event, 'ox') === false) {
+            return Constraint::reject('missing ox-tag');
         }
-        return \nostriphant\Transpher\Relay\Incoming\Constraint::accept();
+        return Constraint::accept();
     }
 
     #[\Override]

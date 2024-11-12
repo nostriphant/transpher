@@ -18,4 +18,16 @@ readonly class Constraint {
     static function reject(string $reason): self {
         return new self(Constraint\Result::REJECTED, $reason);
     }
+
+    public function __invoke(callable $accepted, callable $rejected) {
+        switch ($this->result) {
+            case Constraint\Result::ACCEPTED:
+                yield from $accepted();
+                break;
+
+            case Constraint\Result::REJECTED:
+                yield from $rejected($this->reason);
+                break;
+        }
+    }
 }

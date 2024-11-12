@@ -203,7 +203,7 @@ describe('REQ', function () {
     });
 
     it('sends events to all clients subscribed on author (pubkey), even after restarting the server', function () {
-        $transpher_store = ROOT_DIR . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . uniqid();
+        $transpher_store = ROOT_DIR . '/data/events/' . uniqid();
         mkdir($transpher_store);
 
         $alice = Client::persistent_client($transpher_store);

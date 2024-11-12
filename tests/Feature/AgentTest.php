@@ -8,7 +8,7 @@ use nostriphant\TranspherTests\Feature\Functions;
 describe('agent', function () : void {
     it('starts relay and sends private direct messsage to relay owner', function () : void {
         $relay = Functions::bootRelay('127.0.0.1:8085', [
-                'RELAY_STORE' => ROOT_DIR . '/data/' . uniqid('relay_', true)
+                'RELAY_STORE' => ROOT_DIR . '/data/events/' . uniqid('relay_', true)
         ]);
 
         $agent_key = \Pest\key_sender();

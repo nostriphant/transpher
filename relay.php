@@ -29,7 +29,7 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
 //);
 
-$store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data';
+$store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
 is_dir($store_path) || mkdir($store_path);
 $events = new nostriphant\Transpher\Directory($store_path);
 $incoming = new \nostriphant\Transpher\Relay\Incoming($events);

@@ -1,13 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher\Relay;
-use nostriphant\Transpher\Nostr\Key;
 
-/**
- * Description of InformationDocument
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 class InformationDocument {
     static function generate(string $name, string $description, string $npub, string $contact) {
         return [

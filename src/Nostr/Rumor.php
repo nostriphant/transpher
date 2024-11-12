@@ -3,11 +3,6 @@
 namespace nostriphant\Transpher\Nostr;
 use nostriphant\Transpher\Nostr;
 
-/**
- * Description of Event
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 readonly class Rumor {
     
     public string $id;

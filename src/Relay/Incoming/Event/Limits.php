@@ -14,7 +14,8 @@ readonly class Limits {
             ?array $kind_whitelist = null,
             ?array $kind_blacklist = null,
             null|int|array $content_maxlength = null,
-            $eventid_min_leading_zeros = 0
+            $eventid_min_leading_zeros = 0,
+            $pubkey_min_leading_zeros = 0
     ): \nostriphant\Transpher\Relay\Limits {
         
         $checks = [
@@ -50,6 +51,9 @@ readonly class Limits {
 
         if ($eventid_min_leading_zeros > 0) {
             $checks['not enough leading zeros (' . $eventid_min_leading_zeros . ') for event id'] = fn(Event $event): bool => self::calculateLeadingZeros($event->id) < $eventid_min_leading_zeros;
+        }
+        if ($pubkey_min_leading_zeros > 0) {
+            $checks['not enough leading zeros (' . $pubkey_min_leading_zeros . ') for pubkey'] = fn(Event $event): bool => self::calculateLeadingZeros($event->pubkey) < $pubkey_min_leading_zeros;
         }
 
         return new \nostriphant\Transpher\Relay\Limits($checks);

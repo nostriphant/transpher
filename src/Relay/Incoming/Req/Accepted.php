@@ -9,14 +9,14 @@ class Accepted {
 
     public function __construct(
             private \nostriphant\Transpher\Relay\Store $events,
-            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
+            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
+            private \nostriphant\Transpher\Relay\Limits $limits,
     ) {
 
     }
 
     public function __invoke(string $subscription_id, \nostriphant\Transpher\Nostr\Filters $filters): mixed {
-        $limits = Accepted\Limits::fromEnv();
-        $constraint = $limits($this->subscriptions);
+        $constraint = ($this->limits)($this->subscriptions);
         yield from $constraint(
                 rejected: fn(string $reason) => yield Factory::closed($subscription_id, $reason),
                 accepted: function () use ($subscription_id, $filters) {

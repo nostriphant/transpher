@@ -12,12 +12,12 @@ readonly class Limits {
         
     }
 
-    static function fromEnv(string $class): self {
+    static function fromEnv(string $group, string $class): self {
         $arguments = [];
         $environment_variables = getenv(null);
         foreach ((new \ReflectionMethod($class, 'construct'))->getParameters() as $parameter) {
             $parameter_name = $parameter->getName();
-            $env_var_name = strtoupper('LIMIT_' . array_slice(explode('\\', $class), -2, 1)[0] . '_' . $parameter_name);
+            $env_var_name = strtoupper('LIMIT_' . $group . '_' . $parameter_name);
             if (isset($environment_variables[$env_var_name]) === false) {
                 continue;
             }

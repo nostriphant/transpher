@@ -14,10 +14,10 @@ readonly class Incoming {
 
     public function __invoke(Subscriptions $subscriptions, Message $message): \Generator {
         yield from (match (strtoupper($message->type)) {
-                    'EVENT' => new Incoming\Event(new Incoming\Event\Accepted($this->events, $this->files, $subscriptions), Limits::fromEnv(Incoming\Event\Limits::class)),
+                    'EVENT' => new Incoming\Event(new Incoming\Event\Accepted($this->events, $this->files, $subscriptions), Incoming\Event\Limits::fromEnv()),
                     'CLOSE' => new Incoming\Close($subscriptions),
-                    'REQ' => new Incoming\Req($this->events, $subscriptions, Limits::fromEnv(Incoming\Req\Limits::class)),
-                    'COUNT' => new Incoming\Count($this->events, Limits::fromEnv(Incoming\Count\Limits::class)),
+                    'REQ' => new Incoming\Req(new Incoming\Req\Accepted($this->events, $subscriptions), Incoming\Req\Limits::fromEnv()),
+                    'COUNT' => new Incoming\Count($this->events, Incoming\Count\Limits::fromEnv()),
                     default => new Incoming\Unknown($message->type)
                 })($message->payload);
     }

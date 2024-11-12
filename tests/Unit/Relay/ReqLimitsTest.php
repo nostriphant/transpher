@@ -6,7 +6,7 @@ use nostriphant\Transpher\Relay\Incoming\Constraint\Result;
 it('has a maximum number of subscriptions per connected client.', function () {
     $subscriptions = \Pest\subscriptions();
 
-    $limits = Limits::construct(max_per_client: 1);
+    $limits = \nostriphant\Transpher\Relay\Incoming\Req\Accepted\Limits::construct(max_per_client: 1);
 
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 
@@ -23,7 +23,7 @@ it('has a maximum number of subscriptions per connected client.', function () {
 it('has a maximum number of subscriptions per connected client. Defaults to 10.', function () {
     $subscriptions = \Pest\subscriptions();
 
-    $limits = Limits::construct();
+    $limits = \nostriphant\Transpher\Relay\Incoming\Req\Accepted\Limits::construct();
 
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 
@@ -50,7 +50,7 @@ it('has a maximum number of subscriptions per connected client. Defaults to 10.'
 it('has a maximum number of subscriptions per connected client. Disabled when set to zero.', function () {
     $subscriptions = \Pest\subscriptions();
 
-    $limits = Limits::construct(max_per_client: 0);
+    $limits = \nostriphant\Transpher\Relay\Incoming\Req\Accepted\Limits::construct(max_per_client: 0);
 
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 
@@ -86,7 +86,7 @@ it('has a maximum number of subscriptions per connected client, configurable thr
     $subscriptions = \Pest\subscriptions();
 
     putenv('LIMIT_REQ_MAX_PER_CLIENT=1');
-    $limits = Limits::fromEnv();
+    $limits = \nostriphant\Transpher\Relay\Incoming\Req\Accepted\Limits::fromEnv();
 
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 

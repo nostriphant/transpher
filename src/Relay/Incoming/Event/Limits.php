@@ -60,7 +60,7 @@ readonly class Limits {
     }
 
     static function fromEnv(): \nostriphant\Transpher\Relay\Limits {
-        return \nostriphant\Transpher\Relay\Limits::fromEnv(__CLASS__);
+        return \nostriphant\Transpher\Relay\Limits::fromEnv('EVENT', __CLASS__);
     }
 
     static function calculateLeadingZeros(string $hex) {

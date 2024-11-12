@@ -13,7 +13,9 @@ readonly class Limits {
             int $created_at_upper_delta = (60 * 15),
             ?array $kind_whitelist = null,
             ?array $kind_blacklist = null,
-            null|int|array $content_maxlength = null
+            null|int|array $content_maxlength = null,
+            $eventid_min_leading_zeros = 0,
+            $pubkey_min_leading_zeros = 0
     ): \nostriphant\Transpher\Relay\Limits {
         
         $checks = [
@@ -47,11 +49,40 @@ readonly class Limits {
             $checks['content is longer than ' . $content_maxlength[0] . ' bytes'] = $content_maxlength_check;
         }
 
+        if ($eventid_min_leading_zeros > 0) {
+            $checks['not enough leading zeros (' . $eventid_min_leading_zeros . ') for event id'] = fn(Event $event): bool => self::calculateLeadingZeros($event->id) < $eventid_min_leading_zeros;
+        }
+        if ($pubkey_min_leading_zeros > 0) {
+            $checks['not enough leading zeros (' . $pubkey_min_leading_zeros . ') for pubkey'] = fn(Event $event): bool => self::calculateLeadingZeros($event->pubkey) < $pubkey_min_leading_zeros;
+        }
+
         return new \nostriphant\Transpher\Relay\Limits($checks);
     }
 
     static function fromEnv(): \nostriphant\Transpher\Relay\Limits {
         return \nostriphant\Transpher\Relay\Limits::fromEnv(__CLASS__);
+    }
+
+    static function calculateLeadingZeros(string $hex) {
+        if (!ctype_xdigit($hex)) {
+            throw new InvalidArgumentException("Not a hexidecimal number");
+        }
+
+        $binary = '';
+        foreach (str_split($hex) as $hexChar) {
+            $binary .= str_pad(base_convert($hexChar, 16, 2), 4, '0', STR_PAD_LEFT);
+        }
+
+        $leadingZeros = 0;
+        for ($i = 0; $i < strlen($binary); $i++) {
+            if ($binary[$i] === '0') {
+                $leadingZeros++;
+            } else {
+                break;
+            }
+        }
+
+        return $leadingZeros;
     }
 
     private static function secondsTohuman(int $amount): string {

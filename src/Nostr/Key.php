@@ -1,21 +1,9 @@
 <?php
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
- */
-
 namespace nostriphant\Transpher\Nostr;
 use Elliptic\EC;
-use function BitWasp\Bech32\convertBits;
-use function BitWasp\Bech32\decode;
-use function BitWasp\Bech32\encode;
+use Mdanter\Ecc\Crypto\Signature\SchnorrSignature;
 
-/**
- * Description of Key
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 readonly class Key {
 
     public function __construct(#[\SensitiveParameter] private string $private_key) {
@@ -44,13 +32,13 @@ readonly class Key {
     }
 
     static function signer(string $message): callable {
-        return fn(string $private_key) => (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->sign($private_key, $message)['signature'];
+        return fn(string $private_key) => (new SchnorrSignature())->sign($private_key, $message)['signature'];
     }
 
     static function verify(string $pubkey, string $signature, string $message): bool {
         $reporting = set_error_handler(fn() => null);
         try {
-            $verification = (new \Mdanter\Ecc\Crypto\Signature\SchnorrSignature())->verify($pubkey, $signature, $message);
+            $verification = (new SchnorrSignature())->verify($pubkey, $signature, $message);
         } catch (\Throwable $e) {
             file_append_contents(ROOT_DIR . '/logs/errors.log', $e->getFile() . '@' . $e->getLine() . ': ' . $e->getMessage() . '( ' . $signature . '  )' . PHP_EOL);
             $verification = false;

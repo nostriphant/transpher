@@ -10,7 +10,7 @@ readonly class Event implements Type {
 
     public function __construct(
             private \nostriphant\Transpher\Relay\Store $events,
-            private string $data,
+            private string $files,
             private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
             private \nostriphant\Transpher\Relay\Limits $limits
     ) {
@@ -33,7 +33,7 @@ readonly class Event implements Type {
                         $this->events[$event->id] = $event;
                         $kindClass = __CLASS__ . '\\Kind' . $event->kind;
                         if (class_exists($kindClass)) {
-                            $incoming_kind = new $kindClass($this->events);
+                            $incoming_kind = new $kindClass($this->events, $this->files);
                             $incoming_kind($event);
                         }
                         break;

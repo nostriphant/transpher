@@ -34,7 +34,16 @@ readonly class Event implements Type {
                         $kindClass = __CLASS__ . '\\Kind' . $event->kind;
                         if (class_exists($kindClass)) {
                             $incoming_kind = new $kindClass($this->events, $this->files);
-                            $incoming_kind($event);
+                            $validation = $kindClass::validate($event);
+                            switch ($validation->result) {
+                                case Constraint\Result::ACCEPTED:
+                                    $incoming_kind($event);
+                                    break;
+
+                                case Constraint\Result::REJECTED:
+                                    yield Factory::ok($event->id, false, 'invalid:' . $validation->reason);
+                                    return;
+                            }
                         }
                         break;
 

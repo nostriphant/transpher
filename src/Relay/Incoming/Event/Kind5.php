@@ -4,12 +4,19 @@ namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Relay\Condition;
 
-readonly class Kind5 {
+readonly class Kind5 implements Kind {
 
-    public function __construct(private \nostriphant\Transpher\Relay\Store $store) {
+    #[\Override]
+    public function __construct(private \nostriphant\Transpher\Relay\Store $store, private string $files) {
         
     }
 
+    #[\Override]
+    static function validate(\nostriphant\Transpher\Nostr\Event $event): \nostriphant\Transpher\Relay\Incoming\Constraint {
+        return \nostriphant\Transpher\Relay\Incoming\Constraint::accept();
+    }
+
+    #[\Override]
     public function __invoke(\nostriphant\Transpher\Nostr\Event $event): void {
         $prototypes = [];
         $possible_references = [

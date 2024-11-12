@@ -112,8 +112,8 @@ namespace Pest {
         };
     }
 
-    function incoming(?\nostriphant\Transpher\Relay\Store $store = null) {
-        return new Incoming($store ?? store());
+    function incoming(?\nostriphant\Transpher\Relay\Store $store = null, string $data = ROOT_DIR . '/data/files') {
+        return new Incoming($store ?? store(), $data);
     }
 
     function vectors(string $name): object {

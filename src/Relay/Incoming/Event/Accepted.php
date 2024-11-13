@@ -12,7 +12,7 @@ class Accepted {
     public function __construct(
             private \nostriphant\Transpher\Relay\Store $events,
             private string $files,
-            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
+            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
     ) {
         
     }
@@ -21,19 +21,7 @@ class Accepted {
         $replaceable_events = [];
         switch (Event::determineClass($event)) {
             case KindClass::REGULAR:
-                $this->events[$event->id] = $event;
-                $kindClass = __NAMESPACE__ . '\\Kind' . $event->kind;
-                if (class_exists($kindClass) === false) {
-                    yield from ($this->subscriptions)($event);
-                } else {
-                    yield from $kindClass::validate($event)(
-                                    accepted: function (Event $event) use ($kindClass) {
-                                        (new $kindClass($this->events, $this->files))($event);
-                                        yield from ($this->subscriptions)($event);
-                                    },
-                                    rejected: fn(string $reason) => yield Factory::ok($event->id, false, 'invalid:' . $reason)
-                            );
-                }
+                yield from (new Regular($this->events, $this->files, $this->subscriptions))($event);
                 break;
 
             case KindClass::REPLACEABLE:

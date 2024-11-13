@@ -29,30 +29,16 @@ class Accepted {
                 break;
 
             case KindClass::EPHEMERAL:
-                yield from ($this->subscriptions)($event);
+                yield from (new Ephemeral($this->subscriptions))($event);
                 break;
 
             case KindClass::ADDRESSABLE:
-                $replaceable_events = ($this->events)(Condition::makeFiltersFromPrototypes([
-                            'kinds' => [$event->kind],
-                            'authors' => [$event->pubkey],
-                            '#d' => Event::extractTagValues($event, 'd')
-                ]));
-
-                $this->events[$event->id] = $event;
-                foreach ($replaceable_events as $replaceable_event) {
-                    $replace_id = $replaceable_event->id;
-                    if ($replaceable_event->created_at === $event->created_at) {
-                        $replace_id = max($replaceable_event->id, $event->id);
-                    }
-                    unset($this->events[$replace_id]);
-                }
-                yield from ($this->subscriptions)($event);
+                yield from (new Addressable($this->events, $this->subscriptions))($event);
                 break;
 
             case KindClass::UNDEFINED:
             default:
-                yield Factory::notice('Undefined event kind ' . $event->kind);
+                yield from (new Undefined())($event);
                 break;
         }
 

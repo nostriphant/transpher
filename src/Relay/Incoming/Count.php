@@ -21,18 +21,10 @@ readonly class Count implements Type {
         if (count($payload) < 2) {
             yield Factory::notice('Invalid message');
         } else {
-            $filter_prototypes = array_filter(array_slice($payload, 1));
-            $constraint = ($this->limits)($filter_prototypes);
-            switch ($constraint->result) {
-                case Constraint\Result::REJECTED:
-                    yield Factory::closed($payload[0], $constraint->reason);
-                    break;
-
-                case Constraint\Result::ACCEPTED:
-                    $filters = Condition::makeFiltersFromPrototypes(...$filter_prototypes);
-                    yield Factory::countResponse($payload[0], count(($this->events)($filters)));
-                    break;
-            }
+            yield from ($this->limits)(array_filter(array_slice($payload, 1)))(
+                            accepted: fn(array $filter_prototypes) => yield Factory::countResponse($payload[0], count(($this->events)(Condition::makeFiltersFromPrototypes(...$filter_prototypes)))),
+                    rejected: fn(string $reason) => yield Factory::closed($payload[0], $reason)
+            );
         }
     }
 }

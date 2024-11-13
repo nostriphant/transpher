@@ -48,6 +48,10 @@ namespace {
         }
         $this->value->messages = [];
     });
+
+    expect()->extend('toHaveState', function (\nostriphant\Transpher\Relay\Incoming\Constraint\Result $state) {
+        expect($this->value->result)->toBe($state);
+    });
 }
 
 /*
@@ -155,5 +159,7 @@ namespace Pest {
                 });
         return $to;
     }
+
+
 
 }

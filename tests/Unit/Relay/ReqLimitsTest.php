@@ -11,12 +11,12 @@ it('has a maximum number of subscriptions per connected client.', function () {
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
-    expect($limit->result)->toBe(Result::ACCEPTED);
+    expect($limit)->toHaveState(Result::ACCEPTED);
 
     $subscriptions('sub-id', $subscription);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
-    expect($limit->result)->toBe(Result::REJECTED);
+    expect($limit)->toHaveState(Result::REJECTED);
     $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of subscriptions per client (1) reached'));
 });
 
@@ -28,7 +28,7 @@ it('has a maximum number of subscriptions per connected client. Defaults to 10.'
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
-    expect($limit->result)->toBe(Result::ACCEPTED);
+    expect($limit)->toHaveState(Result::ACCEPTED);
 
     $subscriptions('sub-id0', $subscription);
     $subscriptions('sub-id1', $subscription);
@@ -42,7 +42,7 @@ it('has a maximum number of subscriptions per connected client. Defaults to 10.'
     $subscriptions('sub-id9', $subscription);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
-    expect($limit->result)->toBe(Result::REJECTED);
+    expect($limit)->toHaveState(Result::REJECTED);
     $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of subscriptions per client (10) reached'));
 });
 
@@ -55,7 +55,7 @@ it('has a maximum number of subscriptions per connected client. Disabled when se
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
-    expect($limit->result)->toBe(Result::ACCEPTED);
+    expect($limit)->toHaveState(Result::ACCEPTED);
 
     $subscriptions('sub-id0', $subscription);
     $subscriptions('sub-id1', $subscription);
@@ -79,7 +79,7 @@ it('has a maximum number of subscriptions per connected client. Disabled when se
     $subscriptions('sub-id9', $subscription);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
-    expect($limit->result)->toBe(Result::ACCEPTED);
+    expect($limit)->toHaveState(Result::ACCEPTED);
 });
 
 it('has a maximum number of subscriptions per connected client, configurable through env-vars. Defaults to 10. Disabled when set to zero.', function () {
@@ -91,12 +91,12 @@ it('has a maximum number of subscriptions per connected client, configurable thr
     $subscription = nostriphant\Transpher\Relay\Condition::makeFiltersFromPrototypes(['ids' => ['a']]);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
-    expect($limit->result)->toBe(Result::ACCEPTED);
+    expect($limit)->toHaveState(Result::ACCEPTED);
 
     $subscriptions('sub-id', $subscription);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
-    expect($limit->result)->toBe(Result::REJECTED);
+    expect($limit)->toHaveState(Result::REJECTED);
     $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of subscriptions per client (1) reached'));
     putenv('LIMIT_REQ_MAX_PER_CLIENT');
 });

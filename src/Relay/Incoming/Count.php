@@ -4,8 +4,6 @@ namespace nostriphant\Transpher\Relay\Incoming;
 
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Relay\Condition;
-use function \Functional\map,
- \Functional\partial_left;
 
 readonly class Count implements Type {
 

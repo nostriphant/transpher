@@ -25,20 +25,7 @@ class Accepted {
                 break;
 
             case KindClass::REPLACEABLE:
-                $replaceable_events = ($this->events)(Condition::makeFiltersFromPrototypes([
-                            'kinds' => [$event->kind],
-                            'authors' => [$event->pubkey]
-                ]));
-
-                $this->events[$event->id] = $event;
-                foreach ($replaceable_events as $replaceable_event) {
-                    $replace_id = $replaceable_event->id;
-                    if ($replaceable_event->created_at === $event->created_at) {
-                        $replace_id = max($replaceable_event->id, $event->id);
-                    }
-                    unset($this->events[$replace_id]);
-                }
-                yield from ($this->subscriptions)($event);
+                yield from (new Replaceable($this->events, $this->subscriptions))($event);
                 break;
 
             case KindClass::EPHEMERAL:

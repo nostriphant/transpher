@@ -15,7 +15,7 @@ class Regular {
         
     }
 
-    public function __invoke(\nostriphant\Transpher\Nostr\Event $event) {
+    public function __invoke(Event $event) {
         $this->events[$event->id] = $event;
         $kindClass = __NAMESPACE__ . '\\Kind' . $event->kind;
         if (class_exists($kindClass) === false) {

@@ -15,13 +15,13 @@ class Kind1063 implements Kind {
     #[\Override]
     static function validate(Event $event): Constraint {
         if (Event::hasTag($event, 'url') === false) {
-            return Constraint::reject('missing url-tag');
+            return Constraint::rejected('missing url-tag');
         } elseif (Event::hasTag($event, 'x') === false) {
-            return Constraint::reject('missing x-tag');
+            return Constraint::rejected('missing x-tag');
         } elseif (Event::hasTag($event, 'ox') === false) {
-            return Constraint::reject('missing ox-tag');
+            return Constraint::rejected('missing ox-tag');
         }
-        return Constraint::accept($event);
+        return Constraint::accepted($event);
     }
 
     #[\Override]

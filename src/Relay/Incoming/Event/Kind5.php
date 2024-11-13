@@ -15,7 +15,7 @@ readonly class Kind5 implements Kind {
 
     #[\Override]
     static function validate(Event $event): Constraint {
-        return Constraint::accept($event);
+        return Constraint::accepted($event);
     }
 
     #[\Override]

@@ -34,9 +34,9 @@ readonly class Limits {
     public function __invoke(mixed ...$args): Constraint {
         foreach ($this->checks as $reason => $check) {
             if ($check(...$args)) {
-                return Constraint::reject($reason);
+                return Constraint::rejected($reason);
             }
         }
-        return Constraint::accept(...$args);
+        return Constraint::accepted(...$args);
     }
 }

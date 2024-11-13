@@ -2,9 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
-use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Event\KindClass;
-use nostriphant\Transpher\Relay\Condition;
 use nostriphant\Transpher\Nostr\Event;
 
 class Accepted {

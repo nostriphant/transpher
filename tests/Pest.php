@@ -161,5 +161,8 @@ namespace Pest {
     }
 
 
+    function rejected(string $expected_reason) {
+        return ['rejected' => fn(string $reason) => expect($reason)->toBe($expected_reason)];
+    }
 
 }

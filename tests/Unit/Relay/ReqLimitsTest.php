@@ -17,7 +17,7 @@ it('has a maximum number of subscriptions per connected client.', function () {
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
     expect($limit)->toHaveState(Result::REJECTED);
-    $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of subscriptions per client (1) reached'));
+    $limit(...\Pest\rejected('max number of subscriptions per client (1) reached'));
 });
 
 it('has a maximum number of subscriptions per connected client. Defaults to 10.', function () {
@@ -43,7 +43,7 @@ it('has a maximum number of subscriptions per connected client. Defaults to 10.'
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
     expect($limit)->toHaveState(Result::REJECTED);
-    $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of subscriptions per client (10) reached'));
+    $limit(...\Pest\rejected('max number of subscriptions per client (10) reached'));
 });
 
 
@@ -97,6 +97,6 @@ it('has a maximum number of subscriptions per connected client, configurable thr
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
     expect($limit)->toHaveState(Result::REJECTED);
-    $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of subscriptions per client (1) reached'));
+    $limit(...\Pest\rejected('max number of subscriptions per client (1) reached'));
     putenv('LIMIT_REQ_MAX_PER_CLIENT');
 });

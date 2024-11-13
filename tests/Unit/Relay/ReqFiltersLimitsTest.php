@@ -11,7 +11,7 @@ it('has a maximum number of filters per subscription.', function () {
 
     $limit = $limits([['ids' => ['a']], ['ids' => ['a']]]);
     expect($limit)->toHaveState(Result::REJECTED);
-    $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of filters per subscription (1) reached'));
+    $limit(...\Pest\rejected('max number of filters per subscription (1) reached'));
 });
 
 it('has a maximum number of filters per subscription. Defaults to 10.', function () {
@@ -33,7 +33,7 @@ it('has a maximum number of filters per subscription. Defaults to 10.', function
         ['ids' => ['a']]
     ]);
     expect($limit)->toHaveState(Result::REJECTED);
-    $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of filters per subscription (10) reached'));
+    $limit(...\Pest\rejected('max number of filters per subscription (10) reached'));
 });
 
 
@@ -57,6 +57,6 @@ it('has a maximum number of filters per subscription, configurable through env-v
 
     $limit = $limits([['ids' => ['a']], ['ids' => ['a']]]);
     expect($limit)->toHaveState(Result::REJECTED);
-    $limit(rejected: fn(string $reason) => expect($reason)->toBe('max number of filters per subscription (1) reached'));
+    $limit(...\Pest\rejected('max number of filters per subscription (1) reached'));
     putenv('LIMIT_REQ_MAX_FILTERS_PER_SUBSCRIPTION');
 });

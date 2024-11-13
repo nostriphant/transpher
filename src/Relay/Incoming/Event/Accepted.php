@@ -18,7 +18,6 @@ class Accepted {
     }
 
     public function __invoke(Event $event): \Generator {
-        $replaceable_events = [];
         switch (Event::determineClass($event)) {
             case KindClass::REGULAR:
                 yield from (new Regular($this->events, $this->files, $this->subscriptions))($event);

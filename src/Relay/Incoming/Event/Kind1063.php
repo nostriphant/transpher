@@ -21,15 +21,12 @@ class Kind1063 implements Kind {
         } elseif (Event::hasTag($event, 'ox') === false) {
             return Constraint::reject('missing ox-tag');
         }
-        return Constraint::accept();
+        return Constraint::accept($event);
     }
 
     #[\Override]
     public function __invoke(Event $event): void {
         $urls = Event::extractTagValues($event, 'url');
-        if (empty($urls)) {
-            throw new \InvalidArgumentException('missing url-tag');
-        }
         $remote_handle = fopen($urls[0], 'r');
 
         $x = Event::extractTagValues($event, 'x');

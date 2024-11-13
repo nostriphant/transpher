@@ -17,11 +17,9 @@ readonly class Event implements Type {
 
     #[\Override]
     public function __invoke(array $payload): \Generator {
-        $event = new \nostriphant\Transpher\Nostr\Event(...$payload[0]);
-        $constraint = ($this->limits)($event);
-        yield from $constraint(
-                        accepted: fn() => yield from ($this->accepted)($event),
-                        rejected: fn(string $reason) => yield Factory::ok($event->id, false, 'invalid:' . $reason)
+        yield from ($this->limits)(new \nostriphant\Transpher\Nostr\Event(...$payload[0]))(
+                        accepted: $this->accepted,
+                        rejected: fn(string $reason) => yield Factory::ok($payload[0]['id'], false, 'invalid:' . $reason)
                 );
     }
 }

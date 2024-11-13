@@ -3,6 +3,8 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Relay\Condition;
+use nostriphant\Transpher\Relay\Incoming\Constraint;
+use nostriphant\Transpher\Nostr\Event;
 
 readonly class Kind5 implements Kind {
 
@@ -12,12 +14,12 @@ readonly class Kind5 implements Kind {
     }
 
     #[\Override]
-    static function validate(\nostriphant\Transpher\Nostr\Event $event): \nostriphant\Transpher\Relay\Incoming\Constraint {
-        return \nostriphant\Transpher\Relay\Incoming\Constraint::accept();
+    static function validate(Event $event): Constraint {
+        return Constraint::accept($event);
     }
 
     #[\Override]
-    public function __invoke(\nostriphant\Transpher\Nostr\Event $event): void {
+    public function __invoke(Event $event): void {
         $prototypes = [];
         $possible_references = [
             'e' => 'ids',

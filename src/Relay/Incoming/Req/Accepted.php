@@ -16,14 +16,12 @@ class Accepted {
     }
 
     public function __invoke(string $subscription_id, \nostriphant\Transpher\Nostr\Filters $filters): mixed {
-        $constraint = ($this->limits)($this->subscriptions);
-        yield from $constraint(
-                rejected: fn(string $reason) => yield Factory::closed($subscription_id, $reason),
-                accepted: function () use ($subscription_id, $filters) {
+        yield from ($this->limits)($this->subscriptions)(
+                        rejected: fn(string $reason) => yield Factory::closed($subscription_id, $reason),
+                        accepted: function () use ($subscription_id, $filters) {
                             ($this->subscriptions)($subscription_id, $filters);
                             yield from array_map(partial_left([Factory::class, 'requestedEvent'], $subscription_id), ($this->events)($filters));
                             yield Factory::eose($subscription_id);
-                }
-        );
+        });
     }
 }

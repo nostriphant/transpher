@@ -31,12 +31,12 @@ readonly class Limits {
         return [$class, 'construct'](...$arguments);
     }
 
-    public function __invoke(): Constraint {
+    public function __invoke(mixed ...$args): Constraint {
         foreach ($this->checks as $reason => $check) {
-            if ($check(...func_get_args())) {
+            if ($check(...$args)) {
                 return Constraint::reject($reason);
             }
         }
-        return Constraint::accept();
+        return Constraint::accept(...$args);
     }
 }

@@ -19,11 +19,9 @@ readonly class Req implements Type {
         if (count($payload) < 2) {
             yield Factory::notice('Invalid message');
         } else {
-            $filter_prototypes = array_filter(array_slice($payload, 1));
-            $constraint = ($this->limits)($filter_prototypes);
-            yield from $constraint(
-                    rejected: fn(string $reason) => yield Factory::closed($payload[0], $reason),
-                            accepted: fn() => yield from ($this->accepted)($payload[0], Condition::makeFiltersFromPrototypes(...$filter_prototypes))
+            yield from ($this->limits)(array_filter(array_slice($payload, 1)))(
+                            rejected: fn(string $reason) => yield Factory::closed($payload[0], $reason),
+                            accepted: fn(array $filter_prototypes) => yield from ($this->accepted)($payload[0], Condition::makeFiltersFromPrototypes(...$filter_prototypes))
                     );
         }
     }

@@ -5,7 +5,7 @@ namespace nostriphant\Transpher\Relay\Incoming\Event;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Event\KindClass;
 use nostriphant\Transpher\Relay\Condition;
-use nostriphant\Transpher\Relay\Incoming\Constraint\Result;
+use nostriphant\Transpher\Nostr\Event;
 
 class Accepted {
 
@@ -17,24 +17,22 @@ class Accepted {
         
     }
 
-    public function __invoke(\nostriphant\Transpher\Nostr\Event $event): \Generator {
+    public function __invoke(Event $event): \Generator {
         $replaceable_events = [];
-        switch (\nostriphant\Transpher\Nostr\Event::determineClass($event)) {
+        switch (Event::determineClass($event)) {
             case KindClass::REGULAR:
                 $this->events[$event->id] = $event;
                 $kindClass = __NAMESPACE__ . '\\Kind' . $event->kind;
-                if (class_exists($kindClass)) {
-                    $incoming_kind = new $kindClass($this->events, $this->files);
-                    $validation = $kindClass::validate($event);
-                    switch ($validation->result) {
-                        case Result::ACCEPTED:
-                            $incoming_kind($event);
-                            break;
-
-                        case Result::REJECTED:
-                            yield Factory::ok($event->id, false, 'invalid:' . $validation->reason);
-                            return;
-                    }
+                if (class_exists($kindClass) === false) {
+                    yield from ($this->subscriptions)($event);
+                } else {
+                    yield from $kindClass::validate($event)(
+                                    accepted: function (Event $event) use ($kindClass) {
+                                        (new $kindClass($this->events, $this->files))($event);
+                                        yield from ($this->subscriptions)($event);
+                                    },
+                                    rejected: fn(string $reason) => yield Factory::ok($event->id, false, 'invalid:' . $reason)
+                            );
                 }
                 break;
 
@@ -52,16 +50,18 @@ class Accepted {
                     }
                     unset($this->events[$replace_id]);
                 }
+                yield from ($this->subscriptions)($event);
                 break;
 
             case KindClass::EPHEMERAL:
+                yield from ($this->subscriptions)($event);
                 break;
 
             case KindClass::ADDRESSABLE:
                 $replaceable_events = ($this->events)(Condition::makeFiltersFromPrototypes([
                             'kinds' => [$event->kind],
                             'authors' => [$event->pubkey],
-                            '#d' => \nostriphant\Transpher\Nostr\Event::extractTagValues($event, 'd')
+                            '#d' => Event::extractTagValues($event, 'd')
                 ]));
 
                 $this->events[$event->id] = $event;
@@ -72,25 +72,14 @@ class Accepted {
                     }
                     unset($this->events[$replace_id]);
                 }
+                yield from ($this->subscriptions)($event);
                 break;
 
             case KindClass::UNDEFINED:
             default:
                 yield Factory::notice('Undefined event kind ' . $event->kind);
-                return;
+                break;
         }
 
-        if (empty($this->subscriptions) === false) {
-            ($this->subscriptions)(function (callable $subscription, string $subscriptionId) use ($event) {
-                $to = $subscription($event);
-                if ($to === false) {
-                    return false;
-                }
-                $to(Factory::requestedEvent($subscriptionId, $event));
-                $to(Factory::eose($subscriptionId));
-                return true;
-            });
-        }
-        yield Factory::accept($event->id);
     }
 }

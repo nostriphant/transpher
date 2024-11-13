@@ -12,8 +12,8 @@ readonly class Constraint {
         
     }
 
-    static function accept(): self {
-        return new self(Constraint\Result::ACCEPTED, (fn(array $callbacks) => yield from $callbacks['accepted']()));
+    static function accept(mixed ...$args): self {
+        return new self(Constraint\Result::ACCEPTED, (fn(array $callbacks) => yield from $callbacks['accepted'](...$args)));
     }
 
     static function reject(string $reason): self {

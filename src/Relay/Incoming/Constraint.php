@@ -6,8 +6,7 @@ readonly class Constraint {
 
     private function __construct(
             public Constraint\Result $result,
-            public \Closure $callback,
-            public ?string $reason = null,
+            public \Closure $callback
     ) {
         
     }
@@ -17,7 +16,7 @@ readonly class Constraint {
     }
 
     static function reject(string $reason): self {
-        return new self(Constraint\Result::REJECTED, (fn(array $callbacks) => yield from $callbacks['rejected']($reason)), $reason);
+        return new self(Constraint\Result::REJECTED, (fn(array $callbacks) => yield from $callbacks['rejected']($reason)));
     }
 
     public function __invoke(callable ...$callbacks) {

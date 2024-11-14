@@ -2,16 +2,6 @@
 
 use nostriphant\Transpher\Relay\Incoming\Event\Limits;
 
-it('SHOULD ignore created_at limits for regular events', function () {
-    $limits = Limits::construct();
-
-    $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() - (60 * 60 * 24) - 5)(\Pest\key_sender()));
-    expect($limit)->toHaveState(accepted: '*');
-
-    $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() + (60 * 15) + 5)(\Pest\key_sender()));
-    expect($limit)->toHaveState(accepted: '*');
-});
-
 it('SHOULD send the client an OK result saying the event was not stored for the created_at timestamp not being within the permitted limits.', function (int $kind) {
     $limits = Limits::construct();
 
@@ -21,6 +11,7 @@ it('SHOULD send the client an OK result saying the event was not stored for the 
     $limit = $limits(\Pest\rumor(kind: $kind, pubkey: \Pest\pubkey_sender(), created_at: time() + (60 * 15) + 5)(\Pest\key_sender()));
     expect($limit)->toHaveState(rejected: ['the event created_at field is out of the acceptable range (+15min) for this relay']);
 })->with([
+    'regular' => 1,
     'replaceable' => 0,
     'ephemeral' => 20000,
     'addressable' => 30000
@@ -101,18 +92,6 @@ it('can be configured for event content max limit, only for certain event kinds.
     expect($limit)->toHaveState(accepted: '*');
 });
 
-it('SHOULD ignore created_at limits through env-vars for regular events', function () {
-    putenv('LIMIT_EVENT_CREATED_AT_LOWER_DELTA=60');
-    putenv('LIMIT_EVENT_CREATED_AT_UPPER_DELTA=15');
-    $limits = Limits::fromEnv();
-
-    $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() - 61)(\Pest\key_sender()));
-    expect($limit)->toHaveState(accepted: '*');
-
-    $limit = $limits(\Pest\rumor(kind: 1, pubkey: \Pest\pubkey_sender(), created_at: time() + 16)(\Pest\key_sender()));
-    expect($limit)->toHaveState(accepted: '*');
-});
-
 it('SHOULD send the client an OK result saying the event was not stored for the created_at timestamp not being within the permitted limits through env-vars.', function (int $kind) {
     putenv('LIMIT_EVENT_CREATED_AT_LOWER_DELTA=60');
     putenv('LIMIT_EVENT_CREATED_AT_UPPER_DELTA=15');
@@ -124,6 +103,7 @@ it('SHOULD send the client an OK result saying the event was not stored for the 
     $limit = $limits(\Pest\rumor(kind: $kind, pubkey: \Pest\pubkey_sender(), created_at: time() + 17)(\Pest\key_sender()));
     expect($limit)->toHaveState(rejected: ['the event created_at field is out of the acceptable range (+15sec) for this relay']);
 })->with([
+    'regular' => 1,
     'replaceable' => 0,
     'ephemeral' => 20000,
     'addressable' => 30000

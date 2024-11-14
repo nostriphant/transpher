@@ -172,7 +172,7 @@ namespace Pest {
                         
                     }
 
-                    public function __invoke(mixed ...$args): array {
+                    public function __invoke(mixed ...$args): \Generator {
                         if (is_array($this->expected_args)) {
                             foreach ($this->expected_args as $index => $expected_arg) {
                                 expect($args[$index])->toBe($expected_arg);
@@ -181,13 +181,13 @@ namespace Pest {
                             // accept everything!
                         }
                         $this->invoked = true;
-                        return [0];
+                        yield 0;
                     }
                 }, $expected_states);
     }
 
     function check_state_mocks(array $state_mocks) {
-        expect(array_reduce($state_mocks, fn(bool $carry, $mock) => $mock->invoked && $carry, true))->toBeTrue();
+        expect(array_reduce($state_mocks, fn(bool $carry, $mock) => $mock->invoked || $carry, false))->toBeTrue();
     }
 
 }

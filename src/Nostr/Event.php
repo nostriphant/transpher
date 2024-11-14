@@ -3,8 +3,7 @@
 namespace nostriphant\Transpher\Nostr;
 
 use nostriphant\Transpher\Nostr\Event\KindClass;
-use function \Functional\select,
-             \Functional\map;
+use nostriphant\Transpher\Alternate;
 
 readonly class Event {
 
@@ -35,8 +34,27 @@ readonly class Event {
         };
     }
 
+    static function alternateClass(self $event): Alternate {
+        return match (true) {
+            $event->kind === 1 => Alternate::regular($event),
+            $event->kind === 2 => Alternate::regular($event),
+            4 <= $event->kind && $event->kind < 45 => Alternate::regular($event),
+            1000 <= $event->kind && $event->kind < 10000 => Alternate::regular($event),
+            $event->kind == 0 => Alternate::replaceable($event),
+            $event->kind === 3 => Alternate::replaceable($event),
+            10000 <= $event->kind && $event->kind < 20000 => Alternate::replaceable($event),
+            20000 <= $event->kind && $event->kind < 30000 => Alternate::ephemeral($event),
+            30000 <= $event->kind && $event->kind < 40000 => Alternate::addressable($event),
+            default => Alternate::undefined($event),
+        };
+    }
+
+    static function hasTag(self $event, string $tag_identifier): bool {
+        return count(array_filter($event->tags, fn(array $tag) => $tag[0] === $tag_identifier)) > 0;
+    }
+
     static function extractTagValues(self $event, string $tag_identifier): array {
-        return map(select($event->tags, fn(array $tag) => $tag[0] === $tag_identifier), fn(array $tag) => $tag[1]);
+        return array_values(array_map(fn(array $tag) => array_slice($tag, 1), array_filter($event->tags, fn(array $tag) => $tag[0] === $tag_identifier)));
     }
 
     static function verify(self $event): bool {

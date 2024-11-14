@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay;
 
-use nostriphant\Transpher\Relay\Incoming\Constraint;
+use nostriphant\Transpher\Alternate;
 
 readonly class Limits {
 
@@ -12,12 +12,12 @@ readonly class Limits {
         
     }
 
-    static function fromEnv(string $class): self {
+    static function fromEnv(string $group, string $class): self {
         $arguments = [];
         $environment_variables = getenv(null);
         foreach ((new \ReflectionMethod($class, 'construct'))->getParameters() as $parameter) {
             $parameter_name = $parameter->getName();
-            $env_var_name = strtoupper('LIMIT_' . array_slice(explode('\\', $class), -2, 1)[0] . '_' . $parameter_name);
+            $env_var_name = strtoupper('LIMIT_' . $group . '_' . $parameter_name);
             if (isset($environment_variables[$env_var_name]) === false) {
                 continue;
             }
@@ -31,12 +31,12 @@ readonly class Limits {
         return [$class, 'construct'](...$arguments);
     }
 
-    public function __invoke(): Constraint {
+    public function __invoke(mixed ...$args): Alternate {
         foreach ($this->checks as $reason => $check) {
-            if ($check(...func_get_args())) {
-                return Constraint::reject($reason);
+            if ($check(...$args)) {
+                return Alternate::rejected($reason);
             }
         }
-        return Constraint::accept();
+        return Alternate::accepted(...$args);
     }
 }

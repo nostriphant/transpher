@@ -42,5 +42,15 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }
+    },
+    "scripts": {
+        "clearCache": [
+            "rm -rf ./data/events/*",
+            "rm -rf ./data/files/*"
+        ],
+        "test": [
+            "@clearCache @no_additional_args",
+            "./vendor/bin/pest"
+        ]
     }
 }

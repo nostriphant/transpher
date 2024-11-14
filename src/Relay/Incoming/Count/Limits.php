@@ -19,6 +19,6 @@ readonly class Limits {
     }
 
     static function fromEnv(): \nostriphant\Transpher\Relay\Limits {
-        return \nostriphant\Transpher\Relay\Limits::fromEnv(__CLASS__);
+        return \nostriphant\Transpher\Relay\Limits::fromEnv('COUNT', __CLASS__);
     }
 }

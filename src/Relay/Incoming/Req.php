@@ -4,14 +4,11 @@ namespace nostriphant\Transpher\Relay\Incoming;
 
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Relay\Condition;
-use function \Functional\map,
- \Functional\partial_left;
 
 readonly class Req implements Type {
 
     public function __construct(
-            private \nostriphant\Transpher\Relay\Store $events,
-            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
+            private Req\Accepted $accepted,
             private \nostriphant\Transpher\Relay\Limits $limits
     ) {
         
@@ -22,20 +19,10 @@ readonly class Req implements Type {
         if (count($payload) < 2) {
             yield Factory::notice('Invalid message');
         } else {
-            $filter_prototypes = array_filter(array_slice($payload, 1));
-            $constraint = ($this->limits)($this->subscriptions, $filter_prototypes);
-            switch ($constraint->result) {
-                case Constraint\Result::REJECTED:
-                    yield Factory::closed($payload[0], $constraint->reason);
-                    break;
-
-                case Constraint\Result::ACCEPTED:
-                    $filters = Condition::makeFiltersFromPrototypes(...$filter_prototypes);
-                    ($this->subscriptions)($payload[0], $filters);
-                    yield from map(($this->events)($filters), partial_left([Factory::class, 'requestedEvent'], $payload[0]));
-                    yield Factory::eose($payload[0]);
-                    break;
-            }
+            yield from ($this->limits)(array_filter(array_slice($payload, 1)))(
+                            rejected: fn(string $reason) => yield Factory::closed($payload[0], $reason),
+                            accepted: fn(array $filter_prototypes) => yield from ($this->accepted)($payload[0], Condition::makeFiltersFromPrototypes(...$filter_prototypes))
+                    );
         }
     }
 }

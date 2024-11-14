@@ -29,14 +29,39 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
 //);
 
-$store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data';
+$store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
 is_dir($store_path) || mkdir($store_path);
 $events = new nostriphant\Transpher\Directory($store_path);
-$incoming = new \nostriphant\Transpher\Relay\Incoming($events);
+
+$files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
+is_dir($files_path) || mkdir($files_path);
+$files = new \nostriphant\Transpher\Files($files_path);
+
+$incoming = new \nostriphant\Transpher\Relay\Incoming($events, $files);
 $clientHandler = new \nostriphant\Transpher\Relay($incoming, $logger);
 
 $router = new Router($server, $logger, $errorHandler);
 $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $logger, $acceptor, $clientHandler)));
+$router->addRoute('GET', '/{file:\w+}', new class($files) implements \Amp\Http\Server\RequestHandler {
+
+    public function __construct(private \nostriphant\Transpher\Files $files) {
+        
+    }
+
+
+    #[\Override]
+    public function handleRequest(\Amp\Http\Server\Request $request): \Amp\Http\Server\Response {
+        if (strcasecmp($request->getMethod(), 'HEAD') === 0) {
+            return new \Amp\Http\Server\Response(headers: ['Content-Type' => 'text/plain'], body: '');
+        } else {
+            $args = $request->getAttribute(Router::class);
+            return new \Amp\Http\Server\Response(
+                    headers: ['Content-Type' => 'text/plain'],
+                    body: ($this->files)($args['file'])()
+            );
+        }
+    }
+});
 
 $server->start($router, $errorHandler);
 

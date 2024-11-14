@@ -49,8 +49,11 @@ namespace {
         $this->value->messages = [];
     });
 
-    expect()->extend('toHaveState', function (\nostriphant\Transpher\Relay\Incoming\Constraint\Result $state) {
-        expect($this->value->result)->toBe($state);
+    expect()->extend('toHaveState', function (mixed ...$expected_state) {
+        foreach (call_user_func_array($this->value, $state_mocks = \Pest\generate_state_mocks(...$expected_state)) as $msg) {
+            
+        }
+        \Pest\check_state_mocks($state_mocks);
     });
 }
 
@@ -160,9 +163,31 @@ namespace Pest {
         return $to;
     }
 
+    function generate_state_mocks(mixed ...$expected_states) {
+        return array_map(fn(mixed $expected_args) => new class($expected_args) {
 
-    function rejected(string $expected_reason) {
-        return ['rejected' => fn(string $reason) => expect($reason)->toBe($expected_reason)];
+                    public bool $invoked = false;
+
+                    public function __construct(private array|string $expected_args) {
+                        
+                    }
+
+                    public function __invoke(mixed ...$args): array {
+                        if (is_array($this->expected_args)) {
+                            foreach ($this->expected_args as $index => $expected_arg) {
+                                expect($args[$index])->toBe($expected_arg);
+                            }
+                        } elseif ($this->expected_args === '*') {
+                            // accept everything!
+                        }
+                        $this->invoked = true;
+                        return [0];
+                    }
+                }, $expected_states);
+    }
+
+    function check_state_mocks(array $state_mocks) {
+        expect(array_reduce($state_mocks, fn(bool $carry, $mock) => $mock->invoked && $carry, true))->toBeTrue();
     }
 
 }

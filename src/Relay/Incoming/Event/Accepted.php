@@ -16,28 +16,12 @@ class Accepted {
     }
 
     public function __invoke(Event $event): \Generator {
-        switch (Event::determineClass($event)) {
-            case KindClass::REGULAR:
-                yield from (new Regular($this->events, $this->files, $this->subscriptions))($event);
-                break;
-
-            case KindClass::REPLACEABLE:
-                yield from (new Replaceable($this->events, $this->subscriptions))($event);
-                break;
-
-            case KindClass::EPHEMERAL:
-                yield from (new Ephemeral($this->subscriptions))($event);
-                break;
-
-            case KindClass::ADDRESSABLE:
-                yield from (new Addressable($this->events, $this->subscriptions))($event);
-                break;
-
-            case KindClass::UNDEFINED:
-            default:
-                yield from (new Undefined())($event);
-                break;
-        }
-
+        yield from Event::alternateClass($event)(
+                        regular: new Regular($this->events, $this->files, $this->subscriptions),
+                        replaceable: new Replaceable($this->events, $this->subscriptions),
+                        ephemeral: new Ephemeral($this->subscriptions),
+                        addressable: new Addressable($this->events, $this->subscriptions),
+                        undefined: new Undefined()
+                );
     }
 }

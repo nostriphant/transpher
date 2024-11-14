@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
-use nostriphant\Transpher\Nostr\Event\KindClass;
 use nostriphant\Transpher\Nostr\Event;
 
 class Accepted {

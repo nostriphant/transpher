@@ -1,7 +1,6 @@
 <?php
 
 use nostriphant\Transpher\Relay\Incoming\Req\Limits;
-use nostriphant\Transpher\Relay\Incoming\Constraint\Result;
 
 it('has a maximum number of filters per subscription.', function () {
     $limits = Limits::construct(max_filters_per_subscription: 1);

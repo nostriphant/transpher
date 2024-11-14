@@ -1,8 +1,5 @@
 <?php
 
-use nostriphant\Transpher\Relay\Incoming\Req\Limits;
-use nostriphant\Transpher\Relay\Incoming\Constraint\Result;
-
 it('has a maximum number of subscriptions per connected client.', function () {
     $subscriptions = \Pest\subscriptions();
 

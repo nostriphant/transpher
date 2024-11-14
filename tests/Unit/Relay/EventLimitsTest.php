@@ -1,7 +1,6 @@
 <?php
 
 use nostriphant\Transpher\Relay\Incoming\Event\Limits;
-use nostriphant\Transpher\Relay\Incoming\Constraint\Result;
 
 it('SHOULD ignore created_at limits for regular events', function () {
     $limits = Limits::construct();

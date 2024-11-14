@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Relay\Incoming;
+namespace nostriphant\Transpher;
 
 readonly class Alternate {
 

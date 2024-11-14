@@ -2,11 +2,14 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
+use nostriphant\Transpher\Nostr\Event;
+use nostriphant\Transpher\Alternate;
+
 interface Kind {
 
     public function __construct(\nostriphant\Transpher\Relay\Store $store, string $files);
 
-    static function validate(\nostriphant\Transpher\Nostr\Event $event): \nostriphant\Transpher\Relay\Incoming\Alternate;
+    static function validate(Event $event): Alternate;
 
-    public function __invoke(\nostriphant\Transpher\Nostr\Event $event): void;
+    public function __invoke(Event $event): void;
 }

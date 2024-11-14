@@ -15,7 +15,12 @@ readonly class Files {
 
             }
 
-            public function __invoke(string $event_id, string $remote_file): void {
+            public function __invoke(): ?string {
+                if (func_num_args() === 0) {
+                    return file_get_contents($this->path);
+                }
+
+                list($event_id, $remote_file) = func_get_args();
                 $remote_handle = fopen($remote_file, 'r');
                 $local_handle = fopen($this->path, 'w');
                 while ($buffer = fread($remote_handle, 512)) {
@@ -26,6 +31,7 @@ readonly class Files {
 
                 mkdir($this->path . '.events');
                 touch($this->path . '.events/' . $event_id);
+                return null;
             }
         };
     }

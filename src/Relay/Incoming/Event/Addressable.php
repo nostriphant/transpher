@@ -18,7 +18,7 @@ class Addressable {
         $replaceable_events = ($this->events)(Condition::makeFiltersFromPrototypes([
                     'kinds' => [$event->kind],
                     'authors' => [$event->pubkey],
-                    '#d' => Event::extractTagValues($event, 'd')
+                    '#d' => array_map(fn(array $tag_values) => $tag_values[0], Event::extractTagValues($event, 'd'))
         ]));
 
         $this->events[$event->id] = $event;

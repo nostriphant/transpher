@@ -27,10 +27,10 @@ class Kind1063 implements Kind {
     #[\Override]
     public function __invoke(Event $event): void {
         $urls = Event::extractTagValues($event, 'url');
-        $remote_handle = fopen($urls[0], 'r');
+        $remote_handle = fopen($urls[0][0], 'r');
 
         $x = Event::extractTagValues($event, 'x');
-        $local_file = $this->files . '/' . $x[0];
+        $local_file = $this->files . '/' . $x[0][0];
         $local_handle = fopen($local_file, 'w');
         while ($buffer = fread($remote_handle, 512)) {
             fwrite($local_handle, $buffer);

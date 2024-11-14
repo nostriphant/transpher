@@ -54,7 +54,7 @@ readonly class Event {
     }
 
     static function extractTagValues(self $event, string $tag_identifier): array {
-        return array_values(array_map(fn(array $tag) => $tag[1], array_filter($event->tags, fn(array $tag) => $tag[0] === $tag_identifier)));
+        return array_values(array_map(fn(array $tag) => array_slice($tag, 1), array_filter($event->tags, fn(array $tag) => $tag[0] === $tag_identifier)));
     }
 
     static function verify(self $event): bool {

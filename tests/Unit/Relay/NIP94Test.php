@@ -42,7 +42,6 @@ it('refuses NIP-94 files with missing url-tag', function () {
     expect(\Pest\handle($message, incoming()))->toHaveReceived(
             ['OK', $message()[1]['id'], false, 'invalid:missing url-tag']
     );
-
 });
 
 it('refuses NIP-94 files (kind 1063) with missing hash (x)', function () {

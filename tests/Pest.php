@@ -120,7 +120,7 @@ namespace Pest {
     }
 
     function incoming(?\nostriphant\Transpher\Relay\Store $store = null, string $files = ROOT_DIR . '/data/files') {
-        return new Incoming($store ?? store(), $files);
+        return new Incoming($store ?? store(), new \nostriphant\Transpher\Files($files));
     }
 
     function vectors(string $name): object {

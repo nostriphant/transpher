@@ -31,12 +31,13 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 
 $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
 is_dir($store_path) || mkdir($store_path);
+$events = new nostriphant\Transpher\Directory($store_path);
 
 $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 is_dir($files_path) || mkdir($files_path);
+$files = new \nostriphant\Transpher\Files($files_path);
 
-$events = new nostriphant\Transpher\Directory($store_path);
-$incoming = new \nostriphant\Transpher\Relay\Incoming($events, $files_path);
+$incoming = new \nostriphant\Transpher\Relay\Incoming($events, $files);
 $clientHandler = new \nostriphant\Transpher\Relay($incoming, $logger);
 
 $router = new Router($server, $logger, $errorHandler);

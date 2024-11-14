@@ -8,8 +8,8 @@ use nostriphant\Transpher\Alternate;
 class Kind1 implements Kind {
 
     #[\Override]
-    public function __construct(private \nostriphant\Transpher\Relay\Store $store, private string $files) {
-
+    public function __construct(private \nostriphant\Transpher\Relay\Store $store, private \nostriphant\Transpher\Files $files) {
+        
     }
 
     #[\Override]
@@ -32,27 +32,18 @@ class Kind1 implements Kind {
                         break;
 
                     case 'x':
-                        $local_file = $this->files . '/' . $value;
+                        $hash = $value;
                         break;
                 }
             }
 
             if (isset($remote_file) === false) {
                 return;
-            } elseif (isset($local_file) === false) {
+            } elseif (isset($hash) === false) {
                 return;
             }
 
-            $remote_handle = fopen($remote_file, 'r');
-            $local_handle = fopen($local_file, 'w');
-            while ($buffer = fread($remote_handle, 512)) {
-                fwrite($local_handle, $buffer);
-            }
-            fclose($remote_handle);
-            fclose($local_handle);
-
-            mkdir($local_file . '.events');
-            touch($local_file . '.events/' . $event->id);
+            ($this->files)($hash)($event->id, $remote_file);
         }
     }
 }

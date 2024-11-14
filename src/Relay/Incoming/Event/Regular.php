@@ -9,7 +9,7 @@ class Regular {
 
     public function __construct(
             private \nostriphant\Transpher\Relay\Store $events,
-            private string $files,
+            private \nostriphant\Transpher\Files $files,
             private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
     ) {
         

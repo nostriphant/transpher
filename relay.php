@@ -51,11 +51,15 @@ $router->addRoute('GET', '/{file:\w+}', new class($files) implements \Amp\Http\S
 
     #[\Override]
     public function handleRequest(\Amp\Http\Server\Request $request): \Amp\Http\Server\Response {
-        $args = $request->getAttribute(Router::class);
-        return new \Amp\Http\Server\Response(
-                headers: ['Content-Type' => 'text/plain'],
-                body: ($this->files)($args['file'])()
-        );
+        if (strcasecmp($request->getMethod(), 'HEAD') === 0) {
+            return new \Amp\Http\Server\Response(headers: ['Content-Type' => 'text/plain'], body: '');
+        } else {
+            $args = $request->getAttribute(Router::class);
+            return new \Amp\Http\Server\Response(
+                    headers: ['Content-Type' => 'text/plain'],
+                    body: ($this->files)($args['file'])()
+            );
+        }
     }
 });
 

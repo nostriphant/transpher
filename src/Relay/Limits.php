@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay;
 
-use nostriphant\Transpher\Relay\Incoming\Constraint;
+use nostriphant\Transpher\Relay\Incoming\Alternate;
 
 readonly class Limits {
 
@@ -31,12 +31,12 @@ readonly class Limits {
         return [$class, 'construct'](...$arguments);
     }
 
-    public function __invoke(mixed ...$args): Constraint {
+    public function __invoke(mixed ...$args): Alternate {
         foreach ($this->checks as $reason => $check) {
             if ($check(...$args)) {
-                return Constraint::rejected($reason);
+                return Alternate::rejected($reason);
             }
         }
-        return Constraint::accepted(...$args);
+        return Alternate::accepted(...$args);
     }
 }

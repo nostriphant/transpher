@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Relay\Condition;
-use nostriphant\Transpher\Relay\Incoming\Constraint;
+use nostriphant\Transpher\Relay\Incoming\Alternate;
 use nostriphant\Transpher\Nostr\Event;
 
 readonly class Kind5 implements Kind {
@@ -14,8 +14,8 @@ readonly class Kind5 implements Kind {
     }
 
     #[\Override]
-    static function validate(Event $event): Constraint {
-        return Constraint::accepted($event);
+    static function validate(Event $event): Alternate {
+        return Alternate::accepted($event);
     }
 
     #[\Override]

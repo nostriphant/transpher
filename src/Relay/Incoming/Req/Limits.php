@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Req;
 
-use nostriphant\Transpher\Relay\Incoming\Constraint;
+use nostriphant\Transpher\Relay\Incoming\Alternate;
 use nostriphant\Transpher\Relay\Subscriptions;
 
 readonly class Limits {

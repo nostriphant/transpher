@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
-use nostriphant\Transpher\Relay\Incoming\Constraint;
+use nostriphant\Transpher\Relay\Incoming\Alternate;
 use nostriphant\Transpher\Nostr\Event;
 use nostriphant\Transpher\Nostr\Event\KindClass;
 

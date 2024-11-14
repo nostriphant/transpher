@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming;
 
-readonly class Constraint {
+readonly class Alternate {
 
     private function __construct(
             public \Closure $callback

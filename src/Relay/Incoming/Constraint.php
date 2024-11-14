@@ -10,12 +10,8 @@ readonly class Constraint {
         
     }
 
-    static function accepted(mixed ...$args): self {
-        return new self(fn(callable ...$callbacks) => yield from $callbacks['accepted'](...$args));
-    }
-
-    static function rejected(string $reason): self {
-        return new self(fn(callable ...$callbacks) => yield from $callbacks['rejected']($reason));
+    static function __callStatic(string $name, array $arguments): self {
+        return new self(fn(callable ...$callbacks) => yield from $callbacks[$name](...$arguments));
     }
 
     public function __invoke(callable ...$callbacks) {

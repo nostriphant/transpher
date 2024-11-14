@@ -28,7 +28,7 @@ class Kind1 implements Kind {
                 list($property, $value) = explode(' ', $imeta_value);
                 switch ($property) {
                     case 'url':
-                        $remote_handle = fopen($value, 'r');
+                        $remote_file = $value;
                         break;
 
                     case 'x':
@@ -37,12 +37,13 @@ class Kind1 implements Kind {
                 }
             }
 
-            if (isset($remote_handle) === false) {
+            if (isset($remote_file) === false) {
                 return;
             } elseif (isset($local_file) === false) {
                 return;
             }
 
+            $remote_handle = fopen($remote_file, 'r');
             $local_handle = fopen($local_file, 'w');
             while ($buffer = fread($remote_handle, 512)) {
                 fwrite($local_handle, $buffer);

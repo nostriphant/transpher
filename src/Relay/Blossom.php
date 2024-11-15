@@ -2,13 +2,17 @@
 
 namespace nostriphant\Transpher\Relay;
 
-class Blossom implements \Amp\Http\Server\RequestHandler {
+readonly class Blossom implements \Amp\Http\Server\RequestHandler {
 
-    public function __construct(
-            private \nostriphant\Transpher\Files $files,
-            private \Amp\Http\Server\Router $router
+    private function __construct(private \nostriphant\Transpher\Files $files) {
+        
+    }
+
+    static function connect(
+            \nostriphant\Transpher\Files $files,
+            \Amp\Http\Server\Router $router
     ) {
-        $router->addRoute('GET', '/{file:\w+}', $this);
+        $router->addRoute('GET', '/{file:\w+}', new self($files));
     }
 
     #[\Override]
@@ -16,7 +20,7 @@ class Blossom implements \Amp\Http\Server\RequestHandler {
         if (strcasecmp($request->getMethod(), 'HEAD') === 0) {
             return new \Amp\Http\Server\Response(headers: ['Content-Type' => 'text/plain'], body: '');
         } else {
-            $args = $request->getAttribute(Router::class);
+            $args = $request->getAttribute(\Amp\Http\Server\Router::class);
             return new \Amp\Http\Server\Response(
                     headers: ['Content-Type' => 'text/plain'],
                     body: ($this->files)($args['file'])()

@@ -52,4 +52,8 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Tests
-        run: ./vendor/bin/pest --ci
+        run: |
+          mkdir ./data
+          mkdir ./data/events
+          mkdir ./data/files
+          ./vendor/bin/pest --ci

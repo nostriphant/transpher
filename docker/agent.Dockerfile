@@ -3,7 +3,7 @@ FROM php:8.3
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 RUN ["apt", "update"]
-RUN ["apt-get", "install", "-y", "libzip-dev", "zip", "libgmp-dev", "libsodium-dev"]
+RUN ["apt-get", "install", "-y", "libzip-dev", "zip", "libgmp-dev", "libsodium-dev", "autoconf", "build-essential", "git", "libtool", "pkgconf"]
 
 RUN ["docker-php-ext-configure", "pcntl", "--enable-pcntl"]
 RUN ["docker-php-ext-install", "zip", "gmp", "pcntl"]
@@ -11,6 +11,16 @@ RUN ["docker-php-ext-install", "zip", "gmp", "pcntl"]
 RUN ["pecl", "install", "--force", "redis"]
 RUN ["rm", "-rf", "/tmp/pear"]
 RUN ["docker-php-ext-enable", "redis", "sodium"]
+
+WORKDIR "/opt"
+RUN ["git", "clone", "https://github.com/1ma/secp256k1-nostr-php"]
+WORKDIR "/opt/secp256k1-nostr-php"
+RUN ["git", "submodule", "init"]
+RUN ["git", "submodule", "update"]
+RUN ["make", "secp256k1", "ext"]
+RUN ["make", "check"]
+RUN ["make", "install"]
+ADD ["./docker/ext-secp256k1-nostr-php.ini", "$PHP_INI_DIR/conf.d/ext-secp256k1-nostr-php.ini"]
 
 WORKDIR "/app"
 COPY ["composer.json", "composer.lock", "bootstrap.php", "agent.php", "."]

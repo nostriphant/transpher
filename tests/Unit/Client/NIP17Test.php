@@ -14,7 +14,7 @@ it('relays private direct messsage from alice to bob', function (): void {
     $event = Factory::privateDirect($alice_key, $bob_key(Key::public(Key\Format::HEXIDECIMAL)), 'Hello!!');
 
     expect(\Pest\handle($event, incoming(store: $store)))->toHaveReceived(
-            ['OK']
+            ['OK', $event()[1]['id'], true]
     );
 
     $recipient = \Pest\handle(Factory::req($subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), incoming(store: $store));

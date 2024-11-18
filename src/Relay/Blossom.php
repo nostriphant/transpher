@@ -12,6 +12,7 @@ readonly class Blossom implements \Amp\Http\Server\RequestHandler {
             \nostriphant\Transpher\Files $files,
             \Amp\Http\Server\Router $router
     ) {
+        $router->addRoute('HEAD', '/{file:\w+}', new self($files));
         $router->addRoute('GET', '/{file:\w+}', new self($files));
     }
 

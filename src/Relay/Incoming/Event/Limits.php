@@ -13,8 +13,8 @@ readonly class Limits {
             ?array $kind_whitelist = null,
             ?array $kind_blacklist = null,
             null|int|array $content_maxlength = null,
-            $eventid_min_leading_zeros = 0,
-            $pubkey_min_leading_zeros = 0
+            int $eventid_min_leading_zeros = 0,
+            int $pubkey_min_leading_zeros = 0
     ): \nostriphant\Transpher\Relay\Limits {
         
         $checks = [

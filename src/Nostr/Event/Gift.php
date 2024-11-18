@@ -19,9 +19,9 @@ class Gift {
         $encrypter = Nostr::encrypt($randomKey, hex2bin($recipient_pubkey));
         $gift = new Rumor(
             pubkey: $randomKey(Key::public()),
-            created_at: mktime(rand(0,23), rand(0,59), rand(0,59)),
-            kind: 1059, 
-            content: $encrypter(Nostr::encode(get_object_vars($event))), 
+            created_at: time() - rand(0, 60 * 60 * 48),
+                kind: 1059,
+                content: $encrypter(Nostr::encode(get_object_vars($event))), 
             tags: [['p', $recipient_pubkey]]
         );
         return $gift($randomKey);

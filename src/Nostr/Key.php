@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Nostr;
 use Elliptic\EC;
-use Mdanter\Ecc\Crypto\Signature\SchnorrSignature;
 
 readonly class Key {
 
@@ -31,20 +30,12 @@ readonly class Key {
         return self::fromHex($key->priv->toString('hex'));
     }
 
-    static function signer(string $message): callable {
-        return fn(string $private_key) => (new SchnorrSignature())->sign($private_key, $message)['signature'];
+    static function signer(string $hash): callable {
+        return fn(string $private_key) => secp256k1_nostr_sign($private_key, $hash);
     }
 
-    static function verify(string $pubkey, string $signature, string $message): bool {
-        $reporting = set_error_handler(fn() => null);
-        try {
-            $verification = (new SchnorrSignature())->verify($pubkey, $signature, $message);
-        } catch (\Throwable $e) {
-            file_append_contents(ROOT_DIR . '/logs/errors.log', $e->getFile() . '@' . $e->getLine() . ': ' . $e->getMessage() . '( ' . $signature . '  )' . PHP_EOL);
-            $verification = false;
-        }
-        set_error_handler($reporting);
-        return $verification;
+    static function verify(string $pubkey, string $signature, string $hash): bool {
+        return secp256k1_nostr_verify($pubkey, $hash, $signature);
     }
 
     static function sharedSecret(#[\SensitiveParameter] string $recipient_pubkey) {

@@ -18,12 +18,10 @@ it('accepts a kind 1 and answers with OK', function () {
 });
 
 it('rejects a kind 1 and answers with OK, false, when signature is wrong', function () {
-    
-
     $sender_key = \Pest\key_sender();
     $message = Factory::event($sender_key, 1, 'Hello World');
     $message_raw = $message();
-    $message_raw[1]['sig'] = 'improper signature here';
+    $message_raw[1]['sig'] = \Pest\key_recipient()(\nostriphant\Transpher\Nostr\Key::signer(hash('sha256', 'improper signature here')));
     $recipient = \Pest\handle(new nostriphant\Transpher\Nostr\Message(...$message_raw));
 
     expect($recipient)->toHaveReceived(

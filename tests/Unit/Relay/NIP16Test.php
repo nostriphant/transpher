@@ -53,13 +53,16 @@ it('replaces replaceable (10000 lte n < 20000) events, keeping only the last one
         $original_event = Factory::event($sender_key, $kind, 'Hello World');
         $recipient = \Pest\handle($original_event, incoming(store: $store));
 
+        expect($recipient)->toHaveReceived(['OK', $original_id = $original_event()[1]['id'], true]);
         expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
-        $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100);
+        $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 10);
         $recipient = \Pest\handle($updated_event, incoming(store: $store));
 
-        expect(isset($store[$original_event()[1]['id']]))->ToBeFalse();
-        expect(isset($store[$updated_event()[1]['id']]))->toBeTrue();
+        expect($recipient)->toHaveReceived(['OK', $updated_id = $updated_event()[1]['id'], true]);
+
+        expect(isset($store[$original_id]))->ToBeFalse();
+        expect(isset($store[$updated_id]))->toBeTrue();
     }
 });
 
@@ -101,7 +104,7 @@ it('replaces replaceable (n == 0) events, keeping only the last one (based on pu
 
     expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
-    $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100);
+    $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 10);
     $recipient = \Pest\handle($updated_event, incoming(store: $store));
 
     expect(isset($store[$original_event()[1]['id']]))->ToBeFalse();

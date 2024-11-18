@@ -7,12 +7,41 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install secp256k1_nostr extension for PHP
+        run: sudo apt install autoconf build-essential git libtool pkgconf
+
+      - name: Clone secp256k1_nostr extension for PHP repository
+        uses: actions/checkout@v4
+        with:
+          repository: '1ma/secp256k1-nostr-php'
+          ref: 'v0.1.3'
+          path: '../../1ma/secp256k1-nostr-php'
+
+      - name: Init secp256k1_nostr extension for PHP
+        working-directory: $GITHUB_WORKSPACE/../../1ma/secp256k1-nostr-php
+        run: |
+          git submodule init
+          git submodule update
+
+      - name: Build secp256k1_nostr extension for PHP
+        working-directory: $GITHUB_WORKSPACE/../../1ma/secp256k1-nostr-php
+        run: |
+          make secp256k1 ext
+          make check
+
+      - name: Install secp256k1_nostr extension for PHP
+        working-directory: $GITHUB_WORKSPACE/../../1ma/secp256k1-nostr-php
+        run: |
+          sudo make install
+          sudo cp $GITHUB_WORKSPACE/docker/ext-secp256k1-nostr-php.ini", "$PHP_INI_DIR/conf.d/ext-secp256k1-nostr-php.ini"]
+
       - name: Checkout
         uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          extensions: secp256k1_nostr
           php-version: 8.3
           tools: composer:v2
           coverage: xdebug

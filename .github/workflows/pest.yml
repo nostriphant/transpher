@@ -18,22 +18,20 @@ jobs:
           path: 'build/1ma/secp256k1-nostr-php'
 
       - name: Init secp256k1_nostr extension for PHP
-        working-directory: $GITHUB_WORKSPACE/build/1ma/secp256k1-nostr-php
+        working-directory: ./build/1ma/secp256k1-nostr-php
         run: |
           git submodule init
           git submodule update
 
       - name: Build secp256k1_nostr extension for PHP
-        working-directory: $GITHUB_WORKSPACE/build/1ma/secp256k1-nostr-php
+        working-directory: ./build/1ma/secp256k1-nostr-php
         run: |
           make secp256k1 ext
           make check
 
       - name: Install secp256k1_nostr extension for PHP
-        working-directory: $GITHUB_WORKSPACE/build/1ma/secp256k1-nostr-php
-        run: |
-          sudo make install
-          sudo cp $GITHUB_WORKSPACE/docker/ext-secp256k1-nostr-php.ini", "$PHP_INI_DIR/conf.d/ext-secp256k1-nostr-php.ini"]
+        working-directory: ./build/1ma/secp256k1-nostr-php
+        run: sudo make install
 
       - name: Checkout
         uses: actions/checkout@v3

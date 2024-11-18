@@ -7,6 +7,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          tools: composer:v2
+          coverage: xdebug
+          
       - name: Install secp256k1_nostr extension for PHP
         run: sudo apt install autoconf build-essential git libtool pkgconf
 
@@ -40,9 +47,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           ini-values: extension=secp256k1_nostr.so
-          php-version: 8.3
-          tools: composer:v2
-          coverage: xdebug
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader

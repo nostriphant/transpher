@@ -49,7 +49,6 @@ it('refuses NIP-94 files (kind 1063) with missing hash (x)', function () {
     file_put_contents($file, 'Hello world 2!');
     $hash = hash_file('sha256', $file);
 
-    unlink(ROOT_DIR . '/data/files/' . $hash);
     expect(ROOT_DIR . '/data/files/' . $hash)->not()->toBeFile();
 
     $sender_key = \Pest\key_sender();
@@ -71,7 +70,6 @@ it('refuses NIP-94 files (kind 1063) with missing original hash (ox)', function 
     file_put_contents($file, 'Hello world 2!');
     $hash = hash_file('sha256', $file);
 
-    unlink(ROOT_DIR . '/data/files/' . $hash);
     expect(ROOT_DIR . '/data/files/' . $hash)->not()->toBeFile();
 
     $sender_key = \Pest\key_sender();

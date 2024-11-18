@@ -56,4 +56,4 @@ jobs:
           mkdir ./data
           mkdir ./data/events
           mkdir ./data/files
-          ./vendor/bin/pest --ci
+          composer test -- --parallel

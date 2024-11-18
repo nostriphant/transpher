@@ -7,6 +7,7 @@ use nostriphant\Transpher\Nostr\Event\Seal;
 use function Pest\incoming;
 
 it('relays private direct messsage from alice to bob', function (): void {
+    putenv('LIMIT_EVENT_CREATED_AT_LOWER_DELTA=' . (60 * 60 * 72));
     $store = \Pest\store();
     $alice_key = \Pest\key_sender();
 
@@ -35,4 +36,5 @@ it('relays private direct messsage from alice to bob', function (): void {
                 }],
             ['EOSE', $subscriptionId]
     );
+    putenv('LIMIT_EVENT_CREATED_AT_LOWER_DELTA');
 });

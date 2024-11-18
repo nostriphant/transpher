@@ -13,7 +13,7 @@ it('replaces replaceable (n == 3; follow list) events, keeping only the last one
 
     expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
-    $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 100);
+    $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 10);
     $recipient = \Pest\handle($updated_event, incoming(store: $store));
 
     expect(isset($store[$original_event()[1]['id']]))->ToBeFalse();

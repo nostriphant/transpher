@@ -39,7 +39,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          extensions: secp256k1_nostr
+          ini-values: extension=secp256k1_nostr.so
           php-version: 8.3
           tools: composer:v2
           coverage: xdebug

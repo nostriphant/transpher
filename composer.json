@@ -12,7 +12,6 @@
         "simplito/elliptic-php": "^1.0",
         "rikmeijer/functional-php": "^1.0",
         "phpseclib/phpseclib": "^3.0",
-        "bitwasp/bech32": "^0.0.1",
         "amphp/http-server": "^3.3",
         "amphp/byte-stream": "^2.1",
         "amphp/log": "^2.0",
@@ -20,7 +19,8 @@
         "amphp/http-server-router": "^2.0",
         "amphp/http-server-static-content": "^2.0",
         "amphp/websocket-client": "^2.0",
-        "public-square/phpecc": "^0.1.2"
+        "public-square/phpecc": "^0.1.2",
+        "nostriphant/nip19": "^1.0"
     },
     "license": "MIT",
     "autoload": {

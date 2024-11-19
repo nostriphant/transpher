@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b8559bbc696b66368cf0db1694917f11",
+    "content-hash": "2f899e93a38f0a54890c305b8dad7d70",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2465,6 +2465,51 @@
             "time": "2018-02-13T20:26:39+00:00"
         },
         {
+            "name": "nostriphant/nip19",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nostriphant/nip19.git",
+                "reference": "8a27358e0f5525ff2560794eb9c45bbc9a248267"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nostriphant/nip19/zipball/8a27358e0f5525ff2560794eb9c45bbc9a248267",
+                "reference": "8a27358e0f5525ff2560794eb9c45bbc9a248267",
+                "shasum": ""
+            },
+            "require": {
+                "bitwasp/bech32": "^0.0.1",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "pestphp/pest": "^2.35"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "nostriphant\\NIP19\\": "src/",
+                    "nostriphant\\NIP19Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nostriphant.dev",
+                    "email": "hello@nostriphant.dev"
+                }
+            ],
+            "description": "Nostr NIP-19 bech32-encoded entities in PHP",
+            "support": {
+                "issues": "https://github.com/nostriphant/nip19/issues",
+                "source": "https://github.com/nostriphant/nip19/tree/1.0"
+            },
+            "time": "2024-11-19T15:18:11+00:00"
+        },
+        {
             "name": "paragonie/constant_time_encoding",
             "version": "v3.0.0",
             "source": {
@@ -4033,28 +4078,28 @@
         },
         {
             "name": "jean85/pretty-package-versions",
-            "version": "2.0.6",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Jean85/pretty-package-versions.git",
-                "reference": "f9fdd29ad8e6d024f52678b570e5593759b550b4"
+                "reference": "3c4e5f62ba8d7de1734312e4fff32f67a8daaf10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Jean85/pretty-package-versions/zipball/f9fdd29ad8e6d024f52678b570e5593759b550b4",
-                "reference": "f9fdd29ad8e6d024f52678b570e5593759b550b4",
+                "url": "https://api.github.com/repos/Jean85/pretty-package-versions/zipball/3c4e5f62ba8d7de1734312e4fff32f67a8daaf10",
+                "reference": "3c4e5f62ba8d7de1734312e4fff32f67a8daaf10",
                 "shasum": ""
             },
             "require": {
-                "composer-runtime-api": "^2.0.0",
-                "php": "^7.1|^8.0"
+                "composer-runtime-api": "^2.1.0",
+                "php": "^7.4|^8.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.2",
                 "jean85/composer-provided-replaced-stub-package": "^1.0",
                 "phpstan/phpstan": "^1.4",
-                "phpunit/phpunit": "^7.5|^8.5|^9.4",
-                "vimeo/psalm": "^4.3"
+                "phpunit/phpunit": "^7.5|^8.5|^9.6",
+                "vimeo/psalm": "^4.3 || ^5.0"
             },
             "type": "library",
             "extra": {
@@ -4086,9 +4131,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Jean85/pretty-package-versions/issues",
-                "source": "https://github.com/Jean85/pretty-package-versions/tree/2.0.6"
+                "source": "https://github.com/Jean85/pretty-package-versions/tree/2.1.0"
             },
-            "time": "2024-03-08T09:58:59+00:00"
+            "time": "2024-11-18T16:19:46+00:00"
         },
         {
             "name": "mockery/mockery",

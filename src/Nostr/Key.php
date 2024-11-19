@@ -2,6 +2,7 @@
 
 namespace nostriphant\Transpher\Nostr;
 use Elliptic\EC;
+use nostriphant\NIP19\Bech32;
 
 readonly class Key {
 

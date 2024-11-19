@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "144b452de2f5d079ae855ee0d375fb5c",
+    "content-hash": "d8c1be37ff59f8006002875a146c83ae",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2390,7 +2390,7 @@
         },
         {
             "name": "nostriphant/nip01",
-            "version": "1.0",
+            "version": "1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip01.git",
@@ -2429,7 +2429,7 @@
             "description": "Nostr NIP-01 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip01/issues",
-                "source": "https://github.com/nostriphant/nip01/tree/1.0"
+                "source": "https://github.com/nostriphant/nip01/tree/1.1"
             },
             "time": "2024-11-19T19:29:50+00:00"
         },
@@ -7221,8 +7221,7 @@
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3",
-        "ext-pcntl": "*",
-        "ext-secp256k1_nostr": "*"
+        "ext-pcntl": "*"
     },
     "platform-dev": {},
     "plugin-api-version": "2.6.0"

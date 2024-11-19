@@ -12,7 +12,7 @@ it('relays private direct messsage from alice to bob', function (): void {
     $alice_key = \Pest\key_sender();
 
     $bob_key = \Pest\key_recipient();
-    $event = Factory::privateDirect($alice_key, $bob_key(Key::public(Key\Format::HEXIDECIMAL)), 'Hello!!');
+    $event = Factory::privateDirect($alice_key, $bob_key(Key::public()), 'Hello!!');
 
     expect(\Pest\handle($event, incoming(store: $store)))->toHaveReceived(
             ['OK', $event()[1]['id'], true]

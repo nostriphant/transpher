@@ -2390,19 +2390,20 @@
         },
         {
             "name": "nostriphant/nip01",
-            "version": "1.1",
+            "version": "1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip01.git",
-                "reference": "847ccef489c1baade97aabbba1318cdc3917d188"
+                "reference": "0bb793bd58ef3e8346ccdf2314c4f88259dfc6fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip01/zipball/847ccef489c1baade97aabbba1318cdc3917d188",
-                "reference": "847ccef489c1baade97aabbba1318cdc3917d188",
+                "url": "https://api.github.com/repos/nostriphant/nip01/zipball/0bb793bd58ef3e8346ccdf2314c4f88259dfc6fb",
+                "reference": "0bb793bd58ef3e8346ccdf2314c4f88259dfc6fb",
                 "shasum": ""
             },
             "require": {
+                "ext-secp256k1_nostr": "*",
                 "php": "^8.3",
                 "simplito/elliptic-php": "^1.0"
             },
@@ -2429,9 +2430,9 @@
             "description": "Nostr NIP-01 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip01/issues",
-                "source": "https://github.com/nostriphant/nip01/tree/1.1"
+                "source": "https://github.com/nostriphant/nip01/tree/1.2"
             },
-            "time": "2024-11-19T19:29:50+00:00"
+            "time": "2024-11-19T20:23:17+00:00"
         },
         {
             "name": "nostriphant/nip19",

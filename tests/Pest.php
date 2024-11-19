@@ -84,16 +84,16 @@ namespace Pest {
         return key('nsec15udyzkfk7twhpdmhu5syc4lqm7dxmll0jxeu0rq65f89gaewx0ps89derx');
     }
 
-    function pubkey_sender(Key\Format $format = Key\Format::HEXIDECIMAL): string {
-        return key_sender()(Key::public($format));
+    function pubkey_sender(): string {
+        return key_sender()(Key::public());
     }
 
     function key_recipient(): Key {
         return key('nsec1dm444kv7gug4ge7sjms8c8ym3dqhdz44x3jhq0mcq9eqftw9krxqymj9qk');
     }
 
-    function pubkey_recipient(Key\Format $format = Key\Format::HEXIDECIMAL): string {
-        return key_recipient()(Key::public($format));
+    function pubkey_recipient(): string {
+        return key_recipient()(Key::public());
     }
 
     function relay(): Sender {

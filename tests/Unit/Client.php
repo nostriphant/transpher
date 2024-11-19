@@ -4,6 +4,7 @@ namespace nostriphant\TranspherTests\Unit;
 
 use Amp\Websocket\WebsocketMessage;
 use nostriphant\NIP19\Bech32;
+use nostriphant\NIP01\Key;
 
 class Client extends \nostriphant\TranspherTests\Client {
 
@@ -36,7 +37,7 @@ class Client extends \nostriphant\TranspherTests\Client {
     }
 
     #[\Override]
-    public function privateDirectMessage(\nostriphant\Transpher\Nostr\Key $sender, string $recipient_npub, string $message) {
+    public function privateDirectMessage(Key $sender, string $recipient_npub, string $message) {
         $note = \nostriphant\Transpher\Nostr\Message\Factory::privateDirect($sender, Bech32::fromNpub($recipient_npub), $message);
         $this->send($note);
     }

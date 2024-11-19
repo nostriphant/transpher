@@ -69,14 +69,15 @@ namespace {
 */
 namespace Pest {
 
-    use nostriphant\Transpher\Nostr\Key;
+    use nostriphant\NIP01\Key;
+    use nostriphant\NIP19\Bech32;
     use nostriphant\Transpher\Nostr\Event;
     use nostriphant\Transpher\Nostr\Message;
     use nostriphant\Transpher\Relay\Incoming;
     use nostriphant\Transpher\Relay\Sender;
 
     function key(string $nsec): Key {
-        return Key::fromBech32($nsec);
+        return Key::fromHex(Bech32::fromNsec($nsec));
     }
 
     function key_sender(): Key {

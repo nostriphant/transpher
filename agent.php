@@ -3,7 +3,8 @@
 require_once __DIR__ . '/bootstrap.php';
 
 use nostriphant\Transpher\Client;
-use nostriphant\Transpher\Nostr\Key;
+use nostriphant\NIP01\Key;
+use nostriphant\NIP19\Bech32;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
@@ -17,7 +18,7 @@ $relay_url = $_SERVER['RELAY_URL'];
 $log->info('Client connecting to ' . $relay_url);
 $agent = new nostriphant\Transpher\Agent(
     new Client($relay_url),
-    Key::fromBech32($_SERVER['AGENT_NSEC']),
+    Key::fromHex(Bech32::fromNsec($_SERVER['AGENT_NSEC'])),
     $_SERVER['RELAY_OWNER_NPUB']
 );
 

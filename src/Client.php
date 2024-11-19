@@ -5,7 +5,7 @@ namespace nostriphant\Transpher;
 use nostriphant\Transpher\Nostr;
 use function Amp\Websocket\Client\connect;
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\Nostr\Key;
+use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
 
 class Client {

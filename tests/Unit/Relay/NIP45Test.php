@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Key;
+use nostriphant\NIP01\Key;
 
 use nostriphant\Transpher\Nostr\Event\Factory as EventFactory;
 use nostriphant\Transpher\Nostr\Message\Factory as MessageFactory;

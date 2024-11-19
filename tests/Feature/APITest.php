@@ -1,19 +1,20 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Key;
+use nostriphant\NIP01\Key;
 use nostriphant\TranspherTests\Feature\Functions;
 use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Subscription\Filter;
+use nostriphant\NIP19\Bech32;
 
 beforeAll(function () {
     global $relay;
     $agent_key = \Pest\key_recipient();
 
     $relay = Functions::bootRelay('127.0.0.1:8087', $env = [
-        'AGENT_NSEC' => $agent_key(Key::private(\nostriphant\Transpher\Nostr\Key\Format::BECH32)),
+        'AGENT_NSEC' => Bech32::toNsec($agent_key(Key::private())),
         'RELAY_URL' => 'ws://127.0.0.1:8087',
-        'RELAY_OWNER_NPUB' => \Pest\pubkey_sender(Key\Format::BECH32),
+        'RELAY_OWNER_NPUB' => Bech32::toNpub(\Pest\pubkey_sender()),
         'RELAY_NAME' => 'Really relay',
         'RELAY_DESCRIPTION' => 'This is my dev relay',
         'RELAY_CONTACT' => 'transpher@nostriphant.dev',
@@ -39,7 +40,7 @@ describe('relay', function () {
         $response = \nostriphant\Transpher\Nostr::decode($responseText);
 
         expect($response)->not()->toBeNull($responseText);
-        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', \Pest\pubkey_sender(Key\Format::BECH32), 'transpher@nostriphant.dev'));
+        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', Bech32::toNpub(\Pest\pubkey_sender()), 'transpher@nostriphant.dev'));
     });
 });
 
@@ -48,8 +49,8 @@ describe('relay', function () {
 describe('agent', function (): void {
     it('starts relay and sends private direct messsage to relay owner', function (): void {
         $agent = Functions::bootAgent(8084, [
-            'RELAY_OWNER_NPUB' => Pest\pubkey_recipient(\nostriphant\Transpher\Nostr\Key\Format::BECH32),
-            'AGENT_NSEC' => Pest\pubkey_sender(\nostriphant\Transpher\Nostr\Key\Format::BECH32),
+            'RELAY_OWNER_NPUB' => Bech32::toNpub(Pest\pubkey_recipient()),
+            'AGENT_NSEC' => Bech32::toNsec(Pest\pubkey_sender()),
             'RELAY_URL' => 'ws://127.0.0.1:8087'
         ]);
         sleep(1); // hack to give agent some time to boot...

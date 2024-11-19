@@ -3,8 +3,8 @@
 namespace nostriphant\Transpher;
 use nostriphant\Transpher\Client;
 use Psr\Log\LoggerInterface;
-use nostriphant\Transpher\Nostr\Key\Format;
-use nostriphant\Transpher\Nostr\Key;
+use nostriphant\NIP01\Key;
+use nostriphant\NIP19\Bech32;
 
 /**
  * Description of Agent
@@ -17,7 +17,7 @@ readonly class Agent {
     }
     
     public function __invoke(LoggerInterface $log): callable {
-        $log->info('Running agent with public key ' . (($this->key)(Key::public(Format::BECH32))));
+        $log->info('Running agent with public key ' . Bech32::toNpub(($this->key)(Key::public())));
         $log->info('Sending Private Direct Message event');
         $this->client->privateDirectMessage($this->key, $this->relay_owner_npub, 'Hello, I am your agent! The URL of your relay is {relay_url}');
         

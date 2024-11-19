@@ -1,7 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher;
-use nostriphant\Transpher\Nostr\Key;
+use nostriphant\NIP01\Key;
 
 /**
  * Description of Nostr

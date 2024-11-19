@@ -4,6 +4,7 @@ namespace nostriphant\TranspherTests;
 
 use nostriphant\Transpher\Nostr;
 use nostriphant\Transpher\Nostr\Message;
+use nostriphant\NIP01\Key;
 
 /**
  * Description of Client
@@ -34,7 +35,7 @@ class Client extends \nostriphant\Transpher\Client {
                 expect($payload[1]['content'])->toBe($content);
             }];
     }
-    public function expectNostrPrivateDirectMessage(string $subscriptionId, Nostr\Key $recipient_key, string $message_content) {
+    public function expectNostrPrivateDirectMessage(string $subscriptionId, Key $recipient_key, string $message_content) {
         $this->expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $message_content) {
                 expect($payload[0])->toBe($subscriptionId);
 

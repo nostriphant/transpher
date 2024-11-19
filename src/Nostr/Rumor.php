@@ -2,6 +2,7 @@
 
 namespace nostriphant\Transpher\Nostr;
 use nostriphant\Transpher\Nostr;
+use nostriphant\NIP01\Key;
 
 readonly class Rumor {
     

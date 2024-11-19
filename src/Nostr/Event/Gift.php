@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Nostr\Event;
 use nostriphant\Transpher\Nostr;
-use nostriphant\Transpher\Nostr\Key;
+use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Event;
 use nostriphant\Transpher\Nostr\Rumor;
 

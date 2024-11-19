@@ -1,7 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher\Nostr\Message;
-use nostriphant\Transpher\Nostr\Key;
+use nostriphant\NIP01\Key;
 
 /**
  * Description of Event

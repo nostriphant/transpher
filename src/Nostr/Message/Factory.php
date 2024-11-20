@@ -4,7 +4,7 @@ namespace nostriphant\Transpher\Nostr\Message;
 
 use function \Functional\map;
 use nostriphant\Transpher\Nostr\Message;
-use nostriphant\Transpher\Nostr\Event;
+use nostriphant\NIP01\Event;
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Event\Gift;
 use nostriphant\Transpher\Nostr\Event\Seal;

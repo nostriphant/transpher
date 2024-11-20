@@ -2437,20 +2437,21 @@
         },
         {
             "name": "nostriphant/nip-01",
-            "version": "1.3",
+            "version": "1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip-01.git",
-                "reference": "f63e7fdab0d10bc28f42b908daef156e27e21970"
+                "reference": "19e1e54458a62b837c1c1ba6e6e6c2865d340447"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/f63e7fdab0d10bc28f42b908daef156e27e21970",
-                "reference": "f63e7fdab0d10bc28f42b908daef156e27e21970",
+                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/19e1e54458a62b837c1c1ba6e6e6c2865d340447",
+                "reference": "19e1e54458a62b837c1c1ba6e6e6c2865d340447",
                 "shasum": ""
             },
             "require": {
                 "ext-secp256k1_nostr": "*",
+                "nostriphant/functional-alternate": "^1.1",
                 "php": "^8.3",
                 "simplito/elliptic-php": "^1.0"
             },
@@ -2459,6 +2460,10 @@
             },
             "type": "library",
             "autoload": {
+                "files": [
+                    "pest.php",
+                    "tests/Functions.php"
+                ],
                 "psr-4": {
                     "nostriphant\\NIP01\\": "src/",
                     "nostriphant\\NIP01Tests\\": "tests/"
@@ -2477,9 +2482,9 @@
             "description": "Nostr NIP-01 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip-01/issues",
-                "source": "https://github.com/nostriphant/nip-01/tree/1.3"
+                "source": "https://github.com/nostriphant/nip-01/tree/1.4"
             },
-            "time": "2024-11-20T11:34:57+00:00"
+            "time": "2024-11-20T12:58:38+00:00"
         },
         {
             "name": "nostriphant/nip-19",

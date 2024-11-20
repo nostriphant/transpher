@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay;
 
-use nostriphant\Transpher\Nostr\Event;
+use nostriphant\NIP01\Event;
 use function Functional\some,
              Functional\partial_left;
 

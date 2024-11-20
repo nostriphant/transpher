@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\Nostr\Event;
+use nostriphant\NIP01\Event;
 
 class Undefined {
 

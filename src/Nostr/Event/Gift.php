@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Nostr\Event;
 use nostriphant\Transpher\Nostr;
 use nostriphant\NIP01\Key;
-use nostriphant\Transpher\Nostr\Event;
+use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Nostr\Rumor;
 use nostriphant\NIP44\Encrypt,
     nostriphant\NIP44\Decrypt;

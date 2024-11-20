@@ -3,10 +3,11 @@
 namespace nostriphant\Transpher\Nostr\Event;
 
 use nostriphant\NIP01\Key;
+use nostriphant\NIP01\Event;
 
 class Factory {
 
-    static function event(Key $sender_key, int $kind, string $content, array ...$tags): \nostriphant\Transpher\Nostr\Event {
+    static function event(Key $sender_key, int $kind, string $content, array ...$tags): Event {
         return self::rumor($sender_key(Key::public()), time(), $kind, $content, ...$tags)($sender_key);
     }
 

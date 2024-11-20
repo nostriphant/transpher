@@ -50,6 +50,7 @@ namespace {
     });
 
     nostriphant\FunctionalAlternate\extend_pest('expect');
+    nostriphant\NIP01\extend_pest('expect');
 }
 
 /*
@@ -66,30 +67,11 @@ namespace Pest {
 
     use nostriphant\NIP01\Key;
     use nostriphant\NIP19\Bech32;
-    use nostriphant\Transpher\Nostr\Event;
+    use nostriphant\NIP01\Event;
     use nostriphant\Transpher\Nostr\Message;
     use nostriphant\Transpher\Relay\Incoming;
     use nostriphant\Transpher\Relay\Sender;
 
-    function key(string $nsec): Key {
-        return Key::fromHex(Bech32::fromNsec($nsec));
-    }
-
-    function key_sender(): Key {
-        return key('nsec15udyzkfk7twhpdmhu5syc4lqm7dxmll0jxeu0rq65f89gaewx0ps89derx');
-    }
-
-    function pubkey_sender(): string {
-        return key_sender()(Key::public());
-    }
-
-    function key_recipient(): Key {
-        return key('nsec1dm444kv7gug4ge7sjms8c8ym3dqhdz44x3jhq0mcq9eqftw9krxqymj9qk');
-    }
-
-    function pubkey_recipient(): string {
-        return key_recipient()(Key::public());
-    }
 
     function relay(): Sender {
         return new class implements Sender {
@@ -119,10 +101,6 @@ namespace Pest {
         return new Incoming($store ?? store(), new \nostriphant\Transpher\Files($files));
     }
 
-    function vectors(string $name): object {
-        return json_decode(file_get_contents(__DIR__ . '/vectors/' . $name . '.json'), false);
-    }
-
     function rumor(?int $created_at = null, ?string $pubkey = '', ?int $kind = 0, ?string $content = '', ?array $tags = []): \nostriphant\Transpher\Nostr\Rumor {
         return new \nostriphant\Transpher\Nostr\Rumor(
                 $created_at ?? time(),
@@ -131,18 +109,6 @@ namespace Pest {
                 $content,
                 $tags
         );
-    }
-
-    function event(array $event): Event {
-        return new Event(...array_merge([
-                    'id' => '',
-                    'pubkey' => '',
-                    'created_at' => time(),
-                    'kind' => 1,
-                    'content' => 'Hello World',
-                    'sig' => '',
-                    'tags' => []
-                        ], $event));
     }
 
     function handle(Message $message, ?Incoming $incoming = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null): Sender {

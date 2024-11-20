@@ -6,6 +6,7 @@ use function Functional\some,
              Functional\true,
              Functional\partial_left;
 use nostriphant\Transpher\Nostr\Subscription\Filter;
+use nostriphant\NIP01\Event;
 
 readonly class Filters {
 

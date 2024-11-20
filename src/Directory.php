@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher;
 
-use nostriphant\Transpher\Nostr\Event;
+use nostriphant\NIP01\Event;
 
 class Directory implements Relay\Store {
 

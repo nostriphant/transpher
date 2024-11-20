@@ -2,6 +2,7 @@
 
 use nostriphant\Transpher\Relay\Incoming\Event\Limits;
 use nostriphant\NIP01\Key;
+use nostriphant\NIP01\Event;
 
 $event_ids = [
     ['000006d8c378af1779d2feebc7603a125d99eca0ccf1085959b307f64e5dd358', 21],
@@ -14,7 +15,7 @@ $event_ids = [
 
 it('should check for expected amount of leading zeros for an event-id', function ($id, $difficulty) {
     $signer = \Pest\key_sender();
-    $event = nostriphant\Transpher\Nostr\Event::__set_state(json_decode('{
+    $event = Event::__set_state(json_decode('{
         "id": "' . $id . '",
         "pubkey": "' . $signer(Key::public()) . '",
         "created_at": 1651794653,
@@ -35,7 +36,7 @@ it('should check for expected amount of leading zeros for an event-id', function
 
 it('should check for expected amount of leading zeros for an event-id, configured through ENV-vars', function ($id, $difficulty) {
     $signer = \Pest\key_sender();
-    $event = nostriphant\Transpher\Nostr\Event::__set_state(json_decode('{
+    $event = Event::__set_state(json_decode('{
         "id": "' . $id . '",
         "pubkey": "' . $signer(Key::public()) . '",
         "created_at": 1651794653,
@@ -76,7 +77,7 @@ it('should check for expected amount of leading zeros for a pubkey', function (s
 
     expect($pubkey)->toBe($signer(Key::public()));
     //expect($event->sig)->toBe($signer(Key::signer($event->id)));
-    expect(\nostriphant\Transpher\Nostr\Event::verify($event))->toBeTrue();
+    expect(Event::verify($event))->toBeTrue();
 
     $limits = Limits::construct(pubkey_min_leading_zeros: $difficulty);
     $constraint = $limits($event);

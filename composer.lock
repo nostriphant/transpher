@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d8c1be37ff59f8006002875a146c83ae",
+    "content-hash": "a083f5b9e549e2fc745a671a59ee885f",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2389,17 +2389,17 @@
             "time": "2018-02-13T20:26:39+00:00"
         },
         {
-            "name": "nostriphant/nip01",
-            "version": "1.2",
+            "name": "nostriphant/nip-01",
+            "version": "1.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nostriphant/nip01.git",
-                "reference": "0bb793bd58ef3e8346ccdf2314c4f88259dfc6fb"
+                "url": "https://github.com/nostriphant/nip-01.git",
+                "reference": "f63e7fdab0d10bc28f42b908daef156e27e21970"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip01/zipball/0bb793bd58ef3e8346ccdf2314c4f88259dfc6fb",
-                "reference": "0bb793bd58ef3e8346ccdf2314c4f88259dfc6fb",
+                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/f63e7fdab0d10bc28f42b908daef156e27e21970",
+                "reference": "f63e7fdab0d10bc28f42b908daef156e27e21970",
                 "shasum": ""
             },
             "require": {
@@ -2429,23 +2429,23 @@
             ],
             "description": "Nostr NIP-01 implementation in PHP",
             "support": {
-                "issues": "https://github.com/nostriphant/nip01/issues",
-                "source": "https://github.com/nostriphant/nip01/tree/1.2"
+                "issues": "https://github.com/nostriphant/nip-01/issues",
+                "source": "https://github.com/nostriphant/nip-01/tree/1.3"
             },
-            "time": "2024-11-19T20:23:17+00:00"
+            "time": "2024-11-20T11:34:57+00:00"
         },
         {
-            "name": "nostriphant/nip19",
-            "version": "1.0",
+            "name": "nostriphant/nip-19",
+            "version": "1.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nostriphant/nip19.git",
-                "reference": "8a27358e0f5525ff2560794eb9c45bbc9a248267"
+                "url": "https://github.com/nostriphant/nip-19.git",
+                "reference": "f794430e52778fac6b8a3b6067c84a24a159175b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip19/zipball/8a27358e0f5525ff2560794eb9c45bbc9a248267",
-                "reference": "8a27358e0f5525ff2560794eb9c45bbc9a248267",
+                "url": "https://api.github.com/repos/nostriphant/nip-19/zipball/f794430e52778fac6b8a3b6067c84a24a159175b",
+                "reference": "f794430e52778fac6b8a3b6067c84a24a159175b",
                 "shasum": ""
             },
             "require": {
@@ -2468,34 +2468,34 @@
             ],
             "authors": [
                 {
-                    "name": "Nostriphant.dev",
-                    "email": "hello@nostriphant.dev"
+                    "name": "Rik Meijer",
+                    "email": "rik@nostriphant.dev"
                 }
             ],
             "description": "Nostr NIP-19 bech32-encoded entities in PHP",
             "support": {
-                "issues": "https://github.com/nostriphant/nip19/issues",
-                "source": "https://github.com/nostriphant/nip19/tree/1.0"
+                "issues": "https://github.com/nostriphant/nip-19/issues",
+                "source": "https://github.com/nostriphant/nip-19/tree/1.1"
             },
-            "time": "2024-11-19T15:18:11+00:00"
+            "time": "2024-11-20T11:35:09+00:00"
         },
         {
-            "name": "nostriphant/nip44",
-            "version": "1.1",
+            "name": "nostriphant/nip-44",
+            "version": "1.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/nostriphant/nip44.git",
-                "reference": "ff14863488c7322598c52cee6468d2003bb4564b"
+                "url": "https://github.com/nostriphant/nip-44.git",
+                "reference": "d8e61ffebdaa1f44ec5758f41055ee6d15f98884"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip44/zipball/ff14863488c7322598c52cee6468d2003bb4564b",
-                "reference": "ff14863488c7322598c52cee6468d2003bb4564b",
+                "url": "https://api.github.com/repos/nostriphant/nip-44/zipball/d8e61ffebdaa1f44ec5758f41055ee6d15f98884",
+                "reference": "d8e61ffebdaa1f44ec5758f41055ee6d15f98884",
                 "shasum": ""
             },
             "require": {
                 "ext-sodium": "*",
-                "nostriphant/nip01": "^1.0",
+                "nostriphant/nip-01": "^1.0",
                 "php": "^8.3",
                 "phpseclib/phpseclib": "^3.0"
             },
@@ -2521,10 +2521,10 @@
             ],
             "description": "Nostr NIP-44 implementation in PHP",
             "support": {
-                "issues": "https://github.com/nostriphant/nip44/issues",
-                "source": "https://github.com/nostriphant/nip44/tree/1.1"
+                "issues": "https://github.com/nostriphant/nip-44/issues",
+                "source": "https://github.com/nostriphant/nip-44/tree/1.2"
             },
-            "time": "2024-11-20T08:47:26+00:00"
+            "time": "2024-11-20T11:36:07+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",

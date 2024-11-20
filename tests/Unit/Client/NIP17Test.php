@@ -2,9 +2,10 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\Nostr\Event\Gift;
-use nostriphant\Transpher\Nostr\Event\Seal;
+use nostriphant\NIP59\Gift;
+use nostriphant\NIP59\Seal;
 use function Pest\incoming;
+use nostriphant\NIP01\Event;
 
 it('relays private direct messsage from alice to bob', function (): void {
     putenv('LIMIT_EVENT_CREATED_AT_LOWER_DELTA=' . (60 * 60 * 72));
@@ -23,16 +24,15 @@ it('relays private direct messsage from alice to bob', function (): void {
             ['EVENT', $subscriptionId, function (array $gift) use ($bob_key) {
                     expect($gift['kind'])->toBe(1059);
 
-                    $seal = Gift::unwrap($bob_key, $gift['pubkey'], $gift['content']);
-                    expect($seal['kind'])->toBe(13);
-                    expect($seal['pubkey'])->toBeString();
-                    expect($seal['content'])->toBeString();
+                    $seal = Gift::unwrap($bob_key, Event::__set_state($gift));
+                    expect($seal->kind)->toBe(13);
+                    expect($seal->pubkey)->toBeString();
+                    expect($seal->content)->toBeString();
 
-                    $private_message = Seal::open($bob_key, $seal['pubkey'], $seal['content']);
-                    expect($private_message)->toBeArray();
+                    $private_message = Seal::open($bob_key, $seal);
                     expect($private_message)->toHaveKey('id');
                     expect($private_message)->toHaveKey('content');
-                    expect($private_message['content'])->toBe('Hello!!');
+                    expect($private_message->content)->toBe('Hello!!');
                 }],
             ['EOSE', $subscriptionId]
     );

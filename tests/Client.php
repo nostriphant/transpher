@@ -2,9 +2,11 @@
 
 namespace nostriphant\TranspherTests;
 
-use nostriphant\NIP01\Nostr;
 use nostriphant\Transpher\Nostr\Message;
 use nostriphant\NIP01\Key;
+use nostriphant\NIP59\Gift;
+use nostriphant\NIP01\Event;
+use nostriphant\NIP59\Seal;
 
 /**
  * Description of Client
@@ -42,17 +44,16 @@ class Client extends \nostriphant\Transpher\Client {
                 $gift = $payload[1];
                 expect($gift['kind'])->toBe(1059);
             
-            $seal = \nostriphant\Transpher\Nostr\Event\Gift::unwrap($recipient_key, $gift['pubkey'], $gift['content']);
-                expect($seal['kind'])->toBe(13);
-            expect($seal['pubkey'])->toBeString();
-            expect($seal['content'])->toBeString();
+            $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
+                expect($seal->kind)->toBe(13);
+                expect($seal->pubkey)->toBeString();
+                expect($seal->content)->toBeString();
 
-            $private_message = \nostriphant\Transpher\Nostr\Event\Seal::open($recipient_key, $seal['pubkey'], $seal['content']);
-                expect($private_message)->toBeArray();
-            expect($private_message)->toHaveKey('id');
+                $private_message = Seal::open($recipient_key, $seal);
+                expect($private_message)->toHaveKey('id');
             expect($private_message)->toHaveKey('content');
-            expect($private_message['content'])->toBe($message_content);
-        }];
+            expect($private_message->content)->toBe($message_content);
+            }];
         $this->expectNostrEose($subscriptionId);
     }
     public function expectNostrEose(string $subscriptionId) {

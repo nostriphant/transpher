@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3ea37e7173b463297b0dc5364c6c8688",
+    "content-hash": "8312e4696aef7ce8750f840333197fde",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2577,6 +2577,51 @@
                 "source": "https://github.com/nostriphant/nip-44/tree/1.3"
             },
             "time": "2024-11-20T13:18:04+00:00"
+        },
+        {
+            "name": "nostriphant/nip-59",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nostriphant/nip-59.git",
+                "reference": "803d2c65ef3ecbbf54e0c7883f3d7dd87e743c63"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nostriphant/nip-59/zipball/803d2c65ef3ecbbf54e0c7883f3d7dd87e743c63",
+                "reference": "803d2c65ef3ecbbf54e0c7883f3d7dd87e743c63",
+                "shasum": ""
+            },
+            "require": {
+                "nostriphant/nip-44": "^1.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "pestphp/pest": "^2.35"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "nostriphant\\NIP59\\": "src/",
+                    "nostriphant\\NIP59Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rik Meijer",
+                    "email": "rik@nostriphant.dev"
+                }
+            ],
+            "description": "Nostr NIP-59 implementation in PHP",
+            "support": {
+                "issues": "https://github.com/nostriphant/nip-59/issues",
+                "source": "https://github.com/nostriphant/nip-59/tree/1.0"
+            },
+            "time": "2024-11-20T14:04:55+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",

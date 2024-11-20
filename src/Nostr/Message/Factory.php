@@ -6,8 +6,9 @@ use function \Functional\map;
 use nostriphant\Transpher\Nostr\Message;
 use nostriphant\NIP01\Event;
 use nostriphant\NIP01\Key;
-use nostriphant\Transpher\Nostr\Event\Gift;
-use nostriphant\Transpher\Nostr\Event\Seal;
+use nostriphant\NIP59\Gift;
+use nostriphant\NIP59\Seal;
+use nostriphant\NIP59\Rumor;
 use nostriphant\Transpher\Nostr\Subscription\Filter;
 
 class Factory {
@@ -21,7 +22,7 @@ class Factory {
     }
 
     static function eventAt(Key $sender_key, int $kind, string $content, int $at, array ...$tags): Message {
-        return self::message('EVENT', get_object_vars((new \nostriphant\Transpher\Nostr\Rumor(
+        return self::message('EVENT', get_object_vars((new Rumor(
                                         pubkey: $sender_key(Key::public()),
                                         created_at: $at,
                                         kind: $kind,
@@ -31,7 +32,7 @@ class Factory {
     }
 
     static function privateDirect(Key $private_key, string $recipient_pubkey, string $message): Message {
-        return self::message('EVENT', get_object_vars(Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, new \nostriphant\Transpher\Nostr\Rumor(
+        return self::message('EVENT', get_object_vars(Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, new Rumor(
                                                         pubkey: $private_key(Key::public()),
                                             created_at: time(),
                                             kind: 14,

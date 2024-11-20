@@ -11,8 +11,8 @@ class Factory {
         return self::rumor($sender_key(Key::public()), time(), $kind, $content, ...$tags)($sender_key);
     }
 
-    static function rumor(string $pubkey, int $created_at, int $kind, string $content, array ...$tags): \nostriphant\Transpher\Nostr\Rumor {
-        return new \nostriphant\Transpher\Nostr\Rumor(
+    static function rumor(string $pubkey, int $created_at, int $kind, string $content, array ...$tags): \nostriphant\NIP59\Rumor {
+        return new \nostriphant\NIP59\Rumor(
                 pubkey: $pubkey,
                 created_at: $created_at,
                 kind: $kind,

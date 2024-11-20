@@ -72,7 +72,7 @@ $keys = [
 it('should check for expected amount of leading zeros for a pubkey', function (string $privkey, string $pubkey, int $difficulty) {
     $signer = Key::fromHex($privkey);
 
-    $rumor = new \nostriphant\Transpher\Nostr\Rumor(time(), $pubkey, 1, "It's just me mining my own business", [["nonce", "776797", "" . ($difficulty - 1)]]);
+    $rumor = new \nostriphant\NIP59\Rumor(time(), $pubkey, 1, "It's just me mining my own business", [["nonce", "776797", "" . ($difficulty - 1)]]);
     $event = $rumor($signer);
 
     expect($pubkey)->toBe($signer(Key::public()));
@@ -93,7 +93,7 @@ it('should check for expected amount of leading zeros for a pubkey, configured t
 
     expect($pubkey)->toBe($signer(Key::public()));
 
-    $rumor = new \nostriphant\Transpher\Nostr\Rumor(1651794653, $pubkey, 1, "It's just me mining my own business", ["nonce", "776797", "" . ($difficulty - 1)]);
+    $rumor = new \nostriphant\NIP59\Rumor(1651794653, $pubkey, 1, "It's just me mining my own business", ["nonce", "776797", "" . ($difficulty - 1)]);
     $event = $rumor($signer);
 
     putenv('LIMIT_EVENT_PUBKEY_MIN_LEADING_ZEROS=' . $difficulty);

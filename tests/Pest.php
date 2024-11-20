@@ -101,8 +101,8 @@ namespace Pest {
         return new Incoming($store ?? store(), new \nostriphant\Transpher\Files($files));
     }
 
-    function rumor(?int $created_at = null, ?string $pubkey = '', ?int $kind = 0, ?string $content = '', ?array $tags = []): \nostriphant\Transpher\Nostr\Rumor {
-        return new \nostriphant\Transpher\Nostr\Rumor(
+    function rumor(?int $created_at = null, ?string $pubkey = '', ?int $kind = 0, ?string $content = '', ?array $tags = []): \nostriphant\NIP59\Rumor {
+        return new \nostriphant\NIP59\Rumor(
                 $created_at ?? time(),
                 $pubkey,
                 $kind,

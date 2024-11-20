@@ -6,6 +6,8 @@ use nostriphant\NIP01\Event;
 
 class Directory implements Relay\Store {
 
+    const NIP01_EVENT_SPLITOFF_TIME = 1732116770;
+
     use Relay\Store\Memory {
         offsetSet as eventsOffsetSet;
         offsetUnset as eventsOffsetUnset;
@@ -15,6 +17,10 @@ class Directory implements Relay\Store {
     public function __construct(private string $store) {
         $events = [];
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {
+            if (filectime($event_file) < self::NIP01_EVENT_SPLITOFF_TIME) {
+                $event_file_contents = file_get_contents($store);
+                file_put_contents(str_replace('return \\nostriphant\\Transpher\\Nostr\\Event::', 'return \\nostriphant\\NP01\\Event::', $event_file_contents), $event_file);
+            }
             $event_data = include $event_file;
             $event = is_array($event_data) ? Event::__set_state($event_data) : $event_data;
             $events[$event->id] = $event;

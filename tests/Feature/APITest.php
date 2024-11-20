@@ -6,6 +6,7 @@ use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Nostr\Subscription\Filter;
 use nostriphant\NIP19\Bech32;
+use nostriphant\NIP01\Nostr;
 
 beforeAll(function () {
     global $relay;
@@ -37,7 +38,7 @@ describe('relay', function () {
         $responseText = curl_exec($curl);
         expect($responseText)->not()->toBeFalse('['. curl_errno($curl).'] ' . curl_error($curl));
         expect($responseText)->not()->toContain('<b>Warning</b>');
-        $response = \nostriphant\Transpher\Nostr::decode($responseText);
+        $response = Nostr::decode($responseText);
 
         expect($response)->not()->toBeNull($responseText);
         expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', Bech32::toNpub(\Pest\pubkey_sender()), 'transpher@nostriphant.dev'));

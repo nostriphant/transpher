@@ -2,7 +2,7 @@
 
 namespace nostriphant\TranspherTests;
 
-use nostriphant\Transpher\Nostr;
+use nostriphant\NIP01\Nostr;
 use nostriphant\Transpher\Nostr\Message;
 use nostriphant\NIP01\Key;
 
@@ -42,13 +42,13 @@ class Client extends \nostriphant\Transpher\Client {
                 $gift = $payload[1];
                 expect($gift['kind'])->toBe(1059);
             
-            $seal = Nostr\Event\Gift::unwrap($recipient_key, $gift['pubkey'], $gift['content']);
-            expect($seal['kind'])->toBe(13);
+            $seal = \nostriphant\Transpher\Nostr\Event\Gift::unwrap($recipient_key, $gift['pubkey'], $gift['content']);
+                expect($seal['kind'])->toBe(13);
             expect($seal['pubkey'])->toBeString();
             expect($seal['content'])->toBeString();
 
-            $private_message = Nostr\Event\Seal::open($recipient_key, $seal['pubkey'], $seal['content']);
-            expect($private_message)->toBeArray();
+            $private_message = \nostriphant\Transpher\Nostr\Event\Seal::open($recipient_key, $seal['pubkey'], $seal['content']);
+                expect($private_message)->toBeArray();
             expect($private_message)->toHaveKey('id');
             expect($private_message)->toHaveKey('content');
             expect($private_message['content'])->toBe($message_content);
@@ -72,7 +72,7 @@ class Client extends \nostriphant\Transpher\Client {
             }];
     }
     
-    public function sendSignedMessage(Nostr\Message $signed_message) {
+    public function sendSignedMessage(Message $signed_message) {
         $this->expectNostrOK($signed_message()[1]['id']);
         $this->send($signed_message);
         $this->start();

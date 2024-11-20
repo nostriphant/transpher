@@ -2,11 +2,12 @@
 
 namespace nostriphant\Transpher;
 
-use nostriphant\Transpher\Nostr;
+use nostriphant\NIP01\Nostr;
 use function Amp\Websocket\Client\connect;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
+use nostriphant\Transpher\Nostr\Message;
 
 class Client {
 
@@ -46,7 +47,7 @@ class Client {
         $this->listening = true;
         while ($this->listening && ($message = $this->receive($timeout))) {
             $buffer = $message->buffer();
-            $payload = Nostr\Message::decode($buffer);
+            $payload = Message::decode($buffer);
             ($this->onjson_callback)([$this, 'ignore'], $payload);
         }
     }

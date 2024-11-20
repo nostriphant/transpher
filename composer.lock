@@ -2437,16 +2437,16 @@
         },
         {
             "name": "nostriphant/nip-01",
-            "version": "1.4",
+            "version": "1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip-01.git",
-                "reference": "19e1e54458a62b837c1c1ba6e6e6c2865d340447"
+                "reference": "5519cf6aa1f4d993c466ee7bdf967e0821dcc9a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/19e1e54458a62b837c1c1ba6e6e6c2865d340447",
-                "reference": "19e1e54458a62b837c1c1ba6e6e6c2865d340447",
+                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/5519cf6aa1f4d993c466ee7bdf967e0821dcc9a4",
+                "reference": "5519cf6aa1f4d993c466ee7bdf967e0821dcc9a4",
                 "shasum": ""
             },
             "require": {
@@ -2482,9 +2482,9 @@
             "description": "Nostr NIP-01 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip-01/issues",
-                "source": "https://github.com/nostriphant/nip-01/tree/1.4"
+                "source": "https://github.com/nostriphant/nip-01/tree/1.5"
             },
-            "time": "2024-11-20T12:58:38+00:00"
+            "time": "2024-11-20T13:34:11+00:00"
         },
         {
             "name": "nostriphant/nip-19",
@@ -2533,16 +2533,16 @@
         },
         {
             "name": "nostriphant/nip-44",
-            "version": "1.2",
+            "version": "1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip-44.git",
-                "reference": "d8e61ffebdaa1f44ec5758f41055ee6d15f98884"
+                "reference": "4671a9305c29a84e38af64826d6da9a9eb89f38e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip-44/zipball/d8e61ffebdaa1f44ec5758f41055ee6d15f98884",
-                "reference": "d8e61ffebdaa1f44ec5758f41055ee6d15f98884",
+                "url": "https://api.github.com/repos/nostriphant/nip-44/zipball/4671a9305c29a84e38af64826d6da9a9eb89f38e",
+                "reference": "4671a9305c29a84e38af64826d6da9a9eb89f38e",
                 "shasum": ""
             },
             "require": {
@@ -2574,9 +2574,9 @@
             "description": "Nostr NIP-44 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip-44/issues",
-                "source": "https://github.com/nostriphant/nip-44/tree/1.2"
+                "source": "https://github.com/nostriphant/nip-44/tree/1.3"
             },
-            "time": "2024-11-20T11:36:07+00:00"
+            "time": "2024-11-20T13:18:04+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",

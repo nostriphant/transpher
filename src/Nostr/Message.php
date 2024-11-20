@@ -2,6 +2,8 @@
 
 namespace nostriphant\Transpher\Nostr;
 
+use nostriphant\NIP01\Nostr;
+
 readonly class Message {
 
     public mixed $payload;
@@ -17,10 +19,10 @@ readonly class Message {
     }
 
     public function __toString(): string {
-        return \nostriphant\Transpher\Nostr::encode($this());
+        return Nostr::encode($this());
     }
 
     static function decode(string $json): self {
-        return new self(...\nostriphant\Transpher\Nostr::decode($json));
+        return new self(...Nostr::decode($json));
     }
 }

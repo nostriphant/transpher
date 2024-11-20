@@ -5,6 +5,8 @@ namespace nostriphant\Transpher;
 use Amp\Websocket\WebsocketClient;
 use Psr\Log\LoggerInterface;
 use nostriphant\Transpher\Relay\Sender;
+use nostriphant\NIP01\Nostr;
+use nostriphant\Transpher\Nostr\Message;
 
 /**
  * Description of Reply
@@ -17,10 +19,10 @@ readonly class SendNostr implements Sender {
     
     #[\Override]
     public function __invoke(mixed $json): bool {
-        if ($json instanceof Nostr\Message) {
+        if ($json instanceof Message) {
             $text = $json;
         } else {
-            $text = \nostriphant\Transpher\Nostr::encode($json);
+            $text = Nostr::encode($json);
         }
         $this->log->debug($this->action . ' message ' . $text);
         $this->client->sendText($text);

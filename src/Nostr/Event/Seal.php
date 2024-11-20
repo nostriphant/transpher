@@ -1,7 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher\Nostr\Event;
-use nostriphant\Transpher\Nostr;
+use nostriphant\NIP01\Nostr;
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Rumor;
 use nostriphant\NIP01\Event;

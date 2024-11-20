@@ -19,7 +19,7 @@ class Directory implements Relay\Store {
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {
             if (filectime($event_file) < self::NIP01_EVENT_SPLITOFF_TIME) {
                 $event_file_contents = file_get_contents($event_file);
-                file_put_contents(str_replace('return \\nostriphant\\Transpher\\Nostr\\Event::', 'return \\nostriphant\\NP01\\Event::', $event_file_contents), $event_file);
+                file_put_contents($event_file, str_replace('return \\nostriphant\\Transpher\\Nostr\\Event::', 'return \\nostriphant\\NP01\\Event::', $event_file_contents));
             }
             $event_data = include $event_file;
             $event = is_array($event_data) ? Event::__set_state($event_data) : $event_data;

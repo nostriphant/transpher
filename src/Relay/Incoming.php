@@ -4,7 +4,7 @@ namespace nostriphant\Transpher\Relay;
 
 use nostriphant\Transpher\Relay\Store;
 use nostriphant\Transpher\Relay\Subscriptions;
-use nostriphant\Transpher\Nostr\Message;
+use nostriphant\NIP01\Message;
 
 readonly class Incoming {
 

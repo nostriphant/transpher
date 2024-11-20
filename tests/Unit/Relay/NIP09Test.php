@@ -2,7 +2,7 @@
 
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP01\Key;
-use nostriphant\Transpher\Nostr\Message;
+use nostriphant\NIP01\Message;
 use function Pest\store,
              Pest\incoming;
 

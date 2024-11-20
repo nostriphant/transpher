@@ -2,7 +2,7 @@
 
 namespace nostriphant\TranspherTests;
 
-use nostriphant\Transpher\Nostr\Message;
+use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP59\Gift;
 use nostriphant\NIP01\Event;

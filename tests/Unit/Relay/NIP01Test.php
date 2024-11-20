@@ -6,7 +6,7 @@ describe('generic (https://nips.nostr.com/1#from-relay-to-client-sending-events-
     });
 
     it('responds with a NOTICE on unsupported message types', function () {
-        $recipient = \Pest\handle(new nostriphant\Transpher\Nostr\Message('UNKNOWN'));
+        $recipient = \Pest\handle(new nostriphant\NIP01\Message('UNKNOWN'));
 
         expect($recipient)->toHaveReceived(
                 ['NOTICE', 'Message type UNKNOWN not supported']

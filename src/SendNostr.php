@@ -6,7 +6,7 @@ use Amp\Websocket\WebsocketClient;
 use Psr\Log\LoggerInterface;
 use nostriphant\Transpher\Relay\Sender;
 use nostriphant\NIP01\Nostr;
-use nostriphant\Transpher\Nostr\Message;
+use nostriphant\NIP01\Message;
 
 /**
  * Description of Reply

@@ -3,11 +3,6 @@
 namespace nostriphant\Transpher\Nostr\Message;
 use nostriphant\NIP01\Key;
 
-/**
- * Description of Event
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 readonly class Rumor {
     
     public function __construct(private \nostriphant\NIP59\Rumor $event) {}

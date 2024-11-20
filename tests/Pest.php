@@ -68,7 +68,7 @@ namespace Pest {
     use nostriphant\NIP01\Key;
     use nostriphant\NIP19\Bech32;
     use nostriphant\NIP01\Event;
-    use nostriphant\Transpher\Nostr\Message;
+    use nostriphant\NIP01\Message;
     use nostriphant\Transpher\Relay\Incoming;
     use nostriphant\Transpher\Relay\Sender;
 

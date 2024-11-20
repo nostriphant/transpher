@@ -12,7 +12,7 @@ describe('REQ', function () {
     it('replies NOTICE Invalid message on non-existing filters', function () {
         
 
-        $recipient = \Pest\handle(new \nostriphant\Transpher\Nostr\Message('REQ'));
+        $recipient = \Pest\handle(new \nostriphant\NIP01\Message('REQ'));
 
         expect($recipient)->toHaveReceived(
                 ['NOTICE', 'Invalid message']

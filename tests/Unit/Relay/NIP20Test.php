@@ -23,7 +23,7 @@ it('rejects a kind 1 and answers with OK, false, when signature is wrong', funct
     $message = Factory::event($sender_key, 1, 'Hello World');
     $message_raw = $message();
     $message_raw[1]['sig'] = \Pest\key_recipient()(Key::signer(hash('sha256', 'improper signature here')));
-    $recipient = \Pest\handle(new nostriphant\Transpher\Nostr\Message(...$message_raw));
+    $recipient = \Pest\handle(new nostriphant\NIP01\Message(...$message_raw));
 
     expect($recipient)->toHaveReceived(
             ['OK', $message()[1]['id'], false, 'invalid:signature is wrong']

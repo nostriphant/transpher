@@ -14,6 +14,7 @@ use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\SendNostr;
+use nostriphant\NIP01\Message;
 
 class Relay implements WebsocketClientHandler {
 
@@ -39,7 +40,7 @@ class Relay implements WebsocketClientHandler {
             $payload = (string) $message;
             $this->log->debug('Received message: ' . $payload);
             try {
-                each(($this->incoming)($client_subscriptions, Nostr\Message::decode($payload)), $wrapped_client);
+                each(($this->incoming)($client_subscriptions, Message::decode($payload)), $wrapped_client);
             } catch (\InvalidArgumentException $ex) {
                 $wrapped_client(Factory::notice($ex->getMessage()));
             }

@@ -5,6 +5,8 @@ use nostriphant\Transpher\Nostr;
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Event;
 use nostriphant\Transpher\Nostr\Rumor;
+use nostriphant\NIP44\Encrypt,
+    nostriphant\NIP44\Decrypt;
 
 /**
  * Works with NIP-59 kind 1059 events
@@ -16,7 +18,7 @@ class Gift {
     
     static function wrap(string $recipient_pubkey, Event $event) : Event {
         $randomKey = Key::generate();
-        $encrypter = Nostr::encrypt($randomKey, hex2bin($recipient_pubkey));
+        $encrypter = Encrypt::make($randomKey, $recipient_pubkey);
         $gift = new Rumor(
             pubkey: $randomKey(Key::public()),
             created_at: time() - rand(0, 60 * 60 * 48),
@@ -28,7 +30,7 @@ class Gift {
     }
     
     static function unwrap(Key $recipient_key, string $sender_pubkey, string $gift) : array {
-        $decrypter = Nostr::decrypt($recipient_key, hex2bin($sender_pubkey));
+        $decrypter = Decrypt::make($recipient_key, $sender_pubkey);
         return Nostr::decode($decrypter($gift), true);
     }
     

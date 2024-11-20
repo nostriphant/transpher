@@ -2481,16 +2481,16 @@
         },
         {
             "name": "nostriphant/nip44",
-            "version": "1.0",
+            "version": "1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip44.git",
-                "reference": "28b84a8466483e6e5c0211fba93e69ba6ac7ed92"
+                "reference": "ff14863488c7322598c52cee6468d2003bb4564b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip44/zipball/28b84a8466483e6e5c0211fba93e69ba6ac7ed92",
-                "reference": "28b84a8466483e6e5c0211fba93e69ba6ac7ed92",
+                "url": "https://api.github.com/repos/nostriphant/nip44/zipball/ff14863488c7322598c52cee6468d2003bb4564b",
+                "reference": "ff14863488c7322598c52cee6468d2003bb4564b",
                 "shasum": ""
             },
             "require": {
@@ -2522,9 +2522,9 @@
             "description": "Nostr NIP-44 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip44/issues",
-                "source": "https://github.com/nostriphant/nip44/tree/1.0"
+                "source": "https://github.com/nostriphant/nip44/tree/1.1"
             },
-            "time": "2024-11-19T19:58:20+00:00"
+            "time": "2024-11-20T08:47:26+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",

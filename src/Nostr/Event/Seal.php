@@ -5,6 +5,8 @@ use nostriphant\Transpher\Nostr;
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Rumor;
 use nostriphant\Transpher\Nostr\Event;
+use nostriphant\NIP44\Encrypt,
+    nostriphant\NIP44\Decrypt;
 
 /**
  * Works with NIP-59 kind 13 events
@@ -15,7 +17,7 @@ use nostriphant\Transpher\Nostr\Event;
 class Seal {
     
     static function close(Key $sender_private_key, string $recipient_pubkey, Rumor $event) : Event {
-        $encrypter = Nostr::encrypt($sender_private_key, hex2bin($recipient_pubkey));
+        $encrypter = Encrypt::make($sender_private_key, $recipient_pubkey);
         $seal = new Rumor(
             pubkey: $sender_private_key(Key::public()),
             created_at: mktime(rand(0,23), rand(0,59), rand(0,59)), 
@@ -27,7 +29,7 @@ class Seal {
     }
     
     static function open(Key $recipient_private_key, string $sender_pubkey, string $seal) : array {
-        $decrypter = Nostr::decrypt($recipient_private_key, hex2bin($sender_pubkey));
+        $decrypter = Decrypt::make($recipient_private_key, $sender_pubkey);
         return Nostr::decode($decrypter($seal));
     }
 }

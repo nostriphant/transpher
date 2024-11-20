@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Nostr;
 
-use nostriphant\Transpher\Alternate;
+use nostriphant\FunctionalAlternate\Alternate;
 use nostriphant\NIP01\Key;
 
 readonly class Event {

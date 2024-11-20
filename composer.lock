@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a083f5b9e549e2fc745a671a59ee885f",
+    "content-hash": "3ea37e7173b463297b0dc5364c6c8688",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2387,6 +2387,53 @@
                 "source": "https://github.com/nikic/FastRoute/tree/master"
             },
             "time": "2018-02-13T20:26:39+00:00"
+        },
+        {
+            "name": "nostriphant/functional-alternate",
+            "version": "1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nostriphant/functional-alternate.git",
+                "reference": "c033405ea1d8ccde120e5082e07ae19fa66b007c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nostriphant/functional-alternate/zipball/c033405ea1d8ccde120e5082e07ae19fa66b007c",
+                "reference": "c033405ea1d8ccde120e5082e07ae19fa66b007c",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "pestphp/pest-dev-tools": "^3.0.0"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/Autoload.php"
+                ],
+                "psr-4": {
+                    "nostriphant\\FunctionalAlternate\\": "src/",
+                    "nostriphant\\FunctionalAlternateTests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rik Meijer",
+                    "email": "rik@nostriphant.dev"
+                }
+            ],
+            "description": "Functionally alternating logical paths",
+            "support": {
+                "issues": "https://github.com/nostriphant/functional-alternate/issues",
+                "source": "https://github.com/nostriphant/functional-alternate/tree/1.1"
+            },
+            "time": "2024-11-20T12:32:51+00:00"
         },
         {
             "name": "nostriphant/nip-01",

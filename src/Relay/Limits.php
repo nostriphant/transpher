@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay;
 
-use nostriphant\Transpher\Alternate;
+use nostriphant\FunctionalAlternate\Alternate;
 
 readonly class Limits {
 

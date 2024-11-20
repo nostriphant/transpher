@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Relay\Condition;
-use nostriphant\Transpher\Alternate;
+use nostriphant\FunctionalAlternate\Alternate;
 use nostriphant\Transpher\Nostr\Event;
 
 readonly class Kind5 implements Kind {

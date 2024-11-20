@@ -1,16 +1,15 @@
 <?php
 
 use nostriphant\NIP01\Key;
-
-use nostriphant\Transpher\Nostr\Event\Factory as EventFactory;
+use nostriphant\NIP59\Rumor;
 use nostriphant\Transpher\Nostr\Message\Factory as MessageFactory;
 
 it('accepts a simple COUNT message and returns the number of matching events', function () {
     $alice_key = \Pest\key_sender();
     $bob_key = Key::generate();
     $store = \Pest\store([
-        EventFactory::event($alice_key, 1, 'Hello world, from Alice!'),
-        EventFactory::event($bob_key, 1, 'Hello world, from Bob!')
+        (new Rumor(time(), $alice_key(Key::public()), 1, 'Hello world, from Alice!', []))($alice_key),
+        (new Rumor(time(), $bob_key(Key::public()), 1, 'Hello world, from Bob!', []))($bob_key)
     ]);
 
     $recipient = \Pest\handle(MessageFactory::countRequest($id = uniqid(), [

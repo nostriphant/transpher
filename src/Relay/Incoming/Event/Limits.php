@@ -3,7 +3,6 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Nostr\Event;
-use nostriphant\Transpher\Nostr\Event\KindClass;
 
 readonly class Limits {
 

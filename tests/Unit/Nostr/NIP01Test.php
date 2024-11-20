@@ -1,7 +1,6 @@
 <?php
 
 use nostriphant\Transpher\Nostr\Event;
-use nostriphant\Transpher\Nostr\Event\KindClass;
 use function \Pest\event;
 
 describe('KindClass', function () {

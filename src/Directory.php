@@ -6,7 +6,7 @@ use nostriphant\NIP01\Event;
 
 class Directory implements Relay\Store {
 
-    const NIP01_EVENT_SPLITOFF_TIME = 1732116770;
+    const NIP01_EVENT_SPLITOFF_TIME = 1732125327;
 
     use Relay\Store\Memory {
         offsetSet as eventsOffsetSet;

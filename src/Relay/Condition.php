@@ -16,37 +16,27 @@ readonly class Condition {
         return call_user_func($this->test, $event);
     }
 
-    static function scalar(string $event_field): callable {
-        return self::build('is_array', fn(array $filter_values, Event $event): bool => in_array($event->$event_field, $filter_values));
+    static function scalar(string $event_field, mixed $expected_value): self {
+        return new self(fn(Event $event): bool => is_array($expected_value) === false || in_array($event->$event_field, $expected_value));
     }
 
-    static function since(string $event_field): callable {
-        return self::build('is_int', fn(int $filter_value, Event $event): bool => $event->$event_field >= $filter_value);
+    static function since(string $event_field, mixed $expected_value): self {
+        return new self(fn(Event $event): bool => is_int($expected_value) === false || $event->$event_field >= $expected_value);
     }
 
-    static function until(string $event_field): callable {
-        return self::build('is_int', fn(int $filter_value, Event $event): bool => $event->$event_field <= $filter_value);
+    static function until(string $event_field, mixed $expected_value): self {
+        return new self(fn(Event $event): bool => is_int($expected_value) === false || $event->$event_field <= $expected_value);
     }
 
-    static function tag(string $event_tag_identifier): callable {
-        return self::build('is_array', fn(array $filter_values, Event $event): bool => some($event->tags, fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $filter_values)));
+    static function tag(string $event_tag_identifier, mixed $expected_value): self {
+        return new self(fn(Event $event): bool => is_array($expected_value) === false || some($event->tags, fn(array $event_tag) => $event_tag[0] === $event_tag_identifier && in_array($event_tag[1], $expected_value)));
     }
 
-    static function limit(): callable {
+    static function limit(int $expected_value): self {
         $hits = 0;
-        return self::build('is_int', function (int $limit, Event $event) use (&$hits) {
+        return new self(function (Event $event) use (&$hits, $expected_value) {
                     $hits++;
-                    return $limit >= $hits;
+                    return is_int($expected_value) === false || $expected_value >= $hits;
                 });
-    }
-
-    static function build(string $type_test, \Closure $test): callable {
-        return function (mixed $expected_value) use ($type_test, $test): self {
-            if ($type_test($expected_value) === false) {
-                return new self(fn(Event $event) => true);
-            }
-
-            return new self(partial_left($test, $expected_value));
-        };
     }
 }

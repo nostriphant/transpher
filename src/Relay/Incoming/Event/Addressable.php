@@ -16,7 +16,7 @@ class Addressable {
     }
 
     public function __invoke(Event $event) {
-        $replaceable_events = ($this->events)(Subscription::make(Conditions::map(), [
+        $replaceable_events = ($this->events)(Subscription::make(new Conditions(), [
                     'kinds' => [$event->kind],
                     'authors' => [$event->pubkey],
                     '#d' => array_map(fn(array $tag_values) => $tag_values[0], Event::extractTagValues($event, 'd'))

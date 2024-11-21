@@ -54,7 +54,7 @@ readonly class Kind5 implements Kind {
             return;
         }
 
-        $removable_events = ($this->store)(Subscription::make(Conditions::map(), ...$prototypes));
+        $removable_events = ($this->store)(Subscription::make(new Conditions(), ...$prototypes));
         foreach ($removable_events as $removable_event_id => $removable_event) {
             unset($this->store[$removable_event_id]);
         }

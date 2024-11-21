@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Relay\Incoming;
 
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\Relay\Condition;
+use nostriphant\Transpher\Relay\Conditions;
 
 readonly class Event implements Type {
 

@@ -7,7 +7,7 @@ use nostriphant\NIP01\Event;
 
 readonly class Subscription {
 
-    private function __construct(private array $filters) {
+    private function __construct(public array $filters) {
         
     }
     

@@ -1,1 +1,1 @@
-<?php return nostriphant\Transpher\Relay\Condition::since('created_at');
+<?php return nostriphant\Transpher\Relay\Conditions::since('created_at');

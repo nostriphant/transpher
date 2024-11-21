@@ -10,20 +10,7 @@ readonly class Filter {
 
     public array $conditions;
 
-    public function __construct(
-            ?Condition $ids = null,
-            ?Condition $authors = null,
-            ?Condition $kinds = null,
-            ?Condition $since = null,
-            ?Condition $until = null,
-            ?Condition $limit = null,
-            ?array $tags = null
-    ) {
-        $conditions = array_filter(get_defined_vars());
-        if (empty($tags) === false) {
-            $conditions = \array_merge($conditions, $tags);
-        }
-        unset($conditions['tags']);
+    public function __construct(Condition ...$conditions) {
         $this->conditions = $conditions;
     }
 
@@ -32,14 +19,6 @@ readonly class Filter {
     }
 
     static function fromPrototype(Condition ...$conditions) {
-        $tags = array_diff_key($conditions, [
-            'ids' => null,
-            'authors' => null,
-            'kinds' => null,
-            'since' => null,
-            'until' => null,
-            'limit' => null
-        ]);
-        return new self(...array_merge(array_diff_key($conditions, $tags), ['tags' => $tags]));
+        return new self(...$conditions);
     }
 }

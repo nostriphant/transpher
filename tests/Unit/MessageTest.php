@@ -80,10 +80,6 @@ it('can create a subscribe message with a different filter-conditions', function
     expect($message[2]['limit'])->toBe(25);
 });
 
-it('does not allow for unknown filters', function () {
-    expect(fn() => new Filter(unknown: 1724755392))->toThrow('Unknown named parameter $unknown');
-});
-
 
 it('does not allow for unknown filters, merge tags', function() {
     

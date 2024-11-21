@@ -1,2 +1,2 @@
-<?php return nostriphant\Transpher\Relay\Condition::until('created_at');
+<?php return nostriphant\Transpher\Relay\Conditions::until('created_at');
 

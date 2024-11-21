@@ -3,7 +3,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
-use nostriphant\Transpher\Relay\Condition;
+use nostriphant\Transpher\Relay\Conditions;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 
@@ -17,7 +17,7 @@ class Replaceable {
     }
 
     public function __invoke(Event $event) {
-        $replaceable_events = ($this->events)(Subscription::make(Condition::map(), [
+        $replaceable_events = ($this->events)(Subscription::make(Conditions::map(), [
                     'kinds' => [$event->kind],
                     'authors' => [$event->pubkey]
         ]));

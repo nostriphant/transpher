@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Relay\Condition;
-use nostriphant\Transpher\Nostr\Filters;
+use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 
 class Addressable {
@@ -16,7 +16,7 @@ class Addressable {
     }
 
     public function __invoke(Event $event) {
-        $replaceable_events = ($this->events)(Filters::make(Condition::map(), [
+        $replaceable_events = ($this->events)(Subscription::make(Condition::map(), [
                     'kinds' => [$event->kind],
                     'authors' => [$event->pubkey],
                     '#d' => array_map(fn(array $tag_values) => $tag_values[0], Event::extractTagValues($event, 'd'))

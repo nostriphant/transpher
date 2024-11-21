@@ -4,7 +4,7 @@
 namespace nostriphant\Transpher\Relay\Store;
 
 use function \Functional\select;
-use nostriphant\Transpher\Nostr\Filters;
+use nostriphant\Transpher\Nostr\Subscription;
 
 trait Memory {
 
@@ -12,7 +12,7 @@ trait Memory {
 
     }
 
-    public function __invoke(Filters $subscription): array {
+    public function __invoke(Subscription $subscription): array {
         return select($this->events, $subscription);
     }
 

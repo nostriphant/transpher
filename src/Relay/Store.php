@@ -1,7 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher\Relay;
-use nostriphant\Transpher\Nostr\Filters;
+use nostriphant\Transpher\Nostr\Subscription;
 
 /**
  *
@@ -9,5 +9,5 @@ use nostriphant\Transpher\Nostr\Filters;
  */
 interface Store extends \ArrayAccess, \Countable {
 
-    public function __invoke(Filters $subscription): array;
+    public function __invoke(Subscription $subscription): array;
 }

@@ -8,14 +8,14 @@ use function Functional\some,
 use nostriphant\Transpher\Nostr\Subscription\Filter;
 use nostriphant\NIP01\Event;
 
-readonly class Filters {
+readonly class Subscription {
 
-    private function __construct(private \Closure $possible_filters) {
+    private function __construct(private \Closure $filters) {
         
     }
     
     public function __invoke(Event $event) : bool {
-        return some(($this->possible_filters)(fn(array $possible_filter) => true(map($possible_filter, fn(callable $subscription_filter) => $subscription_filter($event)))));
+        return some(($this->filters)(fn(array $possible_filter) => true(map($possible_filter, fn(callable $subscription_filter) => $subscription_filter($event)))));
     }
 
     static function make(callable $to, array ...$filter_prototypes): self {

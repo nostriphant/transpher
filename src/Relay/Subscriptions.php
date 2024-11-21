@@ -1,7 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher\Relay;
-use nostriphant\Transpher\Nostr\Filters;
+use nostriphant\Transpher\Nostr\Subscription;
 use function \Functional\if_else;
 use \nostriphant\Transpher\Relay\Sender;
 use nostriphant\Transpher\Nostr\Message\Factory;
@@ -37,7 +37,7 @@ class Subscriptions {
         yield Factory::accept($event->id);
     }
 
-    static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, Filters $filters): void {
+    static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, Subscription $filters): void {
         $subscriptions[$subscription_id] = if_else($filters, fn() => $relay, fn() => false);
     }
 

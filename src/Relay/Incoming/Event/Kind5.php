@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Relay\Condition;
-use nostriphant\Transpher\Nostr\Filters;
+use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\FunctionalAlternate\Alternate;
 use nostriphant\NIP01\Event;
 
@@ -54,7 +54,7 @@ readonly class Kind5 implements Kind {
             return;
         }
 
-        $removable_events = ($this->store)(Filters::make(Condition::map(), ...$prototypes));
+        $removable_events = ($this->store)(Subscription::make(Condition::map(), ...$prototypes));
         foreach ($removable_events as $removable_event_id => $removable_event) {
             unset($this->store[$removable_event_id]);
         }

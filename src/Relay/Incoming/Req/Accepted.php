@@ -15,7 +15,7 @@ class Accepted {
 
     }
 
-    public function __invoke(string $subscription_id, \nostriphant\Transpher\Nostr\Filters $filters): mixed {
+    public function __invoke(string $subscription_id, \nostriphant\Transpher\Nostr\Subscription $filters): mixed {
         yield from ($this->limits)($this->subscriptions)(
                         rejected: fn(string $reason) => yield Factory::closed($subscription_id, $reason),
                         accepted: function () use ($subscription_id, $filters) {

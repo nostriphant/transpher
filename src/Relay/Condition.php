@@ -5,6 +5,7 @@ namespace nostriphant\Transpher\Relay;
 use nostriphant\NIP01\Event;
 use function Functional\some,
              Functional\partial_left;
+use nostriphant\Transpher\Nostr\Subscription\Filter;
 
 class Condition {
 
@@ -41,16 +42,19 @@ class Condition {
     }
 
     static function map(): callable {
-        return function (mixed $filter_value, string $filter_field) {
-            $directory = __DIR__ . '/Condition/';
+        $directory = __DIR__ . '/Condition/';
+        return function (Filter $filter) use ($directory) {
+            $conditions = [];
+            foreach ($filter->conditions as $filter_field => $filter_value) {
+                if (is_file($directory . $filter_field . '.php')) {
+                    $condition = require __DIR__ . '/Condition/' . $filter_field . '.php';
+                } else {
+                    $condition = (require __DIR__ . '/Condition/tags.php')(ltrim($filter_field, '#'));
+                }
 
-            if (is_file($directory . $filter_field . '.php')) {
-                $filter = require __DIR__ . '/Condition/' . $filter_field . '.php';
-            } else {
-                $filter = (require __DIR__ . '/Condition/tags.php')(ltrim($filter_field, '#'));
+                $conditions[$filter_field] = $condition($filter_value);
             }
-
-            return $filter($filter_value);
+            return $conditions;
         };
     }
 

@@ -37,6 +37,6 @@ readonly class Filter {
     }
 
     static function map(callable $to): callable {
-        return fn(array $filter_prototype) => map(self::fromPrototype($filter_prototype)->conditions, $to);
+        return fn(array $filter_prototype) => $to(self::fromPrototype($filter_prototype));
     }
 }

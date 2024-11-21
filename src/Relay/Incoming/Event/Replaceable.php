@@ -4,6 +4,7 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\Transpher\Relay\Condition;
+use nostriphant\Transpher\Nostr\Filters;
 use nostriphant\NIP01\Event;
 
 class Replaceable {
@@ -16,7 +17,7 @@ class Replaceable {
     }
 
     public function __invoke(Event $event) {
-        $replaceable_events = ($this->events)(Condition::makeFiltersFromPrototypes([
+        $replaceable_events = ($this->events)(Filters::make(Condition::map(), [
                     'kinds' => [$event->kind],
                     'authors' => [$event->pubkey]
         ]));

@@ -4,6 +4,7 @@ namespace nostriphant\Transpher\Relay\Incoming;
 
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\Transpher\Relay\Condition;
+use nostriphant\Transpher\Nostr\Filters;
 
 readonly class Count implements Type {
 
@@ -20,7 +21,7 @@ readonly class Count implements Type {
             yield Factory::notice('Invalid message');
         } else {
             yield from ($this->limits)(array_filter(array_slice($payload, 1)))(
-                            accepted: fn(array $filter_prototypes) => yield Factory::countResponse($payload[0], count(($this->events)(Condition::makeFiltersFromPrototypes(...$filter_prototypes)))),
+                            accepted: fn(array $filter_prototypes) => yield Factory::countResponse($payload[0], count(($this->events)(Filters::make(Condition::map(), ...$filter_prototypes)))),
                     rejected: fn(string $reason) => yield Factory::closed($payload[0], $reason)
             );
         }

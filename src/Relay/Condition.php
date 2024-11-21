@@ -57,8 +57,4 @@ class Condition {
             return $conditions;
         };
     }
-
-    static function makeFiltersFromPrototypes(array ...$prototypes): \nostriphant\Transpher\Nostr\Filters {
-        return \nostriphant\Transpher\Nostr\Filters::make(self::map(), ...$prototypes);
-    }
 }

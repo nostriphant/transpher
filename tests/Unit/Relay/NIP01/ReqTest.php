@@ -68,7 +68,7 @@ describe('REQ', function () {
         $alice->sendSignedMessage($note2);
 
         $subscription = Factory::subscribe(
-                new Filter(ids: [$note2()[1]['id']])
+                ["ids" => [$note2()[1]['id']]]
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello worldi!');
@@ -84,7 +84,7 @@ describe('REQ', function () {
         $alice_key = \Pest\key_sender();
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world!'));
         $subscription = Factory::subscribe(
-                new Filter(authors: [$alice_key(Key::public())])
+                ["authors" => [$alice_key(Key::public())]]
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -137,7 +137,7 @@ describe('REQ', function () {
         $alice->sendSignedMessage(Factory::event($alice_key, 1, 'Hello world!'));
 
         $subscription = Factory::subscribe(
-                new Filter(authors: [$alice_key(Key::public())])
+                ["authors" => [$alice_key(Key::public())]]
         );
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
         $bob->expectNostrEose($subscription()[1]);
@@ -160,7 +160,7 @@ describe('REQ', function () {
         $alice->sendSignedMessage(Factory::event($alice_key, 3, 'Hello world!'));
 
         $subscription = Factory::subscribe(
-                new Filter(kinds: [3])
+               ["kinds" => [3]]
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello world!');
@@ -216,7 +216,7 @@ describe('REQ', function () {
 
         $bob = Client::persistent_client($transpher_store);
         $subscription = Factory::subscribe(
-                new Filter(authors: [$alice_key(Key::public())])
+                ["authors" => [$alice_key(Key::public())]]
         );
 
         $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');

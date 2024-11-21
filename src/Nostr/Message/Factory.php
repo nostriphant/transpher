@@ -74,8 +74,8 @@ class Factory {
         return self::message('CLOSE', $subscriptionId);
     }
     
-    static function subscribe(Filter ...$filters): Message {
-        return self::req(bin2hex(random_bytes(32)), ...map($filters, fn(Filter $filter) => $filter->conditions));
+    static function subscribe(array ...$filters): Message {
+        return self::req(bin2hex(random_bytes(32)), ...$filters);
     }
 
     static function requestedEvent(string $subscriptionId, Event $event): Message {

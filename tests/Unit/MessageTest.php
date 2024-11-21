@@ -31,9 +31,7 @@ it('can generate a properly signed note', function() {
 });
 
 it('can create a subscribe message with a kinds filter', function() {
-    $subscription = Factory::subscribe(
-            new Filter(kinds: [1])
-    );
+    $subscription = Factory::subscribe(["kinds" => [1]]);
     expect($subscription)->toBeCallable();
 
     $message = $subscription();
@@ -45,8 +43,8 @@ it('can create a subscribe message with a kinds filter', function() {
 });
 it('can create a subscribe message with multiple filters', function() {
     $subscription = Factory::subscribe(
-            new Filter(kinds: [1]),
-            new Filter(since: 1724755392)
+            ["kinds" => [1]],
+            ["since" => 1724755392]
     );
 
     $message = $subscription();
@@ -58,20 +56,17 @@ it('can create a subscribe message with multiple filters', function() {
     expect($message[3]['since'])->toBe(1724755392);
 });
 
-it('can create a subscribe message with a different filter-conditions', function() {
-    $conditions = [
+it('can create a subscribe message with a different filter-conditions', function () {
+    $subscription = Factory::subscribe([
         "ids" => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"],
         "authors" => ["5ab2a1fc-40b2-4ae1-85a4-4d207330d3c1", "b618d576-bf3c-4f5a-9334-d9c860b142b4"],
-        "kinds" => [1,2,4,6],
+        "kinds" => [1, 2, 4, 6],
         //"#<single-letter (a-zA-Z)>" => <a list of tag values, for #e — a list of event ids, for #p — a list of pubkeys, etc.>,
         "since" => 1724755392,
         "until" => 1756284192,
         "limit" => 25
-    ];
-    
-    $subscription = Factory::subscribe(
-            new Filter(...$conditions)
-    );
+    ]);
+
     $message = $subscription();
     expect($message[0])->toBe('REQ');
     expect($message[1])->toBeString();
@@ -93,8 +88,8 @@ it('does not allow for unknown filters', function () {
 it('does not allow for unknown filters, merge tags', function() {
     
     $subscription = Factory::subscribe(
-            new Filter(kinds: [1]),
-            new Filter(tags: ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]])
+            ["kinds" => [1]],
+            ['#e' => ["7356b35d-a428-4d51-bc32-ba26e45803c6", "7aa26f57-2162-4543-9aa5-b4dc0cfd73e4"]]
     );
     $message = $subscription();
     expect($message)->toHaveLength(4);

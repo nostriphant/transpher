@@ -56,9 +56,7 @@ describe('agent', function (): void {
         ]);
         sleep(1); // hack to give agent some time to boot...
         $alice = \nostriphant\TranspherTests\Client::client(8087);
-        $subscription = Factory::subscribe(
-                new Filter(tags: ['#p' => [Pest\pubkey_recipient()]])
-        );
+        $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
         $alice->expectNostrPrivateDirectMessage($subscription()[1], Pest\key_recipient(), 'Hello, I am your agent! The URL of your relay is ws://127.0.0.1:8087');
         $request = $subscription();
         $alice->json($request);

@@ -19,6 +19,6 @@ readonly class Filters {
     }
 
     static function make(callable $to, array ...$filter_prototypes): self {
-        return new self(partial_left('\Functional\map', map($filter_prototypes, Filter::map($to))));
+        return new self(partial_left('\Functional\map', array_map(fn(array $filter_prototype) => $to(Filter::fromPrototype($filter_prototype)), $filter_prototypes)));
     }
 }

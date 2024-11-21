@@ -1,1 +1,3 @@
-<?php return nostriphant\Transpher\Relay\Conditions::limit();
+<?php
+
+return nostriphant\Transpher\Relay\Condition::limit();

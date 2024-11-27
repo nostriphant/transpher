@@ -55,12 +55,11 @@ readonly class SQLite implements Relay\Store {
         return $this->fetchEventArray($offset)['id'] === $offset;
     }
 
-    public function offsetGet(mixed $offset): mixed {
-        $event = $this->fetchEventArray($offset);
+    private function collectTags(string $event_id) {
         $query = $this->database->prepare("SELECT tag.id, tag.name, tag_value.position, tag_value.value "
                 . "FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
                 . "WHERE tag.event_id=:event_id");
-        $query->bindValue('event_id', $offset);
+        $query->bindValue('event_id', $event_id);
         $tag_result = $query->execute();
 
         $tags = [];
@@ -70,7 +69,12 @@ readonly class SQLite implements Relay\Store {
                 $tag['position'] => $tag['value']
             ];
         }
-        $event['tags'] = array_values($tags);
+        return array_values($tags);
+    }
+
+    public function offsetGet(mixed $offset): mixed {
+        $event = $this->fetchEventArray($offset);
+        $event['tags'] = $this->collectTags($offset);
         return \nostriphant\NIP01\Event::__set_state($event);
     }
 

@@ -18,8 +18,15 @@ readonly class SQLite implements Relay\Store {
 
         $this->database->querySingle("CREATE TABLE IF NOT EXISTS tag ("
                 . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                . "event_id INTEGER,"
+                . "event_id INTEGER REFERENCES event (id) ON DELETE CASCADE ON UPDATE CASCADE,"
                 . "name TEXT"
+                . ")");
+
+        $this->database->querySingle("CREATE TABLE IF NOT EXISTS tag_value ("
+                . "position INTEGER,"
+                . "tag_id INTEGER REFERENCES tag (id) ON DELETE CASCADE ON UPDATE CASCADE,"
+                . "value TEXT,"
+                . "UNIQUE (tag_id, position) ON CONFLICT FAIL"
                 . ")");
     }
 

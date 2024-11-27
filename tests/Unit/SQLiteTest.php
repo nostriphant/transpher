@@ -6,9 +6,9 @@ it('creates a table `event` if not exists', function () {
     expect($db_file)->toBeFile();
 
     $store = new nostriphant\Transpher\SQLite($sqlite);
+    expect($sqlite->lastErrorMsg())->toBe('not an error');
 
-
-    $expected_tables = ['event', 'tag'];
+    $expected_tables = ['event', 'tag', 'tag_value'];
     foreach ($expected_tables as $expected_table) {
         $table = $sqlite->querySingle("SELECT name FROM sqlite_schema WHERE type='table' AND name='{$expected_table}'");
         expect($table)->toBe($expected_table);

@@ -134,6 +134,6 @@ readonly class SQLite implements Relay\Store {
     }
 
     public function count(): int {
-        return count($this->events);
+        return $this->database->querySingle("SELECT COUNT(id) FROM event");
     }
 }

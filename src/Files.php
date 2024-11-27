@@ -29,8 +29,9 @@ readonly class Files {
                 fclose($remote_handle);
                 fclose($local_handle);
 
-                mkdir($this->path . '.events');
-                touch($this->path . '.events/' . $event_id);
+                $events_path = $this->path . '.events';
+                is_dir($events_path) || mkdir($events_path);
+                touch($events_path . '/' . $event_id);
                 return null;
             }
         };

@@ -41,7 +41,7 @@ readonly class SQLite implements Relay\Store {
         );
     }
 
-    public function __invoke(Subscription $subscription): \Generator {
+    public function __invoke(Subscription $subscription): \Generator|array {
         $to = new Relay\Conditions(SQLite\Condition::class);
         $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
 

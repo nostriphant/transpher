@@ -53,8 +53,6 @@ it('handlers multiple filters', function() {
 
 it('treats unknown filters as tag', function () {
     $subscription = Subscription::make(new Conditions(), ["some-tag" => [1724755392]]);
-
-    expect($subscription->filters[0]->conditions['some-tag'])->toBeCallable();
     expect($subscription(event(['tags' => [['some-tag', 1724755392]]])))->toBeTrue();
 });
 

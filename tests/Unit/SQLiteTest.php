@@ -7,10 +7,10 @@ it('creates a table `event` if not exists', function () {
 
     $store = new nostriphant\Transpher\SQLite($sqlite);
 
-    $tables = $sqlite->query("SELECT name FROM sqlite_schema WHERE type='table'");
 
     $expected_tables = ['event', 'tag'];
-    while ($table = $tables->fetchArray()) {
-        expect($table['name'])->toBeIn($expected_tables);
+    foreach ($expected_tables as $expected_table) {
+        $table = $sqlite->querySingle("SELECT name FROM sqlite_schema WHERE type='table' AND name='{$expected_table}'");
+        expect($table)->toBe($expected_table);
     }
 });

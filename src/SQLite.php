@@ -8,12 +8,18 @@ readonly class SQLite implements Relay\Store {
 
     public function __construct(private \SQLite3 $database) {
         $this->database->querySingle("CREATE TABLE IF NOT EXISTS event ("
-                . "id INTEGER PRIMARY KEY,"
+                . "id INTEGER PRIMARY KEY ASC,"
                 . "pubkey INTEGER,"
                 . "created_at INTEGER,"
                 . "kind INTEGER,"
                 . "content TEXT,"
                 . "sig INTEGER"
+                . ")");
+
+        $this->database->querySingle("CREATE TABLE IF NOT EXISTS tag ("
+                . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                . "event_id INTEGER,"
+                . "name TEXT"
                 . ")");
     }
 

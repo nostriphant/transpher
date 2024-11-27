@@ -167,3 +167,37 @@ it('can store an event with tags', function () {
     expect($sqlite->querySingle("SELECT COUNT(id) FROM tag WHERE event_id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'"))->toBe(3);
     expect($sqlite->querySingle("SELECT COUNT(tag_value.id) FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id WHERE tag.event_id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'"))->toBe(3);
 });
+
+
+it('can delete an event with tags', function () {
+    $db_file = tempnam(sys_get_temp_dir(), 'test') . '.sqlite';
+    $sqlite = new SQLite3($db_file);
+    expect($db_file)->toBeFile();
+
+    $store = new nostriphant\Transpher\SQLite($sqlite);
+    expect($sqlite->lastErrorMsg())->toBe('not an error');
+
+    expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
+                    . "'07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb',"
+                    . "'a38bcec507900130fd6ec167dd7fa942014a92c07e56fe52e1fabfea14afcdfc',"
+                    . "1731082493,"
+                    . "5,"
+                    . "'',"
+                    . "'ea4fbc932a5b1d9e68fa3deb3f7af83924c5b35871294a23a62f95fd33702e0bc701b10e1886811313007b42a7d5a5595d3eb8fb4980c24715fefc7632017d44'"
+                    . ")"))->toBeTrue();
+
+    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'e')");
+    $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (1, 'b9073d8a515eea632834db9f52d786882a90e7152601079dbec49f301e46bff9')");
+
+    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'L')");
+    $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (2, 'pink.momostr')");
+
+    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'k')");
+    $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (3, '1')");
+
+    unset($store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']);
+
+    expect($sqlite->querySingle("SELECT id FROM event WHERE id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'"))->toBeNull();
+    expect($sqlite->querySingle("SELECT COUNT(id) FROM tag WHERE event_id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'"))->toBe(0);
+    expect($sqlite->querySingle("SELECT COUNT(tag_value.id) FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id WHERE tag.event_id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'"))->toBe(0);
+});

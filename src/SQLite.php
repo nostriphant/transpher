@@ -7,6 +7,7 @@ use nostriphant\Transpher\Nostr\Subscription;
 readonly class SQLite implements Relay\Store {
 
     public function __construct(private \SQLite3 $database) {
+        $this->database->exec("PRAGMA foreign_keys = ON");
         $this->database->exec("CREATE TABLE IF NOT EXISTS event ("
                 . "id TEXT PRIMARY KEY ASC,"
                 . "pubkey TEXT,"
@@ -127,7 +128,9 @@ readonly class SQLite implements Relay\Store {
     }
 
     public function offsetUnset(mixed $offset): void {
-        unset($this->events[$offset]);
+        $query = $this->database->prepare("DELETE FROM event WHERE id = :event_id");
+        $query->bindValue('event_id', $offset);
+        $query->execute();
     }
 
     public function count(): int {

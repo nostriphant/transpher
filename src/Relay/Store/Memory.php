@@ -5,6 +5,9 @@ namespace nostriphant\Transpher\Relay\Store;
 
 use function \Functional\select;
 use nostriphant\Transpher\Nostr\Subscription;
+use nostriphant\Transpher\Nostr\Subscription\Filter;
+use function Functional\some;
+use nostriphant\NIP01\Event;
 
 trait Memory {
 
@@ -13,7 +16,8 @@ trait Memory {
     }
 
     public function __invoke(Subscription $subscription): array {
-        return select($this->events, $subscription);
+        $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...($subscription->to)($filter_prototype)), $subscription->filter_prototypes);
+        return select($this->events, fn(Event $event) => some(array_map(fn(Filter $filter) => $filter($event), $filters)));
     }
 
     public function offsetExists(mixed $offset): bool {

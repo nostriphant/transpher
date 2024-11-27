@@ -11,7 +11,7 @@ readonly class Subscription {
     private array $filters;
 
     private function __construct(public Conditions $to, public array $filter_prototypes) {
-        $this->filters = $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $filter_prototypes);
+        $this->filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $filter_prototypes);
     }
     
     public function __invoke(Event $event): bool {

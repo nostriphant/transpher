@@ -74,10 +74,55 @@ readonly class SQLite implements Relay\Store {
     }
 
     public function offsetSet(mixed $offset, mixed $value): void {
-        if (isset($offset)) {
-            $this->events[$offset] = $value;
-        } else {
-            $this->events[] = $value;
+        if (!$value instanceof \nostriphant\NIP01\Event) {
+            return;
+        }
+
+        $query = $this->database->prepare("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
+                . ":id,"
+                . ":pubkey,"
+                . ":created_at,"
+                . ":kind,"
+                . ":content,"
+                . ":sig"
+                . ")");
+        $event = get_object_vars($value);
+        $tags = [];
+        foreach ($event as $property => $value) {
+            if ($property === 'tags') {
+                foreach ($value as $event_tag) {
+                    $tag = [
+                        'query' => $this->database->prepare("INSERT INTO tag (event_id, name) VALUES (:event_id, :name)"),
+                        'values' => []
+                    ];
+                    $tag['query']->bindValue('event_id', $event['id']);
+                    $tag['query']->bindValue('name', array_shift($event_tag));
+
+                    foreach ($event_tag as $position => $event_tag_value) {
+                        $tag_value_query = $this->database->prepare("INSERT INTO tag_value (tag_id, position, value) VALUES (:tag_id, :position, :value)");
+                        $tag_value_query->bindValue('position', $position + 1);
+                        $tag_value_query->bindValue('value', $event_tag_value);
+                        $tag['values'][] = $tag_value_query;
+                    }
+
+                    $tags[] = $tag;
+                }
+                
+            } else {
+                $query->bindValue($property, $value);
+            }
+        }
+
+        if ($query->execute() !== false) {
+            foreach ($tags as $tag) {
+                if ($tag['query']->execute() !== false) {
+                    $tag_id = $this->database->lastInsertRowID();
+                    foreach ($tag['values'] as $value) {
+                        $value->bindValue('tag_id', $tag_id);
+                        $value->execute();
+                    }
+                }
+            }
         }
     }
 

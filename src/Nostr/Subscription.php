@@ -10,7 +10,8 @@ readonly class Subscription {
 
     private array $filters;
 
-    private function __construct(public Conditions $to, public array $filter_prototypes) {
+    private function __construct(public array $filter_prototypes) {
+        $to = new Conditions;
         $this->filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $filter_prototypes);
     }
     
@@ -18,7 +19,7 @@ readonly class Subscription {
         return some(array_map(fn(Filter $filter) => $filter($event), $this->filters));
     }
 
-    static function make(Conditions $to, array ...$filter_prototypes): self {
-        return new self($to, $filter_prototypes);
+    static function make(array ...$filter_prototypes): self {
+        return new self($filter_prototypes);
     }
 }

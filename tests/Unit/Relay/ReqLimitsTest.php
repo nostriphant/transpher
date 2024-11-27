@@ -8,7 +8,7 @@ it('has a maximum number of subscriptions per connected client.', function () {
 
     $limits = \nostriphant\Transpher\Relay\Incoming\Req\Accepted\Limits::construct(max_per_client: 1);
 
-    $subscription = Subscription::make(new Conditions(), ['ids' => ['a']]);
+    $subscription = Subscription::make(['ids' => ['a']]);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
     expect($limit)->toHaveState(accepted: '*');
@@ -24,7 +24,7 @@ it('has a maximum number of subscriptions per connected client. Defaults to 10.'
 
     $limits = \nostriphant\Transpher\Relay\Incoming\Req\Accepted\Limits::construct();
 
-    $subscription = Subscription::make(new Conditions(), ['ids' => ['a']]);
+    $subscription = Subscription::make(['ids' => ['a']]);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
     expect($limit)->toHaveState(accepted: '*');
@@ -50,7 +50,7 @@ it('has a maximum number of subscriptions per connected client. Disabled when se
 
     $limits = \nostriphant\Transpher\Relay\Incoming\Req\Accepted\Limits::construct(max_per_client: 0);
 
-    $subscription = Subscription::make(new Conditions(), ['ids' => ['a']]);
+    $subscription = Subscription::make(['ids' => ['a']]);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
     expect($limit)->toHaveState(accepted: '*');
@@ -86,7 +86,7 @@ it('has a maximum number of subscriptions per connected client, configurable thr
     putenv('LIMIT_REQ_MAX_PER_CLIENT=1');
     $limits = \nostriphant\Transpher\Relay\Incoming\Req\Accepted\Limits::fromEnv();
 
-    $subscription = Subscription::make(new Conditions(), ['ids' => ['a']]);
+    $subscription = Subscription::make(['ids' => ['a']]);
 
     $limit = $limits($subscriptions, ['ids' => ['a']]);
     expect($limit)->toHaveState(accepted: '*');

@@ -17,7 +17,7 @@ class Replaceable {
     }
 
     public function __invoke(Event $event) {
-        $replaceable_events = ($this->events)(Subscription::make(new Conditions(), [
+        $replaceable_events = ($this->events)(Subscription::make([
                     'kinds' => [$event->kind],
                     'authors' => [$event->pubkey]
         ]));

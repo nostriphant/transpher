@@ -7,22 +7,22 @@ use nostriphant\Transpher\Nostr\Subscription;
 readonly class SQLite implements Relay\Store {
 
     public function __construct(private \SQLite3 $database) {
-        $this->database->querySingle("CREATE TABLE IF NOT EXISTS event ("
-                . "id INTEGER PRIMARY KEY ASC,"
-                . "pubkey INTEGER,"
+        $this->database->exec("CREATE TABLE IF NOT EXISTS event ("
+                . "id TEXT PRIMARY KEY ASC,"
+                . "pubkey TEXT,"
                 . "created_at INTEGER,"
                 . "kind INTEGER,"
                 . "content TEXT,"
-                . "sig INTEGER"
+                . "sig TEXT"
                 . ")");
 
-        $this->database->querySingle("CREATE TABLE IF NOT EXISTS tag ("
+        $this->database->exec("CREATE TABLE IF NOT EXISTS tag ("
                 . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                . "event_id INTEGER REFERENCES event (id) ON DELETE CASCADE ON UPDATE CASCADE,"
+                . "event_id TEXT REFERENCES event (id) ON DELETE CASCADE ON UPDATE CASCADE,"
                 . "name TEXT"
                 . ")");
 
-        $this->database->querySingle("CREATE TABLE IF NOT EXISTS tag_value ("
+        $this->database->exec("CREATE TABLE IF NOT EXISTS tag_value ("
                 . "position INTEGER,"
                 . "tag_id INTEGER REFERENCES tag (id) ON DELETE CASCADE ON UPDATE CASCADE,"
                 . "value TEXT,"
@@ -35,9 +35,10 @@ readonly class SQLite implements Relay\Store {
     }
 
     public function offsetExists(mixed $offset): bool {
-        //return $this->database->q
-
-        return isset($this->events[$offset]);
+        $query = $this->database->prepare("SELECT id FROM event WHERE id=:event_id LIMIT 1");
+        $query->bindValue('event_id', $offset);
+        $event = $query->execute()->fetchArray();
+        return $event['id'] === $offset;
     }
 
     public function offsetGet(mixed $offset): mixed {

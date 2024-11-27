@@ -12,6 +12,10 @@ readonly class Until implements Test {
 
     #[\Override]
     public function __invoke(array $query): array {
-        return is_int($this->expected_value) === false || $event->{$this->event_field} <= $this->expected_value;
+        if (is_int($this->expected_value) === false) {
+            return $query;
+        }
+        $query['where'][] = ["{$this->event_field} <= ?", $this->expected_value];
+        return $query;
     }
 }

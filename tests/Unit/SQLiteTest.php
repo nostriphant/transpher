@@ -231,7 +231,7 @@ it('can count events', function () {
     expect($store)->toHaveCount(1);
 });
 
-it('can filter an event on id', function () {
+it('can filter an event on id', function (array $filter_prototype) {
     $db_file = tempnam(sys_get_temp_dir(), 'test') . '.sqlite';
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
@@ -263,8 +263,13 @@ it('can filter an event on id', function () {
     $data = $result->fetchArray();
     expect($data['id'])->toBe('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb');
 
-    $events = iterator_to_array($store(\nostriphant\Transpher\Nostr\Subscription::make(['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']])));
+    $events = iterator_to_array($store(\nostriphant\Transpher\Nostr\Subscription::make($filter_prototype)));
     expect($events)->toHaveCount(1);
     expect($events[0])->toBeInstanceOf(nostriphant\NIP01\Event::class);
     expect($events[0]->id)->toBe('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb');
-});
+})->with([
+    [['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']]],
+    [['authors' => ['a38bcec507900130fd6ec167dd7fa942014a92c07e56fe52e1fabfea14afcdfc']]],
+    [['since' => 1731082480]],
+    [['until' => 1731082500]]
+]);

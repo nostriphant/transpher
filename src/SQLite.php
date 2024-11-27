@@ -23,11 +23,20 @@ readonly class SQLite implements Relay\Store {
                 . ")");
 
         $this->database->exec("CREATE TABLE IF NOT EXISTS tag_value ("
+                . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 . "position INTEGER,"
                 . "tag_id INTEGER REFERENCES tag (id) ON DELETE CASCADE ON UPDATE CASCADE,"
                 . "value TEXT,"
                 . "UNIQUE (tag_id, position) ON CONFLICT FAIL"
                 . ")");
+
+        $this->database->exec("CREATE TRIGGER IF NOT EXISTS auto_increment_position_trigger "
+                . "AFTER INSERT ON tag_value WHEN new.position IS NULL BEGIN"
+                . "    UPDATE tag_value"
+                . "    SET position = (SELECT IFNULL(MAX(position), 0) + 1 FROM tag_value WHERE tag_id = new.tag_id)"
+                . "    WHERE id = new.id;"
+                . "END;"
+        );
     }
 
     public function __invoke(Subscription $subscription): array {

@@ -3,6 +3,7 @@
 namespace nostriphant\Transpher;
 
 use nostriphant\Transpher\Nostr\Subscription;
+use nostriphant\NIP01\Event;
 
 readonly class SQLite implements Relay\Store {
 
@@ -40,8 +41,40 @@ readonly class SQLite implements Relay\Store {
         );
     }
 
-    public function __invoke(Subscription $subscription): array {
-        return select($this->events, $subscription);
+    public function __invoke(Subscription $subscription): \Generator {
+        $to = new Relay\Conditions(SQLite\Condition::class);
+        $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
+
+        $query_prototype = array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [
+            'where' => [],
+            'limit' => null
+        ]);
+
+        $parameters = [];
+        $where = array_reduce($query_prototype['where'], function (array $where, array $condition) use (&$parameters) {
+            $where[] = array_shift($condition);
+            $parameters = array_merge($parameters, $condition);
+            return $where;
+        }, []);
+
+        $query = "SELECT id, pubkey, created_at, kind, content, sig "
+                . "FROM event "
+                . "WHERE (" . implode(') AND (', $where) . ")"
+                . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : "");
+        $statement = $this->database->prepare($query);
+        array_walk($parameters, function (mixed $parameter, int $position) use ($statement) {
+            $statement->bindValue($position + 1, $parameter);
+        });
+
+        $result = $statement->execute();
+        if ($result === false) {
+            throw new \Exception($this->database->lastErrorMsg());
+        }
+
+        while ($data = $result->fetchArray(SQLITE3_ASSOC)) {
+            $data['tags'] = $this->collectTags($data['id']);
+            yield new Event(...$data);
+        }
     }
 
     private function fetchEventArray(string $event_id): array {
@@ -75,11 +108,11 @@ readonly class SQLite implements Relay\Store {
     public function offsetGet(mixed $offset): mixed {
         $event = $this->fetchEventArray($offset);
         $event['tags'] = $this->collectTags($offset);
-        return \nostriphant\NIP01\Event::__set_state($event);
+        return Event::__set_state($event);
     }
 
     public function offsetSet(mixed $offset, mixed $value): void {
-        if (!$value instanceof \nostriphant\NIP01\Event) {
+        if (!$value instanceof Event) {
             return;
         }
 

@@ -3,7 +3,6 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
-use nostriphant\Transpher\Relay\Conditions;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 

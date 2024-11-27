@@ -11,7 +11,7 @@ readonly class Subscription {
     private array $filters;
 
     private function __construct(public array $filter_prototypes) {
-        $to = new Conditions;
+        $to = new Conditions(\nostriphant\Transpher\Relay\Condition::class);
         $this->filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $filter_prototypes);
     }
     

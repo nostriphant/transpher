@@ -13,7 +13,7 @@ readonly class Conditions {
         'until' => 'until'
     ];
 
-    public function __construct() {
+    public function __construct(private string $mapperClass) {
         
     }
 
@@ -25,7 +25,7 @@ readonly class Conditions {
                 $method = self::MAP[$method];
             }
 
-            $conditions[$filter_field] = Condition::$method($expected_value);
+            $conditions[$filter_field] = $this->mapperClass::$method($expected_value);
         }
         return $conditions;
     }

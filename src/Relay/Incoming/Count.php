@@ -3,7 +3,6 @@
 namespace nostriphant\Transpher\Relay\Incoming;
 
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\Relay\Conditions;
 use nostriphant\Transpher\Nostr\Subscription;
 
 readonly class Count implements Type {

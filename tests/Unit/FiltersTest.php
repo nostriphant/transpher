@@ -1,6 +1,5 @@
 <?php
 
-use nostriphant\Transpher\Relay\Conditions;
 use nostriphant\Transpher\Nostr\Subscription;
 use function \Pest\event;
 

@@ -24,9 +24,16 @@ it('can check if an event exists', function () {
     $store = new nostriphant\Transpher\SQLite($sqlite);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
-    $sqlite->exec("INSERT INTO event (id) VALUES ('2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0')");
+    expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
+                    . "'07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb',"
+                    . "'a38bcec507900130fd6ec167dd7fa942014a92c07e56fe52e1fabfea14afcdfc',"
+                    . "1731082493,"
+                    . "5,"
+                    . "'',"
+                    . "'ea4fbc932a5b1d9e68fa3deb3f7af83924c5b35871294a23a62f95fd33702e0bc701b10e1886811313007b42a7d5a5595d3eb8fb4980c24715fefc7632017d44'"
+                    . ")"))->toBeTrue();
 
-    expect(isset($store['2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0']))->toBeTrue();
+    expect(isset($store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']))->toBeTrue();
 });
 
 it('can retrieve an event with tags added without a specific position', function () {
@@ -37,15 +44,48 @@ it('can retrieve an event with tags added without a specific position', function
     $store = new nostriphant\Transpher\SQLite($sqlite);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
-    $sqlite->exec("INSERT INTO event (id) VALUES ('2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0')");
-    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0', 'p')");
+    expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
+                    . "'07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb',"
+                    . "'a38bcec507900130fd6ec167dd7fa942014a92c07e56fe52e1fabfea14afcdfc',"
+                    . "1731082493,"
+                    . "5,"
+                    . "'',"
+                    . "'ea4fbc932a5b1d9e68fa3deb3f7af83924c5b35871294a23a62f95fd33702e0bc701b10e1886811313007b42a7d5a5595d3eb8fb4980c24715fefc7632017d44'"
+                    . ")"))->toBeTrue();
+    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'p')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (1, 'first-value')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (1, 'second-value')");
 
-    $event = $store['2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0'];
-    expect($event['tags'])->toHaveCount(1);
-    expect($event['tags'][0])->toBe(['p', 'first-value', 'second-value']);
+    $event = $store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'];
+    expect($event->tags)->toHaveCount(1);
+    expect($event->tags[0])->toBe(['p', 'first-value', 'second-value']);
 });
+
+it('can retrieve an event with a tag', function () {
+    $db_file = tempnam(sys_get_temp_dir(), 'test') . '.sqlite';
+    $sqlite = new SQLite3($db_file);
+    expect($db_file)->toBeFile();
+
+    $store = new nostriphant\Transpher\SQLite($sqlite);
+    expect($sqlite->lastErrorMsg())->toBe('not an error');
+
+    expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
+                    . "'07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb',"
+                    . "'a38bcec507900130fd6ec167dd7fa942014a92c07e56fe52e1fabfea14afcdfc',"
+                    . "1731082493,"
+                    . "5,"
+                    . "'',"
+                    . "'ea4fbc932a5b1d9e68fa3deb3f7af83924c5b35871294a23a62f95fd33702e0bc701b10e1886811313007b42a7d5a5595d3eb8fb4980c24715fefc7632017d44'"
+                    . ")"))->toBeTrue();
+    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'p')");
+    $sqlite->exec("INSERT INTO tag_value (tag_id, position, value) VALUES (1, 2, 'second-value')");
+    $sqlite->exec("INSERT INTO tag_value (tag_id, position, value) VALUES (1, 1, 'first-value')");
+
+    $event = $store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'];
+    expect($event->tags)->toHaveCount(1);
+    expect($event->tags[0])->toBe(['p', 'first-value', 'second-value']);
+});
+
 
 it('can retrieve an event with tags', function () {
     $db_file = tempnam(sys_get_temp_dir(), 'test') . '.sqlite';
@@ -55,12 +95,32 @@ it('can retrieve an event with tags', function () {
     $store = new nostriphant\Transpher\SQLite($sqlite);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
-    $sqlite->exec("INSERT INTO event (id) VALUES ('2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0')");
-    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0', 'p')");
-    $sqlite->exec("INSERT INTO tag_value (tag_id, position, value) VALUES (1, 2, 'second-value')");
-    $sqlite->exec("INSERT INTO tag_value (tag_id, position, value) VALUES (1, 1, 'first-value')");
+    expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
+                    . "'07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb',"
+            . "'a38bcec507900130fd6ec167dd7fa942014a92c07e56fe52e1fabfea14afcdfc',"
+            . "1731082493,"
+            . "5,"
+            . "'',"
+            . "'ea4fbc932a5b1d9e68fa3deb3f7af83924c5b35871294a23a62f95fd33702e0bc701b10e1886811313007b42a7d5a5595d3eb8fb4980c24715fefc7632017d44'"
+            . ")"))->toBeTrue();
 
-    $event = $store['2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0'];
-    expect($event['tags'])->toHaveCount(1);
-    expect($event['tags'][0])->toBe(['p', 'first-value', 'second-value']);
+    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'e')");
+    $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (1, 'b9073d8a515eea632834db9f52d786882a90e7152601079dbec49f301e46bff9')");
+
+    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'L')");
+    $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (2, 'pink.momostr')");
+
+    $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'k')");
+    $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (3, '1')");
+
+    $event = $store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'];
+    expect($event->pubkey)->toBe('a38bcec507900130fd6ec167dd7fa942014a92c07e56fe52e1fabfea14afcdfc');
+    expect($event->created_at)->toBe(1731082493);
+    expect($event->kind)->toBe(5);
+    expect($event->content)->toBe('');
+    expect($event->sig)->toBe('ea4fbc932a5b1d9e68fa3deb3f7af83924c5b35871294a23a62f95fd33702e0bc701b10e1886811313007b42a7d5a5595d3eb8fb4980c24715fefc7632017d44');
+    expect($event->tags)->toHaveCount(3);
+    expect($event->tags[0])->toBe(['e', 'b9073d8a515eea632834db9f52d786882a90e7152601079dbec49f301e46bff9']);
+    expect($event->tags[1])->toBe(['L', 'pink.momostr']);
+    expect($event->tags[2])->toBe(['k', '1']);
 });

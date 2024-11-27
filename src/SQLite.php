@@ -43,18 +43,19 @@ readonly class SQLite implements Relay\Store {
         return select($this->events, $subscription);
     }
 
-    private function fetchEvent(string $event_id): array {
-        $query = $this->database->prepare("SELECT id FROM event WHERE id=:event_id LIMIT 1");
+    private function fetchEventArray(string $event_id): array {
+        $query = $this->database->prepare("SELECT id, pubkey, created_at, kind, content, sig FROM event WHERE id=:event_id LIMIT 1");
         $query->bindValue('event_id', $event_id);
-        return $query->execute()->fetchArray();
+        $result = $query->execute();
+        return $result->fetchArray(SQLITE3_ASSOC);
     }
 
     public function offsetExists(mixed $offset): bool {
-        return $this->fetchEvent($offset)['id'] === $offset;
+        return $this->fetchEventArray($offset)['id'] === $offset;
     }
 
     public function offsetGet(mixed $offset): mixed {
-        $event = $this->fetchEvent($offset);
+        $event = $this->fetchEventArray($offset);
         $query = $this->database->prepare("SELECT tag.id, tag.name, tag_value.position, tag_value.value "
                 . "FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
                 . "WHERE tag.event_id=:event_id");
@@ -69,7 +70,7 @@ readonly class SQLite implements Relay\Store {
             ];
         }
         $event['tags'] = array_values($tags);
-        return $event;
+        return \nostriphant\NIP01\Event::__set_state($event);
     }
 
     public function offsetSet(mixed $offset, mixed $value): void {

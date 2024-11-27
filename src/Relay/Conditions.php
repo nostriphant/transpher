@@ -4,6 +4,15 @@ namespace nostriphant\Transpher\Relay;
 
 readonly class Conditions {
 
+    const array MAP = [
+        'authors' => 'pubkey',
+        'ids' => 'id',
+        'kinds' => 'kind',
+        'limit' => 'limit',
+        'since' => 'since',
+        'until' => 'until'
+    ];
+
     public function __construct() {
         
     }
@@ -11,15 +20,12 @@ readonly class Conditions {
     public function __invoke(array $filter_prototype): array {
         $conditions = [];
         foreach ($filter_prototype as $filter_field => $expected_value) {
-            $conditions[$filter_field] = match ($filter_field) {
-                'authors' => Condition::pubkey($expected_value),
-                'ids' => Condition::id($expected_value),
-                'kinds' => Condition::kind($expected_value),
-                'limit' => Condition::limit($expected_value),
-                'since' => Condition::since($expected_value),
-                'until' => Condition::until($expected_value),
-                default => Condition::$filter_field($expected_value)
-            };
+            $method = $filter_field;
+            if (isset(self::MAP[$method])) {
+                $method = self::MAP[$method];
+            }
+
+            $conditions[$filter_field] = Condition::$method($expected_value);
         }
         return $conditions;
     }

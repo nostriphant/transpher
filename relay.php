@@ -29,11 +29,29 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
 //);
 
-$store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-is_dir($store_path) || mkdir($store_path);
-$events = new nostriphant\Transpher\Directory($store_path);
+if (isset($_SERVER['RELAY_DATA'])) {
+    $data_dir = $_SERVER['RELAY_DATA'];
+    is_dir($data_dir) || mkdir($data_dir);
 
-$files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
+    $events = new nostriphant\Transpher\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
+
+    $store_path = $data_dir . '/events';
+    if (is_dir($store_path)) {
+        // migrate old events to sqlite
+        \nostriphant\Transpher\Directory::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events) {
+            $events[$event->id] = $event;
+            unlink($store_path . '/' . $event->id . '.php');
+        });
+    }
+
+    $files_path = $data_dir . '/files';
+} else {
+    $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
+    is_dir($store_path) || mkdir($store_path);
+    $events = new nostriphant\Transpher\Directory($store_path);
+
+    $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
+}
 is_dir($files_path) || mkdir($files_path);
 $files = new \nostriphant\Transpher\Files($files_path);
 

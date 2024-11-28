@@ -4,13 +4,17 @@ use nostriphant\NIP01\Key;
 use nostriphant\TranspherTests\Feature\Functions;
 use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\Nostr\Subscription\Filter;
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Nostr;
 
 beforeAll(function () {
-    global $relay;
+    global $relay, $env;
     $agent_key = \Pest\key_recipient();
+    $data_dir = ROOT_DIR . '/data/' . uniqid('relay_', true);
+    is_dir($data_dir) || mkdir($data_dir);
+
+    $event = Pest\event(['id' => uniqid()]);
+    \nostriphant\Transpher\Directory::write($data_dir . '/events/', $event);
 
     $relay = Functions::bootRelay('127.0.0.1:8087', $env = [
         'AGENT_NSEC' => Bech32::toNsec($agent_key(Key::private())),
@@ -19,9 +23,12 @@ beforeAll(function () {
         'RELAY_NAME' => 'Really relay',
         'RELAY_DESCRIPTION' => 'This is my dev relay',
         'RELAY_CONTACT' => 'transpher@nostriphant.dev',
-        'RELAY_STORE' => ROOT_DIR . '/data/events/' . uniqid('relay_', true),
+        'RELAY_DATA' => $data_dir,
         'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72 // to accept NIP17 pdm created_at randomness
     ]);
+
+    expect(\nostriphant\Transpher\Directory::file($data_dir . '/events/', $event->id))->not()->toBeFile();
+    rmdir($data_dir . '/events/');
 });
 
 afterAll(function () {
@@ -71,10 +78,11 @@ describe('agent', function (): void {
 
 describe('blossom support', function () {
     it('supports BUD-01 (GET /<sha-256>)', function () {
+        global $env;
         $content = 'Hello World!';
         $hash = hash('sha256', $content);
-        file_put_contents(ROOT_DIR . '/data/files/' . $hash, $content);
-        expect(file_get_contents(ROOT_DIR . '/data/files/' . $hash))->toBe($content);
+        file_put_contents($env['RELAY_DATA'] . '/files/' . $hash, $content);
+        expect(file_get_contents($env['RELAY_DATA'] . '/files/' . $hash))->toBe($content);
 
         $curl = curl_init('http://localhost:8087/' . $hash);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -87,10 +95,12 @@ describe('blossom support', function () {
     });
 
     it('supports BUD-01 (HEAD /<sha-256>)', function () {
+        global $env;
+
         $content = 'Hello World!';
         $hash = hash('sha256', $content);
-        file_put_contents(ROOT_DIR . '/data/files/' . $hash, $content);
-        expect(file_get_contents(ROOT_DIR . '/data/files/' . $hash))->toBe($content);
+        file_put_contents($env['RELAY_DATA'] . '/' . $hash, $content);
+        expect(file_get_contents($env['RELAY_DATA'] . '/files/' . $hash))->toBe($content);
 
         $curl = curl_init('http://localhost:8087/' . $hash);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

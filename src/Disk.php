@@ -6,7 +6,7 @@ use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\Transpher\Stores\Memory;
 
-class Directory implements Relay\Store {
+class Disk implements Relay\Store {
 
     const NIP01_EVENT_SPLITOFF_TIME = 1732125327;
 

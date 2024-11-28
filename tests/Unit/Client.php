@@ -17,7 +17,7 @@ class Client extends \nostriphant\TranspherTests\Client {
 
     static function persistent_client(string $store): self {
         return new self(new \nostriphant\Transpher\Relay(
-                        \Pest\incoming(new \nostriphant\Transpher\Directory($store)),
+                        \Pest\incoming(new \nostriphant\Transpher\Disk($store)),
                         \Mockery::spy(\Psr\Log\LoggerInterface::class)
                 ));
     }

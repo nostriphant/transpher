@@ -47,7 +47,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $data_dir . '/files';
 } else {
     $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-    $events = new nostriphant\Transpher\Directory($store_path);
+    $events = new \nostriphant\Transpher\Stores\Disk($store_path);
 
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }

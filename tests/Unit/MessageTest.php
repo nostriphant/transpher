@@ -2,7 +2,6 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\Nostr\Subscription\Filter;
 
 it('can generate a properly signed note', function() {
     $private_key = Key::fromHex('435790f13406085d153b10bd9e00a9f977e637f10ce37db5ccfc5d3440c12d6c');

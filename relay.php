@@ -38,7 +38,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {
         // migrate old events to sqlite
-        \nostriphant\Transpher\Directory::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events) {
+        \nostriphant\Transpher\Stores\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events) {
             $events[$event->id] = $event;
             unlink($store_path . '/' . $event->id . '.php');
         });

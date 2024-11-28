@@ -2,14 +2,12 @@
 
 namespace nostriphant\Transpher\Nostr\Message;
 
-use function \Functional\map;
 use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Event;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP59\Gift;
 use nostriphant\NIP59\Seal;
 use nostriphant\NIP59\Rumor;
-use nostriphant\Transpher\Nostr\Subscription\Filter;
 
 class Factory {
 

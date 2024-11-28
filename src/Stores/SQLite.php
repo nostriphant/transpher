@@ -106,12 +106,13 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         return array_values($tags);
     }
 
-    public function offsetGet(mixed $offset): mixed {
+    public function offsetGet(mixed $offset): Event {
         $event = $this->fetchEventArray($offset);
         $event['tags'] = $this->collectTags($offset);
         return Event::__set_state($event);
     }
 
+    #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
         if (!$value instanceof Event) {
             return;

@@ -3,16 +3,13 @@
 namespace nostriphant\Transpher;
 
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Nostr\Subscription;
 
 class Directory implements Relay\Store {
 
     const NIP01_EVENT_SPLITOFF_TIME = 1732125327;
 
-    use Relay\Store\Memory {
-        offsetSet as eventsOffsetSet;
-        offsetUnset as eventsOffsetUnset;
-        __construct as eventsConstructor;
-    }
+    private Relay\Store\Memory $memory;
 
     public function __construct(private string $store) {
         $events = [];
@@ -21,7 +18,7 @@ class Directory implements Relay\Store {
             $events[$event->id] = $event;
         });
 
-        $this->eventsConstructor($events);
+        $this->memory = new Relay\Store\Memory($events);
     }
 
     static function walk_store(string $store, callable $callback): void {
@@ -49,13 +46,33 @@ class Directory implements Relay\Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $event): void {
-        $this->eventsOffsetSet($offset, $event);
+        $this->memory[$offset] = $event;
         self::write($this->store, $event);
     }
 
     #[\Override]
     public function offsetUnset(mixed $offset): void {
         unlink(self::file($this->store, $offset));
-        $this->eventsOffsetUnset($offset);
+        unset($this->memory[$offset]);
+    }
+
+    #[\Override]
+    public function __invoke(Subscription $subscription): \Generator {
+        yield from call_user_func($this->memory, $subscription);
+    }
+
+    #[\Override]
+    public function offsetExists(mixed $offset): bool {
+        return isset($this->memory[$offset]);
+    }
+
+    #[\Override]
+    public function offsetGet(mixed $offset): Event {
+        return $this->memory[$offset];
+    }
+
+    #[\Override]
+    public function count(): int {
+        return count($this->memory);
     }
 }

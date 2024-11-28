@@ -15,10 +15,10 @@ trait Memory {
 
     }
 
-    public function __invoke(Subscription $subscription): \Generator|array {
+    public function __invoke(Subscription $subscription): \Generator {
         $to = new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class);
         $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
-        return select($this->events, fn(Event $event) => some(array_map(fn(Filter $filter) => $filter($event), $filters)));
+        yield from select($this->events, fn(Event $event) => some(array_map(fn(Filter $filter) => $filter($event), $filters)));
     }
 
     public function offsetExists(mixed $offset): bool {

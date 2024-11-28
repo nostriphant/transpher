@@ -15,11 +15,11 @@ class Addressable {
     }
 
     public function __invoke(Event $event) {
-        $replaceable_events = ($this->events)(Subscription::make([
-                    'kinds' => [$event->kind],
+        $replaceable_events = iterator_to_array(($this->events)(Subscription::make([
+                            'kinds' => [$event->kind],
                     'authors' => [$event->pubkey],
                     '#d' => array_map(fn(array $tag_values) => $tag_values[0], Event::extractTagValues($event, 'd'))
-        ]));
+        ])));
 
         $this->events[$event->id] = $event;
         foreach ($replaceable_events as $replaceable_event) {

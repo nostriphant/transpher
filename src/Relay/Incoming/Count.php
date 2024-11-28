@@ -20,8 +20,8 @@ readonly class Count implements Type {
             yield Factory::notice('Invalid message');
         } else {
             yield from ($this->limits)(array_filter(array_slice($payload, 1)))(
-                            accepted: fn(array $filter_prototypes) => yield Factory::countResponse($payload[0], count(($this->events)(Subscription::make(...$filter_prototypes)))),
-                    rejected: fn(string $reason) => yield Factory::closed($payload[0], $reason)
+                            accepted: fn(array $filter_prototypes) => yield Factory::countResponse($payload[0], iterator_count(($this->events)(Subscription::make(...$filter_prototypes)))),
+                            rejected: fn(string $reason) => yield Factory::closed($payload[0], $reason)
             );
         }
     }

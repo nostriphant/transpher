@@ -9,5 +9,5 @@ use nostriphant\Transpher\Nostr\Subscription;
  */
 interface Store extends \ArrayAccess, \Countable {
 
-    public function __invoke(Subscription $subscription): \Generator|array;
+    public function __invoke(Subscription $subscription): \Generator;
 }

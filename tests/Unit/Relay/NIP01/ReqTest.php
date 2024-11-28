@@ -2,7 +2,6 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\Nostr\Subscription\Filter;
 use nostriphant\TranspherTests\Unit\Client;
 use function Pest\incoming;
 

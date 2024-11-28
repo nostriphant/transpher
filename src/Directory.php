@@ -16,6 +16,7 @@ class Directory implements Relay\Store {
 
     public function __construct(private string $store) {
         $events = [];
+        is_dir($store) || mkdir($store);
         self::walk_store($store, function (Event $event) use (&$events) {
             $events[$event->id] = $event;
         });
@@ -24,7 +25,6 @@ class Directory implements Relay\Store {
     }
 
     static function walk_store(string $store, callable $callback): void {
-        is_dir($store) || mkdir($store);
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {
             if (filectime($event_file) < self::NIP01_EVENT_SPLITOFF_TIME) {
                 $event_file_contents = file_get_contents($event_file);

@@ -5,7 +5,7 @@ namespace nostriphant\Transpher;
 readonly class Files {
 
     public function __construct(private string $path) {
-        
+        is_dir($path) || mkdir($path);
     }
 
     public function __invoke(string $hash): object {

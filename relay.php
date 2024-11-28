@@ -47,12 +47,10 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $data_dir . '/files';
 } else {
     $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-    is_dir($store_path) || mkdir($store_path);
     $events = new nostriphant\Transpher\Directory($store_path);
 
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }
-is_dir($files_path) || mkdir($files_path);
 $files = new \nostriphant\Transpher\Files($files_path);
 
 $incoming = new \nostriphant\Transpher\Relay\Incoming($events, $files);

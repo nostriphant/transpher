@@ -91,7 +91,7 @@ namespace Pest {
     }
 
     function store(array $events = []) {
-        return new \nostriphant\Transpher\Relay\Store\Memory($events);
+        return new \nostriphant\Transpher\Stores\Memory($events);
     }
 
     function incoming(?\nostriphant\Transpher\Relay\Store $store = null, string $files = ROOT_DIR . '/data/files') {

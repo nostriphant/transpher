@@ -1,7 +1,7 @@
 <?php
 
 
-namespace nostriphant\Transpher\Relay\Store;
+namespace nostriphant\Transpher\Stores;
 
 use function \Functional\select;
 use nostriphant\Transpher\Nostr\Subscription;

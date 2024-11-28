@@ -4,12 +4,13 @@ namespace nostriphant\Transpher;
 
 use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Nostr\Subscription;
+use nostriphant\Transpher\Stores\Memory;
 
 class Directory implements Relay\Store {
 
     const NIP01_EVENT_SPLITOFF_TIME = 1732125327;
 
-    private Relay\Store\Memory $memory;
+    private Memory $memory;
 
     public function __construct(private string $store) {
         $events = [];
@@ -18,7 +19,7 @@ class Directory implements Relay\Store {
             $events[$event->id] = $event;
         });
 
-        $this->memory = new Relay\Store\Memory($events);
+        $this->memory = new Memory($events);
     }
 
     static function walk_store(string $store, callable $callback): void {

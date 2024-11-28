@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\SQLite;
+namespace nostriphant\Transpher\Stores\SQLite;
 
 use function Functional\true;
 

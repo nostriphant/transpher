@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\SQLite\Condition;
+namespace nostriphant\Transpher\Stores\SQLite\Condition;
 
 use nostriphant\NIP01\Event;
 

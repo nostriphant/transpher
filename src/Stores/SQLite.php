@@ -1,11 +1,12 @@
 <?php
 
-namespace nostriphant\Transpher;
+namespace nostriphant\Transpher\Stores;
 
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Relay\Conditions;
 
-readonly class SQLite implements Relay\Store {
+readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     public function __construct(private \SQLite3 $database) {
         $this->database->exec("PRAGMA foreign_keys = ON");
@@ -42,7 +43,7 @@ readonly class SQLite implements Relay\Store {
     }
 
     public function __invoke(Subscription $subscription): \Generator {
-        $to = new Relay\Conditions(SQLite\Condition::class);
+        $to = new Conditions(SQLite\Condition::class);
         $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
 
         $query_prototype = array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [

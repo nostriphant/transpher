@@ -14,7 +14,9 @@ beforeAll(function () {
     is_dir($data_dir) || mkdir($data_dir);
 
     $event = Pest\event(['id' => uniqid()]);
-    \nostriphant\Transpher\Directory::write($data_dir . '/events/', $event);
+    is_dir($data_dir . '/events') || mkdir($data_dir . '/events');
+    $event_file = $data_dir . '/events' . DIRECTORY_SEPARATOR . $event->id . '.php';
+    file_put_contents($event_file, '<?php return ' . var_export($event, true) . ';');
 
     $relay = Functions::bootRelay('127.0.0.1:8087', $env = [
         'AGENT_NSEC' => Bech32::toNsec($agent_key(Key::private())),
@@ -27,7 +29,7 @@ beforeAll(function () {
         'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72 // to accept NIP17 pdm created_at randomness
     ]);
 
-    expect(\nostriphant\Transpher\Directory::file($data_dir . '/events/', $event->id))->not()->toBeFile();
+    expect($event_file)->not()->toBeFile();
     rmdir($data_dir . '/events/');
 });
 

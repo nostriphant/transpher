@@ -46,6 +46,18 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . "END;"
         );
         $this->log->debug('Trigger auto_increment_position_trigger created (if it did not already exist)');
+
+        $this->database->exec("CREATE VIEW IF NOT EXISTS event_tag_json AS "
+                . "SELECT "
+                . "    tag.event_id, "
+                . "    tag.name, "
+                . "    json_insert(json_group_array(tag_value.value), '$[#]', tag.name) AS json"
+                . " FROM tag "
+                . " LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
+                . " GROUP BY tag.name"
+                . " ORDER BY tag_value.position ASC"
+        );
+        $this->log->debug('View event_tag_json created (if it did not already exist)');
     }
 
     private function queryEvents(array $query_prototype): \Generator {
@@ -57,27 +69,20 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         }, []);
 
         $query = "SELECT "
-                . "id, "
+                . "event.id, "
                 . "pubkey, "
                 . "created_at, "
                 . "kind, "
                 . "content, "
                 . "sig, "
-                . "GROUP_CONCAT(tags_json,',') as tags_json "
-                . "FROM "
-                . "event LEFT JOIN "
-                . "(SELECT "
-                . "     tag.event_id, "
-                //. "    json_insert(json_array(tag.name),'$[#]', tag_value.value) AS tags_json"
-                . "    json_insert(json_group_array(tag_value.value), '$[#]', tag.name)  AS tags_json"
-                . " FROM tag "
-                . " LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
-                . " "
-                . " GROUP BY tag.name"
-                . " ORDER BY tag_value.position ASC"
-                . ") tag_values ON tag_values.event_id = event.id "
-                . "WHERE (" . implode(') AND (', $where) . ")"
+                . "(SELECT GROUP_CONCAT(event_tag_json.json,',') FROM event_tag_json WHERE event_tag_json.event_id = event.id) as tags_json "
+                . "FROM event "
+                . "LEFT JOIN tag ON tag.event_id = event.id "
+                . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
+                . "WHERE (" . implode(') AND (', $where) . ") "
+                . 'GROUP BY event.id '
                 . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : "");
+
         $statement = $this->database->prepare($query);
         if ($statement === false) {
             $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
@@ -120,7 +125,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     private function fetchEventArray(string $event_id): Event {
         $this->log->debug('Fetching event ' . $event_id . '.');
         $events = iterator_to_array($this->queryEvents([
-                    'where' => [['id = ?', $event_id]],
+                    'where' => [['event.id = ?', $event_id]],
                     'limit' => 1
         ]));
         return $events[0];

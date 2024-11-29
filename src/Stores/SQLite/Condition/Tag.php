@@ -17,7 +17,7 @@ readonly class Tag implements Test {
         }
 
         $positionals = array_fill(0, count($this->expected_value), '?');
-        $query['where'][] = array_merge(["event.id IN (SELECT event_id FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id WHERE name = ? AND tag_value.value IN (" . implode(', ', $positionals) . "))", $this->tag], $this->expected_value);
+        $query['where'][] = array_merge(["tag.name = ? AND tag_value.value IN (" . implode(', ', $positionals) . ")", $this->tag], $this->expected_value);
         return $query;
     }
 }

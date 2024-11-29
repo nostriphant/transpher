@@ -14,7 +14,7 @@ readonly class Scalar implements Test {
             return $query;
         }
         $positionals = array_fill(0, count($this->expected_value), '?');
-        $query['where'][] = array_merge(["{$this->event_field} IN (" . implode(', ', $positionals) . ")"], $this->expected_value);
+        $query['where'][] = array_merge(["event.{$this->event_field} IN (" . implode(', ', $positionals) . ")"], $this->expected_value);
         return $query;
     }
 }

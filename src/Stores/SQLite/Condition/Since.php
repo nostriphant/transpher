@@ -15,7 +15,7 @@ readonly class Since implements Test {
         if (is_int($this->expected_value) === false) {
             return $query;
         }
-        $query['where'][] = ["{$this->event_field} >= ?", $this->expected_value];
+        $query['where'][] = ["event.{$this->event_field} >= ?", $this->expected_value];
         return $query;
     }
 }

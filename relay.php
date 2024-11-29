@@ -40,8 +40,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
         $logger->debug('Starting migrating events...');
         $logger->debug(\nostriphant\Transpher\Stores\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events) {
                     $events[$event->id] = $event;
-                    unlink($store_path . '/' . $event->id . '.php');
-                    return true;
+                    return unlink($store_path . '/' . $event->id . '.php');
                 }) . ' events migrated.');
     }
 

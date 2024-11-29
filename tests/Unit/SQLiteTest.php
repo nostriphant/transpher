@@ -120,9 +120,10 @@ it('can retrieve an event with tags', function () {
     expect($event->content)->toBe('');
     expect($event->sig)->toBe('ea4fbc932a5b1d9e68fa3deb3f7af83924c5b35871294a23a62f95fd33702e0bc701b10e1886811313007b42a7d5a5595d3eb8fb4980c24715fefc7632017d44');
     expect($event->tags)->toHaveCount(3);
-    expect($event->tags[0])->toBe(['e', 'b9073d8a515eea632834db9f52d786882a90e7152601079dbec49f301e46bff9']);
-    expect($event->tags[1])->toBe(['L', 'pink.momostr']);
-    expect($event->tags[2])->toBe(['k', '1']);
+
+    expect(nostriphant\NIP01\Event::extractTagValues($event, 'e')[0])->toBe(['b9073d8a515eea632834db9f52d786882a90e7152601079dbec49f301e46bff9']);
+    expect(nostriphant\NIP01\Event::extractTagValues($event, 'L')[0])->toBe(['pink.momostr']);
+    expect(nostriphant\NIP01\Event::extractTagValues($event, 'k')[0])->toBe(['1']);
 });
 
 
@@ -264,6 +265,7 @@ it('can filter events', function (array $filter_prototype) {
     expect($data['id'])->toBe('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb');
 
     $events = iterator_to_array($store(\nostriphant\Transpher\Nostr\Subscription::make($filter_prototype)));
+    expect($sqlite->lastErrorMsg())->toBe('not an error');
     expect($events)->toHaveCount(1);
     expect($events[0])->toBeInstanceOf(nostriphant\NIP01\Event::class);
     expect($events[0]->id)->toBe('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb');

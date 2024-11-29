@@ -48,16 +48,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $this->log->debug('Trigger auto_increment_position_trigger created (if it did not already exist)');
     }
 
-    public function __invoke(Subscription $subscription): \Generator {
-        $this->log->debug('Filtering using ' . count($subscription->filter_prototypes) . ' filters.');
-        $to = new Conditions(SQLite\Condition::class);
-        $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
-
-        $query_prototype = array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [
-            'where' => [],
-            'limit' => null
-        ]);
-
+    private function queryEvents(array $query_prototype): \Generator {
         $parameters = [];
         $where = array_reduce($query_prototype['where'], function (array $where, array $condition) use (&$parameters) {
             $where[] = array_shift($condition);
@@ -65,23 +56,49 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             return $where;
         }, []);
 
-        $query = "SELECT id, pubkey, created_at, kind, content, sig "
-                . "FROM event "
+        $query = "SELECT "
+                . "id, "
+                . "pubkey, "
+                . "created_at, "
+                . "kind, "
+                . "content, "
+                . "sig, "
+                . "GROUP_CONCAT(tags_json,',') as tags_json "
+                . "FROM "
+                . "event LEFT JOIN "
+                . "(SELECT "
+                . "     tag.event_id, "
+                //. "    json_insert(json_array(tag.name),'$[#]', tag_value.value) AS tags_json"
+                . "    json_insert(json_group_array(tag_value.value), '$[#]', tag.name)  AS tags_json"
+                . " FROM tag "
+                . " LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
+                . " "
+                . " GROUP BY tag.name"
+                . " ORDER BY tag_value.position ASC"
+                . ") tag_values ON tag_values.event_id = event.id "
                 . "WHERE (" . implode(') AND (', $where) . ")"
                 . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : "");
         $statement = $this->database->prepare($query);
+        if ($statement === false) {
+            $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
+            return;
+        }
+
         array_walk($parameters, function (mixed $parameter, int $position) use ($statement) {
             $statement->bindValue($position + 1, $parameter);
         });
 
         $result = $statement->execute();
         if ($result === false) {
-            throw new \Exception($this->database->lastErrorMsg());
+            $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
+            return;
         }
 
         $count = 0;
         while ($data = $result->fetchArray(SQLITE3_ASSOC)) {
-            $data['tags'] = $this->collectTags($data['id']);
+            $data['tags'] = json_decode('[' . $data['tags_json'] . ']') ?? [];
+            array_walk($data['tags'], fn(array &$tag) => array_unshift($tag, array_pop($tag)));
+            unset($data['tags_json']);
             yield new Event(...$data);
             $count++;
         }
@@ -89,44 +106,34 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $this->log->debug('Yielded ' . $count . ' events.');
     }
 
-    private function fetchEventArray(string $event_id): array {
+    public function __invoke(Subscription $subscription): \Generator {
+        $this->log->debug('Filtering using ' . count($subscription->filter_prototypes) . ' filters.');
+        $to = new Conditions(SQLite\Condition::class);
+        $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
+
+        yield from $this->queryEvents(array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [
+                    'where' => [],
+                    'limit' => null
+        ]));
+    }
+
+    private function fetchEventArray(string $event_id): Event {
         $this->log->debug('Fetching event ' . $event_id . '.');
-        $query = $this->database->prepare("SELECT id, pubkey, created_at, kind, content, sig FROM event WHERE id=:event_id LIMIT 1");
-        $query->bindValue('event_id', $event_id);
-        $result = $query->execute();
-        return $result->fetchArray(SQLITE3_ASSOC);
+        $events = iterator_to_array($this->queryEvents([
+                    'where' => [['id = ?', $event_id]],
+                    'limit' => 1
+        ]));
+        return $events[0];
     }
 
     public function offsetExists(mixed $offset): bool {
         $this->log->debug('Does event ' . $offset . ' exist?');
-        return $this->fetchEventArray($offset)['id'] === $offset;
-    }
-
-    private function collectTags(string $event_id) {
-        $this->log->debug('Collecting tags for ' . $event_id);
-
-        $query = $this->database->prepare("SELECT tag.id, tag.name, tag_value.position, tag_value.value "
-                . "FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
-                . "WHERE tag.event_id=:event_id");
-        $query->bindValue('event_id', $event_id);
-        $tag_result = $query->execute();
-
-        $tags = [];
-        while ($tag = $tag_result->fetchArray(SQLITE3_ASSOC)) {
-            $tags[$tag['id']] = ($tags[$tag['id']] ?? []) + [
-                0 => $tag['name'],
-                $tag['position'] => $tag['value']
-            ];
-        }
-        return array_values($tags);
+        return $this->fetchEventArray($offset)->id === $offset;
     }
 
     public function offsetGet(mixed $offset): Event {
         $this->log->debug('Getting event ' . $offset);
-
-        $event = $this->fetchEventArray($offset);
-        $event['tags'] = $this->collectTags($offset);
-        return Event::__set_state($event);
+        return $this->fetchEventArray($offset);
     }
 
     #[\Override]

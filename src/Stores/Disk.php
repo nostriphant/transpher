@@ -23,7 +23,8 @@ class Disk implements Store {
         $this->memory = new Memory($events);
     }
 
-    static function walk_store(string $store, callable $callback): void {
+    static function walk_store(string $store, callable $callback): int {
+        $count = 0;
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {
             if (filectime($event_file) < self::NIP01_EVENT_SPLITOFF_TIME) {
                 $event_file_contents = file_get_contents($event_file);
@@ -33,8 +34,11 @@ class Disk implements Store {
             }
 
             $event_data = include $event_file;
-            $callback(is_array($event_data) ? Event::__set_state($event_data) : $event_data);
+            if ($callback(is_array($event_data) ? Event::__set_state($event_data) : $event_data)) {
+                $count++;
+            }
         }
+        return $count;
     }
 
     static function write(string $path, Event $event): void {

@@ -8,8 +8,10 @@ use nostriphant\Transpher\Relay\Conditions;
 
 readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
-    public function __construct(private \SQLite3 $database) {
+    public function __construct(private \SQLite3 $database, private \Psr\Log\LoggerInterface $log) {
         $this->database->exec("PRAGMA foreign_keys = ON");
+        $this->log->debug('Enabled foreign keys in database');
+
         $this->database->exec("CREATE TABLE IF NOT EXISTS event ("
                 . "id TEXT PRIMARY KEY ASC,"
                 . "pubkey TEXT,"
@@ -18,12 +20,14 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . "content TEXT,"
                 . "sig TEXT"
                 . ")");
+        $this->log->debug('Table event created (if it did not already exist)');
 
         $this->database->exec("CREATE TABLE IF NOT EXISTS tag ("
                 . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 . "event_id TEXT REFERENCES event (id) ON DELETE CASCADE ON UPDATE CASCADE,"
                 . "name TEXT"
                 . ")");
+        $this->log->debug('Table tag created (if it did not already exist)');
 
         $this->database->exec("CREATE TABLE IF NOT EXISTS tag_value ("
                 . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -32,6 +36,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . "value TEXT,"
                 . "UNIQUE (tag_id, position) ON CONFLICT FAIL"
                 . ")");
+        $this->log->debug('Table tag_value created (if it did not already exist)');
 
         $this->database->exec("CREATE TRIGGER IF NOT EXISTS auto_increment_position_trigger "
                 . "AFTER INSERT ON tag_value WHEN new.position IS NULL BEGIN"
@@ -40,9 +45,11 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . "    WHERE id = new.id;"
                 . "END;"
         );
+        $this->log->debug('Trigger auto_increment_position_trigger created (if it did not already exist)');
     }
 
     public function __invoke(Subscription $subscription): \Generator {
+        $this->log->debug('Filtering using ' . count($subscription->filter_prototypes) . ' filters.');
         $to = new Conditions(SQLite\Condition::class);
         $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
 
@@ -72,13 +79,18 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             throw new \Exception($this->database->lastErrorMsg());
         }
 
+        $count = 0;
         while ($data = $result->fetchArray(SQLITE3_ASSOC)) {
             $data['tags'] = $this->collectTags($data['id']);
             yield new Event(...$data);
+            $count++;
         }
+
+        $this->log->debug('Yielded ' . $count . ' events.');
     }
 
     private function fetchEventArray(string $event_id): array {
+        $this->log->debug('Fetching event ' . $event_id . '.');
         $query = $this->database->prepare("SELECT id, pubkey, created_at, kind, content, sig FROM event WHERE id=:event_id LIMIT 1");
         $query->bindValue('event_id', $event_id);
         $result = $query->execute();
@@ -86,10 +98,13 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     }
 
     public function offsetExists(mixed $offset): bool {
+        $this->log->debug('Does event ' . $offset . ' exist?');
         return $this->fetchEventArray($offset)['id'] === $offset;
     }
 
     private function collectTags(string $event_id) {
+        $this->log->debug('Collecting tags for ' . $event_id);
+
         $query = $this->database->prepare("SELECT tag.id, tag.name, tag_value.position, tag_value.value "
                 . "FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
                 . "WHERE tag.event_id=:event_id");
@@ -107,6 +122,8 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     }
 
     public function offsetGet(mixed $offset): Event {
+        $this->log->debug('Getting event ' . $offset);
+
         $event = $this->fetchEventArray($offset);
         $event['tags'] = $this->collectTags($offset);
         return Event::__set_state($event);
@@ -114,6 +131,8 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
+        $this->log->debug('Setting event ' . $offset);
+
         if (!$value instanceof Event) {
             return;
         }
@@ -167,12 +186,14 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     }
 
     public function offsetUnset(mixed $offset): void {
+        $this->log->debug('Deleting event ' . $offset);
         $query = $this->database->prepare("DELETE FROM event WHERE id = :event_id");
         $query->bindValue('event_id', $offset);
         $query->execute();
     }
 
     public function count(): int {
+        $this->log->debug('Counting events');
         return $this->database->querySingle("SELECT COUNT(id) FROM event");
     }
 }

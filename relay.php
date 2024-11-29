@@ -16,7 +16,17 @@ use nostriphant\Transpher\RequestHandler;
 list($ip, $port) = explode(":", $_SERVER['argv'][1]);
 
 $logger = new Logger('relay-' . $port);
-$logger->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', Level::Debug));
+$logger->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', match (strtoupper($_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO')) {
+                    'DEBUG' => Level::Debug,
+                    'NOTICE' => Level::Notice,
+                    'INFO' => Level::Info,
+                    'WARNING' => Level::Warning,
+                    'ERROR' => Level::Error,
+                    'CRITICAL' => Level::Critical,
+                    'ALERT' => Level::Alert,
+                    'EMERGENCY' => Level::Emergency,
+                    default => Level::Info
+                }));
 $logger->pushHandler(new StreamHandler(STDOUT, Level::Info));
 
 $server = SocketHttpServer::createForDirectAccess($logger, connectionLimitPerIp: $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000);
@@ -33,7 +43,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];
     is_dir($data_dir) || mkdir($data_dir);
 
-    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
+    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $logger);
 
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {

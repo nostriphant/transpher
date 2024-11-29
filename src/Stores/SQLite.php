@@ -21,6 +21,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . "sig TEXT"
                 . ")");
         $this->log->debug('Table event created (if it did not already exist)');
+        $this->database->exec('ALTER TABLE event ADD COLUMN tags_json TEXT');
 
         $this->database->exec("CREATE TABLE IF NOT EXISTS tag ("
                 . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -58,6 +59,9 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . " ORDER BY tag_value.position ASC"
         );
         $this->log->debug('View event_tag_json created (if it did not already exist)');
+
+        $this->database->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE tags_json IS NULL");
+        $this->log->debug('Updated missing tags_json values');
     }
 
     private function queryEvents(array $query_prototype): \Generator {
@@ -75,7 +79,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . "kind, "
                 . "content, "
                 . "sig, "
-                . "(SELECT GROUP_CONCAT(event_tag_json.json,',') FROM event_tag_json WHERE event_tag_json.event_id = event.id) as tags_json "
+                . "tags_json "
                 . "FROM event "
                 . "LEFT JOIN tag ON tag.event_id = event.id "
                 . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
@@ -195,6 +199,11 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 }
             }
         }
+
+        $update = $this->database->prepare("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = ?");
+        $update->bindValue(1, $event['id']);
+        $update->execute();
+        $this->log->debug('Updated event tags-json');
     }
 
     public function offsetUnset(mixed $offset): void {

@@ -15,7 +15,7 @@ it('creates a table `event` if not exists', function () {
     }
 });
 
-// this requires a copy of transpher.sqlite, which I am not going to version for obious reasons
+//// this requires a copy of transpher.sqlite, which I am not going to version for obious reasons
 //it('real life test', function () {
 //    $db_file = ROOT_DIR . '/data/transpher.sqlite';
 //    $sqlite = new SQLite3($db_file);
@@ -71,6 +71,7 @@ it('can retrieve an event with tags added without a specific position', function
     $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'p')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (1, 'first-value')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (1, 'second-value')");
+    $sqlite->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'");
 
     $event = $store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'];
     expect($event->tags)->toHaveCount(1);
@@ -96,6 +97,7 @@ it('can retrieve an event with a tag', function () {
     $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'p')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, position, value) VALUES (1, 2, 'second-value')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, position, value) VALUES (1, 1, 'first-value')");
+    $sqlite->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'");
 
     $event = $store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'];
     expect($event->tags)->toHaveCount(1);
@@ -128,6 +130,8 @@ it('can retrieve an event with tags', function () {
 
     $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'k')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (3, '1')");
+
+    $sqlite->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'");
 
     $event = $store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'];
     expect($event->pubkey)->toBe('a38bcec507900130fd6ec167dd7fa942014a92c07e56fe52e1fabfea14afcdfc');
@@ -212,6 +216,8 @@ it('can delete an event with tags', function () {
     $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'k')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (3, '1')");
 
+    $sqlite->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'");
+
     unset($store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']);
 
     expect($sqlite->querySingle("SELECT id FROM event WHERE id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'"))->toBeNull();
@@ -245,6 +251,8 @@ it('can count events', function () {
     $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'k')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (3, '1')");
 
+    $sqlite->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'");
+
     expect($store)->toHaveCount(1);
 });
 
@@ -273,6 +281,8 @@ it('can filter events', function (array $filter_prototype) {
 
     $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'k')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (3, '1')");
+
+    $sqlite->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'");
 
     $statement = $sqlite->prepare("SELECT id, pubkey, created_at, kind, content, sig FROM event WHERE (id IN (?))");
     $statement->bindValue(1, '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb');
@@ -320,6 +330,8 @@ it('can limit events in result set', function () {
 
     $sqlite->exec("INSERT INTO tag (event_id, name) VALUES ('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', 'k')");
     $sqlite->exec("INSERT INTO tag_value (tag_id, value) VALUES (3, '1')");
+
+    $sqlite->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'");
 
     $statement = $sqlite->prepare("SELECT id, pubkey, created_at, kind, content, sig FROM event WHERE (id IN (?))");
     $statement->bindValue(1, '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb');

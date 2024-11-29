@@ -5,7 +5,7 @@ it('creates a table `event` if not exists', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     $expected_tables = ['event', 'tag', 'tag_value'];
@@ -21,7 +21,7 @@ it('can check if an event exists', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -41,7 +41,7 @@ it('can retrieve an event with tags added without a specific position', function
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -66,7 +66,7 @@ it('can retrieve an event with a tag', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -92,7 +92,7 @@ it('can retrieve an event with tags', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -132,7 +132,7 @@ it('can store an event with tags', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->querySingle("SELECT id FROM event WHERE id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'"))->toBeNull();
@@ -174,7 +174,7 @@ it('can delete an event with tags', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -207,7 +207,7 @@ it('can count events', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -236,7 +236,7 @@ it('can filter events', function (array $filter_prototype) {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -282,7 +282,7 @@ it('can limit events in result set', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite);
+    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, Mockery::spy(\Psr\Log\LoggerInterface::class));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("

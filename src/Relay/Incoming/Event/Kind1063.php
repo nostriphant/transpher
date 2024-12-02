@@ -27,7 +27,6 @@ class Kind1063 implements Kind {
     #[\Override]
     public function __invoke(Event $event): void {
         $urls = Event::extractTagValues($event, 'url');
-        $remote_handle = fopen($urls[0][0], 'r');
         $x = Event::extractTagValues($event, 'x');
         ($this->files)($x[0][0])($event->id, $urls[0][0]);
     }

@@ -11,8 +11,8 @@ use nostriphant\NIP01\Event;
 
 class Memory implements \nostriphant\Transpher\Relay\Store {
 
-    public function __construct(private array $events) {
-
+    public function __construct(private array $events, private Subscription $ignore) {
+        
     }
 
     #[\Override]
@@ -34,7 +34,9 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
-        if (isset($offset)) {
+        if (call_user_func($this->ignore, $value)) {
+            return;
+        } elseif (isset($offset)) {
             $this->events[$offset] = $value;
         } else {
             $this->events[] = $value;

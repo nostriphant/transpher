@@ -26,7 +26,7 @@ class Disk implements Store {
             }
         });
 
-        $this->memory = new Memory($events);
+        $this->memory = new Memory($events, $ignore);
     }
 
     static function walk_store(string $store, callable $callback): int {

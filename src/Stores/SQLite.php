@@ -172,19 +172,20 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         yield from $this->queryEvents($query_prototype);
     }
 
-    private function fetchEventArray(string $event_id): Event {
+    private function fetchEventArray(string $event_id): ?Event {
         $this->log->debug('Fetching event ' . $event_id . '.');
         $events = iterator_to_array($this->queryEvents([
                     'where' => [['event.id = ?', $event_id]],
                     'limit' => 1
         ]));
-        return $events[0];
+        return count($events) > 0 ? $events[0] : null;
     }
 
     #[\Override]
     public function offsetExists(mixed $offset): bool {
         $this->log->debug('Does event ' . $offset . ' exist?');
-        return $this->fetchEventArray($offset)->id === $offset;
+        $event = $this->fetchEventArray($offset);
+        return $event !== null ? $event->id === $offset : false;
     }
 
     #[\Override]

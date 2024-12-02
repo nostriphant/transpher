@@ -8,6 +8,8 @@ use nostriphant\Transpher\Relay\Conditions;
 
 readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
+    const VERSION = '20241202';
+
     public function __construct(private \SQLite3 $database, private Subscription $ignore, private \Psr\Log\LoggerInterface $log) {
         $this->database->exec("PRAGMA foreign_keys = ON");
         $this->log->debug('Enabled foreign keys in database');
@@ -21,7 +23,9 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . "sig TEXT"
                 . ")");
         $this->log->debug('Table event created (if it did not already exist)');
-        $this->database->exec('ALTER TABLE event ADD COLUMN tags_json TEXT');
+        if (self::retrieveVersion($this->database) < self::VERSION) {
+            $this->database->exec('ALTER TABLE event ADD COLUMN tags_json TEXT');
+        }
 
         $this->database->exec("CREATE TABLE IF NOT EXISTS tag ("
                 . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -62,9 +66,45 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
         $this->database->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE tags_json IS NULL");
         $this->log->debug('Updated missing tags_json values');
+
+        $this->database->exec('PRAGMA user_version = "' . self::VERSION . '"');
+
+        $query_prototype = self::transformSubscriptionToQueryConditions($ignore);
+        list($where, $parameters) = self::extractConditionsAndParametersFromQueryPrototype($query_prototype);
+        if (empty($where) === false) {
+            $query = "DELETE "
+                    . "FROM event "
+                    . "WHERE (" . implode(') AND (', $where) . ") "
+                    . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : "");
+
+            $statement = $this->database->prepare($query);
+            if ($statement === false) {
+                $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
+                return;
+            }
+
+            self::applyParametersToPreparedStatement($statement, $parameters);
+            $result = $statement->execute();
+            if ($result === false) {
+                $this->log->error('Cleanup query failed: ' . $this->database->lastErrorMsg());
+            }
+        }
     }
 
-    private function queryEvents(array $query_prototype): \Generator {
+    static function retrieveVersion(\SQLite3 $database): string {
+        return $database->querySingle('PRAGMA user_version');
+    }
+
+    static function transformSubscriptionToQueryConditions(Subscription $subscription) {
+        $to = new Conditions(SQLite\Condition::class);
+        $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
+        return array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [
+            'where' => [],
+            'limit' => null
+        ]);
+    }
+
+    static function extractConditionsAndParametersFromQueryPrototype(array $query_prototype) {
         $parameters = [];
         $where = array_reduce($query_prototype['where'], function (array $where, array $condition) use (&$parameters) {
             $where[] = array_shift($condition);
@@ -72,6 +112,17 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             return $where;
         }, []);
 
+        return [$where, $parameters];
+    }
+
+    static function applyParametersToPreparedStatement(\SQLite3Stmt $statement, array $parameters) {
+        array_walk($parameters, function (mixed $parameter, int $position) use ($statement) {
+            $statement->bindValue($position + 1, $parameter);
+        });
+    }
+
+    private function queryEvents(array $query_prototype): \Generator {
+        list($where, $parameters) = self::extractConditionsAndParametersFromQueryPrototype($query_prototype);
         $query = "SELECT "
                 . "event.id, "
                 . "pubkey, "
@@ -93,9 +144,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             return;
         }
 
-        array_walk($parameters, function (mixed $parameter, int $position) use ($statement) {
-            $statement->bindValue($position + 1, $parameter);
-        });
+        self::applyParametersToPreparedStatement($statement, $parameters);
 
         $result = $statement->execute();
         if ($result === false) {
@@ -118,13 +167,9 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     #[\Override]
     public function __invoke(Subscription $subscription): \Generator {
         $this->log->debug('Filtering using ' . count($subscription->filter_prototypes) . ' filters.');
-        $to = new Conditions(SQLite\Condition::class);
-        $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
+        $query_prototype = self::transformSubscriptionToQueryConditions($subscription);
 
-        yield from $this->queryEvents(array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [
-                    'where' => [],
-                    'limit' => null
-        ]));
+        yield from $this->queryEvents($query_prototype);
     }
 
     private function fetchEventArray(string $event_id): Event {

@@ -28,6 +28,19 @@ it('checks if an event exists', function (callable $factory) {
     expect(isset($store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']))->toBeTrue();
 })->with('stores');
 
+it('retrieves events', function (callable $factory, array $filter_prototype, int $expected_count) {
+    list($store, $created_events) = $factory([],
+            Pest\event(['id' => uniqid(), "content" => 'Hallo', "pubkey" => "2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0", 'kind' => 1]),
+            Pest\event(['id' => '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', "content" => 'Hallo 2', "pubkey" => "2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0", 'kind' => 2])
+    );
+
+    $events = $store(nostriphant\Transpher\Nostr\Subscription::make($filter_prototype));
+    expect(iterator_count($events))->toBe($expected_count);
+})->with('stores')->with([
+    [['authors' => ["2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0"]], 2],
+    [['authors' => ["2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0"], 'kinds' => [2]], 1]
+]);
+
 it('ignores an event that matches ignore filter', function (callable $factory) {
     list($store, $created_events) = $factory(['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']]);
 

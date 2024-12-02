@@ -13,7 +13,7 @@ class Disk implements Store {
 
     private Memory $memory;
 
-    public function __construct(private string $store) {
+    public function __construct(private string $store, private Subscription $ignore) {
         $events = [];
         is_dir($store) || mkdir($store);
         self::walk_store($store, function (Event $event) use (&$events) {
@@ -52,6 +52,9 @@ class Disk implements Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $event): void {
+        if (call_user_func($this->ignore, $event)) {
+            return;
+        }
         $this->memory[$offset] = $event;
         self::write($this->store, $event);
     }

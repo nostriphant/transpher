@@ -17,7 +17,13 @@ class Disk implements Store {
         $events = [];
         is_dir($store) || mkdir($store);
         self::walk_store($store, function (Event $event) use (&$events) {
-            $events[$event->id] = $event;
+            if (call_user_func($this->ignore, $event)) {
+                unlink(self::file($this->store, $event->id));
+                return false;
+            } else {
+                $events[$event->id] = $event;
+                return true;
+            }
         });
 
         $this->memory = new Memory($events);

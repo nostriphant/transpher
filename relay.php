@@ -39,11 +39,11 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
 //);
 
+$subscription = nostriphant\Transpher\Nostr\Subscription::make([]);
 if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];
     is_dir($data_dir) || mkdir($data_dir);
 
-    $subscription = nostriphant\Transpher\Nostr\Subscription::make([]);
     $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $subscription, $logger);
 
     $store_path = $data_dir . '/events';
@@ -58,7 +58,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $data_dir . '/files';
 } else {
     $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-    $events = new \nostriphant\Transpher\Stores\Disk($store_path);
+    $events = new \nostriphant\Transpher\Stores\Disk($store_path, $subscription);
 
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }

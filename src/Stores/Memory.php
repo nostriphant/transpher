@@ -11,8 +11,10 @@ use nostriphant\NIP01\Event;
 
 class Memory implements \nostriphant\Transpher\Relay\Store {
 
-    public function __construct(private array $events, private Subscription $ignore) {
-        
+    private array $events;
+
+    public function __construct(array $events, private Subscription $ignore) {
+        $this->events = array_filter($events, fn(Event $event) => $ignore($event) === false);
     }
 
     #[\Override]

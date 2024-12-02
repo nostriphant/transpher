@@ -65,8 +65,13 @@ dataset('stores', [
         return [$store, $created_events];
     },
     'memory' => function (array $ignore_prototype, nostriphant\NIP01\Event ...$events): array {
-        $store = new \nostriphant\Transpher\Stores\Memory($events, Subscription::make($ignore_prototype));
+        $created_events = [];
+        foreach ($events as $event) {
+            $created_events[$event->id] = $event;
+        }
 
-        return [$store, array_map(fn(nostriphant\NIP01\Event $event) => fn() => expect(isset($store[$event->id]))->toBeFalse(), $events)];
+        $store = new \nostriphant\Transpher\Stores\Memory($created_events, Subscription::make($ignore_prototype));
+
+        return [$store, array_map(fn(nostriphant\NIP01\Event $event) => fn() => expect(isset($store[$event->id]))->toBeFalse(), $created_events)];
     }
 ]);

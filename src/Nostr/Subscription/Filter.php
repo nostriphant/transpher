@@ -15,7 +15,7 @@ readonly class Filter {
     }
 
     public function __invoke(Event $event): bool {
-        return true(array_map(fn(callable $subscription_filter) => $subscription_filter($event), $this->conditions));
+        return empty($this->conditions) === false && true(array_map(fn(callable $subscription_filter) => $subscription_filter($event), $this->conditions));
     }
 
     static function fromPrototype(Condition ...$conditions) {

@@ -8,7 +8,7 @@ use nostriphant\Transpher\Relay\Conditions;
 
 readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
-    public function __construct(private \SQLite3 $database, private \Psr\Log\LoggerInterface $log) {
+    public function __construct(private \SQLite3 $database, private Subscription $ignore, private \Psr\Log\LoggerInterface $log) {
         $this->database->exec("PRAGMA foreign_keys = ON");
         $this->log->debug('Enabled foreign keys in database');
 
@@ -151,8 +151,9 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
         $this->log->debug('Setting event ' . $offset);
-
         if (!$value instanceof Event) {
+            return;
+        } elseif (call_user_func($this->ignore, $value)) {
             return;
         }
 

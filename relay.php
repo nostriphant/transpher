@@ -43,7 +43,8 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];
     is_dir($data_dir) || mkdir($data_dir);
 
-    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $logger);
+    $subscription = nostriphant\Transpher\Nostr\Subscription::make([]);
+    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $subscription, $logger);
 
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {

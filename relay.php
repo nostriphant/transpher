@@ -61,7 +61,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
 
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }
-$files = new \nostriphant\Transpher\Files($files_path);
+$files = new \nostriphant\Transpher\Files($files_path, $events);
 
 $incoming = new \nostriphant\Transpher\Relay\Incoming($events, $files);
 $clientHandler = new \nostriphant\Transpher\Relay($incoming, $logger);

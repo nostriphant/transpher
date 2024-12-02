@@ -65,9 +65,6 @@ namespace {
 */
 namespace Pest {
 
-    use nostriphant\NIP01\Key;
-    use nostriphant\NIP19\Bech32;
-    use nostriphant\NIP01\Event;
     use nostriphant\NIP01\Message;
     use nostriphant\Transpher\Relay\Incoming;
     use nostriphant\Transpher\Relay\Sender;
@@ -95,7 +92,8 @@ namespace Pest {
     }
 
     function incoming(?\nostriphant\Transpher\Relay\Store $store = null, string $files = ROOT_DIR . '/data/files') {
-        return new Incoming($store ?? store(), new \nostriphant\Transpher\Files($files));
+        $store = $store ?? store();
+        return new Incoming($store, new \nostriphant\Transpher\Files($files, $store));
     }
 
     function rumor(?int $created_at = null, ?string $pubkey = '', ?int $kind = 0, ?string $content = '', ?array $tags = []): \nostriphant\NIP59\Rumor {

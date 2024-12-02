@@ -28,7 +28,7 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
     }
 
     #[\Override]
-    public function offsetGet(mixed $offset): Event {
+    public function offsetGet(mixed $offset): ?Event {
         return $this->events[$offset];
     }
 

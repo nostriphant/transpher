@@ -10,5 +10,5 @@ interface Store extends \ArrayAccess, \Countable {
 
     #[\ReturnTypeWillChange]
     #[\Override]
-    public function offsetGet(mixed $offset): Event;
+    public function offsetGet(mixed $offset): ?Event;
 }

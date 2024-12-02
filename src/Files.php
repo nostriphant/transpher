@@ -4,15 +4,15 @@ namespace nostriphant\Transpher;
 
 readonly class Files {
 
-    public function __construct(private string $path) {
+    public function __construct(private string $path, private Relay\Store $store) {
         is_dir($path) || mkdir($path);
     }
 
     public function __invoke(string $hash): object {
-        return new class($this->path . DIRECTORY_SEPARATOR . $hash) {
+        return new class($this->path . DIRECTORY_SEPARATOR . $hash, $this->store) {
 
-            public function __construct(private string $path) {
-
+            public function __construct(private string $path, private Relay\Store $store) {
+                
             }
 
             public function __invoke(): ?string {
@@ -21,6 +21,10 @@ readonly class Files {
                 }
 
                 list($event_id, $remote_file) = func_get_args();
+                if (isset($this->store[$event_id]) === false) {
+                    return null;
+                }
+
                 $remote_handle = fopen($remote_file, 'r');
                 $local_handle = fopen($this->path, 'w');
                 while ($buffer = fread($remote_handle, 512)) {

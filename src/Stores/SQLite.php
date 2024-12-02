@@ -115,6 +115,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $this->log->debug('Yielded ' . $count . ' events.');
     }
 
+    #[\Override]
     public function __invoke(Subscription $subscription): \Generator {
         $this->log->debug('Filtering using ' . count($subscription->filter_prototypes) . ' filters.');
         $to = new Conditions(SQLite\Condition::class);
@@ -135,12 +136,14 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         return $events[0];
     }
 
+    #[\Override]
     public function offsetExists(mixed $offset): bool {
         $this->log->debug('Does event ' . $offset . ' exist?');
         return $this->fetchEventArray($offset)->id === $offset;
     }
 
-    public function offsetGet(mixed $offset): Event {
+    #[\Override]
+    public function offsetGet(mixed $offset): ?Event {
         $this->log->debug('Getting event ' . $offset);
         return $this->fetchEventArray($offset);
     }
@@ -206,6 +209,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $this->log->debug('Updated event tags-json');
     }
 
+    #[\Override]
     public function offsetUnset(mixed $offset): void {
         $this->log->debug('Deleting event ' . $offset);
         $query = $this->database->prepare("DELETE FROM event WHERE id = :event_id");
@@ -213,6 +217,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $query->execute();
     }
 
+    #[\Override]
     public function count(): int {
         $this->log->debug('Counting events');
         return $this->database->querySingle("SELECT COUNT(id) FROM event");

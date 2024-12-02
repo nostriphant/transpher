@@ -73,7 +73,7 @@ class Disk implements Store {
     }
 
     #[\Override]
-    public function offsetGet(mixed $offset): Event {
+    public function offsetGet(mixed $offset): ?Event {
         return $this->memory[$offset];
     }
 

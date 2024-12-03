@@ -69,6 +69,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $this->database->exec('PRAGMA user_version = "' . self::VERSION . '"');
 
         if ($whitelist->enabled) {
+            $this->log->info('Whitelist enabled, clearing up database...');
             $factory = SQLite\TransformSubscription::transformToSQL3StatementFactory($whitelist, ["event.id"]);
             $statement = $this->database->prepare("DELETE "
                     . "FROM event "
@@ -80,7 +81,10 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             $result = $statement->execute();
             if ($result === false) {
                 $this->log->error('Cleanup query failed: ' . $this->database->lastErrorMsg());
+            } else {
+                $count = $this->log->info('Cleanup succesful (' . $this->database->changes() . ')');
             }
+            $result->finalize();
         }
     }
 

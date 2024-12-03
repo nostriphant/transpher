@@ -46,7 +46,9 @@
     "scripts": {
         "clearCache": [
             "rm -rf ./data/events/*",
-            "rm -rf ./data/files/*"
+            "rm -rf ./data/files/*",
+            "rm -rf ./data/disktest_*",
+            "rm -rf ./data/relay_*"
         ],
         "test": [
             "@clearCache @no_additional_args",

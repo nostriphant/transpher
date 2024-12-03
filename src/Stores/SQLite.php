@@ -82,7 +82,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             if ($result === false) {
                 $this->log->error('Cleanup query failed: ' . $this->database->lastErrorMsg());
             } else {
-                $count = $this->log->info('Cleanup succesful (' . $this->database->changes() . ')');
+                $this->log->info('Cleanup succesful (' . $this->database->changes() . ')');
             }
             $result->finalize();
         }

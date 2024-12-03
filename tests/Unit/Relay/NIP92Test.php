@@ -5,7 +5,7 @@ use function Pest\incoming;
 
 it('downloads NIP-92 files (kind 1, with imeta tag) into a data folder', function () {
     $file = tempnam(sys_get_temp_dir(), 'file');
-    file_put_contents($file, uniqid());
+    file_put_contents($file, uniqid(true));
     $hash = hash_file('sha256', $file);
 
     expect(ROOT_DIR . '/data/files/' . $hash)->not()->toBeFile();

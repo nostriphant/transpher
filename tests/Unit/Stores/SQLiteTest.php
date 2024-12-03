@@ -56,6 +56,7 @@ it('retrieves an event with a tag', function () {
     $sqlite->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'");
 
     $event = $store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'];
+    expect($event->tags)->toBeIterable();
     expect($event->tags)->toHaveCount(1);
     expect($event->tags[0])->toBe(['p', 'first-value', 'second-value']);
 });

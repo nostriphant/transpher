@@ -70,16 +70,14 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $this->database->exec('PRAGMA user_version = "' . self::VERSION . '"');
 
         if ($whitelist->enabled) {
-            list($select, $parameters) = self::generateSelectQuery($whitelist, ["event.id"]);
+            $factory = self::prepare($whitelist, ["event.id"]);
             $statement = $this->database->prepare("DELETE "
                     . "FROM event "
-                    . "WHERE event.id NOT IN (" . $select . ") ");
+                    . "WHERE event.id NOT IN (" . $factory($this->database, $this->log)->getSQL(true) . ") ");
             if ($statement === false) {
                 $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
                 return;
             }
-
-            $parameters($statement);
             $result = $statement->execute();
             if ($result === false) {
                 $this->log->error('Cleanup query failed: ' . $this->database->lastErrorMsg());
@@ -91,55 +89,48 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         return $database->querySingle('PRAGMA user_version');
     }
 
-    static function transformSubscriptionToQueryConditions(Subscription $subscription) {
+    static function prepare(Subscription $subscription, array $fields): callable {
         $to = new Conditions(SQLite\Condition::class);
         $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
-        return array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [
+        $query_prototype = array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [
             'where' => [],
             'limit' => null
         ]);
-    }
 
-    static function extractConditionsAndParametersFromQueryPrototype(array $query_prototype) {
-        $parameters = [];
-        $where = array_reduce($query_prototype['where'], function (array $where, array $condition) use (&$parameters) {
-            $where[] = array_shift($condition);
-            $parameters = array_merge($parameters, $condition);
-            return $where;
-        }, []);
-
-        return [$where, fn(\SQLite3Stmt $statement) => array_walk($parameters, function (mixed $parameter, int $position) use ($statement) {
-            $statement->bindValue($position + 1, $parameter);
-        })];
-    }
-
-    static function generateSelectQuery(Subscription $subscription, array $fields) {
-        $query_prototype = self::transformSubscriptionToQueryConditions($subscription);
-        list($where, $parameters) = self::extractConditionsAndParametersFromQueryPrototype($query_prototype);
-        return [
-            "SELECT " . implode(',', $fields) . " FROM event "
-            . "LEFT JOIN tag ON tag.event_id = event.id "
+        list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
+            $return[0][] = array_shift($condition);
+            $return[1] = array_merge($return[1], $condition);
+            return $return;
+        }, [[], []]);
+        $query = "SELECT " . implode(',', $fields) . " FROM event "
+                . "LEFT JOIN tag ON tag.event_id = event.id "
                 . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
                 . "WHERE (" . implode(') AND (', $where) . ") "
                 . 'GROUP BY event.id '
-                . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : ""), $parameters
-        ];
+                . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : "");
+        return function (\SQLite3 $database, \Psr\Log\LoggerInterface $log) use ($query, $parameters): \SQLite3Stmt {
+            $statement = $database->prepare($query);
+
+            if ($statement === false) {
+                $log->error('Query failed: ' . $database->lastErrorMsg());
+                return $database->prepare("SELECT " . implode(',', $fields) . " FROM event LIMIT 0");
+            }
+            array_walk($parameters, function (mixed $parameter, int $position) use ($statement) {
+                $statement->bindValue($position + 1, $parameter);
+            });
+            return $statement;
+        };
     }
 
     private function queryEvents(Subscription $subscription): \Generator {
-        list($query, $parameters) = self::generateSelectQuery($subscription, ["event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json"]);
-        $statement = $this->database->prepare($query);
-        if ($statement === false) {
-            $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
-            return;
-        }
+        $factory = self::prepare($subscription, ["event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json"]);
 
-        $parameters($statement);
+        $statement = $factory($this->database, $this->log);
 
         $result = $statement->execute();
         if ($result === false) {
             $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
-            return;
+            yield from [];
         }
 
         $count = 0;

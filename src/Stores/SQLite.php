@@ -4,7 +4,6 @@ namespace nostriphant\Transpher\Stores;
 
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
-use nostriphant\Transpher\Relay\Conditions;
 
 readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
@@ -70,7 +69,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $this->database->exec('PRAGMA user_version = "' . self::VERSION . '"');
 
         if ($whitelist->enabled) {
-            $factory = self::prepare($whitelist, ["event.id"]);
+            $factory = SQLite\TransformSubscription::transformToSQL3StatementFactory($whitelist, ["event.id"]);
             $statement = $this->database->prepare("DELETE "
                     . "FROM event "
                     . "WHERE event.id NOT IN (" . $factory($this->database, $this->log)->getSQL(true) . ") ");
@@ -89,30 +88,8 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         return $database->querySingle('PRAGMA user_version');
     }
 
-    static function prepare(Subscription $subscription, array $fields): callable {
-        $to = new Conditions(SQLite\Condition::class);
-        $filters = array_map(fn(array $filter_prototype) => SQLite\Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
-        $query_prototype = array_reduce($filters, fn(array $query_prototype, SQLite\Filter $filter) => $filter($query_prototype), [
-            'where' => [],
-            'limit' => null
-        ]);
-
-        list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
-            $return[0][] = array_shift($condition);
-            $return[1] = array_merge($return[1], $condition);
-            return $return;
-        }, [[], []]);
-        $query = "SELECT " . implode(',', $fields) . " FROM event "
-                . "LEFT JOIN tag ON tag.event_id = event.id "
-                . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
-                . "WHERE (" . implode(') AND (', $where) . ") "
-                . 'GROUP BY event.id '
-                . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : "");
-        return new SQLite\SQLite3StatementFactory($query, $parameters);
-    }
-
     private function queryEvents(Subscription $subscription): \Generator {
-        $factory = self::prepare($subscription, ["event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json"]);
+        $factory = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, ["event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json"]);
 
         $statement = $factory($this->database, $this->log);
 

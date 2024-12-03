@@ -20,9 +20,13 @@ it('downloads NIP-92 files (kind 1, with imeta tag) into a data folder', functio
             ]
     );
 
-    expect(\Pest\handle($message, incoming()))->toHaveReceived(
+    $store = new nostriphant\Transpher\Stores\Memory([], nostriphant\Transpher\Nostr\Subscription::make([]));
+
+    expect(\Pest\handle($message, incoming($store)))->toHaveReceived(
             ['OK', $message()[1]['id'], true]
     );
+
+    expect(isset($store[$message()[1]['id']]))->toBeTrue();
 
     expect(ROOT_DIR . '/data/files/' . $hash)->toBeFile();
     expect(ROOT_DIR . '/data/files/' . $hash . '.events')->toBeDirectory();

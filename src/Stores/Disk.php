@@ -13,11 +13,11 @@ class Disk implements Store {
 
     private Memory $memory;
 
-    public function __construct(private string $store, private Subscription $ignore) {
+    public function __construct(private string $store, private Subscription $whitelist) {
         $events = [];
         is_dir($store) || mkdir($store);
-        self::walk_store($store, function (Event $event) use (&$events) {
-            if (call_user_func($this->ignore, $event)) {
+        self::walk_store($store, function (Event $event) use (&$events, $whitelist) {
+            if ($whitelist($event) === false) {
                 unlink(self::file($this->store, $event->id));
                 return false;
             } else {
@@ -26,7 +26,7 @@ class Disk implements Store {
             }
         });
 
-        $this->memory = new Memory($events, $ignore);
+        $this->memory = new Memory($events, $whitelist);
     }
 
     static function walk_store(string $store, callable $callback): int {
@@ -58,7 +58,7 @@ class Disk implements Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $event): void {
-        if (call_user_func($this->ignore, $event)) {
+        if (call_user_func($this->whitelist, $event) === false) {
             return;
         }
         $this->memory[$offset] = $event;

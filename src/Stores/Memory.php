@@ -13,8 +13,8 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
 
     private array $events;
 
-    public function __construct(array $events, private Subscription $ignore) {
-        $this->events = array_filter($events, fn(Event $event) => $ignore($event) === false);
+    public function __construct(array $events, private Subscription $whitelist) {
+        $this->events = array_filter($events, fn(Event $event) => $whitelist($event) !== false);
     }
 
     #[\Override]
@@ -36,7 +36,7 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
-        if (call_user_func($this->ignore, $value)) {
+        if (call_user_func($this->whitelist, $value) === false) {
             return;
         } elseif (isset($offset)) {
             $this->events[$offset] = $value;

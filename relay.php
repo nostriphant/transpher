@@ -12,6 +12,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 use function Amp\trapSignal;
 use nostriphant\Transpher\RequestHandler;
+use nostriphant\NIP19\Bech32;
+use nostriphant\NIP01\Key;
 
 list($ip, $port) = explode(":", $_SERVER['argv'][1]);
 
@@ -39,12 +41,22 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
 //);
 
-$subscription = nostriphant\Transpher\Nostr\Subscription::make([]);
+$whitelist = nostriphant\Transpher\Nostr\Subscription::make(
+        [
+            'authors' => [
+                Bech32::fromNpub($_SERVER['RELAY_OWNER_NPUB']),
+                Key::fromHex(Bech32::fromNsec($_SERVER['AGENT_NSEC']))(Key::public())
+            ],
+        ],
+        [
+            '#p' => [Bech32::fromNpub($_SERVER['RELAY_OWNER_NPUB'])]
+        ]
+);
 if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];
     is_dir($data_dir) || mkdir($data_dir);
 
-    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $subscription, $logger);
+    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $whitelist, $logger);
 
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {
@@ -58,7 +70,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $data_dir . '/files';
 } else {
     $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-    $events = new \nostriphant\Transpher\Stores\Disk($store_path, $subscription);
+    $events = new \nostriphant\Transpher\Stores\Disk($store_path, $whitelist);
 
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }

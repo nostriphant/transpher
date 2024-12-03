@@ -6,10 +6,10 @@ use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Nostr;
+use nostriphant\Transpher\Nostr\Subscription;
 
 beforeAll(function () {
-    global $relay, $env;
-    $agent_key = \Pest\key_recipient();
+    global $relay, $env, $data_dir;
     $data_dir = ROOT_DIR . '/data/' . uniqid('relay_', true);
     is_dir($data_dir) || mkdir($data_dir);
 
@@ -19,13 +19,14 @@ beforeAll(function () {
     file_put_contents($event_file, '<?php return ' . var_export($event, true) . ';');
 
     $relay = Functions::bootRelay('127.0.0.1:8087', $env = [
-        'AGENT_NSEC' => Bech32::toNsec($agent_key(Key::private())),
+        'AGENT_NSEC' => Bech32::toNsec(\Pest\key_sender()(Key::private())),
         'RELAY_URL' => 'ws://127.0.0.1:8087',
-        'RELAY_OWNER_NPUB' => Bech32::toNpub(\Pest\pubkey_sender()),
+        'RELAY_OWNER_NPUB' => Bech32::toNpub(\Pest\pubkey_recipient()),
         'RELAY_NAME' => 'Really relay',
         'RELAY_DESCRIPTION' => 'This is my dev relay',
         'RELAY_CONTACT' => 'transpher@nostriphant.dev',
         'RELAY_DATA' => $data_dir,
+        'RELAY_LOG_LEVEL' => 'DEBUG',
         'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72 // to accept NIP17 pdm created_at randomness
     ]);
 
@@ -50,7 +51,7 @@ describe('relay', function () {
         $response = Nostr::decode($responseText);
 
         expect($response)->not()->toBeNull($responseText);
-        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', Bech32::toNpub(\Pest\pubkey_sender()), 'transpher@nostriphant.dev'));
+        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', Bech32::toNpub(\Pest\pubkey_recipient()), 'transpher@nostriphant.dev'));
     });
 });
 
@@ -58,9 +59,10 @@ describe('relay', function () {
 
 describe('agent', function (): void {
     it('starts relay and sends private direct messsage to relay owner', function (): void {
+        global $data_dir;
         $agent = Functions::bootAgent(8084, [
             'RELAY_OWNER_NPUB' => Bech32::toNpub(Pest\pubkey_recipient()),
-            'AGENT_NSEC' => Bech32::toNsec(Pest\pubkey_sender()),
+            'AGENT_NSEC' => Bech32::toNsec(Pest\key_sender()(Key::private())),
             'RELAY_URL' => 'ws://127.0.0.1:8087'
         ]);
         sleep(1); // hack to give agent some time to boot...
@@ -72,7 +74,16 @@ describe('agent', function (): void {
         expect($request[2])->toBeArray();
         expect($request[2]['#p'])->toContain(Pest\pubkey_recipient());
 
-        $alice->start();
+        $alice->sendSignedMessage(Factory::event(\Pest\key_recipient(), 1, 'Hello!'));
+
+        $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), Subscription::make([]), Mockery::spy(Psr\Log\LoggerInterface::class));
+
+        $messages = iterator_to_array($events(Subscription::make(['authors' => [Pest\pubkey_recipient()]])));
+        expect($messages[0]->kind)->toBe(1);
+        expect($messages[0]->content)->toBe('Hello!');
+
+        $messages = iterator_to_array($events(Subscription::make(['#p' => [Pest\pubkey_recipient()]])));
+        expect($messages[0]->kind)->toBe(1059);
 
         $agent();
     });

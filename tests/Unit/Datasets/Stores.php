@@ -13,7 +13,7 @@ dataset('stores', [
         $created_events = [];
         foreach ($events as $event) {
             file_put_contents($transpher_store . DIRECTORY_SEPARATOR . $event->id . '.php', '<?php return ' . var_export($event, true) . ';');
-            $created_events[] = fn() => expect($transpher_store . DIRECTORY_SEPARATOR . $event->id . '.php')->not()->toBeFile();
+            $created_events[$event->id] = fn(bool $is_deleted) => expect(is_file($transpher_store . DIRECTORY_SEPARATOR . $event->id . '.php'))->toBe(!$is_deleted);
         }
 
         return [new \nostriphant\Transpher\Stores\Disk($transpher_store, Subscription::make($ignore_prototype)), $created_events];
@@ -51,10 +51,15 @@ dataset('stores', [
             expect($sqlite->querySingle("SELECT id FROM event WHERE id = '{$event->id}'"))->toBe($event->id);
             expect($sqlite->querySingle("SELECT COUNT(id) FROM tag WHERE event_id = '{$event->id}'"))->toBe(count($event->tags));
 
-            $created_events[] = function () use ($sqlite, $event) {
-                expect($sqlite->querySingle("SELECT id FROM event WHERE id = '{$event->id}'"))->toBeNull();
-                expect($sqlite->querySingle("SELECT COUNT(id) FROM tag WHERE event_id = '{$event->id}'"))->toBe(0);
-                expect($sqlite->querySingle("SELECT COUNT(tag_value.id) FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id WHERE tag.event_id = '{$event->id}'"))->toBe(0);
+            $created_events[$event->id] = function (bool $is_deleted) use ($sqlite, $event) {
+                if ($is_deleted) {
+                    expect($sqlite->querySingle("SELECT id FROM event WHERE id = '{$event->id}'"))->toBeNull();
+                    expect($sqlite->querySingle("SELECT COUNT(id) FROM tag WHERE event_id = '{$event->id}'"))->toBe(0);
+                    expect($sqlite->querySingle("SELECT COUNT(tag_value.id) FROM tag LEFT JOIN tag_value ON tag.id = tag_value.tag_id WHERE tag.event_id = '{$event->id}'"))->toBe(0);
+                } else {
+                    expect($sqlite->querySingle("SELECT id FROM event WHERE id = '{$event->id}'"))->toBe($event->id);
+                    expect($sqlite->querySingle("SELECT COUNT(id) FROM tag WHERE event_id = '{$event->id}'"))->toBe(count($event->tags));
+                }
             };
         }
 
@@ -72,6 +77,6 @@ dataset('stores', [
 
         $store = new \nostriphant\Transpher\Stores\Memory($created_events, Subscription::make($ignore_prototype));
 
-        return [$store, array_map(fn(nostriphant\NIP01\Event $event) => fn() => expect(isset($store[$event->id]))->toBeFalse(), $created_events)];
+        return [$store, array_map(fn(nostriphant\NIP01\Event $event) => fn(bool $is_deleted) => expect(isset($store[$event->id]))->toBe($is_deleted === false), $created_events)];
     }
 ]);

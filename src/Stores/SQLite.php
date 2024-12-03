@@ -108,18 +108,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . "WHERE (" . implode(') AND (', $where) . ") "
                 . 'GROUP BY event.id '
                 . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : "");
-        return function (\SQLite3 $database, \Psr\Log\LoggerInterface $log) use ($query, $parameters): \SQLite3Stmt {
-            $statement = $database->prepare($query);
-
-            if ($statement === false) {
-                $log->error('Query failed: ' . $database->lastErrorMsg());
-                return $database->prepare("SELECT " . implode(',', $fields) . " FROM event LIMIT 0");
-            }
-            array_walk($parameters, function (mixed $parameter, int $position) use ($statement) {
-                $statement->bindValue($position + 1, $parameter);
-            });
-            return $statement;
-        };
+        return new SQLite\SQLite3StatementFactory($query, $parameters);
     }
 
     private function queryEvents(Subscription $subscription): \Generator {

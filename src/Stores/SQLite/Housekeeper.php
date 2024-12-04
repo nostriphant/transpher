@@ -14,21 +14,9 @@ class Housekeeper {
             return;
         }
         $this->log->info('Whitelist enabled, clearing up database...');
-        $factory = TransformSubscription::transformToSQL3StatementFactory($whitelist, "event.id");
-        $statement = $database->prepare("DELETE "
-                . "FROM event "
-                . "WHERE event.id NOT IN (" . $factory($database, $this->log) . ") ");
-        if ($statement === false) {
-            $this->log->error('Query failed: ' . $database->lastErrorMsg());
-            return;
-        }
-        $result = $statement->execute();
-        $result->finalize();
-
-        if ($result === false) {
-            $this->log->error('Cleanup query failed: ' . $database->lastErrorMsg());
-        } else {
-            $this->log->info('Cleanup succesful (' . $database->changes() . ')');
-        }
+        $select_statement = TransformSubscription::transformToSQL3StatementFactory($whitelist, "event.id");
+        $statement = Statement::nest("DELETE FROM event WHERE event.id NOT IN (", $select_statement, ") ");
+        $affected_rows = $statement($database, $this->log);
+        $this->log->info('Cleanup succesful (' . $affected_rows->getReturn() . ')');
     }
 }

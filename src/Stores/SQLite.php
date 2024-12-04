@@ -15,9 +15,8 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     }
 
     private function queryEvents(Subscription $subscription): \Generator {
-        $factory = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
-        $statement = $factory($this->database, $this->log);
-        yield from $statement();
+        $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
+        yield from $statement($this->database, $this->log);
     }
 
     #[\Override]

@@ -117,6 +117,7 @@ describe('blossom support', function () {
         $curl = curl_init('http://localhost:8087/' . $hash);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'HEAD');
+        curl_setopt($curl, CURLOPT_NOBODY, true);
         $body = curl_exec($curl);
         $info = curl_getinfo($curl);
         curl_close($curl);

@@ -90,13 +90,18 @@ describe('agent', function (): void {
 });
 
 describe('blossom support', function () {
-    it('supports BUD-01 (GET /<sha-256>)', function () {
+
+    function write(string $content) {
         global $env;
-        $content = 'Hello World!';
         $hash = hash('sha256', $content);
         file_put_contents($env['RELAY_DATA'] . '/files/' . $hash, $content);
+        expect($env['RELAY_DATA'] . '/files/' . $hash)->toBeFile();
         expect(file_get_contents($env['RELAY_DATA'] . '/files/' . $hash))->toBe($content);
+        return $hash;
+    }
 
+    it('supports BUD-01 (GET /<sha-256>)', function () {
+        $hash = write('Hello World!');
         $curl = curl_init('http://localhost:8087/' . $hash);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $body = curl_exec($curl);
@@ -104,17 +109,11 @@ describe('blossom support', function () {
         curl_close($curl);
         expect($info['http_code'])->toBe(200);
         expect($info['content_type'])->toContain('text/plain');
-        expect($body)->toBe($content);
+        expect($body)->toBe('Hello World!');
     });
 
     it('supports BUD-01 (HEAD /<sha-256>)', function () {
-        global $env;
-
-        $content = 'Hello World!';
-        $hash = hash('sha256', $content);
-        file_put_contents($env['RELAY_DATA'] . '/' . $hash, $content);
-        expect(file_get_contents($env['RELAY_DATA'] . '/files/' . $hash))->toBe($content);
-
+        $hash = write('Hello World!');
         $curl = curl_init('http://localhost:8087/' . $hash);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'HEAD');

@@ -47,7 +47,7 @@ readonly class Files {
     public function __invoke(string $hash): object {
         return new class($this->path . DIRECTORY_SEPARATOR . $hash, $this->store) {
 
-            public function __construct(private string $path, private Relay\Store $store) {
+            public function __construct(public string $path, private Relay\Store $store) {
                 
             }
 

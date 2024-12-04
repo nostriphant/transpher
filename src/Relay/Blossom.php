@@ -18,14 +18,9 @@ readonly class Blossom implements \Amp\Http\Server\RequestHandler {
 
     #[\Override]
     public function handleRequest(\Amp\Http\Server\Request $request): \Amp\Http\Server\Response {
-        if (strcasecmp($request->getMethod(), 'HEAD') === 0) {
-            return new \Amp\Http\Server\Response(headers: ['Content-Type' => 'text/plain'], body: '');
-        } else {
-            $args = $request->getAttribute(\Amp\Http\Server\Router::class);
-            return new \Amp\Http\Server\Response(
-                    headers: ['Content-Type' => 'text/plain'],
-                    body: ($this->files)($args['file'])()
-            );
-        }
+        $args = $request->getAttribute(\Amp\Http\Server\Router::class);
+        $file = ($this->files)($args['file']);
+        $headers = ['Content-Type' => 'text/plain', 'Content-Length' => filesize($file->path)];
+        return new \Amp\Http\Server\Response(headers: $headers, body: $file());
     }
 }

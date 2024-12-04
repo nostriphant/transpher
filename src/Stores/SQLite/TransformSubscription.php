@@ -7,7 +7,7 @@ use nostriphant\Transpher\Relay\Conditions;
 
 class TransformSubscription {
 
-    static function transformToSQL3StatementFactory(Subscription $subscription, string ...$fields): SQLite3StatementFactory {
+    static function transformToSQL3StatementFactory(Subscription $subscription, string ...$fields): callable {
         $to = new Conditions(Condition::class);
         $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
         $query_prototype = array_reduce($filters, fn(array $query_prototype, Filter $filter) => $filter($query_prototype), [
@@ -26,6 +26,13 @@ class TransformSubscription {
                 . "WHERE (" . implode(') AND (', $where) . ") "
                 . 'GROUP BY event.id '
                 . ($query_prototype['limit'] !== null ? "LIMIT " . $query_prototype['limit'] : "");
-        return new SQLite3StatementFactory($query, $parameters);
+        return function (\SQLite3 $database, \Psr\Log\LoggerInterface $log) use ($query, $parameters) {
+            $statement = $database->prepare($query);
+            if ($statement === false) {
+                $log->error('Query failed: ' . $database->lastErrorMsg());
+                return new Statement($database->prepare("SELECT * FROM event LIMIT 0"), []);
+            }
+            return new Statement($statement, $parameters);
+        };
     }
 }

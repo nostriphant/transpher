@@ -4,10 +4,12 @@ namespace nostriphant\Transpher\Stores\SQLite;
 
 use nostriphant\NIP01\Event;
 
-class Statement {
+readonly class Statement {
 
-    public function __construct(private \SQLite3Stmt $statement, private \Psr\Log\LoggerInterface $log) {
-
+    public function __construct(private \SQLite3Stmt $statement, array $arguments) {
+        array_walk($arguments, function (mixed $argument, int $position) {
+            $this->statement->bindValue($position + 1, $argument);
+        });
     }
 
     public function __invoke(): \Generator {

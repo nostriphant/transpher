@@ -10,29 +10,12 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     public function __construct(private \SQLite3 $database, private Subscription $whitelist, private \Psr\Log\LoggerInterface $log) {
         $structure = new SQLite\Structure($log);
         $structure($database);
-
-        if ($whitelist->enabled) {
-            $this->log->info('Whitelist enabled, clearing up database...');
-            $factory = SQLite\TransformSubscription::transformToSQL3StatementFactory($whitelist, ["event.id"]);
-            $statement = $this->database->prepare("DELETE "
-                    . "FROM event "
-                    . "WHERE event.id NOT IN (" . $factory($this->database, $this->log)->getSQL(true) . ") ");
-            if ($statement === false) {
-                $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
-                return;
-            }
-            $result = $statement->execute();
-            if ($result === false) {
-                $this->log->error('Cleanup query failed: ' . $this->database->lastErrorMsg());
-            } else {
-                $this->log->info('Cleanup succesful (' . $this->database->changes() . ')');
-            }
-            $result->finalize();
-        }
+        $housekeeper = new SQLite\Housekeeper($log);
+        $housekeeper($database, $whitelist);
     }
 
     private function queryEvents(Subscription $subscription): \Generator {
-        $factory = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, ["event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json"]);
+        $factory = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
 
         $statement = $factory($this->database, $this->log);
 

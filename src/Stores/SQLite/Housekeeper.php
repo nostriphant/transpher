@@ -17,7 +17,7 @@ class Housekeeper {
         $factory = TransformSubscription::transformToSQL3StatementFactory($whitelist, "event.id");
         $statement = $database->prepare("DELETE "
                 . "FROM event "
-                . "WHERE event.id NOT IN (" . $factory($database, $this->log)->getSQL(true) . ") ");
+                . "WHERE event.id NOT IN (" . $factory($database, $this->log) . ") ");
         if ($statement === false) {
             $this->log->error('Query failed: ' . $database->lastErrorMsg());
             return;

@@ -16,25 +16,8 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     private function queryEvents(Subscription $subscription): \Generator {
         $factory = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
-
         $statement = $factory($this->database, $this->log);
-
-        $result = $statement->execute();
-        if ($result === false) {
-            $this->log->error('Query failed: ' . $this->database->lastErrorMsg());
-            yield from [];
-        }
-
-        $count = 0;
-        while ($data = $result->fetchArray(SQLITE3_ASSOC)) {
-            $data['tags'] = json_decode('[' . $data['tags_json'] . ']') ?? [];
-            array_walk($data['tags'], fn(array &$tag) => array_unshift($tag, array_pop($tag)));
-            unset($data['tags_json']);
-            yield new Event(...$data);
-            $count++;
-        }
-
-        $this->log->debug('Yielded ' . $count . ' events.');
+        yield from $statement();
     }
 
     #[\Override]

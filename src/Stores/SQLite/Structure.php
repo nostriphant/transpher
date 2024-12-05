@@ -6,13 +6,12 @@ readonly class Structure {
 
     const VERSION = '20241202';
 
-    public function __construct(private \Psr\Log\LoggerInterface $log) {
+    public function __construct() {
         ;
     }
 
     public function __invoke(\SQLite3 $database): void {
         $database->exec("PRAGMA foreign_keys = ON");
-        $this->log->debug('Enabled foreign keys in database');
 
         $database->exec("CREATE TABLE IF NOT EXISTS event ("
                 . "id TEXT PRIMARY KEY ASC,"
@@ -22,7 +21,6 @@ readonly class Structure {
                 . "content TEXT,"
                 . "sig TEXT"
                 . ")");
-        $this->log->debug('Table event created (if it did not already exist)');
         if (self::retrieveVersion($database) < self::VERSION) {
             $database->exec('ALTER TABLE event ADD COLUMN tags_json TEXT');
         }
@@ -32,7 +30,6 @@ readonly class Structure {
                 . "event_id TEXT REFERENCES event (id) ON DELETE CASCADE ON UPDATE CASCADE,"
                 . "name TEXT"
                 . ")");
-        $this->log->debug('Table tag created (if it did not already exist)');
 
         $database->exec("CREATE TABLE IF NOT EXISTS tag_value ("
                 . "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -41,7 +38,6 @@ readonly class Structure {
                 . "value TEXT,"
                 . "UNIQUE (tag_id, position) ON CONFLICT FAIL"
                 . ")");
-        $this->log->debug('Table tag_value created (if it did not already exist)');
 
         $database->exec("CREATE TRIGGER IF NOT EXISTS auto_increment_position_trigger "
                 . "AFTER INSERT ON tag_value WHEN new.position IS NULL BEGIN"
@@ -50,7 +46,6 @@ readonly class Structure {
                 . "    WHERE id = new.id;"
                 . "END;"
         );
-        $this->log->debug('Trigger auto_increment_position_trigger created (if it did not already exist)');
 
         $database->exec("CREATE VIEW IF NOT EXISTS event_tag_json AS "
                 . "SELECT "
@@ -62,10 +57,8 @@ readonly class Structure {
                 . " GROUP BY tag.name"
                 . " ORDER BY tag_value.position ASC"
         );
-        $this->log->debug('View event_tag_json created (if it did not already exist)');
 
         $database->exec("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE tags_json IS NULL");
-        $this->log->debug('Updated missing tags_json values');
 
         $database->exec('PRAGMA user_version = "' . self::VERSION . '"');
     }

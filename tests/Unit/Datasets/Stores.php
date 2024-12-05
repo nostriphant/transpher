@@ -23,7 +23,7 @@ dataset('stores', [
         $sqlite = new SQLite3($db_file);
         expect($db_file)->toBeFile();
 
-        new \nostriphant\Transpher\Stores\SQLite($sqlite, Subscription::make([]), Mockery::spy(\Psr\Log\LoggerInterface::class));
+        new \nostriphant\Transpher\Stores\SQLite($sqlite, Subscription::make([]));
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
         $created_events = [];
@@ -64,7 +64,7 @@ dataset('stores', [
         }
 
 
-        $store = new \nostriphant\Transpher\Stores\SQLite($sqlite, Subscription::make($ignore_prototype), Mockery::spy(\Psr\Log\LoggerInterface::class));
+        $store = new \nostriphant\Transpher\Stores\SQLite($sqlite, Subscription::make($ignore_prototype));
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
         return [$store, $created_events];

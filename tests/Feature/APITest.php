@@ -76,7 +76,7 @@ describe('agent', function (): void {
 
         $alice->sendSignedMessage(Factory::event(\Pest\key_recipient(), 1, 'Hello!'));
 
-        $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), Subscription::make([]), Mockery::spy(Psr\Log\LoggerInterface::class));
+        $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), Subscription::make([]));
 
         $messages = iterator_to_array($events(Subscription::make(['authors' => [Pest\pubkey_recipient()]])));
         expect($messages[0]->kind)->toBe(1);

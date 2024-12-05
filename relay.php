@@ -35,6 +35,7 @@ $server = SocketHttpServer::createForDirectAccess($logger, connectionLimitPerIp:
 $server->expose(new Socket\InternetAddress($ip, $port));
 
 $errorHandler = new DefaultErrorHandler();
+Monolog\ErrorHandler::register($logger);
 
 $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 //$acceptor = new AllowOriginAcceptor(
@@ -56,7 +57,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];
     is_dir($data_dir) || mkdir($data_dir);
 
-    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $whitelist, $logger);
+    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $whitelist);
 
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {

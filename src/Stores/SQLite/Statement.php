@@ -12,10 +12,10 @@ readonly class Statement {
         $this->is_select = str_starts_with(strtoupper(ltrim($query)), 'SELECT');
     }
 
-    public function __invoke(\SQLite3 $database, \Psr\Log\LoggerInterface $log): \Generator|int {
+    public function __invoke(\SQLite3 $database): \Generator|int {
         $statement = $database->prepare($this->query);
         if ($statement === false) {
-            $log->error('Query failed: ' . $database->lastErrorMsg());
+            trigger_error('Query failed: ' . $database->lastErrorMsg(), E_USER_WARNING);
             if ($this->is_select) {
                 yield from [];
             } else {
@@ -26,7 +26,7 @@ readonly class Statement {
             array_walk($arguments, fn(mixed $argument, int $position) => $statement->bindValue($position + 1, $argument));
             $result = $statement->execute();
             if ($result === false) {
-                $this->log->error('Query failed: ' . $statement->getSQL(true));
+                trigger_error('Query failed: ' . $statement->getSQL(true), E_USER_WARNING);
                 if ($this->is_select) {
                     yield from [];
                 } else {

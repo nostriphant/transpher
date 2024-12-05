@@ -7,26 +7,24 @@ use nostriphant\NIP01\Event;
 
 readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
-    public function __construct(private \SQLite3 $database, private Subscription $whitelist, private \Psr\Log\LoggerInterface $log) {
-        $structure = new SQLite\Structure($log);
+    public function __construct(private \SQLite3 $database, private Subscription $whitelist) {
+        $structure = new SQLite\Structure();
         $structure($database);
-        $housekeeper = new SQLite\Housekeeper($log);
+        $housekeeper = new SQLite\Housekeeper();
         $housekeeper($database, $whitelist);
     }
 
     private function queryEvents(Subscription $subscription): \Generator {
         $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
-        yield from $statement($this->database, $this->log);
+        yield from $statement($this->database);
     }
 
     #[\Override]
     public function __invoke(Subscription $subscription): \Generator {
-        $this->log->debug('Filtering using ' . count($subscription->filter_prototypes) . ' filters.');
         yield from $this->queryEvents($subscription);
     }
 
     private function fetchEventArray(string $event_id): ?Event {
-        $this->log->debug('Fetching event ' . $event_id . '.');
         $events = iterator_to_array($this->queryEvents(Subscription::make([
                             'ids' => [$event_id],
                             'limit' => 1
@@ -36,20 +34,17 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function offsetExists(mixed $offset): bool {
-        $this->log->debug('Does event ' . $offset . ' exist?');
         $event = $this->fetchEventArray($offset);
         return $event !== null ? $event->id === $offset : false;
     }
 
     #[\Override]
     public function offsetGet(mixed $offset): ?Event {
-        $this->log->debug('Getting event ' . $offset);
         return $this->fetchEventArray($offset);
     }
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
-        $this->log->debug('Setting event ' . $offset);
         if (!$value instanceof Event) {
             return;
         } elseif (call_user_func($this->whitelist, $value) === false) {
@@ -106,12 +101,10 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $update = $this->database->prepare("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = ?");
         $update->bindValue(1, $event['id']);
         $update->execute();
-        $this->log->debug('Updated event tags-json');
     }
 
     #[\Override]
     public function offsetUnset(mixed $offset): void {
-        $this->log->debug('Deleting event ' . $offset);
         $query = $this->database->prepare("DELETE FROM event WHERE id = :event_id");
         $query->bindValue('event_id', $offset);
         $query->execute();
@@ -119,7 +112,6 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function count(): int {
-        $this->log->debug('Counting events');
         return $this->database->querySingle("SELECT COUNT(id) FROM event");
     }
 }

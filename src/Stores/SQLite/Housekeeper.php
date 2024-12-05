@@ -15,6 +15,6 @@ class Housekeeper {
         }
         $select_statement = TransformSubscription::transformToSQL3StatementFactory($whitelist, "event.id");
         $statement = Statement::nest("DELETE FROM event WHERE event.id NOT IN (", $select_statement, ")");
-        $statement($database)->getReturn();
+        $statement($database);
     }
 }

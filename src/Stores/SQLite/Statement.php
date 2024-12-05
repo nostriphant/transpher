@@ -12,39 +12,30 @@ readonly class Statement {
         $this->is_select = str_starts_with(strtoupper(ltrim($query)), 'SELECT');
     }
 
-    public function __invoke(\SQLite3 $database): \Generator|int {
+    public function __invoke(\SQLite3 $database): Results {
         $statement = $database->prepare($this->query);
         if ($statement === false) {
             trigger_error('Query failed: ' . $database->lastErrorMsg(), E_USER_WARNING);
-            if ($this->is_select) {
-                yield from [];
-            } else {
-                return 0;
-            }
+            return new Results();
         } else {
             $arguments = $this->arguments;
             array_walk($arguments, fn(mixed $argument, int $position) => $statement->bindValue($position + 1, $argument));
             $result = $statement->execute();
             if ($result === false) {
                 trigger_error('Query failed: ' . $statement->getSQL(true), E_USER_WARNING);
-                if ($this->is_select) {
-                    yield from [];
-                } else {
-                    return 0;
-                }
+                return new Results();
             } elseif ($this->is_select) {
-                while ($data = $result->fetchArray(SQLITE3_ASSOC)) {
-                    $data['tags'] = json_decode('[' . $data['tags_json'] . ']') ?? [];
-                    array_walk($data['tags'], fn(array &$tag) => array_unshift($tag, array_pop($tag)));
-                    unset($data['tags_json']);
-                    yield new Event(...$data);
-                }
+                return Results::fromSQLite3Result($result, function (array $data): Event {
+                            $data['tags'] = json_decode('[' . $data['tags_json'] . ']') ?? [];
+                            array_walk($data['tags'], fn(array &$tag) => array_unshift($tag, array_pop($tag)));
+                            unset($data['tags_json']);
+                            return new Event(...$data);
+                        });
             } else {
-                return $database->changes();
+                return new Results(affected_rows: $database->changes());
             }
             $result->finalize();
             $statement->close();
-
         }
     }
 

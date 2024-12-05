@@ -7,10 +7,8 @@ use nostriphant\Transpher\Stores\Results;
 
 readonly class Statement {
 
-    private bool $is_select;
-
     public function __construct(private string $query, private array $arguments) {
-        $this->is_select = str_starts_with(strtoupper(ltrim($query)), 'SELECT');
+        
     }
 
     public function __invoke(\SQLite3 $database): Results {

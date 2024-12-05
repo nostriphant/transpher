@@ -16,12 +16,12 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     private function queryEvents(Subscription $subscription): \Generator {
         $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
-        yield from $statement($this->database)();
+        return $statement($this->database)();
     }
 
     #[\Override]
     public function __invoke(Subscription $subscription): \Generator {
-        yield from $this->queryEvents($subscription);
+        return $this->queryEvents($subscription);
     }
 
     private function fetchEventArray(string $event_id): ?Event {

@@ -73,7 +73,7 @@ class Disk implements Store {
 
     #[\Override]
     public function __invoke(Subscription $subscription): \Generator {
-        yield from call_user_func($this->memory, $subscription);
+        return call_user_func($this->memory, $subscription);
     }
 
     #[\Override]

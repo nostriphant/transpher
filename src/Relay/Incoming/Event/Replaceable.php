@@ -19,7 +19,7 @@ class Replaceable {
         $replaceable_events = iterator_to_array(($this->events)(Subscription::make([
                             'kinds' => [$event->kind],
                     'authors' => [$event->pubkey]
-        ])));
+        ]))());
 
         $this->events[$event->id] = $event;
         foreach ($replaceable_events as $replaceable_event) {

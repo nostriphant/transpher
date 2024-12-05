@@ -14,13 +14,13 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $housekeeper($database, $whitelist);
     }
 
-    private function queryEvents(Subscription $subscription): \Generator {
+    private function queryEvents(Subscription $subscription): Results {
         $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
-        return $statement($this->database)();
+        return $statement($this->database);
     }
 
     #[\Override]
-    public function __invoke(Subscription $subscription): \Generator {
+    public function __invoke(Subscription $subscription): Results {
         return $this->queryEvents($subscription);
     }
 
@@ -28,7 +28,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $events = iterator_to_array($this->queryEvents(Subscription::make([
                             'ids' => [$event_id],
                             'limit' => 1
-        ])));
+        ]))());
         return count($events) > 0 ? $events[0] : null;
     }
 

@@ -3,7 +3,6 @@
 
 namespace nostriphant\Transpher\Stores;
 
-use function \Functional\select;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\Transpher\Nostr\Subscription\Filter;
 use function Functional\some;
@@ -18,18 +17,17 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
     }
 
     #[\Override]
-    public function __invoke(Subscription $subscription): \Generator {
+    public function __invoke(Subscription $subscription): Results {
         $to = new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class);
         $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
 
-        $results = new Results(results: call_user_func(function (array $filters) {
-                    foreach ($this->events as $event) {
+        return new Results(results: call_user_func(function (array $filters) {
+            foreach ($this->events as $event) {
                         if (some(array_map(fn(Filter $filter) => $filter($event), $filters))) {
                             yield $event;
                         }
                     }
                 }, $filters));
-        return $results();
     }
 
     #[\Override]

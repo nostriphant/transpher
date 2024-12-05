@@ -3,6 +3,7 @@
 namespace nostriphant\Transpher\Stores\SQLite;
 
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Stores\Results;
 
 readonly class Statement {
 

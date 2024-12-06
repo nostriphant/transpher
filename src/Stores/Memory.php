@@ -21,13 +21,9 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
         $to = new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class);
         $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
 
-        return new Results(results: call_user_func(function (array $filters) {
-            foreach ($this->events as $event) {
-                        if (some(array_map(fn(Filter $filter) => $filter($event), $filters))) {
-                            yield $event;
-                        }
-                    }
-                }, $filters));
+        return new Results(function (callable $callback) use ($filters) {
+                    array_reduce(array_filter($this->events, fn(Event $event) => some(array_map(fn(Filter $filter) => $filter($event), $filters))), fn($carry, Event $event) => $callback($event), 0);
+                });
     }
 
     #[\Override]

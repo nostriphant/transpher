@@ -78,12 +78,12 @@ describe('agent', function (): void {
 
         $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), Subscription::make([]));
 
-        $messages = iterator_to_array($events(Subscription::make(['authors' => [Pest\pubkey_recipient()]]))());
-        expect($messages[0]->kind)->toBe(1);
-        expect($messages[0]->content)->toBe('Hello!');
+        $events(Subscription::make(['authors' => [Pest\pubkey_recipient()]]))(\nostriphant\Transpher\Stores\Results::copyTo($notes));
+        expect($notes[0]->kind)->toBe(1);
+        expect($notes[0]->content)->toBe('Hello!');
 
-        $messages = iterator_to_array($events(Subscription::make(['#p' => [Pest\pubkey_recipient()]]))());
-        expect($messages[0]->kind)->toBe(1059);
+        $events(Subscription::make(['#p' => [Pest\pubkey_recipient()]]))(\nostriphant\Transpher\Stores\Results::copyTo($pdms));
+        expect($pdms[0]->kind)->toBe(1059);
 
         $agent();
     });

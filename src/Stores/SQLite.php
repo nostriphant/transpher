@@ -19,28 +19,30 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         return $statement($this->database);
     }
 
+    private function queryEvent(string $event_id): Results {
+        return $this->queryEvents(Subscription::make([
+                            'ids' => [$event_id],
+                            'limit' => 1
+        ]));
+    }
+
     #[\Override]
     public function __invoke(Subscription $subscription): Results {
         return $this->queryEvents($subscription);
     }
 
-    private function fetchEventArray(string $event_id): ?Event {
-        $events = iterator_to_array($this->queryEvents(Subscription::make([
-                            'ids' => [$event_id],
-                            'limit' => 1
-        ]))());
-        return count($events) > 0 ? $events[0] : null;
-    }
-
     #[\Override]
     public function offsetExists(mixed $offset): bool {
-        $event = $this->fetchEventArray($offset);
-        return $event !== null ? $event->id === $offset : false;
+        return $this->offsetGet($offset) !== null;
     }
 
     #[\Override]
     public function offsetGet(mixed $offset): ?Event {
-        return $this->fetchEventArray($offset);
+        $event = null;
+        $this->queryEvent($offset)(function (Event $found_event) use (&$event) {
+            $event = $found_event;
+        });
+        return $event;
     }
 
     #[\Override]

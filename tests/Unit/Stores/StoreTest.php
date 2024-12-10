@@ -34,7 +34,7 @@ it('retrieves events', function (callable $factory, array $filter_prototype, int
             Pest\event(['id' => '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb', "content" => 'Hallo 2', "pubkey" => "2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0", 'kind' => 2])
     );
 
-    $events = $store(nostriphant\Transpher\Nostr\Subscription::make($filter_prototype));
+    $events = $store($filter_prototype);
     expect($events(fn() => true))->toBe($expected_count);
 })->with('stores')->with([
     [['authors' => ["2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0"]], 2],
@@ -83,6 +83,7 @@ it('ignores an event that does not matches whitelist filter', function (callable
     list($store, $created_events) = $factory(['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']]);
 
     expect(isset($store['non-matching']))->toBeFalse();
+    expect(isset($store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']))->toBeFalse();
 
     $store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'] = \nostriphant\NIP01\Event::__set_state([
         'id' => '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb',

@@ -7,28 +7,27 @@ use nostriphant\NIP01\Event;
 
 readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
-    public function __construct(private \SQLite3 $database, private Subscription $whitelist) {
+    private Subscription $whitelist;
+
+    public function __construct(private \SQLite3 $database, array $whitelist_prototypes) {
+        $this->whitelist = new Subscription($whitelist_prototypes);
         $structure = new SQLite\Structure();
         $structure($database);
         $housekeeper = new SQLite\Housekeeper();
-        $housekeeper($database, $whitelist);
-    }
-
-    private function queryEvents(Subscription $subscription): Results {
-        $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory($subscription, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
-        return $statement($this->database);
+        $housekeeper($database, $whitelist_prototypes);
     }
 
     private function queryEvent(string $event_id): Results {
-        return $this->queryEvents(Subscription::make([
-                            'ids' => [$event_id],
-                            'limit' => 1
-        ]));
+        return $this([
+            'ids' => [$event_id],
+            'limit' => 1
+        ]);
     }
 
     #[\Override]
-    public function __invoke(Subscription $subscription): Results {
-        return $this->queryEvents($subscription);
+    public function __invoke(array ...$filter_prototypes): Results {
+        $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory($filter_prototypes, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
+        return $statement($this->database);
     }
 
     #[\Override]

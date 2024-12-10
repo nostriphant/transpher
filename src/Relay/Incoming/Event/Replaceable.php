@@ -16,10 +16,10 @@ class Replaceable {
     }
 
     public function __invoke(Event $event) {
-        ($this->events)(Subscription::make([
-                    'kinds' => [$event->kind],
-                            'authors' => [$event->pubkey]
-        ]))(\nostriphant\Transpher\Stores\Results::copyTo($replaceable_events));
+        ($this->events)([
+            'kinds' => [$event->kind],
+            'authors' => [$event->pubkey]
+        ])(\nostriphant\Transpher\Stores\Results::copyTo($replaceable_events));
 
         $this->events[$event->id] = $event;
         foreach ($replaceable_events as $replaceable_event) {

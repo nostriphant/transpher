@@ -53,7 +53,7 @@ readonly class Kind5 implements Kind {
             return;
         }
 
-        ($this->store)(Subscription::make(...$prototypes))(function (Event $removable_event) {
+        ($this->store)(...$prototypes)(function (Event $removable_event) {
             unset($this->store[$removable_event->id]);
         });
     }

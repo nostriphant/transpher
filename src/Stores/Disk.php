@@ -12,12 +12,14 @@ class Disk implements Store {
     const NIP01_EVENT_SPLITOFF_TIME = 1732125327;
 
     private Memory $memory;
+    private Subscription $whitelist;
 
-    public function __construct(private string $store, private Subscription $whitelist) {
+    public function __construct(private string $store, array $whitelist_prototypes) {
         $events = [];
         is_dir($store) || mkdir($store);
-        self::walk_store($store, function (Event $event) use (&$events, $whitelist) {
-            if ($whitelist($event) === false) {
+        $this->whitelist = new Subscription($whitelist_prototypes);
+        self::walk_store($store, function (Event $event) use (&$events) {
+            if (call_user_func($this->whitelist, $event) === false) {
                 unlink(self::file($this->store, $event->id));
                 return false;
             } else {
@@ -26,7 +28,7 @@ class Disk implements Store {
             }
         });
 
-        $this->memory = new Memory($events, $whitelist);
+        $this->memory = new Memory($events, $whitelist_prototypes);
     }
 
     static function walk_store(string $store, callable $callback): int {
@@ -58,11 +60,10 @@ class Disk implements Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $event): void {
-        if (call_user_func($this->whitelist, $event) === false) {
-            return;
+        if (call_user_func($this->whitelist, $event) !== false) {
+            $this->memory[$offset] = $event;
+            self::write($this->store, $event);
         }
-        $this->memory[$offset] = $event;
-        self::write($this->store, $event);
     }
 
     #[\Override]
@@ -72,8 +73,8 @@ class Disk implements Store {
     }
 
     #[\Override]
-    public function __invoke(Subscription $subscription): Results {
-        return call_user_func($this->memory, $subscription);
+    public function __invoke(array ...$filter_prototypes): Results {
+        return call_user_func_array($this->memory, $filter_prototypes);
     }
 
     #[\Override]

@@ -76,13 +76,13 @@ describe('agent', function (): void {
 
         $alice->sendSignedMessage(Factory::event(\Pest\key_recipient(), 1, 'Hello!'));
 
-        $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), Subscription::make([]));
+        $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 
-        $events(Subscription::make(['authors' => [Pest\pubkey_recipient()]]))(\nostriphant\Transpher\Stores\Results::copyTo($notes));
+        $events(['authors' => [Pest\pubkey_recipient()]])(\nostriphant\Transpher\Stores\Results::copyTo($notes));
         expect($notes[0]->kind)->toBe(1);
         expect($notes[0]->content)->toBe('Hello!');
 
-        $events(Subscription::make(['#p' => [Pest\pubkey_recipient()]]))(\nostriphant\Transpher\Stores\Results::copyTo($pdms));
+        $events(['#p' => [Pest\pubkey_recipient()]])(\nostriphant\Transpher\Stores\Results::copyTo($pdms));
         expect($pdms[0]->kind)->toBe(1059);
 
         $agent();

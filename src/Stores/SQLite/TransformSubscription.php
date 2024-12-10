@@ -2,14 +2,13 @@
 
 namespace nostriphant\Transpher\Stores\SQLite;
 
-use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\Transpher\Relay\Conditions;
 
 class TransformSubscription {
 
-    static function transformToSQL3StatementFactory(Subscription $subscription, string ...$fields): Statement {
+    static function transformToSQL3StatementFactory(array $filter_prototypes, string ...$fields): Statement {
         $to = new Conditions(Condition::class);
-        $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
+        $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $filter_prototypes);
         $query_prototype = array_reduce($filters, fn(array $query_prototype, Filter $filter) => $filter($query_prototype), [
             'where' => [],
             'limit' => null

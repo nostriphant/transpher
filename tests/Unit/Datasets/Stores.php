@@ -3,11 +3,11 @@
 use nostriphant\Transpher\Nostr\Subscription;
 
 dataset('stores', [
-    'disk' => function (array $ignore_prototype, nostriphant\NIP01\Event ...$events): array {
+    'disk' => function (array $whitelist_prototype, nostriphant\NIP01\Event ...$events): array {
         $transpher_store = ROOT_DIR . '/data/disktest_' . uniqid();
         expect($transpher_store)->not()->toBeDirectory();
 
-        new \nostriphant\Transpher\Stores\Disk($transpher_store, Subscription::make([]));
+        new \nostriphant\Transpher\Stores\Disk($transpher_store, []);
         expect($transpher_store)->toBeDirectory();
 
         $created_events = [];
@@ -16,14 +16,14 @@ dataset('stores', [
             $created_events[$event->id] = fn(bool $is_deleted) => expect(is_file($transpher_store . DIRECTORY_SEPARATOR . $event->id . '.php'))->toBe(!$is_deleted);
         }
 
-        return [new \nostriphant\Transpher\Stores\Disk($transpher_store, Subscription::make($ignore_prototype)), $created_events];
+        return [new \nostriphant\Transpher\Stores\Disk($transpher_store, [$whitelist_prototype]), $created_events];
     },
-    'sqlite' => function (array $ignore_prototype, nostriphant\NIP01\Event ...$events): array {
+    'sqlite' => function (array $whitelist_prototype, nostriphant\NIP01\Event ...$events): array {
         $db_file = tempnam(sys_get_temp_dir(), 'test') . '.sqlite';
         $sqlite = new SQLite3($db_file);
         expect($db_file)->toBeFile();
 
-        new \nostriphant\Transpher\Stores\SQLite($sqlite, Subscription::make([]));
+        new \nostriphant\Transpher\Stores\SQLite($sqlite, []);
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
         $created_events = [];
@@ -64,18 +64,18 @@ dataset('stores', [
         }
 
 
-        $store = new \nostriphant\Transpher\Stores\SQLite($sqlite, Subscription::make($ignore_prototype));
+        $store = new \nostriphant\Transpher\Stores\SQLite($sqlite, [$whitelist_prototype]);
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
         return [$store, $created_events];
     },
-    'memory' => function (array $ignore_prototype, nostriphant\NIP01\Event ...$events): array {
+    'memory' => function (array $whitelist_prototype, nostriphant\NIP01\Event ...$events): array {
         $created_events = [];
         foreach ($events as $event) {
             $created_events[$event->id] = $event;
         }
 
-        $store = new \nostriphant\Transpher\Stores\Memory($created_events, Subscription::make($ignore_prototype));
+        $store = new \nostriphant\Transpher\Stores\Memory($created_events, [$whitelist_prototype]);
 
         return [$store, array_map(fn(nostriphant\NIP01\Event $event) => fn(bool $is_deleted) => expect(isset($store[$event->id]))->toBe($is_deleted === false), $created_events)];
     }

@@ -42,9 +42,9 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
 //);
 
-$whitelist = nostriphant\Transpher\Nostr\Subscription::make(
+$whitelist_prototypes = [
         [
-            'authors' => [
+        'authors' => [
                 Bech32::fromNpub($_SERVER['RELAY_OWNER_NPUB']),
                 Key::fromHex(Bech32::fromNsec($_SERVER['AGENT_NSEC']))(Key::public())
             ],
@@ -52,12 +52,12 @@ $whitelist = nostriphant\Transpher\Nostr\Subscription::make(
         [
             '#p' => [Bech32::fromNpub($_SERVER['RELAY_OWNER_NPUB'])]
         ]
-);
+    ];
 if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];
     is_dir($data_dir) || mkdir($data_dir);
 
-    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $whitelist);
+    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), $whitelist_prototypes);
 
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {
@@ -71,7 +71,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $data_dir . '/files';
 } else {
     $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-    $events = new \nostriphant\Transpher\Stores\Disk($store_path, $whitelist);
+    $events = new \nostriphant\Transpher\Stores\Disk($store_path, $whitelist_prototypes);
 
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }

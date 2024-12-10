@@ -20,7 +20,7 @@ class Accepted {
                         rejected: fn(string $reason) => yield Factory::closed($subscription_id, $reason),
                         accepted: function () use ($subscription_id, $filters) {
                             ($this->subscriptions)($subscription_id, $filters);
-                            ($this->events)($filters)(\nostriphant\Transpher\Stores\Results::copyTo($events));
+                            ($this->events)(...$filters->filter_prototypes)(\nostriphant\Transpher\Stores\Results::copyTo($events));
                             yield from array_map(partial_left([Factory::class, 'requestedEvent'], $subscription_id), $events);
                             yield Factory::eose($subscription_id);
         });

@@ -2,18 +2,16 @@
 
 namespace nostriphant\Transpher\Stores\SQLite;
 
-use nostriphant\Transpher\Nostr\Subscription;
-
 class Housekeeper {
     public function __construct() {
         
     }
 
-    public function __invoke(\SQLite3 $database, Subscription $whitelist): void {
-        if ($whitelist->enabled === false) {
+    public function __invoke(\SQLite3 $database, array $whitelist_prototypes): void {
+        if (count(array_filter($whitelist_prototypes)) === 0) {
             return;
         }
-        $select_statement = TransformSubscription::transformToSQL3StatementFactory($whitelist, "event.id");
+        $select_statement = TransformSubscription::transformToSQL3StatementFactory($whitelist_prototypes, "event.id");
         $statement = Statement::nest("DELETE FROM event WHERE event.id NOT IN (", $select_statement, ") RETURNING *");
         $statement($database);
     }

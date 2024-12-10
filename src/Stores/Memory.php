@@ -11,15 +11,17 @@ use nostriphant\NIP01\Event;
 class Memory implements \nostriphant\Transpher\Relay\Store {
 
     private array $events;
+    private Subscription $whitelist;
 
-    public function __construct(array $events, private Subscription $whitelist) {
-        $this->events = array_filter($events, fn(Event $event) => $whitelist($event) !== false);
+    public function __construct(array $events, array $whitelist_prototypes) {
+        $this->whitelist = new Subscription($whitelist_prototypes);
+        $this->events = array_filter($events, fn(Event $event) => ($this->whitelist)($event) !== false);
     }
 
     #[\Override]
-    public function __invoke(Subscription $subscription): Results {
+    public function __invoke(array ...$filter_prototypes): Results {
         $to = new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class);
-        $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $subscription->filter_prototypes);
+        $filters = array_map(fn(array $filter_prototype) => Filter::fromPrototype(...$to($filter_prototype)), $filter_prototypes);
 
         return new Results(function (callable $callback) use ($filters) {
                     array_reduce(array_filter($this->events, fn(Event $event) => some(array_map(fn(Filter $filter) => $filter($event), $filters))), fn($carry, Event $event) => $callback($event), 0);

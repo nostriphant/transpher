@@ -6,7 +6,6 @@ use nostriphant\NIP01\Nostr;
 use function Amp\Websocket\Client\connect;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP01\Key;
-use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Message;
 
 class Client {
@@ -18,8 +17,8 @@ class Client {
         $this->connection = connect($this->url);
     }
     
-    public function privateDirectMessage(Key $sender, string $recipient_npub, string $message) {
-        $note = Factory::privateDirect($sender, Bech32::fromNpub($recipient_npub), str_replace('{relay_url}', $this->url, $message));
+    public function privateDirectMessage(Key $sender, string $recipient_pubkey, string $message) {
+        $note = Factory::privateDirect($sender, $recipient_pubkey, str_replace('{relay_url}', $this->url, $message));
         $this->send($note);
     }
     

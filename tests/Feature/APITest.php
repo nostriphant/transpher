@@ -6,7 +6,6 @@ use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Nostr;
-use nostriphant\Transpher\Nostr\Subscription;
 
 beforeAll(function () {
     global $relay, $env, $data_dir;
@@ -19,9 +18,9 @@ beforeAll(function () {
     file_put_contents($event_file, '<?php return ' . var_export($event, true) . ';');
 
     $relay = Functions::bootRelay('127.0.0.1:8087', $env = [
-        'AGENT_NSEC' => Bech32::toNsec(\Pest\key_sender()(Key::private())),
+        'AGENT_NSEC' => (string) Bech32::nsec(\Pest\key_sender()(Key::private())),
         'RELAY_URL' => 'ws://127.0.0.1:8087',
-        'RELAY_OWNER_NPUB' => Bech32::toNpub(\Pest\pubkey_recipient()),
+        'RELAY_OWNER_NPUB' => (string) Bech32::npub(\Pest\pubkey_recipient()),
         'RELAY_NAME' => 'Really relay',
         'RELAY_DESCRIPTION' => 'This is my dev relay',
         'RELAY_CONTACT' => 'transpher@nostriphant.dev',
@@ -51,7 +50,7 @@ describe('relay', function () {
         $response = Nostr::decode($responseText);
 
         expect($response)->not()->toBeNull($responseText);
-        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', Bech32::toNpub(\Pest\pubkey_recipient()), 'transpher@nostriphant.dev'));
+        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', \Pest\pubkey_recipient(), 'transpher@nostriphant.dev'));
     });
 });
 
@@ -61,8 +60,8 @@ describe('agent', function (): void {
     it('starts relay and sends private direct messsage to relay owner', function (): void {
         global $data_dir;
         $agent = Functions::bootAgent(8084, [
-            'RELAY_OWNER_NPUB' => Bech32::toNpub(Pest\pubkey_recipient()),
-            'AGENT_NSEC' => Bech32::toNsec(Pest\key_sender()(Key::private())),
+            'RELAY_OWNER_NPUB' => (string) Bech32::npub(Pest\pubkey_recipient()),
+            'AGENT_NSEC' => (string) Bech32::nsec(Pest\key_sender()(Key::private())),
             'RELAY_URL' => 'ws://127.0.0.1:8087'
         ]);
         sleep(1); // hack to give agent some time to boot...

@@ -45,13 +45,13 @@ $acceptor = new Amp\Websocket\Server\Rfc6455Acceptor();
 $whitelist_prototypes = [
         [
         'authors' => [
-                Bech32::fromNpub($_SERVER['RELAY_OWNER_NPUB']),
-                Key::fromHex(Bech32::fromNsec($_SERVER['AGENT_NSEC']))(Key::public())
-            ],
+                (new Bech32($_SERVER['RELAY_OWNER_NPUB']))(),
+            Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public())
+        ],
         ],
         [
-            '#p' => [Bech32::fromNpub($_SERVER['RELAY_OWNER_NPUB'])]
-        ]
+            '#p' => [(new Bech32($_SERVER['RELAY_OWNER_NPUB']))()]
+    ]
     ];
 if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];

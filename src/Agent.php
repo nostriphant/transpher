@@ -17,10 +17,10 @@ readonly class Agent {
     }
     
     public function __invoke(LoggerInterface $log): callable {
-        $log->info('Running agent with public key ' . Bech32::toNpub(($this->key)(Key::public())));
+        $log->info('Running agent with public key ' . Bech32::npub(($this->key)(Key::public())));
         $log->info('Sending Private Direct Message event');
-        $this->client->privateDirectMessage($this->key, $this->relay_owner_npub, 'Hello, I am your agent! The URL of your relay is {relay_url}');
-        
+        $this->client->privateDirectMessage($this->key, (new Bech32($this->relay_owner_npub))(), 'Hello, I am your agent! The URL of your relay is {relay_url}');
+
         $log->info('Listening to relay...');
         $this->client->start(0);
 

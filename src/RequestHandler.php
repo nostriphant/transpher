@@ -29,9 +29,9 @@ class RequestHandler implements IRequestHandler {
                 body: json_encode(InformationDocument::generate(
                     $_SERVER['RELAY_NAME'],
                     $_SERVER['RELAY_DESCRIPTION'],
-                    $_SERVER['RELAY_OWNER_NPUB'],
-                    $_SERVER['RELAY_CONTACT']
-                ))
+                    (new \nostriphant\NIP19\Bech32($_SERVER['RELAY_OWNER_NPUB']))(),
+                                    $_SERVER['RELAY_CONTACT']
+                            ))
             );
         }
         

@@ -32,11 +32,11 @@ class Factory {
     static function privateDirect(Key $private_key, string $recipient_pubkey, string $message): Message {
         return self::message('EVENT', get_object_vars(Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, new Rumor(
                                                         pubkey: $private_key(Key::public()),
-                                            created_at: time(),
+                                                        created_at: time(),
                                             kind: 14,
                                             content: $message,
                                             tags: [['p', $recipient_pubkey]]
-                            )))));
+                                        )))));
     }
     
     static function eose(string $subscriptionId): Message {

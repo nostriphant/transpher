@@ -16,7 +16,7 @@
         "amphp/http-server-static-content": "^2.0",
         "amphp/websocket-client": "^2.0",
         "nostriphant/nip-01": "^1.0",
-        "nostriphant/nip-19": "^1.0",
+        "nostriphant/nip-19": "^2.0",
         "nostriphant/nip-44": "^1.0",
         "nostriphant/functional-alternate": "^1.0",
         "nostriphant/nip-59": "^1.0"

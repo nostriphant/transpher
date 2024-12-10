@@ -12,7 +12,7 @@ class Client {
 
     private bool $listening = false;
     
-    public function __construct(private string $url) {
+    public function __construct(readonly public string $url) {
         $this->onJson(fn() => null);
         $this->connection = connect($this->url);
     }

@@ -3,20 +3,16 @@
 namespace nostriphant\Transpher;
 
 use Amp\Websocket\WebsocketClient;
-use Psr\Log\LoggerInterface;
 use nostriphant\Transpher\Relay\Sender;
 use nostriphant\NIP01\Nostr;
 use nostriphant\NIP01\Message;
 
-/**
- * Description of Reply
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 readonly class SendNostr implements Sender {
     
-    private function __construct(private string $action, private WebsocketClient $client, private LoggerInterface $log) {}
-    
+    private function __construct(private string $action, private WebsocketClient $client) {
+        
+    }
+
     #[\Override]
     public function __invoke(mixed $json): bool {
         if ($json instanceof Message) {
@@ -24,7 +20,6 @@ readonly class SendNostr implements Sender {
         } else {
             $text = Nostr::encode($json);
         }
-        $this->log->debug($this->action . ' message ' . $text);
         $this->client->sendText($text);
         return true;
     }

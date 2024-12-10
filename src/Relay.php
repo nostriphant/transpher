@@ -33,7 +33,7 @@ class Relay implements WebsocketClientHandler {
     private ErrorHandler $errorHandler;
     private Files $files;
 
-    public function __construct(private Relay\Store $events, string $files_path, private LoggerInterface $log) {
+    public function __construct(private Relay\Store $events, string $files_path) {
         $this->files = new \nostriphant\Transpher\Files($files_path, $events);
         $this->incoming = new \nostriphant\Transpher\Relay\Incoming($events, $this->files);
         $this->gateway = new WebsocketClientGateway();
@@ -41,16 +41,16 @@ class Relay implements WebsocketClientHandler {
     }
 
 
-    public function __invoke(string $ip, string $port, int $max_connections_per_ip): void {
-        $server = SocketHttpServer::createForDirectAccess($this->log, connectionLimitPerIp: $max_connections_per_ip);
+    public function __invoke(string $ip, string $port, int $max_connections_per_ip, LoggerInterface $log): void {
+        $server = SocketHttpServer::createForDirectAccess($log, connectionLimitPerIp: $max_connections_per_ip);
         $server->expose(new Socket\InternetAddress($ip, $port));
 
-        $router = new Router($server, $this->log, $this->errorHandler);
+        $router = new Router($server, $log, $this->errorHandler);
         $acceptor = new Rfc6455Acceptor();
         //$acceptor = new AllowOriginAcceptor(
         //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
         //);
-        $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $this->log, $acceptor, $this)));
+        $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $log, $acceptor, $this)));
         Relay\Blossom::connect($this->files, $router);
 
         $server->start($router, $this->errorHandler);
@@ -58,7 +58,7 @@ class Relay implements WebsocketClientHandler {
         // Await SIGINT or SIGTERM to be received.
         $signal = trapSignal([SIGINT, SIGTERM]);
 
-        $this->log->info(sprintf("Received signal %d, stopping Relay server", $signal));
+        $log->info(sprintf("Received signal %d, stopping Relay server", $signal));
 
         $server->stop();
     }
@@ -71,11 +71,10 @@ class Relay implements WebsocketClientHandler {
     ): void {
 
         $this->gateway->addClient($client);
-        $wrapped_client = SendNostr::send($client, $this->log);
+        $wrapped_client = SendNostr::send($client);
         $client_subscriptions = new Relay\Subscriptions($wrapped_client);
         foreach ($client as $message) {
             $payload = (string) $message;
-            $this->log->debug('Received message: ' . $payload);
             try {
                 each(($this->incoming)($client_subscriptions, Message::decode($payload)), $wrapped_client);
             } catch (\InvalidArgumentException $ex) {

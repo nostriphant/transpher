@@ -8,11 +8,6 @@ use Amp\Http\Server\RequestHandler as IRequestHandler;
 use Amp\Http\Server\Response;
 use \nostriphant\Transpher\Relay\InformationDocument;
 
-/**
- * Description of RequestHandler
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 class RequestHandler implements IRequestHandler {
     public function __construct(private Websocket $websocket) {
     }

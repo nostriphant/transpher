@@ -16,7 +16,8 @@ class Client extends \nostriphant\TranspherTests\Client {
 
     static function persistent_client(string $store): self {
         return new self(new \nostriphant\Transpher\Relay(
-                        \Pest\incoming(new \nostriphant\Transpher\Stores\Disk($store, [])),
+                        new \nostriphant\Transpher\Stores\Disk($store, []),
+                        \Pest\files_path(),
                         \Mockery::spy(\Psr\Log\LoggerInterface::class)
                 ));
     }
@@ -24,7 +25,8 @@ class Client extends \nostriphant\TranspherTests\Client {
     static function generic_client(bool $reset = false): self {
         if ($reset || isset(self::$generic_relay) === false) {
             self::$generic_relay = new \nostriphant\Transpher\Relay(
-                    \Pest\incoming(),
+                    \Pest\store(),
+                    \Pest\files_path(),
                     \Mockery::spy(\Psr\Log\LoggerInterface::class)
             );
         }

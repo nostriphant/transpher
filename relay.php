@@ -1,28 +1,9 @@
 <?php
 
-require_once __DIR__ . '/bootstrap.php';
+$logger = (require_once __DIR__ . '/bootstrap.php')('relay', 'INFO', $_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO');
 
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Level;
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Key;
-
-$logger = new Logger('relay');
-$logger->pushHandler(new StreamHandler(__DIR__ . '/logs/server.log', match (strtoupper($_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO')) {
-                    'DEBUG' => Level::Debug,
-                    'NOTICE' => Level::Notice,
-                    'INFO' => Level::Info,
-                    'WARNING' => Level::Warning,
-                    'ERROR' => Level::Error,
-                    'CRITICAL' => Level::Critical,
-                    'ALERT' => Level::Alert,
-                    'EMERGENCY' => Level::Emergency,
-                    default => Level::Info
-                }));
-$logger->pushHandler(new StreamHandler(STDOUT, Level::Info));
-
-Monolog\ErrorHandler::register($logger);
 
 $whitelist_prototypes = [
         [

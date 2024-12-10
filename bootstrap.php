@@ -40,3 +40,30 @@ function file_append_contents(string $filename, string $contents): int {
 function in_range(string|int|float $value, string|int|float $start, string|int|float $end): bool {
     return in_array($value, range($start, $end));
 }
+
+use Monolog\Level;
+
+function translate_loglevel(string $loglevel): Level {
+    return match (strtoupper($loglevel)) {
+        'DEBUG' => Level::Debug,
+        'NOTICE' => Level::Notice,
+        'INFO' => Level::Info,
+        'WARNING' => Level::Warning,
+        'ERROR' => Level::Error,
+        'CRITICAL' => Level::Critical,
+        'ALERT' => Level::Alert,
+        'EMERGENCY' => Level::Emergency,
+        default => Level::Info
+    };
+}
+
+return function (string $identifier, string $stdout_level, string $logfile_level): Psr\Log\LoggerInterface {
+    $log = new Monolog\Logger($identifier);
+
+    $log->pushHandler(new Monolog\Handler\StreamHandler(__DIR__ . '/logs/' . $identifier . '.log', translate_loglevel($logfile_level)));
+    $log->pushHandler(new Monolog\Handler\StreamHandler(STDOUT, translate_loglevel($stdout_level)));
+
+    Monolog\ErrorHandler::register($log);
+
+    return $log;
+};

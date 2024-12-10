@@ -19,7 +19,7 @@ $log->info('Client connecting to ' . $relay_url);
 $agent = new nostriphant\Transpher\Agent(
     new Client($relay_url),
     Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))()),
-        $_SERVER['RELAY_OWNER_NPUB']
+    new Bech32($_SERVER['RELAY_OWNER_NPUB'])
 );
 
 $disconnect = $agent($log);

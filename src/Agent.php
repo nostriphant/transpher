@@ -8,9 +8,13 @@ use nostriphant\NIP19\Bech32;
 use nostriphant\Transpher\Nostr\Message\Factory;
 
 readonly class Agent {
+    
+    private Key $key;
+    private Bech32 $relay_owner_npub;
 
-    public function __construct(#[\SensitiveParameter] private Key $key, private Bech32 $relay_owner_npub) {
-        
+    public function __construct(#[\SensitiveParameter] string $agent_nsec, string $relay_owner_npub) {
+        $this->key = Key::fromHex((new Bech32($agent_nsec))());
+        $this->relay_owner_npub = new Bech32($relay_owner_npub);
     }
     
     public function __invoke(Client $client, LoggerInterface $log): callable {

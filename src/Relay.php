@@ -31,7 +31,7 @@ class Relay implements WebsocketClientHandler {
     private ErrorHandler $errorHandler;
     private Files $files;
 
-    public function __construct(private Relay\Store $events, string $files_path) {
+    public function __construct(Relay\Store $events, string $files_path) {
         $this->files = new \nostriphant\Transpher\Files($files_path, $events);
         $this->incoming = new \nostriphant\Transpher\Relay\Incoming($events, $this->files);
         $this->gateway = new WebsocketClientGateway();

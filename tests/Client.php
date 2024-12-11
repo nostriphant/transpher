@@ -11,11 +11,6 @@ use nostriphant\NIP59\Seal;
 class Client extends \nostriphant\Transpher\Client {
 
     private $expected_messages = [];
-    
-    
-    static function client(int $port) : self {
-        return new self("ws://127.0.0.1:" . $port);
-    }
 
     public function expectNostrOK(string $eventId) {
         $this->expected_messages[] = ['OK', function (array $payload) use ($eventId) {

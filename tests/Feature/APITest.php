@@ -8,7 +8,9 @@ use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Nostr;
 
 beforeAll(function () {
-    global $relay, $env, $data_dir;
+    global $relay, $env, $data_dir, $relay_url;
+    $relay_url = fn(string $scheme = 'ws://') => $scheme . '127.0.0.1:8087';
+
     $data_dir = ROOT_DIR . '/data/' . uniqid('relay_', true);
     is_dir($data_dir) || mkdir($data_dir);
 
@@ -17,9 +19,9 @@ beforeAll(function () {
     $event_file = $data_dir . '/events' . DIRECTORY_SEPARATOR . $event->id . '.php';
     file_put_contents($event_file, '<?php return ' . var_export($event, true) . ';');
 
-    $relay = Functions::bootRelay('127.0.0.1:8087', $env = [
+    $relay = Functions::bootRelay($relay_url(''), $env = [
         'AGENT_NSEC' => (string) Bech32::nsec(\Pest\key_sender()(Key::private())),
-        'RELAY_URL' => 'ws://127.0.0.1:8087',
+        'RELAY_URL' => $relay_url(),
         'RELAY_OWNER_NPUB' => (string) Bech32::npub(\Pest\pubkey_recipient()),
         'RELAY_NAME' => 'Really relay',
         'RELAY_DESCRIPTION' => 'This is my dev relay',
@@ -41,7 +43,8 @@ afterAll(function () {
 
 describe('relay', function () {
     it('sends an information document (NIP-11), when on a HTTP request', function () {
-        $curl = curl_init('http://localhost:8087');
+        global $relay_url;
+        $curl = curl_init($relay_url('http://'));
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Accept: application/nostr+json']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $responseText = curl_exec($curl);
@@ -58,16 +61,17 @@ describe('relay', function () {
 
 describe('agent', function (): void {
     it('starts relay and sends private direct messsage to relay owner', function (): void {
-        global $data_dir;
+        global $data_dir, $relay_url;
+
         $agent = Functions::bootAgent(8084, [
             'RELAY_OWNER_NPUB' => (string) Bech32::npub(Pest\pubkey_recipient()),
             'AGENT_NSEC' => (string) Bech32::nsec(Pest\key_sender()(Key::private())),
-            'RELAY_URL' => 'ws://127.0.0.1:8087'
+            'RELAY_URL' => $relay_url()
         ]);
         sleep(1); // hack to give agent some time to boot...
-        $alice = \nostriphant\TranspherTests\Client::client(8087);
+        $alice = new \nostriphant\TranspherTests\Client($relay_url());
         $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
-        $alice->expectNostrPrivateDirectMessage($subscription()[1], Pest\key_recipient(), 'Hello, I am your agent! The URL of your relay is ws://127.0.0.1:8087');
+        $alice->expectNostrPrivateDirectMessage($subscription()[1], Pest\key_recipient(), 'Hello, I am your agent! The URL of your relay is ' . $relay_url());
         $request = $subscription();
         $alice->json($request);
         expect($request[2])->toBeArray();
@@ -100,8 +104,9 @@ describe('blossom support', function () {
     }
 
     it('supports BUD-01 (GET /<sha-256>)', function () {
+        global $relay_url;
         $hash = write('Hello World!');
-        $curl = curl_init('http://localhost:8087/' . $hash);
+        $curl = curl_init($relay_url('http://') . '/' . $hash);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $body = curl_exec($curl);
         $info = curl_getinfo($curl);
@@ -112,8 +117,9 @@ describe('blossom support', function () {
     });
 
     it('supports BUD-01 (HEAD /<sha-256>)', function () {
+        global $relay_url;
         $hash = write('Hello World!');
-        $curl = curl_init('http://localhost:8087/' . $hash);
+        $curl = curl_init($relay_url('http://') . '/' . $hash);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'HEAD');
         curl_setopt($curl, CURLOPT_NOBODY, true);

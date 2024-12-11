@@ -23,10 +23,7 @@ class Client {
                 $callback(Message::decode($message->buffer()));
             }
         });
-
-        return function(Message $message) : void {
-            $this->connection->sendText($message);
-        };
+        return SendNostr::send($this->connection);
     }
 
     public function stop(): void {

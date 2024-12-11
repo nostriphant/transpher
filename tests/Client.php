@@ -8,11 +8,6 @@ use nostriphant\NIP59\Gift;
 use nostriphant\NIP01\Event;
 use nostriphant\NIP59\Seal;
 
-/**
- * Description of Client
- *
- * @author Rik Meijer <hello@rikmeijer.nl>
- */
 class Client extends \nostriphant\Transpher\Client {
 
     private $expected_messages = [];
@@ -21,10 +16,7 @@ class Client extends \nostriphant\Transpher\Client {
     static function client(int $port) : self {
         return new self("ws://127.0.0.1:" . $port);
     }
-    static function generic_client() : self {
-        return self::client(8081);
-    }
-    
+
     public function expectNostrOK(string $eventId) {
         $this->expected_messages[] = ['OK', function (array $payload) use ($eventId) {
                 expect($payload[0])->toBe($eventId);
@@ -85,6 +77,7 @@ class Client extends \nostriphant\Transpher\Client {
         }
     }
 
+    #[\Override]
     public function start(int $timeout = 5): void {
         $this->onJson(function (callable $stop, Message $message) {
             $expected_message = array_shift($this->expected_messages);

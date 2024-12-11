@@ -50,12 +50,12 @@ class Client {
             ($this->onjson_callback)([$this, 'ignore'], $payload);
         }
     }
-    
-    public function ignore() : void {
+
+    public function ignore(): void {
         $this->listening = false;
     }
-    
-    public function stop() : void {
+
+    public function stop(): void {
         $this->listening = false;
         $this->connection->close();
     }

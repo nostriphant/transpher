@@ -101,7 +101,7 @@ describe('agent', function (): void {
         }];
 
         $request = $subscription();
-        $alice->json($request);
+        $alice->send($subscription);
         expect($request[2])->toBeArray();
         expect($request[2]['#p'])->toContain(Pest\pubkey_recipient());
 

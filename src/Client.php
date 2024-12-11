@@ -15,10 +15,6 @@ class Client {
         $this->connection = connect($this->url);
     }
 
-    public function json(mixed $json) : void {
-        $this->send(Nostr::encode($json));
-    }
-
     public function send(string $text): void {
         $this->connection->sendText($text);
     }

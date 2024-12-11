@@ -80,16 +80,6 @@ describe('agent', function (): void {
         $recipient_key = Pest\key_recipient();
 
         $expected_messages = [];
-        $alice->onJson(function (callable $stop, Message $message) use (&$expected_messages) {
-            $expected_message = array_shift($expected_messages);
-            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
-            $expected_message[1]($message->payload);
-
-            if (count($expected_messages) === 0) {
-                $stop();
-            }
-        });
-
         $expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
                 expect($payload[0])->toBe($subscriptionId);
 
@@ -121,7 +111,15 @@ describe('agent', function (): void {
             expect($payload[1])->toBeTrue();
         }];
         $alice->send($signed_message);
-        $alice->start(5);
+        $alice->start(5, function (callable $stop, Message $message) use (&$expected_messages) {
+            $expected_message = array_shift($expected_messages);
+            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+            $expected_message[1]($message->payload);
+
+            if (count($expected_messages) === 0) {
+                $stop();
+            }
+        });
 
         $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 

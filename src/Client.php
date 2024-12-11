@@ -11,9 +11,9 @@ use nostriphant\NIP01\Message;
 class Client {
 
     private bool $listening = false;
-    
+    private \Amp\Websocket\Client\WebsocketConnection $connection;
+
     public function __construct(readonly public string $url) {
-        $this->onJson(fn() => null);
         $this->connection = connect($this->url);
     }
     
@@ -30,29 +30,16 @@ class Client {
         $this->connection->sendText($text);
     }
 
-    public function onJson(callable $callback) {
-        $this->onjson_callback = $callback;
-    }
-   
-    private \Amp\Websocket\Client\WebsocketConnection $connection;
-    private \Closure $onjson_callback;
-    
     public function receive(int $timeout): ?\Amp\Websocket\WebsocketMessage {
         return $this->connection->receive($timeout > 0 ? new \Amp\TimeoutCancellation($timeout) : null);
     }
     
     
-    public function start(int $timeout): void {
+    public function start(int $timeout, callable $callback): void {
         $this->listening = true;
         while ($this->listening && ($message = $this->receive($timeout))) {
-            $buffer = $message->buffer();
-            $payload = Message::decode($buffer);
-            ($this->onjson_callback)([$this, 'ignore'], $payload);
+            ($callback)(fn() => $this->listening = false, Message::decode($message->buffer()));
         }
-    }
-
-    public function ignore(): void {
-        $this->listening = false;
     }
 
     public function stop(): void {

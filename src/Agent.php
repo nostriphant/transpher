@@ -5,7 +5,6 @@ use nostriphant\Transpher\Client;
 use Psr\Log\LoggerInterface;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
-use function \Amp\trapSignal;
 use nostriphant\Transpher\Nostr\Message\Factory;
 
 readonly class Agent {
@@ -14,7 +13,7 @@ readonly class Agent {
         
     }
     
-    public function __invoke(Client $client, LoggerInterface $log): void {
+    public function __invoke(Client $client, LoggerInterface $log): callable {
         $log->info('Client connecting to ' . $client->url);
         $log->info('Listening to relay...');
         $send = $client->start(function (\nostriphant\NIP01\Message $message) {
@@ -25,11 +24,6 @@ readonly class Agent {
         $log->info('Sending Private Direct Message event');
         $send(Factory::privateDirect($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url));
 
-        $signal = trapSignal([SIGINT, SIGTERM]);
-
-        $log->info(sprintf("Received signal %d, stopping Relay server", $signal));
-
-        $client->stop();
-        $log->info('Done');
+        return fn() => $client->stop();
     }
 }

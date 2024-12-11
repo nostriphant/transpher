@@ -20,14 +20,12 @@ use Amp\Http\Server\Router;
 use Amp\Http\Server\SocketHttpServer;
 use Amp\Socket;
 use Amp\Websocket\Server\Websocket;
-use function Amp\trapSignal;
 use nostriphant\Transpher\RequestHandler;
 use Amp\Http\Server\ErrorHandler;
 use Amp\Websocket\Server\Rfc6455Acceptor;
 
 class Relay implements WebsocketClientHandler {
 
-    private array $subscriptions = [];
     private WebsocketGateway $gateway;
     private Relay\Incoming $incoming;
     private ErrorHandler $errorHandler;
@@ -41,7 +39,7 @@ class Relay implements WebsocketClientHandler {
     }
 
 
-    public function __invoke(string $ip, string $port, int $max_connections_per_ip, LoggerInterface $log): void {
+    public function __invoke(string $ip, string $port, int $max_connections_per_ip, LoggerInterface $log): callable {
         $server = SocketHttpServer::createForDirectAccess($log, connectionLimitPerIp: $max_connections_per_ip);
         $server->expose(new Socket\InternetAddress($ip, $port));
 
@@ -55,12 +53,7 @@ class Relay implements WebsocketClientHandler {
 
         $server->start($router, $this->errorHandler);
 
-        // Await SIGINT or SIGTERM to be received.
-        $signal = trapSignal([SIGINT, SIGTERM]);
-
-        $log->info(sprintf("Received signal %d, stopping Relay server", $signal));
-
-        $server->stop();
+        return fn() => $server->stop();
     }
 
     #[\Override]

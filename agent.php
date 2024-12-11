@@ -11,4 +11,9 @@ $agent = new nostriphant\Transpher\Agent(
         new Bech32($_SERVER['RELAY_OWNER_NPUB'])
 );
 
-$agent(new Client(0, $_SERVER['RELAY_URL']), $log);
+$stop = $agent(new Client(0, $_SERVER['RELAY_URL']), $log);
+
+$signal = Amp\trapSignal([SIGINT, SIGTERM]);
+$log->info(sprintf("Received signal %d, stopping agent", $signal));
+
+$stop();

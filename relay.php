@@ -44,4 +44,9 @@ $relay = new \nostriphant\Transpher\Relay($events, $files_path);
 $args = explode(":", $_SERVER['argv'][1]);
 $args[] = $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000;
 $args[] = $logger;
-$relay(...$args);
+$stop = $relay(...$args);
+
+$signal = Amp\trapSignal([SIGINT, SIGTERM]);
+$logger->info(sprintf("Received signal %d, stopping Relay server", $signal));
+
+$stop();

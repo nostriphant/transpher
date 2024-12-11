@@ -4,8 +4,6 @@ namespace nostriphant\Transpher;
 
 use nostriphant\NIP01\Nostr;
 use function Amp\Websocket\Client\connect;
-use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\NIP01\Key;
 use nostriphant\NIP01\Message;
 
 class Client {

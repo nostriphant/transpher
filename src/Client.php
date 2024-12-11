@@ -17,7 +17,7 @@ class Client {
         $this->pipeline = \Amp\Pipeline\Pipeline::fromIterable($this->connection)->unordered();
     }
 
-    public function start(callable $callback): callable {
+    public function start(callable $callback): Relay\Sender {
         \Amp\async(function () use ($callback) {
             foreach ($this->connection as $message) {
                 $callback(Message::decode($message->buffer()));

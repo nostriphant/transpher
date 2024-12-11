@@ -101,7 +101,13 @@ describe('agent', function (): void {
         expect($request[2])->toBeArray();
         expect($request[2]['#p'])->toContain(Pest\pubkey_recipient());
 
-        $alice->sendSignedMessage(Factory::event(\Pest\key_recipient(), 1, 'Hello!'));
+        $signed_message = Factory::event(\Pest\key_recipient(), 1, 'Hello!');
+        $alice->expectNostr('OK', function (array $payload) use ($signed_message) {
+            expect($payload[0])->toBe($signed_message()[1]['id']);
+            expect($payload[1])->toBeTrue();
+        });
+        $alice->send($signed_message);
+        $alice->start();
 
         $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 

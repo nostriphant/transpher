@@ -49,6 +49,10 @@ namespace {
         $this->value->messages = [];
     });
 
+    expect()->extend('toHaveReceivedNothing', function () {
+        expect($this->value->messages)->toHaveCount(0);
+    });
+
     nostriphant\FunctionalAlternate\extend_pest('expect');
     nostriphant\NIP01\extend_pest('expect');
 }

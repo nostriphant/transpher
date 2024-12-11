@@ -22,15 +22,6 @@ class Client extends \nostriphant\Transpher\Client {
         });
     }
 
-    public function sendSignedMessage(Message $signed_message) {
-        $this->expectNostr('OK', function (array $payload) use ($signed_message) {
-            expect($payload[0])->toBe($signed_message()[1]['id']);
-                expect($payload[1])->toBeTrue();
-            });
-        $this->send($signed_message);
-        $this->start();
-    }
-    
     public function __destruct() {
         if (count($this->expected_messages) > 0) {
             throw new \Exception('Lingering expected messages: ' . var_Export($this->expected_messages, true));

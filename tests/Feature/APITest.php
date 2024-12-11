@@ -111,15 +111,13 @@ describe('agent', function (): void {
             expect($payload[1])->toBeTrue();
         }];
         $alice->send($signed_message);
-        $alice->start(function (callable $stop, Message $message) use (&$expected_messages) {
+        $alice->start(function (Message $message) use (&$expected_messages) {
             $expected_message = array_shift($expected_messages);
             expect($message->type)->toBe($expected_message[0], 'Message type checks out');
             $expected_message[1]($message->payload);
-
-            if (count($expected_messages) === 0) {
-                $stop();
-            }
         });
+
+        $agent();
 
         $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 
@@ -129,8 +127,6 @@ describe('agent', function (): void {
 
         $events(['#p' => [Pest\pubkey_recipient()]])(\nostriphant\Transpher\Stores\Results::copyTo($pdms));
         expect($pdms[0]->kind)->toBe(1059);
-
-        $agent();
     });
 });
 

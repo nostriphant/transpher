@@ -22,7 +22,11 @@ class Client {
     }
 
     public function start(callable $callback): void {
-        $this->pipeline->tap(fn($message) => $callback(fn() => $this->listening = false, Message::decode($message->buffer())));
+        \Amp\async(function () use ($callback) {
+            foreach ($this->connection as $message) {
+                $callback(Message::decode($message->buffer()));
+            }
+        });
     }
 
     public function stop(): void {

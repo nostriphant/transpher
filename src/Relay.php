@@ -52,9 +52,9 @@ class Relay implements WebsocketClientHandler {
         $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $log, $acceptor, $this)));
 
         $blossom = new Relay\Blossom($this->files);
-        $blossom_handler = new ClosureRequestHandler(fn(\Amp\Http\Server\Request $request) => $blossom($request));
-        $router->addRoute('HEAD', '/{file:\w+}', $blossom_handler);
-        $router->addRoute('GET', '/{file:\w+}', $blossom_handler);
+        $blossom_handler = new ClosureRequestHandler(fn(\Amp\Http\Server\Request $request) => new \Amp\Http\Server\Response(...$blossom(...$request->getAttribute(\Amp\Http\Server\Router::class))));
+        $routes = Relay\Blossom::ROUTES;
+        array_walk($routes, fn(string $route, string $method) => $router->addRoute($method, $route, $blossom_handler));
 
         $server->start($router, $this->errorHandler);
 

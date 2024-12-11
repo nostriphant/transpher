@@ -4,14 +4,23 @@ namespace nostriphant\Transpher\Relay;
 
 readonly class Blossom {
 
+    const ROUTES = [
+        'HEAD' => '/{hash:\w+}',
+        'GET' => '/{hash:\w+}'
+    ];
+
     public function __construct(private \nostriphant\Transpher\Files $files) {
         
     }
 
-    public function __invoke(\Amp\Http\Server\Request $request): \Amp\Http\Server\Response {
-        $args = $request->getAttribute(\Amp\Http\Server\Router::class);
-        $file = ($this->files)($args['file']);
-        $headers = ['Content-Type' => 'text/plain', 'Content-Length' => filesize($file->path)];
-        return new \Amp\Http\Server\Response(headers: $headers, body: $file());
+    public function __invoke(string $hash): array {
+        $file = call_user_func($this->files, $hash);
+        return [
+            'headers' => [
+                'Content-Type' => 'text/plain',
+                'Content-Length' => filesize($file->path)
+            ],
+            'body' => $file()
+        ];
     }
 }

@@ -9,11 +9,12 @@ class Client {
 
     private bool $listening = false;
     private \Amp\Websocket\Client\WebsocketConnection $connection;
-    private \Amp\Cancellation $cancellation;
+    private \Amp\Pipeline\Pipeline $pipeline;
 
     public function __construct(int $timeout, readonly public string $url) {
-        $this->cancellation = $timeout > 0 ? new \Amp\TimeoutCancellation($timeout) : new \Amp\NullCancellation();
-        $this->connection = connect($this->url);
+        $cancellation = $timeout > 0 ? new \Amp\TimeoutCancellation($timeout) : new \Amp\NullCancellation();
+        $this->connection = connect($this->url, $cancellation);
+        $this->pipeline = \Amp\Pipeline\Pipeline::fromIterable($this->connection)->unordered();
     }
 
     public function send(string $text): void {
@@ -21,10 +22,7 @@ class Client {
     }
 
     public function start(callable $callback): void {
-        $this->listening = true;
-        while ($this->listening && ($message = $this->connection->receive($this->cancellation))) {
-            ($callback)(fn() => $this->listening = false, Message::decode($message->buffer()));
-        }
+        $this->pipeline->tap(fn($message) => $callback(fn() => $this->listening = false, Message::decode($message->buffer())));
     }
 
     public function stop(): void {

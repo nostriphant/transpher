@@ -14,7 +14,7 @@ readonly class Agent {
         
     }
     
-    public function __invoke(Client $client, LoggerInterface $log): callable {
+    public function __invoke(Client $client, LoggerInterface $log): void {
         $log->info('Client connecting to ' . $client->url);
 
         $log->info('Running agent with public key ' . Bech32::npub(($this->key)(Key::public())));

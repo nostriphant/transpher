@@ -17,7 +17,7 @@ readonly class Agent {
         $this->relay_owner_npub = new Bech32($relay_owner_npub);
     }
     
-    public function __invoke(Client $client, LoggerInterface $log): callable {
+    public function __invoke(Client $client, LoggerInterface $log): AwaitSignal {
         $log->info('Client connecting to ' . $client->url);
         $log->info('Listening to relay...');
         $send = $client->start(function (\nostriphant\NIP01\Message $message) {
@@ -28,6 +28,6 @@ readonly class Agent {
         $log->info('Sending Private Direct Message event');
         $send(Factory::privateDirect($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url));
 
-        return fn() => $client->stop();
+        return new AwaitSignal(fn() => $client->stop());
     }
 }

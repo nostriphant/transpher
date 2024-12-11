@@ -9,9 +9,6 @@ $agent = new nostriphant\Transpher\Agent(
         $_SERVER['RELAY_OWNER_NPUB']
 );
 
-$stop = $agent(new Client(0, $_SERVER['RELAY_URL']), $log);
+$await = $agent(new Client(0, $_SERVER['RELAY_URL']), $log);
 
-$signal = Amp\trapSignal([SIGINT, SIGTERM]);
-$log->info(sprintf("Received signal %d, stopping agent", $signal));
-
-$stop();
+$await(fn(int $signal) => $log->info(sprintf("Received signal %d, stopping agent", $signal)));

@@ -11,4 +11,4 @@ $agent = new nostriphant\Transpher\Agent(
         new Bech32($_SERVER['RELAY_OWNER_NPUB'])
 );
 
-$agent(new Client($_SERVER['RELAY_URL']), $log);
+$agent(new Client(0, $_SERVER['RELAY_URL']), $log);

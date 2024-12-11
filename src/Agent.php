@@ -22,8 +22,8 @@ readonly class Agent {
         $client->send(Factory::privateDirect($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url));
 
         $log->info('Listening to relay...');
-        $client->start(0, function (callable $stop, \nostriphant\NIP01\Message $message) {
-
+        $client->start(function (callable $stop, \nostriphant\NIP01\Message $message) {
+            
         });
 
         $signal = trapSignal([SIGINT, SIGTERM]);

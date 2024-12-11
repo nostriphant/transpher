@@ -73,7 +73,7 @@ describe('agent', function (): void {
             'RELAY_URL' => $relay_url()
         ]);
         sleep(1); // hack to give agent some time to boot...
-        $alice = new \nostriphant\Transpher\Client($relay_url());
+        $alice = new \nostriphant\Transpher\Client(5, $relay_url());
         $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
 
         $subscriptionId = $subscription()[1];
@@ -111,7 +111,7 @@ describe('agent', function (): void {
             expect($payload[1])->toBeTrue();
         }];
         $alice->send($signed_message);
-        $alice->start(5, function (callable $stop, Message $message) use (&$expected_messages) {
+        $alice->start(function (callable $stop, Message $message) use (&$expected_messages) {
             $expected_message = array_shift($expected_messages);
             expect($message->type)->toBe($expected_message[0], 'Message type checks out');
             $expected_message[1]($message->payload);

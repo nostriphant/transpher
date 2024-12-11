@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher;
 
-use nostriphant\NIP01\Nostr;
 use function Amp\Websocket\Client\connect;
 use nostriphant\NIP01\Message;
 
@@ -10,8 +9,10 @@ class Client {
 
     private bool $listening = false;
     private \Amp\Websocket\Client\WebsocketConnection $connection;
+    private \Amp\Cancellation $cancellation;
 
-    public function __construct(readonly public string $url) {
+    public function __construct(int $timeout, readonly public string $url) {
+        $this->cancellation = $timeout > 0 ? new \Amp\TimeoutCancellation($timeout) : new \Amp\NullCancellation();
         $this->connection = connect($this->url);
     }
 
@@ -19,13 +20,9 @@ class Client {
         $this->connection->sendText($text);
     }
 
-    public function receive(int $timeout): ?\Amp\Websocket\WebsocketMessage {
-        return $this->connection->receive($timeout > 0 ? new \Amp\TimeoutCancellation($timeout) : null);
-    }
-
-    public function start(int $timeout, callable $callback): void {
+    public function start(callable $callback): void {
         $this->listening = true;
-        while ($this->listening && ($message = $this->receive($timeout))) {
+        while ($this->listening && ($message = $this->connection->receive($this->cancellation))) {
             ($callback)(fn() => $this->listening = false, Message::decode($message->buffer()));
         }
     }

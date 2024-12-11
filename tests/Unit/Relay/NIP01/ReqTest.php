@@ -2,10 +2,7 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\TranspherTests\Unit\Client;
 use function Pest\incoming;
-
-afterEach(fn() => Client::generic_client(true));
 
 describe('REQ', function () {
     it('replies NOTICE Invalid message on non-existing filters', function () {

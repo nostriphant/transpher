@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
 use function \Amp\trapSignal;
+use nostriphant\Transpher\Nostr\Message\Factory;
 
 readonly class Agent {
 
@@ -18,7 +19,7 @@ readonly class Agent {
 
         $log->info('Running agent with public key ' . Bech32::npub(($this->key)(Key::public())));
         $log->info('Sending Private Direct Message event');
-        $client->privateDirectMessage($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is {relay_url}');
+        $client->send(Factory::privateDirect($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url));
 
         $log->info('Listening to relay...');
         $client->start(0, function (callable $stop, \nostriphant\NIP01\Message $message) {

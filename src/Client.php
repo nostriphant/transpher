@@ -16,12 +16,7 @@ class Client {
     public function __construct(readonly public string $url) {
         $this->connection = connect($this->url);
     }
-    
-    public function privateDirectMessage(Key $sender, string $recipient_pubkey, string $message) {
-        $note = Factory::privateDirect($sender, $recipient_pubkey, str_replace('{relay_url}', $this->url, $message));
-        $this->send($note);
-    }
-    
+
     public function json(mixed $json) : void {
         $this->send(Nostr::encode($json));
     }
@@ -33,8 +28,7 @@ class Client {
     public function receive(int $timeout): ?\Amp\Websocket\WebsocketMessage {
         return $this->connection->receive($timeout > 0 ? new \Amp\TimeoutCancellation($timeout) : null);
     }
-    
-    
+
     public function start(int $timeout, callable $callback): void {
         $this->listening = true;
         while ($this->listening && ($message = $this->receive($timeout))) {

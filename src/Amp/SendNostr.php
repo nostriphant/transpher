@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher;
+namespace nostriphant\Transpher\Amp;
 
 use Amp\Websocket\WebsocketClient;
 use nostriphant\Transpher\Relay\Sender;

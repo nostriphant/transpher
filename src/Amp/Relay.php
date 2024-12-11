@@ -1,11 +1,9 @@
 <?php
 
-namespace nostriphant\Transpher;
-
+namespace nostriphant\Transpher\Amp;
 
 use function \Functional\each;
 use \Psr\Log\LoggerInterface;
-use \nostriphant\Transpher\Relay;
 use Amp\Websocket\Server\WebsocketClientHandler;
 use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\Server\WebsocketClientGateway;
@@ -13,28 +11,32 @@ use Amp\Websocket\WebsocketClient;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
 use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\Transpher\SendNostr;
 use nostriphant\NIP01\Message;
 use Amp\Http\Server\DefaultErrorHandler;
 use Amp\Http\Server\Router;
 use Amp\Http\Server\SocketHttpServer;
 use Amp\Socket;
 use Amp\Websocket\Server\Websocket;
-use nostriphant\Transpher\RequestHandler;
 use Amp\Http\Server\ErrorHandler;
 use Amp\Websocket\Server\Rfc6455Acceptor;
 use Amp\Http\Server\RequestHandler\ClosureRequestHandler;
 
+use nostriphant\Transpher\Files;
+use nostriphant\Transpher\Relay\Incoming;
+use nostriphant\Transpher\Relay\Store;
+use nostriphant\Transpher\Relay\Blossom;
+use nostriphant\Transpher\Relay\Subscriptions;
+
 class Relay implements WebsocketClientHandler {
 
     private WebsocketGateway $gateway;
-    private Relay\Incoming $incoming;
+    private Incoming $incoming;
     private ErrorHandler $errorHandler;
     private Files $files;
 
-    public function __construct(Relay\Store $events, string $files_path) {
-        $this->files = new \nostriphant\Transpher\Files($files_path, $events);
-        $this->incoming = new \nostriphant\Transpher\Relay\Incoming($events, $this->files);
+    public function __construct(Store $events, string $files_path) {
+        $this->files = new Files($files_path, $events);
+        $this->incoming = new Incoming($events, $this->files);
         $this->gateway = new WebsocketClientGateway();
         $this->errorHandler = new DefaultErrorHandler();
     }
@@ -51,9 +53,9 @@ class Relay implements WebsocketClientHandler {
         //);
         $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $log, $acceptor, $this)));
 
-        $blossom = new Relay\Blossom($this->files);
-        $blossom_handler = new ClosureRequestHandler(fn(\Amp\Http\Server\Request $request) => new \Amp\Http\Server\Response(...$blossom(...$request->getAttribute(\Amp\Http\Server\Router::class))));
-        $routes = Relay\Blossom::ROUTES;
+        $blossom = new Blossom($this->files);
+        $blossom_handler = new ClosureRequestHandler(fn(Request $request) => new Response(...$blossom(...$request->getAttribute(Router::class))));
+        $routes = Blossom::ROUTES;
         array_walk($routes, fn(string $route, string $method) => $router->addRoute($method, $route, $blossom_handler));
 
         $server->start($router, $this->errorHandler);
@@ -70,7 +72,7 @@ class Relay implements WebsocketClientHandler {
 
         $this->gateway->addClient($client);
         $wrapped_client = SendNostr::send($client);
-        $client_subscriptions = new Relay\Subscriptions($wrapped_client);
+        $client_subscriptions = new Subscriptions($wrapped_client);
         foreach ($client as $message) {
             $payload = (string) $message;
             try {

@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher;
+namespace nostriphant\Transpher\Amp;
 
 use function Amp\Websocket\Client\connect;
 use nostriphant\NIP01\Message;
@@ -14,7 +14,7 @@ class Client {
         $this->connection = connect($this->url, $cancellation);
     }
 
-    public function start(callable $callback): Relay\Sender {
+    public function start(callable $callback): \nostriphant\Transpher\Relay\Sender {
         \Amp\async(function () use ($callback) {
             foreach ($this->connection as $message) {
                 $callback(Message::decode($message->buffer()));

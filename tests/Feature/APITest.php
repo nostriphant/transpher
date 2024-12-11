@@ -73,7 +73,7 @@ describe('agent', function (): void {
             'RELAY_URL' => $relay_url()
         ]);
         sleep(1); // hack to give agent some time to boot...
-        $alice = new \nostriphant\Transpher\Client(5, $relay_url());
+        $alice = new \nostriphant\Transpher\Amp\Client(5, $relay_url());
         $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
 
         $subscriptionId = $subscription()[1];

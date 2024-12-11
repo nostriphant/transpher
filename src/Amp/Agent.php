@@ -1,7 +1,7 @@
 <?php
 
-namespace nostriphant\Transpher;
-use nostriphant\Transpher\Client;
+namespace nostriphant\Transpher\Amp;
+
 use Psr\Log\LoggerInterface;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;

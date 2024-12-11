@@ -39,7 +39,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }
 
-$relay = new \nostriphant\Transpher\Relay($events, $files_path);
+$relay = new \nostriphant\Transpher\Amp\Relay($events, $files_path);
 
 $args = explode(":", $_SERVER['argv'][1]);
 $args[] = $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000;

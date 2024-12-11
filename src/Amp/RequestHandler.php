@@ -1,6 +1,7 @@
 <?php
 
-namespace nostriphant\Transpher;
+namespace nostriphant\Transpher\Amp;
+
 use Amp\Http\HttpStatus;
 use Amp\Websocket\Server\Websocket;
 use Amp\Http\Server\Request;

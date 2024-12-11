@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher;
+namespace nostriphant\Transpher\Amp;
 
 readonly class AwaitSignal {
 

@@ -78,4 +78,18 @@ class Client extends \nostriphant\TranspherTests\Client {
     public function receive(int $timeout): ?WebsocketMessage {
         return !empty($this->messages) ? WebsocketMessage::fromText(array_shift($this->messages)) : null;
     }
+
+    static function expectedEvent(string $subscriptionId, string $content) {
+        return function (array $payload) use ($subscriptionId, $content) {
+            expect($payload[0])->toBe($subscriptionId);
+            expect($payload[1]['content'])->toBe($content);
+        };
+    }
+
+    public function expectNostrClosed(string $subscriptionId, string $expected_message) {
+        $this->expectNostr('CLOSED', function (array $payload) use ($subscriptionId, $expected_message) {
+            expect($payload[0])->toBe($subscriptionId);
+            expect($payload[1])->toBe($expected_message);
+        });
+    }
 }

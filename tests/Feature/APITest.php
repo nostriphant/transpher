@@ -6,6 +6,9 @@ use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Nostr;
+use nostriphant\NIP59\Gift;
+use nostriphant\NIP01\Event;
+use nostriphant\NIP59\Seal;
 
 beforeAll(function () {
     global $relay, $env, $data_dir, $relay_url;
@@ -71,7 +74,28 @@ describe('agent', function (): void {
         sleep(1); // hack to give agent some time to boot...
         $alice = new \nostriphant\TranspherTests\Client($relay_url());
         $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
-        $alice->expectNostrPrivateDirectMessage($subscription()[1], Pest\key_recipient(), 'Hello, I am your agent! The URL of your relay is ' . $relay_url());
+
+        $subscriptionId = $subscription()[1];
+        $recipient_key = Pest\key_recipient();
+
+        $alice->expectNostrEvent(function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
+            expect($payload[0])->toBe($subscriptionId);
+
+            $gift = $payload[1];
+            expect($gift['kind'])->toBe(1059);
+
+            $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
+            expect($seal->kind)->toBe(13);
+            expect($seal->pubkey)->toBeString();
+            expect($seal->content)->toBeString();
+
+            $private_message = Seal::open($recipient_key, $seal);
+            expect($private_message)->toHaveKey('id');
+            expect($private_message)->toHaveKey('content');
+            expect($private_message->content)->toBe('Hello, I am your agent! The URL of your relay is ' . $relay_url());
+        });
+        $alice->expectNostrEose($subscriptionId);
+
         $request = $subscription();
         $alice->json($request);
         expect($request[2])->toBeArray();

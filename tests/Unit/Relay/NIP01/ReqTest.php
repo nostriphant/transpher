@@ -70,7 +70,7 @@ describe('REQ', function () {
                 ["ids" => [$note2()[1]['id']]]
         );
 
-        $bob->expectNostrEvent($subscription()[1], 'Hello worldi!');
+        $bob->expectNostrEvent(Client::expectedEvent($subscription()[1], 'Hello worldi!'));
         $bob->expectNostrEose($subscription()[1]);
         $bob->json($subscription());
         $bob->start();
@@ -86,7 +86,7 @@ describe('REQ', function () {
                 ["authors" => [$alice_key(Key::public())]]
         );
 
-        $bob->expectNostrEvent($subscription()[1], 'Hello world!');
+        $bob->expectNostrEvent(Client::expectedEvent($subscription()[1], 'Hello world!'));
         $bob->expectNostrEose($subscription()[1]);
 
         $bob->json($subscription());
@@ -138,7 +138,7 @@ describe('REQ', function () {
         $subscription = Factory::subscribe(
                 ["authors" => [$alice_key(Key::public())]]
         );
-        $bob->expectNostrEvent($subscription()[1], 'Hello world!');
+        $bob->expectNostrEvent(Client::expectedEvent($subscription()[1], 'Hello world!'));
         $bob->expectNostrEose($subscription()[1]);
 
         $bob->json($subscription());
@@ -162,7 +162,7 @@ describe('REQ', function () {
                ["kinds" => [3]]
         );
 
-        $bob->expectNostrEvent($subscription()[1], 'Hello world!');
+        $bob->expectNostrEvent(Client::expectedEvent($subscription()[1], 'Hello world!'));
         $bob->expectNostrEose($subscription()[1]);
 
         $bob->json($subscription());
@@ -218,7 +218,7 @@ describe('REQ', function () {
                 ["authors" => [$alice_key(Key::public())]]
         );
 
-        $bob->expectNostrEvent($subscription()[1], 'Hello wirld!');
+        $bob->expectNostrEvent(Client::expectedEvent($subscription()[1], 'Hello wirld!'));
         $bob->expectNostrEose($subscription()[1]);
 
         $bob->json($subscription());

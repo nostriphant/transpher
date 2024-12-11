@@ -12,12 +12,6 @@ class Client extends \nostriphant\Transpher\Client {
 
     private $expected_messages = [];
 
-    public function expectNostrOK(string $eventId) {
-        $this->expected_messages[] = ['OK', function (array $payload) use ($eventId) {
-                expect($payload[0])->toBe($eventId);
-                expect($payload[1])->toBeTrue();
-            }];
-    }
     public function expectNostrEvent(string $subscriptionId, string $content) {
         $this->expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $content) {
                 expect($payload[0])->toBe($subscriptionId);
@@ -61,7 +55,11 @@ class Client extends \nostriphant\Transpher\Client {
     }
     
     public function sendSignedMessage(Message $signed_message) {
-        $this->expectNostrOK($signed_message()[1]['id']);
+        $eventId = $signed_message()[1]['id'];
+        $this->expected_messages[] = ['OK', function (array $payload) use ($eventId) {
+                expect($payload[0])->toBe($eventId);
+                expect($payload[1])->toBeTrue();
+            }];
         $this->send($signed_message);
         $this->start();
     }

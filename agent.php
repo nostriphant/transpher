@@ -1,6 +1,6 @@
 <?php
 
-$log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', 'DEBUG');
+$log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', $_SERVER['AGENT_LOG_LEVEL'] ?? 'INFO');
 
 use nostriphant\Transpher\Client;
 

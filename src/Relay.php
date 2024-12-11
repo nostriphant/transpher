@@ -23,6 +23,7 @@ use Amp\Websocket\Server\Websocket;
 use nostriphant\Transpher\RequestHandler;
 use Amp\Http\Server\ErrorHandler;
 use Amp\Websocket\Server\Rfc6455Acceptor;
+use Amp\Http\Server\RequestHandler\ClosureRequestHandler;
 
 class Relay implements WebsocketClientHandler {
 
@@ -49,7 +50,11 @@ class Relay implements WebsocketClientHandler {
         //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
         //);
         $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $log, $acceptor, $this)));
-        Relay\Blossom::connect($this->files, $router);
+
+        $blossom = new Relay\Blossom($this->files);
+        $blossom_handler = new ClosureRequestHandler(fn(\Amp\Http\Server\Request $request) => $blossom($request));
+        $router->addRoute('HEAD', '/{file:\w+}', $blossom_handler);
+        $router->addRoute('GET', '/{file:\w+}', $blossom_handler);
 
         $server->start($router, $this->errorHandler);
 

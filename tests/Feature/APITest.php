@@ -80,7 +80,7 @@ describe('agent', function (): void {
         $recipient_key = Pest\key_recipient();
 
         $expected_messages = [];
-        $alice->start(function (Message $message) use (&$expected_messages) {
+        $send = $alice->start(function (Message $message) use (&$expected_messages) {
             $expected_message = array_shift($expected_messages);
             expect($message->type)->toBe($expected_message[0], 'Message type checks out');
             $expected_message[1]($message->payload);
@@ -107,16 +107,16 @@ describe('agent', function (): void {
         }];
 
         $request = $subscription();
-        $alice->send($subscription);
+        $send($subscription);
         expect($request[2])->toBeArray();
         expect($request[2]['#p'])->toContain(Pest\pubkey_recipient());
 
         $signed_message = Factory::event(\Pest\key_recipient(), 1, 'Hello!');
         $expected_messages[] = ['OK', function (array $payload) use ($signed_message) {
                 expect($payload[0])->toBe($signed_message()[1]['id']);
-            expect($payload[1])->toBeTrue();
+                expect($payload[1])->toBeTrue();
         }];
-        $alice->send($signed_message);
+        $send($signed_message);
 
         $agent();
 

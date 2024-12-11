@@ -17,16 +17,16 @@ class Client {
         $this->pipeline = \Amp\Pipeline\Pipeline::fromIterable($this->connection)->unordered();
     }
 
-    public function send(string $text): void {
-        $this->connection->sendText($text);
-    }
-
-    public function start(callable $callback): void {
+    public function start(callable $callback): callable {
         \Amp\async(function () use ($callback) {
             foreach ($this->connection as $message) {
                 $callback(Message::decode($message->buffer()));
             }
         });
+
+        return function(Message $message) : void {
+            $this->connection->sendText($message);
+        };
     }
 
     public function stop(): void {

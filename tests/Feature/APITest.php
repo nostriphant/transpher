@@ -80,6 +80,12 @@ describe('agent', function (): void {
         $recipient_key = Pest\key_recipient();
 
         $expected_messages = [];
+        $alice->start(function (Message $message) use (&$expected_messages) {
+            $expected_message = array_shift($expected_messages);
+            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+            $expected_message[1]($message->payload);
+        });
+
         $expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
                 expect($payload[0])->toBe($subscriptionId);
 
@@ -111,11 +117,6 @@ describe('agent', function (): void {
             expect($payload[1])->toBeTrue();
         }];
         $alice->send($signed_message);
-        $alice->start(function (Message $message) use (&$expected_messages) {
-            $expected_message = array_shift($expected_messages);
-            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
-            $expected_message[1]($message->payload);
-        });
 
         $agent();
 

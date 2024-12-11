@@ -9,6 +9,7 @@ use nostriphant\NIP01\Nostr;
 use nostriphant\NIP59\Gift;
 use nostriphant\NIP01\Event;
 use nostriphant\NIP59\Seal;
+use nostriphant\NIP01\Message;
 
 beforeAll(function () {
     global $relay, $env, $data_dir, $relay_url;
@@ -72,14 +73,25 @@ describe('agent', function (): void {
             'RELAY_URL' => $relay_url()
         ]);
         sleep(1); // hack to give agent some time to boot...
-        $alice = new \nostriphant\TranspherTests\Client($relay_url());
+        $alice = new \nostriphant\Transpher\Client($relay_url());
         $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
 
         $subscriptionId = $subscription()[1];
         $recipient_key = Pest\key_recipient();
 
-        $alice->expectNostrEvent(function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
-            expect($payload[0])->toBe($subscriptionId);
+        $expected_messages = [];
+        $alice->onJson(function (callable $stop, Message $message) use (&$expected_messages) {
+            $expected_message = array_shift($expected_messages);
+            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+            $expected_message[1]($message->payload);
+
+            if (count($expected_messages) === 0) {
+                $stop();
+            }
+        });
+
+        $expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
+                expect($payload[0])->toBe($subscriptionId);
 
             $gift = $payload[1];
             expect($gift['kind'])->toBe(1059);
@@ -93,8 +105,10 @@ describe('agent', function (): void {
             expect($private_message)->toHaveKey('id');
             expect($private_message)->toHaveKey('content');
             expect($private_message->content)->toBe('Hello, I am your agent! The URL of your relay is ' . $relay_url());
-        });
-        $alice->expectNostrEose($subscriptionId);
+        }];
+        $expected_messages[] = ['EOSE', function (array $payload) use ($subscriptionId) {
+                expect($payload[0])->toBe($subscriptionId);
+        }];
 
         $request = $subscription();
         $alice->json($request);
@@ -102,12 +116,12 @@ describe('agent', function (): void {
         expect($request[2]['#p'])->toContain(Pest\pubkey_recipient());
 
         $signed_message = Factory::event(\Pest\key_recipient(), 1, 'Hello!');
-        $alice->expectNostr('OK', function (array $payload) use ($signed_message) {
-            expect($payload[0])->toBe($signed_message()[1]['id']);
+        $expected_messages[] = ['OK', function (array $payload) use ($signed_message) {
+                expect($payload[0])->toBe($signed_message()[1]['id']);
             expect($payload[1])->toBeTrue();
-        });
+        }];
         $alice->send($signed_message);
-        $alice->start();
+        $alice->start(5);
 
         $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 

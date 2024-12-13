@@ -21,7 +21,7 @@ readonly class Subscription {
             return new self(fn() => null);
         }
 
-        $filters = array_map(fn(array $filter_prototype) => $mapperClass::makeFilter(...Conditions::map($mapperClass, $filter_prototype)), $filter_prototypes);
+        $filters = array_map(fn(array $filter_prototype) => Conditions::map($mapperClass, $filter_prototype), $filter_prototypes);
         return new self($mapperClass::wrapFilters($filters));
     }
 }

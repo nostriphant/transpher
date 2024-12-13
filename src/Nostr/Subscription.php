@@ -22,7 +22,7 @@ readonly class Subscription {
         }
 
         $to = new Conditions($mapperClass);
-        $filters = $to->filters($filter_prototypes);
+        $filters = array_map(fn(array $filter_prototype) => $mapperClass::makeFilter(...$to($filter_prototype)), $filter_prototypes);
         return new self($mapperClass::wrapFilters($filters));
     }
 }

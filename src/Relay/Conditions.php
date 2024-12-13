@@ -13,7 +13,11 @@ readonly class Conditions {
         'until' => 'until'
     ];
 
-    static function map(string $mapperClass, array $filter_prototype): callable {
+    public function __construct(private string $mapperClass) {
+
+    }
+
+    public function __invoke(array $filter_prototype): callable {
         $conditions = [];
         foreach ($filter_prototype as $filter_field => $expected_value) {
             $method = $filter_field;
@@ -21,8 +25,8 @@ readonly class Conditions {
                 $method = self::MAP[$method];
             }
 
-            $conditions[$filter_field] = $mapperClass::$method($expected_value);
+            $conditions[$filter_field] = $this->mapperClass::$method($expected_value);
         }
-        return $mapperClass::makeFilter(...$conditions);
+        return $this->mapperClass::makeFilter(...$conditions);
     }
 }

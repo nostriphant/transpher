@@ -9,9 +9,6 @@ class TransformSubscription {
 
     static function transformToSQL3StatementFactory(array $filter_prototypes, string ...$fields): Statement {
         $subscription = Subscription::make($filter_prototypes, Condition::class);
-
-        $to = new Conditions(Condition::class);
-        $filters = $to->filters($filter_prototypes);
         $query_prototype = $subscription([
             'where' => [],
             'limit' => null

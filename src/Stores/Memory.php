@@ -4,7 +4,6 @@
 namespace nostriphant\Transpher\Stores;
 
 use nostriphant\Transpher\Nostr\Subscription;
-use function Functional\some;
 use nostriphant\NIP01\Event;
 
 class Memory implements \nostriphant\Transpher\Relay\Store {
@@ -20,10 +19,9 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
         $to = new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class);
-        $filters = $to->filters($filter_prototypes);
-
-        return new Results(function (callable $callback) use ($filters) {
-                    array_reduce(array_filter($this->events, fn(Event $event) => some(array_map(fn(callable $filter) => $filter($event), $filters))), fn($carry, Event $event) => $callback($event), 0);
+        $subscription = Subscription::make($filter_prototypes, $to);
+        return new Results(function (callable $callback) use ($subscription) {
+                    array_reduce(array_filter($this->events, $subscription), fn($carry, Event $event) => $callback($event), 0);
                 });
     }
 

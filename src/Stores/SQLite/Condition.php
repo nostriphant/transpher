@@ -49,7 +49,7 @@ readonly class Condition {
     }
 
     static function wrapFilters(array $filters): callable {
-        return fn(array $query): array => array_reduce($filters, fn(array $query_prototype, callable $filter) => $filter($query_prototype), $query);
+        return fn(array $query): array => array_reduce($filters, fn(array $query, callable $filter) => $filter($query), $query);
     }
 
     static function makeFilter(self ...$conditions) {

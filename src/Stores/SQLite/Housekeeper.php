@@ -11,7 +11,7 @@ class Housekeeper {
         if (count(array_filter($whitelist_prototypes)) === 0) {
             return;
         }
-        $select_statement = TransformSubscription::transformToSQL3StatementFactory($whitelist_prototypes, "event.id");
+        $select_statement = TransformSubscription::transformToSQL3StatementFactory(new \nostriphant\Transpher\Nostr\Subscription($whitelist_prototypes, Condition::class), "event.id");
         $statement = Statement::nest("DELETE FROM event WHERE event.id NOT IN (", $select_statement, ") RETURNING *");
         $statement($database);
     }

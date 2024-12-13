@@ -6,8 +6,7 @@ use nostriphant\Transpher\Nostr\Subscription;
 
 class TransformSubscription {
 
-    static function transformToSQL3StatementFactory(array $filter_prototypes, string ...$fields): Statement {
-        $subscription = new Subscription($filter_prototypes, Condition::class);
+    static function transformToSQL3StatementFactory(Subscription $subscription, string ...$fields): Statement {
         $query_prototype = $subscription([
             'where' => [],
             'limit' => null

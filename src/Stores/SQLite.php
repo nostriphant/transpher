@@ -26,7 +26,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory($filter_prototypes, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
+        $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory(new Subscription($filter_prototypes, SQLite\Condition::class), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
         return $statement($this->database);
     }
 

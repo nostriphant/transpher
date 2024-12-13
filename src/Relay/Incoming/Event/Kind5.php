@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
-use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\FunctionalAlternate\Alternate;
 use nostriphant\NIP01\Event;
 

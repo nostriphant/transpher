@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
-use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 
 class Addressable {

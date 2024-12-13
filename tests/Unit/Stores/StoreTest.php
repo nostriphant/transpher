@@ -1,5 +1,4 @@
 <?php
-use nostriphant\Transpher\Nostr\Subscription;
 
 it('checks if an event exists', function (callable $factory) {
     list($store, ) = $factory([], \nostriphant\NIP01\Event::__set_state([

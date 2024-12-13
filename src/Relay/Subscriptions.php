@@ -37,8 +37,8 @@ class Subscriptions {
         yield Factory::accept($event->id);
     }
 
-    static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, Subscription $filters): void {
-        $subscriptions[$subscription_id] = if_else($filters, fn() => $relay, fn() => false);
+    static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, array $filter_prototypes): void {
+        $subscriptions[$subscription_id] = if_else(new Subscription($filter_prototypes), fn() => $relay, fn() => false);
     }
 
     static function unsubscribe(array &$subscriptions, string $subscription_id): void {

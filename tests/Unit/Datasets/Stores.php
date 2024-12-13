@@ -1,7 +1,5 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Subscription;
-
 dataset('stores', [
     'disk' => function (array $whitelist_prototype, nostriphant\NIP01\Event ...$events): array {
         $transpher_store = ROOT_DIR . '/data/disktest_' . uniqid();

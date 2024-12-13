@@ -15,12 +15,12 @@ class Accepted {
 
     }
 
-    public function __invoke(string $subscription_id, \nostriphant\Transpher\Nostr\Subscription $filters): mixed {
+    public function __invoke(string $subscription_id, array $filter_prototypes): mixed {
         yield from ($this->limits)($this->subscriptions)(
                         rejected: fn(string $reason) => yield Factory::closed($subscription_id, $reason),
-                        accepted: function () use ($subscription_id, $filters) {
-                            ($this->subscriptions)($subscription_id, $filters);
-                            ($this->events)(...$filters->filter_prototypes)(\nostriphant\Transpher\Stores\Results::copyTo($events));
+                        accepted: function () use ($subscription_id, $filter_prototypes) {
+                            ($this->subscriptions)($subscription_id, $filter_prototypes);
+                            ($this->events)(...$filter_prototypes)(\nostriphant\Transpher\Stores\Results::copyTo($events));
                             yield from array_map(partial_left([Factory::class, 'requestedEvent'], $subscription_id), $events);
                             yield Factory::eose($subscription_id);
         });

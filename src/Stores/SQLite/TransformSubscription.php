@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Stores\SQLite;
 
-use nostriphant\Transpher\Relay\Conditions;
 use nostriphant\Transpher\Nostr\Subscription;
 
 class TransformSubscription {

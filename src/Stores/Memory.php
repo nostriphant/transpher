@@ -14,7 +14,7 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
     private Subscription $whitelist;
 
     public function __construct(array $events, array $whitelist_prototypes) {
-        $this->whitelist = new Subscription($whitelist_prototypes);
+        $this->whitelist = Subscription::make($whitelist_prototypes, new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class));
         $this->events = array_filter($events, fn(Event $event) => ($this->whitelist)($event) !== false);
     }
 

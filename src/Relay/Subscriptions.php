@@ -38,7 +38,7 @@ class Subscriptions {
     }
 
     static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, array $filter_prototypes): void {
-        $subscriptions[$subscription_id] = if_else(new Subscription($filter_prototypes), fn() => $relay, fn() => false);
+        $subscriptions[$subscription_id] = if_else(Subscription::make($filter_prototypes, new Conditions(\nostriphant\Transpher\Relay\Condition::class)), fn() => $relay, fn() => false);
     }
 
     static function unsubscribe(array &$subscriptions, string $subscription_id): void {

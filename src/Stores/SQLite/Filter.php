@@ -2,8 +2,6 @@
 
 namespace nostriphant\Transpher\Stores\SQLite;
 
-use function Functional\true;
-
 readonly class Filter {
 
     public array $conditions;
@@ -13,9 +11,7 @@ readonly class Filter {
     }
 
     public function __invoke(array $query): array {
-        return array_reduce($this->conditions, function (array $query, callable $subscription_filter) {
-            return $subscription_filter($query);
-        }, $query);
+        return array_reduce($this->conditions, fn(array $query, Condition $condition) => $condition($query), $query);
     }
 
     static function fromPrototype(Condition ...$conditions) {

@@ -3,7 +3,6 @@
 namespace nostriphant\Transpher\Nostr\Subscription;
 
 use nostriphant\Transpher\Relay\Condition;
-use function Functional\true;
 use nostriphant\NIP01\Event;
 
 readonly class Filter {
@@ -15,7 +14,7 @@ readonly class Filter {
     }
 
     public function __invoke(Event $event): bool {
-        return empty($this->conditions) || true(array_map(fn(callable $subscription_filter) => $subscription_filter($event), $this->conditions));
+        return array_reduce($this->conditions, fn(bool $result, Condition $condition) => $result && $condition($event), true);
     }
 
     static function fromPrototype(Condition ...$conditions) {

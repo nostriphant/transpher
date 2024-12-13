@@ -50,6 +50,10 @@ readonly class Condition {
         return self::tag(ltrim($name, '#'), ...$arguments);
     }
 
+    static function wrapFilters(array $filters): callable {
+        return fn(Event $event): bool => array_reduce($filters, fn(bool $result, callable $filter) => $result || $filter($event), false);
+    }
+
     static function makeFilter(self ...$conditions) {
         return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true);
     }

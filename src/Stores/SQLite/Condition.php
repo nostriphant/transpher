@@ -48,6 +48,10 @@ readonly class Condition {
         return self::tag(ltrim($name, '#'), ...$arguments);
     }
 
+    static function wrapFilters(array $filters): callable {
+        return fn(array $query): array => array_reduce($filters, fn(array $query_prototype, callable $filter) => $filter($query_prototype), $query);
+    }
+
     static function makeFilter(self ...$conditions) {
         return fn(array $query): array => array_reduce($conditions, fn(array $query, self $condition) => $condition($query), $query);
     }

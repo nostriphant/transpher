@@ -12,7 +12,7 @@ class TransformSubscription {
 
         $to = new Conditions(Condition::class);
         $filters = $to->filters($filter_prototypes);
-        $query_prototype = array_reduce($filters, fn(array $query_prototype, callable $filter) => $filter($query_prototype), [
+        $query_prototype = $subscription([
             'where' => [],
             'limit' => null
         ]);

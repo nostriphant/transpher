@@ -65,6 +65,10 @@ dataset('stores', [
         $store = new \nostriphant\Transpher\Stores\SQLite($sqlite, [$whitelist_prototype]);
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
+        call_user_func($store->housekeeper);
+
+        expect($sqlite->lastErrorMsg())->toBe('not an error');
+
         return [$store, $created_events];
     },
     'memory' => function (array $whitelist_prototype, nostriphant\NIP01\Event ...$events): array {

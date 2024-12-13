@@ -2,13 +2,15 @@
 
 namespace nostriphant\Transpher\Stores\SQLite;
 
-class Housekeeper {
-    public function __construct() {
+readonly class Housekeeper implements \nostriphant\Transpher\Stores\Housekeeper {
+
+    public function __construct(private \SQLite3 $database, private array $whitelist_prototypes) {
         
     }
 
-    public function __invoke(array $whitelist_prototypes): Statement {
-        $select_statement = TransformSubscription::transformToSQL3StatementFactory(new \nostriphant\Transpher\Nostr\Subscription($whitelist_prototypes, Condition::class), "event.id");
-        return Statement::nest("DELETE FROM event WHERE event.id NOT IN (", $select_statement, ") RETURNING *");
+    public function __invoke(): void {
+        $select_statement = TransformSubscription::transformToSQL3StatementFactory(new \nostriphant\Transpher\Nostr\Subscription($this->whitelist_prototypes, Condition::class), "event.id");
+        $statement = Statement::nest("DELETE FROM event WHERE event.id NOT IN (", $select_statement, ") RETURNING *");
+        $statement($this->database);
     }
 }

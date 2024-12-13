@@ -7,15 +7,15 @@ use nostriphant\NIP01\Event;
 
 readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
-    private Subscription $whitelist;
+    public \nostriphant\Transpher\Stores\Housekeeper $housekeeper;
 
     public function __construct(private \SQLite3 $database, private array $whitelist_prototypes) {
         $structure = new SQLite\Structure();
         $structure($database);
-
         if (Subscription::disabled($whitelist_prototypes) === false) {
-            $housekeeper = new SQLite\Housekeeper();
-            $housekeeper($whitelist_prototypes)($database);
+            $this->housekeeper = new SQLite\Housekeeper($database, $whitelist_prototypes);
+        } else {
+            $this->housekeeper = new NullHousekeeper();
         }
     }
 

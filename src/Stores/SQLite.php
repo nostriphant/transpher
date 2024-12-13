@@ -9,8 +9,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     private Subscription $whitelist;
 
-    public function __construct(private \SQLite3 $database, array $whitelist_prototypes) {
-        $this->whitelist = new Subscription($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
+    public function __construct(private \SQLite3 $database, private array $whitelist_prototypes) {
         $structure = new SQLite\Structure();
         $structure($database);
         $housekeeper = new SQLite\Housekeeper();
@@ -48,7 +47,10 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     public function offsetSet(mixed $offset, mixed $value): void {
         if (!$value instanceof Event) {
             return;
-        } elseif (call_user_func($this->whitelist, $value) === false) {
+        }
+
+        $whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
+        if (call_user_func($whitelist, $value) === false) {
             return;
         }
 

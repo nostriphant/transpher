@@ -17,16 +17,20 @@ readonly class Conditions {
 
     }
 
-    public function __invoke(array $filter_prototype): callable {
-        $conditions = [];
-        foreach ($filter_prototype as $filter_field => $expected_value) {
-            $method = $filter_field;
-            if (isset(self::MAP[$method])) {
-                $method = self::MAP[$method];
-            }
+    public function __invoke(array $filter_prototypes): callable {
+        $filters = [];
+        foreach ($filter_prototypes as $filter_prototype) {
+            $conditions = [];
+            foreach ($filter_prototype as $filter_field => $expected_value) {
+                $method = $filter_field;
+                if (isset(self::MAP[$method])) {
+                    $method = self::MAP[$method];
+                }
 
-            $conditions[$filter_field] = $this->mapperClass::$method($expected_value);
+                $conditions[$filter_field] = $this->mapperClass::$method($expected_value);
+            }
+            $filters[] = $this->mapperClass::makeFilter(...$conditions);
         }
-        return $this->mapperClass::makeFilter(...$conditions);
+        return $this->mapperClass::wrapFilters($filters);
     }
 }

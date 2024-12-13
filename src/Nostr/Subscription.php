@@ -22,7 +22,6 @@ readonly class Subscription {
         }
 
         $mapper = new Conditions($mapperClass);
-        $filters = array_map($mapper, $filter_prototypes);
-        return new self($mapperClass::wrapFilters($filters));
+        return new self($mapper($filter_prototypes));
     }
 }

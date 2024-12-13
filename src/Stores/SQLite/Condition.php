@@ -47,4 +47,8 @@ readonly class Condition {
     static function __callStatic(string $name, array $arguments): self {
         return self::tag(ltrim($name, '#'), ...$arguments);
     }
+
+    static function makeFilter(self ...$conditions) {
+        return fn(array $query): array => array_reduce($conditions, fn(array $query, self $condition) => $condition($query), $query);
+    }
 }

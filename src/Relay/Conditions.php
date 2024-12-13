@@ -29,4 +29,8 @@ readonly class Conditions {
         }
         return $conditions;
     }
+
+    public function filters(array $filter_prototypes): array {
+        return array_map(fn(array $filter_prototype) => $this->mapperClass::makeFilter(...$this($filter_prototype)), $filter_prototypes);
+    }
 }

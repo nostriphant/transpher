@@ -9,16 +9,15 @@ readonly class Subscription {
 
     private \Closure $test;
 
-    public function __construct(array $filter_prototypes, string $mapperClass) {
-        if (self::disabled($filter_prototypes)) {
-            $this->test = fn() => null;
-        } else {
-            $mapper = new Conditions($mapperClass);
-            $this->test = $mapper($filter_prototypes);
-        }
+    public function __construct(private array $filter_prototypes, string $mapperClass) {
+        $mapper = new Conditions($mapperClass);
+        $this->test = $mapper($filter_prototypes);
     }
     
     public function __invoke() {
+        if (self::disabled($this->filter_prototypes)) {
+            return;
+        }
         return call_user_func_array($this->test, func_get_args());
     }
 

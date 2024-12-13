@@ -1,15 +1,12 @@
 <?php
 namespace nostriphant\Transpher\Nostr;
 
-use nostriphant\Transpher\Relay\Conditions;
-
 readonly class Subscription {
 
     private \Closure $test;
 
     public function __construct(private array $filter_prototypes, string $mapperClass) {
-        $mapper = new Conditions($mapperClass);
-        $this->test = $mapper($filter_prototypes);
+        $this->test = $mapperClass::makeConditions()($filter_prototypes);
     }
     
     public function __invoke() {

@@ -1,7 +1,5 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Subscription;
-
 it('has a maximum number of subscriptions per connected client.', function () {
     $subscriptions = \Pest\subscriptions();
 

@@ -17,7 +17,7 @@ class Disk implements Store {
     public function __construct(private string $store, array $whitelist_prototypes) {
         $events = [];
         is_dir($store) || mkdir($store);
-        $this->whitelist = Subscription::make($whitelist_prototypes, new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class));
+        $this->whitelist = Subscription::make($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
         self::walk_store($store, function (Event $event) use (&$events) {
             if (call_user_func($this->whitelist, $event) === false) {
                 unlink(self::file($this->store, $event->id));

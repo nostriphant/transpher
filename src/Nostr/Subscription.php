@@ -15,7 +15,8 @@ readonly class Subscription {
         return $this->disabled ? null : array_reduce($this->filters, fn(bool $result, callable $filter) => $result || $filter($event), false);
     }
 
-    static function make(array $filter_prototypes, Conditions $to): self {
+    static function make(array $filter_prototypes, string $mapperClass): self {
+        $to = new Conditions($mapperClass);
         $disabled = empty($filter_prototypes) || array_reduce($filter_prototypes, fn(bool $disabled, array $filter_prototype) => empty($filter_prototype), true);
         $filters = $to->filters($filter_prototypes);
         return new self($disabled, $filters);

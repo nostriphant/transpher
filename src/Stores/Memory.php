@@ -12,14 +12,13 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
     private Subscription $whitelist;
 
     public function __construct(array $events, array $whitelist_prototypes) {
-        $this->whitelist = Subscription::make($whitelist_prototypes, new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class));
+        $this->whitelist = Subscription::make($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
         $this->events = array_filter($events, fn(Event $event) => ($this->whitelist)($event) !== false);
     }
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        $to = new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class);
-        $subscription = Subscription::make($filter_prototypes, $to);
+        $subscription = Subscription::make($filter_prototypes, \nostriphant\Transpher\Relay\Condition::class);
         return new Results(function (callable $callback) use ($subscription) {
                     array_reduce(array_filter($this->events, $subscription), fn($carry, Event $event) => $callback($event), 0);
                 });

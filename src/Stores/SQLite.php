@@ -10,7 +10,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     private Subscription $whitelist;
 
     public function __construct(private \SQLite3 $database, array $whitelist_prototypes) {
-        $this->whitelist = Subscription::make($whitelist_prototypes, new \nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class));
+        $this->whitelist = Subscription::make($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
         $structure = new SQLite\Structure();
         $structure($database);
         $housekeeper = new SQLite\Housekeeper();

@@ -4,7 +4,7 @@ use nostriphant\Transpher\Nostr\Subscription;
 use function \Pest\event;
 
 function subscription(array $filter_prototypes) {
-    return Subscription::make($filter_prototypes, new nostriphant\Transpher\Relay\Conditions(\nostriphant\Transpher\Relay\Condition::class));
+    return Subscription::make($filter_prototypes, \nostriphant\Transpher\Relay\Condition::class);
 }
 
 it('filters p-tags', function() {

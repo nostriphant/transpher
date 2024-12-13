@@ -50,8 +50,9 @@ readonly class Condition {
         return self::tag(ltrim($name, '#'), ...$arguments);
     }
 
-    static function makeConditions(): Conditions {
-        return new Conditions(__CLASS__);
+    static function makeConditions(array $filter_prototypes): callable {
+        $mapper = new \nostriphant\Transpher\Relay\Conditions(__CLASS__);
+        return $mapper($filter_prototypes);
     }
 
     static function wrapFilters(array $filters): callable {

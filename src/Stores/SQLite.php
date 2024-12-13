@@ -12,8 +12,11 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     public function __construct(private \SQLite3 $database, private array $whitelist_prototypes) {
         $structure = new SQLite\Structure();
         $structure($database);
-        $housekeeper = new SQLite\Housekeeper();
-        $housekeeper($database, $whitelist_prototypes);
+
+        if (Subscription::disabled($whitelist_prototypes) === false) {
+            $housekeeper = new SQLite\Housekeeper();
+            $housekeeper($whitelist_prototypes)($database);
+        }
     }
 
     private function queryEvent(string $event_id): Results {

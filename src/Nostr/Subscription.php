@@ -1,9 +1,7 @@
 <?php
 namespace nostriphant\Transpher\Nostr;
 
-use function Functional\some;
 use nostriphant\Transpher\Relay\Conditions;
-use nostriphant\NIP01\Event;
 
 readonly class Subscription {
 

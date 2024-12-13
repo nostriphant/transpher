@@ -2,8 +2,6 @@
 
 namespace nostriphant\Transpher\Stores\SQLite\Condition;
 
-use nostriphant\NIP01\Event;
-
 readonly class Since implements Test {
 
     public function __construct(private string $event_field, private mixed $expected_value) {

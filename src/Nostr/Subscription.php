@@ -12,7 +12,7 @@ readonly class Subscription {
     }
     
     public function __invoke(Event $event): ?bool {
-        return $this->disabled ? null : some(array_map(fn(callable $filter) => $filter($event), $this->filters));
+        return $this->disabled ? null : array_reduce($this->filters, fn(bool $result, callable $filter) => $result || $filter($event), false);
     }
 
     static function make(array $filter_prototypes, Conditions $to): self {

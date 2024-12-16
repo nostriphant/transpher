@@ -76,13 +76,13 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     }
 
     #[\Override]
-    public function offsetSet(mixed $offset, mixed $value): void {
-        if (!$value instanceof Event) {
+    public function offsetSet(mixed $offset, mixed $event): void {
+        if (!$event instanceof Event) {
             return;
         }
 
         $whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
-        if (call_user_func($whitelist, $value) === false) {
+        if (call_user_func($whitelist, $event) === false) {
             return;
         }
 
@@ -94,16 +94,15 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
                 . ":content,"
                 . ":sig"
                 . ")");
-        $event = get_object_vars($value);
         $tags = [];
-        foreach ($event as $property => $value) {
+        foreach (get_object_vars($event) as $property => $value) {
             if ($property === 'tags') {
                 foreach ($value as $event_tag) {
                     $tag = [
                         'query' => $this->database->prepare("INSERT INTO tag (event_id, name) VALUES (:event_id, :name)"),
                         'values' => []
                     ];
-                    $tag['query']->bindValue('event_id', $event['id']);
+                    $tag['query']->bindValue('event_id', $event->id);
                     $tag['query']->bindValue('name', array_shift($event_tag));
 
                     foreach ($event_tag as $position => $event_tag_value) {
@@ -134,7 +133,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         }
 
         $update = $this->database->prepare("UPDATE event SET tags_json = (SELECT GROUP_CONCAT(event_tag_json.json,', ') FROM event_tag_json WHERE event_tag_json.event_id = event.id) WHERE event.id = ?");
-        $update->bindValue(1, $event['id']);
+        $update->bindValue(1, $event->id);
         $update->execute();
     }
 

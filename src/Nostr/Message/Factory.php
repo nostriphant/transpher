@@ -15,23 +15,23 @@ class Factory {
     }
 
     static function eventAt(Key $sender_key, int $kind, string $content, int $at, array ...$tags): Message {
-        return Message::event(get_object_vars((new Rumor(
-                                        pubkey: $sender_key(Key::public()),
+        return Message::event((new Rumor(
+                                pubkey: $sender_key(Key::public()),
                                         created_at: $at,
                                         kind: $kind,
                                         content: $content,
                                         tags: $tags
-                                ))($sender_key)));
+                                ))($sender_key));
     }
 
     static function privateDirect(Key $private_key, string $recipient_pubkey, string $message): Message {
-        return Message::event(get_object_vars(Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, new Rumor(
-                                                        pubkey: $private_key(Key::public()),
+        return Message::event(Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, new Rumor(
+                                                pubkey: $private_key(Key::public()),
                                                         created_at: time(),
                                             kind: 14,
                                             content: $message,
                                             tags: [['p', $recipient_pubkey]]
-                                        )))));
+                                        ))));
     }
 
     static function subscribe(array ...$filters): Message {

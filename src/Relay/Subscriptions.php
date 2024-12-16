@@ -30,7 +30,7 @@ class Subscriptions {
             if ($to === false) {
                 return false;
             }
-            $to(Message::event($subscriptionId, get_object_vars($event)));
+            $to(Message::event($subscriptionId, $event));
             $to(Message::eose($subscriptionId));
             return true;
         });

@@ -31,6 +31,12 @@ if (isset($_SERVER['RELAY_DATA'])) {
                 }) . ' events migrated.');
     }
 
+
+    if (\nostriphant\Transpher\Nostr\Subscription::disabled($whitelist_prototypes) === false) {
+        $housekeeper = \nostriphant\Transpher\Stores\generate_housekeeper($events);
+        $housekeeper();
+    }
+
     $files_path = $data_dir . '/files';
 } else {
     $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';

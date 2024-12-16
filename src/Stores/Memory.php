@@ -9,16 +9,9 @@ use nostriphant\NIP01\Event;
 final class Memory implements \nostriphant\Transpher\Relay\Store {
 
     readonly public Subscription $whitelist;
-    readonly public Housekeeper $housekeeper;
 
     public function __construct(private array $events, array $whitelist_prototypes) {
         $this->whitelist = new Subscription($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
-        if (Subscription::disabled($whitelist_prototypes) === false) {
-            $this->housekeeper = new Memory\Housekeeper($this);
-        } else {
-            $this->housekeeper = new NullHousekeeper();
-        }
-        call_user_func($this->housekeeper);
     }
 
     #[\Override]

@@ -13,16 +13,9 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         offsetUnset As MW_offsetUnset;
     }
 
-    public \nostriphant\Transpher\Stores\Housekeeper $housekeeper;
-
     public function __construct(public \SQLite3 $database, public array $whitelist_prototypes) {
         $structure = new SQLite\Structure();
         $structure($database);
-        if (Subscription::disabled($whitelist_prototypes) === false) {
-            $this->housekeeper = new SQLite\Housekeeper($this);
-        } else {
-            $this->housekeeper = new NullHousekeeper();
-        }
 
         $this->MW_Construct(iterator_to_array($this()), $whitelist_prototypes);
     }

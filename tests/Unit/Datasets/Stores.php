@@ -14,7 +14,14 @@ dataset('stores', [
             $created_events[$event->id] = fn(bool $is_deleted) => expect(is_file($transpher_store . DIRECTORY_SEPARATOR . $event->id . '.php'))->toBe(!$is_deleted);
         }
 
-        return [new \nostriphant\Transpher\Stores\Disk($transpher_store, [$whitelist_prototype]), $created_events];
+        $store = new \nostriphant\Transpher\Stores\Disk($transpher_store, [$whitelist_prototype]);
+
+        if (\nostriphant\Transpher\Nostr\Subscription::disabled([$whitelist_prototype]) === false) {
+            $housekeeper = \nostriphant\Transpher\Stores\generate_housekeeper($store);
+            $housekeeper();
+        }
+
+        return [$store, $created_events];
     },
     'sqlite' => function (array $whitelist_prototype, nostriphant\NIP01\Event ...$events): array {
         $db_file = tempnam(sys_get_temp_dir(), 'test') . '.sqlite';
@@ -65,7 +72,10 @@ dataset('stores', [
         $store = new \nostriphant\Transpher\Stores\SQLite($sqlite, [$whitelist_prototype]);
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
-        call_user_func($store->housekeeper);
+        if (\nostriphant\Transpher\Nostr\Subscription::disabled([$whitelist_prototype]) === false) {
+            $housekeeper = \nostriphant\Transpher\Stores\generate_housekeeper($store);
+            $housekeeper();
+        }
 
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
@@ -78,6 +88,11 @@ dataset('stores', [
         }
 
         $store = new \nostriphant\Transpher\Stores\Memory($created_events, [$whitelist_prototype]);
+
+        if (\nostriphant\Transpher\Nostr\Subscription::disabled([$whitelist_prototype]) === false) {
+            $housekeeper = \nostriphant\Transpher\Stores\generate_housekeeper($store);
+            $housekeeper();
+        }
 
         return [$store, array_map(fn(nostriphant\NIP01\Event $event) => fn(bool $is_deleted) => expect(isset($store[$event->id]))->toBe($is_deleted === false), $created_events)];
     }

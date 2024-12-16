@@ -16,20 +16,15 @@ class Disk implements Store {
 
     const NIP01_EVENT_SPLITOFF_TIME = 1732125327;
 
-    private Subscription $whitelist;
+    public Subscription $whitelist;
 
-    public function __construct(private string $store, array $whitelist_prototypes) {
+    public function __construct(public string $store, array $whitelist_prototypes) {
         $events = [];
         is_dir($store) || mkdir($store);
         $this->whitelist = new Subscription($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
+
         self::walk_store($store, function (Event $event) use (&$events) {
-            if (call_user_func($this->whitelist, $event) === false) {
-                unlink(self::file($this->store, $event->id));
-                return false;
-            } else {
-                $events[$event->id] = $event;
-                return true;
-            }
+            $events[$event->id] = $event;
         });
 
         $this->MW_Construct($events, $whitelist_prototypes);

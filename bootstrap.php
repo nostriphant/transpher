@@ -1,6 +1,6 @@
 <?php
-
-require_once __DIR__ . '/vendor/autoload.php';
+namespace {
+    require_once __DIR__ . '/vendor/autoload.php';
 
 define('ROOT_DIR', __DIR__);
 is_dir(ROOT_DIR . '/logs') || mkdir(ROOT_DIR . '/logs');
@@ -10,7 +10,7 @@ is_file($dotenv_file) || touch($dotenv_file);
 $dotenv = Dotenv\Dotenv::createMutable(dirname($dotenv_file));
 $dotenv->load();
 
-if (function_exists('array_find') === false) {
+    if (function_exists('array_find') === false) {
 
     /**
      * PHP 8.4 compat
@@ -73,3 +73,17 @@ return function (string $identifier, string $stdout_level, string $logfile_level
 
     return $log;
 };
+}
+
+namespace nostriphant\Transpher\Stores {
+
+    function generate_housekeeper(\nostriphant\Transpher\Relay\Store $store) {
+        return match ($store::class) {
+            Disk::class => new Disk\Housekeeper($store),
+            SQLite::class => new SQLite\Housekeeper($store),
+            Memory::class => new Memory\Housekeeper($store),
+            default => new NullHousekeeper()
+        };
+    }
+
+}

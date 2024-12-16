@@ -24,13 +24,33 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             $this->housekeeper = new NullHousekeeper();
         }
 
-        $this->query([])(Results::copyTo($events));
+        $this()(Results::copyTo($events));
         $this->MW_Construct($events, $whitelist_prototypes);
     }
 
-    private function query(array $filter_prototypes): Results {
-        $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory(new Subscription($filter_prototypes, SQLite\Condition::class), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
-        return $statement($this->database);
+    public function query(Subscription $conditions, string ...$fields): SQLite\Statement {
+        $query_prototype = $conditions([
+            'where' => [],
+            'limit' => null
+        ]);
+
+        $query = "SELECT " . implode(',', $fields) . " FROM event "
+                . "LEFT JOIN tag ON tag.event_id = event.id "
+                . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id ";
+
+        $parameters = [];
+        if (isset($query_prototype['where'])) {
+            list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
+                $return[0][] = array_shift($condition);
+                $return[1] = array_merge($return[1], $condition);
+                return $return;
+            }, [[], []]);
+            $query .= "WHERE (" . implode(') AND (', $where) . ") ";
+        }
+
+        $query .= 'GROUP BY event.id '
+                . (isset($query_prototype['limit']) ? "LIMIT " . $query_prototype['limit'] : "");
+        return new SQLite\Statement($query, $parameters);
     }
 
     private function queryEvent(string $event_id): Results {
@@ -42,7 +62,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        return $this->query($filter_prototypes);
+        return $this->query(new Subscription($filter_prototypes, SQLite\Condition::class), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
     }
 
     #[\Override]

@@ -7,16 +7,30 @@ use nostriphant\NIP01\Event;
 
 readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
+    use MemoryWrapper {
+        __construct As MW_Construct;
+        offsetSet As MW_offsetSet;
+        offsetUnset As MW_offsetUnset;
+    }
+
     public \nostriphant\Transpher\Stores\Housekeeper $housekeeper;
 
-    public function __construct(private \SQLite3 $database, private array $whitelist_prototypes) {
+    public function __construct(public \SQLite3 $database, public array $whitelist_prototypes) {
         $structure = new SQLite\Structure();
         $structure($database);
         if (Subscription::disabled($whitelist_prototypes) === false) {
-            $this->housekeeper = new SQLite\Housekeeper($database, $whitelist_prototypes);
+            $this->housekeeper = new SQLite\Housekeeper($this);
         } else {
             $this->housekeeper = new NullHousekeeper();
         }
+
+        $this->query([])(Results::copyTo($events));
+        $this->MW_Construct($events, $whitelist_prototypes);
+    }
+
+    private function query(array $filter_prototypes): Results {
+        $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory(new Subscription($filter_prototypes, SQLite\Condition::class), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
+        return $statement($this->database);
     }
 
     private function queryEvent(string $event_id): Results {
@@ -28,8 +42,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        $statement = SQLite\TransformSubscription::transformToSQL3StatementFactory(new Subscription($filter_prototypes, SQLite\Condition::class), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json");
-        return $statement($this->database);
+        return $this->query($filter_prototypes);
     }
 
     #[\Override]

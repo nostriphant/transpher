@@ -6,14 +6,19 @@ namespace nostriphant\Transpher\Stores;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 
-class Memory implements \nostriphant\Transpher\Relay\Store {
+final class Memory implements \nostriphant\Transpher\Relay\Store {
 
-    private array $events;
-    private Subscription $whitelist;
+    readonly public Subscription $whitelist;
+    readonly public Housekeeper $housekeeper;
 
-    public function __construct(array $events, array $whitelist_prototypes) {
+    public function __construct(private array $events, array $whitelist_prototypes) {
         $this->whitelist = new Subscription($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
-        $this->events = array_filter($events, fn(Event $event) => ($this->whitelist)($event) !== false);
+        if (Subscription::disabled($whitelist_prototypes) === false) {
+            $this->housekeeper = new Memory\Housekeeper($this);
+        } else {
+            $this->housekeeper = new NullHousekeeper();
+        }
+        call_user_func($this->housekeeper);
     }
 
     #[\Override]
@@ -53,5 +58,30 @@ class Memory implements \nostriphant\Transpher\Relay\Store {
     #[\Override]
     public function count(): int {
         return count($this->events);
+    }
+
+    #[\Override]
+    public function current(): mixed {
+        return current($this->events);
+    }
+
+    #[\Override]
+    public function key(): mixed {
+        return key($this->events);
+    }
+
+    #[\Override]
+    public function next(): void {
+        next($this->events);
+    }
+
+    #[\Override]
+    public function rewind(): void {
+        reset($this->events);
+    }
+
+    #[\Override]
+    public function valid(): bool {
+        return $this->current() !== false;
     }
 }

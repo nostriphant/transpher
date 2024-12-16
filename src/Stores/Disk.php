@@ -4,14 +4,18 @@ namespace nostriphant\Transpher\Stores;
 
 use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Nostr\Subscription;
-use nostriphant\Transpher\Stores\Memory;
 use nostriphant\Transpher\Relay\Store;
 
 class Disk implements Store {
 
+    use MemoryWrapper {
+        __construct As MW_Construct;
+        offsetSet As MW_offsetSet;
+        offsetUnset As MW_offsetUnset;
+    }
+
     const NIP01_EVENT_SPLITOFF_TIME = 1732125327;
 
-    private Memory $memory;
     private Subscription $whitelist;
 
     public function __construct(private string $store, array $whitelist_prototypes) {
@@ -28,7 +32,7 @@ class Disk implements Store {
             }
         });
 
-        $this->memory = new Memory($events, $whitelist_prototypes);
+        $this->MW_Construct($events, $whitelist_prototypes);
     }
 
     static function walk_store(string $store, callable $callback): int {
@@ -61,7 +65,7 @@ class Disk implements Store {
     #[\Override]
     public function offsetSet(mixed $offset, mixed $event): void {
         if (call_user_func($this->whitelist, $event) !== false) {
-            $this->memory[$offset] = $event;
+            $this->MW_offsetSet($offset, $event);
             self::write($this->store, $event);
         }
     }
@@ -69,26 +73,7 @@ class Disk implements Store {
     #[\Override]
     public function offsetUnset(mixed $offset): void {
         unlink(self::file($this->store, $offset));
-        unset($this->memory[$offset]);
+        $this->MW_offsetUnset($offset);
     }
 
-    #[\Override]
-    public function __invoke(array ...$filter_prototypes): Results {
-        return call_user_func_array($this->memory, $filter_prototypes);
-    }
-
-    #[\Override]
-    public function offsetExists(mixed $offset): bool {
-        return isset($this->memory[$offset]);
-    }
-
-    #[\Override]
-    public function offsetGet(mixed $offset): ?Event {
-        return $this->memory[$offset];
-    }
-
-    #[\Override]
-    public function count(): int {
-        return count($this->memory);
-    }
 }

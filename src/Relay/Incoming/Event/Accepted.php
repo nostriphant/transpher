@@ -16,11 +16,11 @@ class Accepted {
 
     public function __invoke(Event $event): \Generator {
         yield from Event::alternateClass($event)(
-                        regular: new Regular($this->events, $this->files, $this->subscriptions),
-                        replaceable: new Replaceable($this->events, $this->subscriptions),
-                        ephemeral: new Ephemeral($this->subscriptions),
-                        addressable: new Addressable($this->events, $this->subscriptions),
-                        undefined: new Undefined()
+                        regular: new Accepted\Regular($this->events, $this->files, $this->subscriptions),
+                        replaceable: new Accepted\Replaceable($this->events, $this->subscriptions),
+                        ephemeral: new Accepted\Ephemeral($this->subscriptions),
+                        addressable: new Accepted\Addressable($this->events, $this->subscriptions),
+                        undefined: new Accepted\Undefined()
                 );
     }
 }

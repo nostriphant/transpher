@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Relay\Incoming\Event;
+namespace nostriphant\Transpher\Relay\Incoming\Event\Accepted;
 
 use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP01\Event;
@@ -17,7 +17,7 @@ class Regular {
 
     public function __invoke(Event $event) {
         $this->events[$event->id] = $event;
-        $kindClass = __NAMESPACE__ . '\\Kind' . $event->kind;
+        $kindClass = Regular\Kind::class . $event->kind;
         if (class_exists($kindClass) === false) {
             yield from ($this->subscriptions)($event);
         } else {

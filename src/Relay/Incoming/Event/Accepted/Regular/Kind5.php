@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Relay\Incoming\Event;
+namespace nostriphant\Transpher\Relay\Incoming\Event\Accepted\Regular;
 
 use nostriphant\FunctionalAlternate\Alternate;
 use nostriphant\NIP01\Event;

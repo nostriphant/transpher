@@ -2,7 +2,7 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\NIP59\Rumor;
-use nostriphant\Transpher\Nostr\Message\Factory as MessageFactory;
+use nostriphant\NIP01\Message;
 
 it('accepts a simple COUNT message and returns the number of matching events', function () {
     $alice_key = \Pest\key_sender();
@@ -12,7 +12,7 @@ it('accepts a simple COUNT message and returns the number of matching events', f
         (new Rumor(time(), $bob_key(Key::public()), 1, 'Hello world, from Bob!', []))($bob_key)
     ]);
 
-    $recipient = \Pest\handle(MessageFactory::countRequest($id = uniqid(), [
+    $recipient = \Pest\handle(Message::count($id = uniqid(), [
                 'authors' => [$alice_key(Key::public())]
                     ], [
                 'authors' => [$bob_key(Key::public())]
@@ -24,7 +24,7 @@ it('accepts a simple COUNT message and returns the number of matching events', f
 });
 
 it('refuses COUNT message without filters', function () {
-    $recipient = \Pest\handle(MessageFactory::countRequest($id = uniqid(), []));
+    $recipient = \Pest\handle(Message::count($id = uniqid(), []));
 
     expect($recipient)->toHaveReceived(
             ['CLOSED', $id, 'count filters are empty']
@@ -32,7 +32,7 @@ it('refuses COUNT message without filters', function () {
 });
 
 it('refuses COUNT message with more than max filters (default 10)', function () {
-    $recipient = \Pest\handle(MessageFactory::countRequest($id = uniqid(),
+    $recipient = \Pest\handle(Message::count($id = uniqid(),
                     ['ids' => ['a']],
                 ['ids' => ['a']],
                 ['ids' => ['a']],

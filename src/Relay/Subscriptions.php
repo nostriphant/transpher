@@ -4,7 +4,7 @@ namespace nostriphant\Transpher\Relay;
 use nostriphant\Transpher\Nostr\Subscription;
 use function \Functional\if_else;
 use \nostriphant\Transpher\Relay\Sender;
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Event;
 
 class Subscriptions {
@@ -30,11 +30,11 @@ class Subscriptions {
             if ($to === false) {
                 return false;
             }
-            $to(Factory::requestedEvent($subscriptionId, $event));
-            $to(Factory::eose($subscriptionId));
+            $to(Message::event($subscriptionId, get_object_vars($event)));
+            $to(Message::eose($subscriptionId));
             return true;
         });
-        yield Factory::accept($event->id);
+        yield Message::ok($event->id, true, '');
     }
 
     static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, array $filter_prototypes): void {

@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming;
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 
 readonly class Count implements Type {
 
@@ -16,12 +16,12 @@ readonly class Count implements Type {
     #[\Override]
     public function __invoke(array $payload): \Generator {
         if (count($payload) < 2) {
-            yield Factory::notice('Invalid message');
+            yield Message::notice('Invalid message');
         } else {
             yield from ($this->limits)(array_filter(array_slice($payload, 1)))(
-                            accepted: fn(array $filter_prototypes) => yield Factory::countResponse($payload[0], iterator_count(($this->events)(...$filter_prototypes))),
-                            rejected: fn(string $reason) => yield Factory::closed($payload[0], $reason)
-            );
+                            accepted: fn(array $filter_prototypes) => yield Message::count($payload[0], ['count' => iterator_count(($this->events)(...$filter_prototypes))]),
+                            rejected: fn(string $reason) => yield Message::closed($payload[0], $reason)
+                    );
         }
     }
 }

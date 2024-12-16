@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event\Accepted;
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Event;
 
 class Regular {
@@ -26,7 +26,7 @@ class Regular {
                                 (new $kindClass($this->events, $this->files))($event);
                                 yield from ($this->subscriptions)($event);
                             },
-                            rejected: fn(string $reason) => yield Factory::ok($event->id, false, 'invalid:' . $reason)
+                            rejected: fn(string $reason) => yield Message::ok($event->id, false, 'invalid:' . $reason)
                     );
         }
     }

@@ -2,6 +2,7 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 use nostriphant\NIP59\Gift;
 use nostriphant\NIP59\Seal;
 use function Pest\incoming;
@@ -19,7 +20,7 @@ it('relays private direct messsage from alice to bob', function (): void {
             ['OK', $event()[1]['id'], true]
     );
 
-    $recipient = \Pest\handle(Factory::req($subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), incoming(store: $store));
+    $recipient = \Pest\handle(Message::req($subscriptionId = uniqid(), ['#p' => [$bob_key(Key::public())]]), incoming(store: $store));
     expect($recipient)->toHaveReceived(
             ['EVENT', $subscriptionId, function (array $gift) use ($bob_key) {
                     expect($gift['kind'])->toBe(1059);

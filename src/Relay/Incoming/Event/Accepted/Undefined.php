@@ -2,8 +2,8 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event\Accepted;
 
-use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP01\Event;
+use nostriphant\NIP01\Message;
 
 class Undefined {
 
@@ -12,6 +12,6 @@ class Undefined {
     }
 
     public function __invoke(Event $event) {
-        yield Factory::notice('Undefined event kind ' . $event->kind);
+        yield Message::notice('Undefined event kind ' . $event->kind);
     }
 }

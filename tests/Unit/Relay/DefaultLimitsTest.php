@@ -1,6 +1,7 @@
 <?php
 
 use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 
 it('SHOULD send the client an OK result saying the event was not stored for the created_at timestamp not being within the permitted limits.', function (int $kind) {
     $recipient_past = \Pest\handle($message_past = Factory::eventAt(\Pest\key_sender(), $kind, 'Hello World', time() - (60 * 60 * 24) - 5));
@@ -24,17 +25,17 @@ it('SHOULD deny more subscriptions than 10 per client, by default', function () 
     $subscriptions = \Pest\subscriptions();
 
     for ($s = 1; $s < 11; $s++) {
-        $recipient_past = \Pest\handle($message_past = Factory::req('subscription' . $s . '-id', ['ids' => ['sdsd']]), subscriptions: $subscriptions);
+        $recipient_past = \Pest\handle($message_past = Message::req('subscription' . $s . '-id', ['ids' => ['sdsd']]), subscriptions: $subscriptions);
         expect($recipient_past)->toHaveReceived(['EOSE', 'subscription' . $s . '-id']);
     }
 
 
-    $recipient_past = \Pest\handle($message_past = Factory::req('subscription11-id', ['ids' => ['sdsd']]), subscriptions: $subscriptions);
+    $recipient_past = \Pest\handle($message_past = Message::req('subscription11-id', ['ids' => ['sdsd']]), subscriptions: $subscriptions);
     expect($recipient_past)->toHaveReceived(['CLOSED', 'subscription11-id', 'max number of subscriptions per client (10) reached']);
 });
 
 
 it('SHOULD deny more filters than 10 per subscription, by default', function () {
-    $recipient_past = \Pest\handle($message_past = Factory::req('subscription-id', ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']]));
+    $recipient_past = \Pest\handle($message_past = Message::req('subscription-id', ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']], ['ids' => ['sdsd']]));
     expect($recipient_past)->toHaveReceived(['CLOSED', 'subscription-id', 'max number of filters per subscription (10) reached']);
 });

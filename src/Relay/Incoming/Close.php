@@ -2,13 +2,8 @@
 
 namespace nostriphant\Transpher\Relay\Incoming;
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 
-/**
- * Description of Close
- *
- * @author rmeijer
- */
 readonly class Close implements Type {
 
     public function __construct(private \nostriphant\Transpher\Relay\Subscriptions $subscriptions) {
@@ -18,10 +13,10 @@ readonly class Close implements Type {
     #[\Override]
     public function __invoke(array $payload): \Generator {
         if (count($payload) < 1) {
-            yield Factory::notice('Missing subscription ID');
+            yield Message::notice('Missing subscription ID');
         } else {
             ($this->subscriptions)($payload[0]);
-            yield Factory::closed($payload[0]);
+            yield Message::closed($payload[0]);
         }
     }
 }

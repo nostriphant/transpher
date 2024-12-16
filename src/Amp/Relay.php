@@ -10,7 +10,6 @@ use Amp\Websocket\Server\WebsocketClientGateway;
 use Amp\Websocket\WebsocketClient;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
-use nostriphant\Transpher\Nostr\Message\Factory;
 use nostriphant\NIP01\Message;
 use Amp\Http\Server\DefaultErrorHandler;
 use Amp\Http\Server\Router;
@@ -78,7 +77,7 @@ class Relay implements WebsocketClientHandler {
             try {
                 each(($this->incoming)($client_subscriptions, Message::decode($payload)), $wrapped_client);
             } catch (\InvalidArgumentException $ex) {
-                $wrapped_client(Factory::notice($ex->getMessage()));
+                $wrapped_client(Message::notice($ex->getMessage()));
             }
         }
     }

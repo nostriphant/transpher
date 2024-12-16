@@ -4,6 +4,7 @@ use nostriphant\Transpher\Nostr\Message\Factory;
 use function Pest\incoming,
              Pest\store;
 use nostriphant\NIP01\Event;
+use nostriphant\NIP01\Message;
 
 /**
  * https://github.com/nostr-protocol/nips/commit/72bb8a128b2d7d3c2c654644cd68d0d0fe58a3b1#diff-8986f5dd399909df0ccb047d3bb1056061e74dcf25bc80af1cd52decf9358340
@@ -19,7 +20,7 @@ describe('REQ', function () {
                 ['OK']
         );
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: $store));
+        $recipient = \Pest\handle(Message::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: $store));
         expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -40,7 +41,7 @@ describe('REQ', function () {
         $tag = 'p';
         $tag_value = uniqid();
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: $store), subscriptions: $subscriptions);
+        $recipient = \Pest\handle(Message::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: $store), subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['EOSE', $id],
         );
@@ -65,7 +66,7 @@ describe('REQ', function () {
         $sender_key = \Pest\key_sender();
         $message = Factory::event($sender_key, 1, 'Hello World', [$tag, $tag_value]);
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: store([
+        $recipient = \Pest\handle(Message::req($id = uniqid(), ['#' . $tag => [$tag_value]]), incoming(store: store([
             new Event(...$message()[1])
         ])));
 

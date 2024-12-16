@@ -2,6 +2,7 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 use function Pest\incoming;
 
 describe('REQ', function () {
@@ -17,7 +18,7 @@ describe('REQ', function () {
     it('replies CLOSED on empty filters', function () {
         
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), []));
+        $recipient = \Pest\handle(Message::req($id = uniqid(), []));
 
         expect($recipient)->toHaveReceived(
                 ['CLOSED', $id, 'subscription filters are empty']
@@ -26,7 +27,7 @@ describe('REQ', function () {
     it('can handle a subscription request, for non existing events', function () {
         
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['ids' => ['abdcd']]));
+        $recipient = \Pest\handle(Message::req($id = uniqid(), ['ids' => ['abdcd']]));
 
         expect($recipient)->toHaveReceived(
                 ['EOSE', $id]
@@ -43,7 +44,7 @@ describe('REQ', function () {
                 ['OK']
         );
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
+        $recipient = \Pest\handle(Message::req($id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
         expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -122,7 +123,7 @@ describe('REQ', function () {
                 ['OK']
         );
 
-        $recipient = \Pest\handle(Factory::req($id = uniqid(), [
+        $recipient = \Pest\handle(Message::req($id = uniqid(), [
                     'authors' => [$alice_key(Key::public())]
             ], [
                 'authors' => [$bob_key(Key::public())]
@@ -162,7 +163,7 @@ describe('REQ', function () {
                 ['EOSE', $subscription()[1]]
         );
 
-        $bob = \Pest\handle(Factory::close($subscription()[1]), incoming(store: $store), subscriptions: $subscriptions);
+        $bob = \Pest\handle(Message::close($subscription()[1]), incoming(store: $store), subscriptions: $subscriptions);
         expect($bob)->toHaveReceived(
                 ['CLOSED', $subscription()[1], '']
         );
@@ -205,7 +206,7 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
 
-        $subscription = Factory::req($id = uniqid(), ['authors' => [$alice_key(Key::public())]]);
+        $subscription = Message::req($id = uniqid(), ['authors' => [$alice_key(Key::public())]]);
         $recipient = \Pest\handle($subscription, incoming(store: $store), subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['EOSE', $id]

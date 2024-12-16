@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Req;
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 
 class Accepted {
 
@@ -16,11 +16,11 @@ class Accepted {
 
     public function __invoke(string $subscription_id, array $filter_prototypes): mixed {
         yield from ($this->limits)($this->subscriptions)(
-                        rejected: fn(string $reason) => yield Factory::closed($subscription_id, $reason),
+                        rejected: fn(string $reason) => yield Message::closed($subscription_id, $reason),
                         accepted: function () use ($subscription_id, $filter_prototypes) {
                             ($this->subscriptions)($subscription_id, $filter_prototypes);
-                            yield from iterator_map(($this->events)(...$filter_prototypes), fn(\nostriphant\NIP01\Event $event) => Factory::requestedEvent($subscription_id, $event));
-                            yield Factory::eose($subscription_id);
-        });
+                            yield from iterator_map(($this->events)(...$filter_prototypes), fn(\nostriphant\NIP01\Event $event) => Message::event($subscription_id, get_object_vars($event)));
+                            yield Message::eose($subscription_id);
+                        });
     }
 }

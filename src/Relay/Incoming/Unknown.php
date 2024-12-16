@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming;
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 
 class Unknown implements Type {
 
@@ -12,6 +12,6 @@ class Unknown implements Type {
 
     #[\Override]
     public function __invoke(array $payload): \Generator {
-        yield Factory::notice('Message type ' . $this->type . ' not supported');
+        yield Message::notice('Message type ' . $this->type . ' not supported');
     }
 }

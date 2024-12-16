@@ -20,7 +20,7 @@ class Factory {
     }
 
     static function eventAt(Key $sender_key, int $kind, string $content, int $at, array ...$tags): Message {
-        return self::message('EVENT', get_object_vars((new Rumor(
+        return Message::event(get_object_vars((new Rumor(
                                         pubkey: $sender_key(Key::public()),
                                         created_at: $at,
                                         kind: $kind,
@@ -30,7 +30,7 @@ class Factory {
     }
 
     static function privateDirect(Key $private_key, string $recipient_pubkey, string $message): Message {
-        return self::message('EVENT', get_object_vars(Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, new Rumor(
+        return Message::event(get_object_vars(Gift::wrap($recipient_pubkey, Seal::close($private_key, $recipient_pubkey, new Rumor(
                                                         pubkey: $private_key(Key::public()),
                                                         created_at: time(),
                                             kind: 14,
@@ -40,36 +40,36 @@ class Factory {
     }
     
     static function eose(string $subscriptionId): Message {
-        return self::message('EOSE', $subscriptionId);
+        return Message::eose($subscriptionId);
     }
     static function ok(string $eventId, bool $accepted, string $message = ''): Message {
-        return self::message('OK', $eventId, $accepted, $message);
+        return Message::ok($eventId, $accepted, $message);
     }
     static function accept(string $eventId, string $message = ''): Message {
         return self::ok($eventId, true, $message);
     }
 
     static function req(string $subscription_id, array ...$filters) {
-        return self::message('REQ', $subscription_id, ...$filters);
+        return Message::req($subscription_id, ...$filters);
     }
 
     static function countRequest(string $subscription_id, array ...$filters) {
-        return self::message('COUNT', $subscription_id, ...$filters);
+        return Message::count($subscription_id, ...$filters);
     }
 
     static function countResponse(string $subscription_id, int $count) {
-        return self::message('COUNT', $subscription_id, ['count' => $count]);
+        return Message::count($subscription_id, ['count' => $count]);
     }
 
     static function notice(string $message): Message {
-        return self::message('NOTICE', $message);
+        return Message::notice($message);
     }
     static function closed(string $subscriptionId, string $message = ''): Message {
-        return self::message('CLOSED', $subscriptionId, $message);
+        return Message::closed($subscriptionId, $message);
     }
     
     static function close(string $subscriptionId): Message {
-        return self::message('CLOSE', $subscriptionId);
+        return Message::close($subscriptionId);
     }
     
     static function subscribe(array ...$filters): Message {
@@ -77,6 +77,6 @@ class Factory {
     }
 
     static function requestedEvent(string $subscriptionId, Event $event): Message {
-        return self::message('EVENT', $subscriptionId, get_object_vars($event));
+        return Message::event($subscriptionId, get_object_vars($event));
     }
 }

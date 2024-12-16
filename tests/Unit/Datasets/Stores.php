@@ -16,10 +16,7 @@ dataset('stores', [
 
         $store = new \nostriphant\Transpher\Stores\Disk($transpher_store, [$whitelist_prototype]);
 
-        if (\nostriphant\Transpher\Nostr\Subscription::disabled([$whitelist_prototype]) === false) {
-            $housekeeper = \nostriphant\Transpher\Stores\generate_housekeeper($store);
-            $housekeeper();
-        }
+        \nostriphant\Transpher\Stores\do_housekeeping($store, [$whitelist_prototype]);
 
         return [$store, $created_events];
     },
@@ -72,10 +69,7 @@ dataset('stores', [
         $store = new \nostriphant\Transpher\Stores\SQLite($sqlite, [$whitelist_prototype]);
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
-        if (\nostriphant\Transpher\Nostr\Subscription::disabled([$whitelist_prototype]) === false) {
-            $housekeeper = \nostriphant\Transpher\Stores\generate_housekeeper($store);
-            $housekeeper();
-        }
+        \nostriphant\Transpher\Stores\do_housekeeping($store, [$whitelist_prototype]);
 
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
@@ -89,10 +83,7 @@ dataset('stores', [
 
         $store = new \nostriphant\Transpher\Stores\Memory($created_events, [$whitelist_prototype]);
 
-        if (\nostriphant\Transpher\Nostr\Subscription::disabled([$whitelist_prototype]) === false) {
-            $housekeeper = \nostriphant\Transpher\Stores\generate_housekeeper($store);
-            $housekeeper();
-        }
+        \nostriphant\Transpher\Stores\do_housekeeping($store, [$whitelist_prototype]);
 
         return [$store, array_map(fn(nostriphant\NIP01\Event $event) => fn(bool $is_deleted) => expect(isset($store[$event->id]))->toBe($is_deleted === false), $created_events)];
     }

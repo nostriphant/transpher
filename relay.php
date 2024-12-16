@@ -32,10 +32,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     }
 
 
-    if (\nostriphant\Transpher\Nostr\Subscription::disabled($whitelist_prototypes) === false) {
-        $housekeeper = \nostriphant\Transpher\Stores\generate_housekeeper($events);
-        $housekeeper();
-    }
+    \nostriphant\Transpher\Stores\do_housekeeping($events, $whitelist_prototypes);
 
     $files_path = $data_dir . '/files';
 } else {

@@ -77,13 +77,17 @@ return function (string $identifier, string $stdout_level, string $logfile_level
 
 namespace nostriphant\Transpher\Stores {
 
-    function generate_housekeeper(\nostriphant\Transpher\Relay\Store $store) {
-        return match ($store::class) {
-            Disk::class => new Disk\Housekeeper($store),
+    function do_housekeeping(\nostriphant\Transpher\Relay\Store $store, array $whitelist_prototypes) {
+        if (\nostriphant\Transpher\Nostr\Subscription::disabled($whitelist_prototypes)) {
+            return;
+        }
+
+        return (match ($store::class) {
+                    Disk::class => new Disk\Housekeeper($store),
             SQLite::class => new SQLite\Housekeeper($store),
             Memory::class => new Memory\Housekeeper($store),
             default => new NullHousekeeper()
-        };
+        })();
     }
 
 }

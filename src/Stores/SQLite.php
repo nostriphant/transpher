@@ -24,7 +24,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             $this->housekeeper = new NullHousekeeper();
         }
 
-        $this->MW_Construct($this(), $whitelist_prototypes);
+        $this->MW_Construct(iterator_to_array($this()), $whitelist_prototypes);
     }
 
     public function query(Subscription $conditions, string ...$fields): SQLite\Statement {

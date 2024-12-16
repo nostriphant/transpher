@@ -5,7 +5,7 @@ use nostriphant\Transpher\Files;
 it('stores file, when event is in store', function () {
     $event_id = uniqid();
 
-    $store = new nostriphant\Transpher\Stores\Memory([], []);
+    $store = \Pest\store();
     $store[$event_id] = \Pest\event(['id' => $event_id = uniqid()]);
     expect(isset($store[$event_id]))->toBeTrue();
 
@@ -24,7 +24,7 @@ it('stores file, when event is in store', function () {
 it('ignores file, when event is NOT in store', function () {
     $event_id = uniqid();
 
-    $store = new nostriphant\Transpher\Stores\Memory([], []);
+    $store = \Pest\store();
 
     $files = new Files(ROOT_DIR . '/data/files/', $store);
     $file = tempnam(sys_get_temp_dir(), 'file');
@@ -38,7 +38,7 @@ it('ignores file, when event is NOT in store', function () {
 
 
 it('removes files, when no events directory', function () {
-    $store = new nostriphant\Transpher\Stores\Memory([], []);
+    $store = \Pest\store();
 
     $hash = uniqid();
 
@@ -56,7 +56,7 @@ it('removes files, when no events directory', function () {
 });
 
 it('removes files, when no events in events directory exist', function () {
-    $store = new nostriphant\Transpher\Stores\Memory([], []);
+    $store = \Pest\store();
 
     $hash = uniqid();
     file_put_contents(ROOT_DIR . '/data/files/' . $hash, uniqid());
@@ -71,7 +71,7 @@ it('removes files, when no events in events directory exist', function () {
 it('removes files, when event is NOT in store', function () {
     $event_id = uniqid();
 
-    $store = new nostriphant\Transpher\Stores\Memory([], []);
+    $store = \Pest\store();
 
     $hash = uniqid();
     file_put_contents(ROOT_DIR . '/data/files/' . $hash, uniqid());

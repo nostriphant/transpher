@@ -8,7 +8,7 @@ trait MemoryWrapper {
 
     readonly private Memory $memory;
 
-    public function __construct(\Traversable|array $events, array $whitelist_prototypes) {
+    public function __construct(array $events, array $whitelist_prototypes) {
         $this->memory = new Memory($events, $whitelist_prototypes);
     }
 
@@ -38,23 +38,8 @@ trait MemoryWrapper {
         return count($this->memory);
     }
 
-    public function current(): mixed {
-        return current($this->memory);
-    }
-
-    public function key(): mixed {
-        return key($this->memory);
-    }
-
-    public function next(): void {
-        next($this->memory);
-    }
-
-    public function rewind(): void {
-        reset($this->memory);
-    }
-
-    public function valid(): bool {
-        return current($this->memory) !== false;
+    #[\Override]
+    public function getIterator(): \Traversable {
+        return $this->memory;
     }
 }

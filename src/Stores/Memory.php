@@ -11,10 +11,7 @@ final class Memory implements \nostriphant\Transpher\Relay\Store {
     readonly public Subscription $whitelist;
     readonly public Housekeeper $housekeeper;
 
-    private array $events;
-
-    public function __construct(\Traversable|array $events, array $whitelist_prototypes) {
-        $this->events = is_array($events) ? $events : iterator_to_array($events);
+    public function __construct(private array $events, array $whitelist_prototypes) {
         $this->whitelist = new Subscription($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
         if (Subscription::disabled($whitelist_prototypes) === false) {
             $this->housekeeper = new Memory\Housekeeper($this);
@@ -64,27 +61,8 @@ final class Memory implements \nostriphant\Transpher\Relay\Store {
     }
 
     #[\Override]
-    public function current(): mixed {
-        return current($this->events);
+    public function getIterator(): \Traversable {
+        yield from $this->events;
     }
 
-    #[\Override]
-    public function key(): mixed {
-        return key($this->events);
-    }
-
-    #[\Override]
-    public function next(): void {
-        next($this->events);
-    }
-
-    #[\Override]
-    public function rewind(): void {
-        reset($this->events);
-    }
-
-    #[\Override]
-    public function valid(): bool {
-        return $this->current() !== false;
-    }
 }

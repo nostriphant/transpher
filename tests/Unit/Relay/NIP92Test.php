@@ -20,7 +20,7 @@ it('downloads NIP-92 files (kind 1, with imeta tag) into a data folder', functio
             ]
     );
 
-    $store = new nostriphant\Transpher\Stores\Memory([], []);
+    $store = \Pest\store();
 
     expect(\Pest\handle($message, incoming($store)))->toHaveReceived(
             ['OK', $message()[1]['id'], true]

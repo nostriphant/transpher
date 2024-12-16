@@ -24,8 +24,8 @@ final class Memory implements \nostriphant\Transpher\Relay\Store {
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
         $subscription = new Subscription($filter_prototypes, \nostriphant\Transpher\Relay\Condition::class);
-        return new Results(function (callable $callback) use ($subscription) {
-                    array_reduce(array_filter($this->events, $subscription), fn($carry, Event $event) => $callback($event), 0);
+        return new Results(function () use ($subscription) {
+                    yield from array_filter($this->events, $subscription);
                 });
     }
 

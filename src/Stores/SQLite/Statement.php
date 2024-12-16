@@ -24,12 +24,12 @@ readonly class Statement {
             trigger_error('Query failed: ' . $statement->getSQL(true), E_USER_WARNING);
             return new Results();
         }
-        return new Results(function (callable $callback) use ($result, $statement) {
+        return new Results(function () use ($result, $statement) {
                     while ($data = $result->fetchArray(SQLITE3_ASSOC)) {
                         $data['tags'] = json_decode('[' . $data['tags_json'] . ']') ?? [];
                         array_walk($data['tags'], fn(array &$tag) => array_unshift($tag, array_pop($tag)));
                         unset($data['tags_json']);
-                        $callback(new Event(...$data));
+                        yield new Event(...$data);
                     }
                     $result->finalize();
                     $statement->close();

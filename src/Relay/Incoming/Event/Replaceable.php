@@ -15,18 +15,18 @@ class Replaceable {
     }
 
     public function __invoke(Event $event) {
-        ($this->events)([
+        $replaceable_events = iterator_to_array(($this->events)([
             'kinds' => [$event->kind],
             'authors' => [$event->pubkey]
-        ])(\nostriphant\Transpher\Stores\Results::copyTo($replaceable_events));
+        ]));
 
         $this->events[$event->id] = $event;
         foreach ($replaceable_events as $replaceable_event) {
             $replace_id = $replaceable_event->id;
             if ($replaceable_event->created_at === $event->created_at) {
-                        $replace_id = max($replaceable_event->id, $event->id);
-                    }
-                    unset($this->events[$replace_id]);
+                $replace_id = max($replaceable_event->id, $event->id);
+            }
+            unset($this->events[$replace_id]);
         }
         yield from ($this->subscriptions)($event);
     }

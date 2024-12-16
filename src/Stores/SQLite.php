@@ -24,8 +24,7 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
             $this->housekeeper = new NullHousekeeper();
         }
 
-        $this()(Results::copyTo($events));
-        $this->MW_Construct($events, $whitelist_prototypes);
+        $this->MW_Construct($this(), $whitelist_prototypes);
     }
 
     public function query(Subscription $conditions, string ...$fields): SQLite\Statement {
@@ -72,11 +71,8 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function offsetGet(mixed $offset): ?Event {
-        $event = null;
-        $this->queryEvent($offset)(function (Event $found_event) use (&$event) {
-            $event = $found_event;
-        });
-        return $event;
+        $events = iterator_to_array($this->queryEvent($offset));
+        return $events[0] ?? null;
     }
 
     #[\Override]

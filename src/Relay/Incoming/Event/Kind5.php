@@ -52,8 +52,8 @@ readonly class Kind5 implements Kind {
             return;
         }
 
-        ($this->store)(...$prototypes)(function (Event $removable_event) {
+        foreach (($this->store)(...$prototypes) as $removable_event) {
             unset($this->store[$removable_event->id]);
-        });
+        }
     }
 }

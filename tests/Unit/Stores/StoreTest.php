@@ -34,7 +34,7 @@ it('retrieves events', function (callable $factory, array $filter_prototype, int
     );
 
     $events = $store($filter_prototype);
-    expect($events(fn() => true))->toBe($expected_count);
+    expect(iterator_count($events))->toBe($expected_count);
 })->with('stores')->with([
     [['authors' => ["2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0"]], 2],
     [['authors' => ["2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0"], 'kinds' => [2]], 1]

@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Req;
 
-use function \Functional\partial_left;
 use nostriphant\Transpher\Nostr\Message\Factory;
 
 class Accepted {
@@ -20,8 +19,7 @@ class Accepted {
                         rejected: fn(string $reason) => yield Factory::closed($subscription_id, $reason),
                         accepted: function () use ($subscription_id, $filter_prototypes) {
                             ($this->subscriptions)($subscription_id, $filter_prototypes);
-                            ($this->events)(...$filter_prototypes)(\nostriphant\Transpher\Stores\Results::copyTo($events));
-                            yield from array_map(partial_left([Factory::class, 'requestedEvent'], $subscription_id), $events);
+                            yield from iterator_map(($this->events)(...$filter_prototypes), fn(\nostriphant\NIP01\Event $event) => Factory::requestedEvent($subscription_id, $event));
                             yield Factory::eose($subscription_id);
         });
     }

@@ -122,11 +122,11 @@ describe('agent', function (): void {
 
         $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 
-        $events(['authors' => [Pest\pubkey_recipient()]])(\nostriphant\Transpher\Stores\Results::copyTo($notes));
+        $notes = iterator_to_array($events(['authors' => [Pest\pubkey_recipient()]]));
         expect($notes[0]->kind)->toBe(1);
         expect($notes[0]->content)->toBe('Hello!');
 
-        $events(['#p' => [Pest\pubkey_recipient()]])(\nostriphant\Transpher\Stores\Results::copyTo($pdms));
+        $pdms = iterator_to_array($events(['#p' => [Pest\pubkey_recipient()]]));
         expect($pdms[0]->kind)->toBe(1059);
     });
 });

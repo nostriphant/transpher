@@ -30,6 +30,12 @@ if (function_exists('array_find') === false) {
 
 }
 
+function iterator_map(\Traversable $iterator, callable $callback): \Traversable {
+    foreach ($iterator as $key => $value) {
+        yield $key => $callback($value);
+    }
+}
+
 function file_append_contents(string $filename, string $contents): int {
     $handle = fopen($filename, 'a');
     $written = fwrite($handle, $contents);

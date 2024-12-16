@@ -8,8 +8,8 @@ trait MemoryWrapper {
 
     readonly private Memory $memory;
 
-    public function __construct(array $events, array $whitelist_prototypes) {
-        $this->memory = new Memory($events, $whitelist_prototypes);
+    public function __construct(\Traversable|array $events, array $whitelist_prototypes) {
+        $this->memory = new Memory(is_array($events) ? $events : iterator_to_array($events), $whitelist_prototypes);
     }
 
     public function offsetSet(mixed $offset, mixed $event): void {

@@ -14,11 +14,11 @@ class Addressable {
     }
 
     public function __invoke(Event $event) {
-        ($this->events)([
+        $replaceable_events = iterator_to_array(($this->events)([
             'kinds' => [$event->kind],
             'authors' => [$event->pubkey],
             '#d' => array_map(fn(array $tag_values) => $tag_values[0], Event::extractTagValues($event, 'd'))
-        ])(\nostriphant\Transpher\Stores\Results::copyTo($replaceable_events));
+        ]));
 
         $this->events[$event->id] = $event;
         foreach ($replaceable_events as $replaceable_event) {

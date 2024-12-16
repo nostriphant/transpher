@@ -14,19 +14,21 @@ class Addressable {
     }
 
     public function __invoke(Event $event) {
-        $replaceable_events = iterator_to_array(($this->events)([
+        $this->events[$event->id] = $event;
+        $replaceable_events = ($this->events)([
             'kinds' => [$event->kind],
             'authors' => [$event->pubkey],
             '#d' => array_map(fn(array $tag_values) => $tag_values[0], Event::extractTagValues($event, 'd'))
-        ]));
-
-        $this->events[$event->id] = $event;
+        ]);
         foreach ($replaceable_events as $replaceable_event) {
+            if ($replaceable_event === $event) {
+                continue;
+            }
             $replace_id = $replaceable_event->id;
             if ($replaceable_event->created_at === $event->created_at) {
-                        $replace_id = max($replaceable_event->id, $event->id);
-                    }
-                    unset($this->events[$replace_id]);
+                $replace_id = max($replaceable_event->id, $event->id);
+            }
+            unset($this->events[$replace_id]);
         }
         yield from ($this->subscriptions)($event);
     }

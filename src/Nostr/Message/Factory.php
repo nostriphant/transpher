@@ -11,10 +11,6 @@ use nostriphant\NIP59\Rumor;
 
 class Factory {
 
-    static function message(string $type, mixed ...$payload): Message {
-        return new Message($type, ...$payload);
-    }
-
     static function event(Key $sender_key, int $kind, string $content, array ...$tags): Message {
         return self::eventAt($sender_key, $kind, $content, time(), ...$tags);
     }

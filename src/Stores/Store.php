@@ -5,7 +5,7 @@ namespace nostriphant\Transpher\Stores;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 
-readonly class Store implements \nostriphant\Transpher\Relay\Store {
+readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
 
     private \nostriphant\Transpher\Nostr\Subscription $whitelist;
 
@@ -14,7 +14,6 @@ readonly class Store implements \nostriphant\Transpher\Relay\Store {
         $this->whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
     }
 
-    #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
         return call_user_func_array($this->engine, $filter_prototypes);
     }

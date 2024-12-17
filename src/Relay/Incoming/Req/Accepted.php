@@ -7,7 +7,7 @@ use nostriphant\NIP01\Message;
 class Accepted {
 
     public function __construct(
-            private \nostriphant\Transpher\Relay\Store $events,
+            private \nostriphant\Transpher\Stores\Store $events,
             private \nostriphant\Transpher\Relay\Subscriptions $subscriptions,
             private \nostriphant\Transpher\Relay\Limits $limits,
     ) {

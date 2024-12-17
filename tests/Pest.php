@@ -92,14 +92,14 @@ namespace Pest {
     }
 
     function store(array $events = []) {
-        return new \nostriphant\Transpher\Stores\Memory($events, []);
+        return new \nostriphant\Transpher\Stores\Store(new \nostriphant\Transpher\Stores\Memory($events), []);
     }
 
     function files_path() {
         return ROOT_DIR . '/data/files';
     }
 
-    function incoming(?\nostriphant\Transpher\Relay\Store $store = null, string $files = ROOT_DIR . '/data/files') {
+    function incoming(?\nostriphant\Transpher\Stores\Store $store = null, string $files = ROOT_DIR . '/data/files') {
         $store = $store ?? store();
         return new Incoming($store, new \nostriphant\Transpher\Files($files, $store));
     }

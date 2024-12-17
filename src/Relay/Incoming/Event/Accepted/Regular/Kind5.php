@@ -8,7 +8,7 @@ use nostriphant\NIP01\Event;
 readonly class Kind5 implements Kind {
 
     #[\Override]
-    public function __construct(private \nostriphant\Transpher\Relay\Store $store, private \nostriphant\Transpher\Files $files) {
+    public function __construct(private \nostriphant\Transpher\Stores\Store $store, private \nostriphant\Transpher\Files $files) {
         
     }
 

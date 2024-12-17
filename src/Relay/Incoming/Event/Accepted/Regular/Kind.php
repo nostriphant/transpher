@@ -7,7 +7,7 @@ use nostriphant\FunctionalAlternate\Alternate;
 
 interface Kind {
 
-    public function __construct(\nostriphant\Transpher\Relay\Store $store, \nostriphant\Transpher\Files $files);
+    public function __construct(\nostriphant\Transpher\Stores\Store $store, \nostriphant\Transpher\Files $files);
 
     static function validate(Event $event): Alternate;
 

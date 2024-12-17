@@ -77,7 +77,7 @@ return function (string $identifier, string $stdout_level, string $logfile_level
 
 namespace nostriphant\Transpher\Stores {
 
-    function do_housekeeping(\nostriphant\Transpher\Relay\Store $store, array $whitelist_prototypes) {
+    function do_housekeeping(\nostriphant\Transpher\Relay\Engine $store, array $whitelist_prototypes) {
         if (\nostriphant\Transpher\Nostr\Subscription::disabled($whitelist_prototypes)) {
             return;
         }

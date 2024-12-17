@@ -3,9 +3,9 @@
 namespace nostriphant\Transpher\Stores;
 
 use nostriphant\NIP01\Event;
-use nostriphant\Transpher\Relay\Store;
+use nostriphant\Transpher\Relay\Engine;
 
-class Disk implements Store {
+class Disk implements Engine {
 
     use MemoryWrapper {
         __construct As MW_Construct;

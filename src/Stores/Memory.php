@@ -6,7 +6,7 @@ namespace nostriphant\Transpher\Stores;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 
-final class Memory implements \nostriphant\Transpher\Relay\Store {
+final class Memory implements \nostriphant\Transpher\Relay\Engine {
 
     public function __construct(private array $events) {
         

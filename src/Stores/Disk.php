@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Stores;
 
 use nostriphant\NIP01\Event;
-use nostriphant\Transpher\Relay\Engine;
+use nostriphant\Transpher\Stores\Engine;
 
 class Disk implements Engine {
 

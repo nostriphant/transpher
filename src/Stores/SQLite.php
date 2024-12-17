@@ -5,7 +5,7 @@ namespace nostriphant\Transpher\Stores;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 
-readonly class SQLite implements \nostriphant\Transpher\Relay\Engine {
+readonly class SQLite implements \nostriphant\Transpher\Stores\Engine {
 
     use MemoryWrapper {
         __construct As MW_Construct;

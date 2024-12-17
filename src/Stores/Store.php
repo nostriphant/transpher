@@ -9,7 +9,7 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
 
     private \nostriphant\Transpher\Nostr\Subscription $whitelist;
 
-    public function __construct(private \nostriphant\Transpher\Relay\Engine $engine, private array $whitelist_prototypes) {
+    public function __construct(private Engine $engine, private array $whitelist_prototypes) {
         \nostriphant\Transpher\Stores\do_housekeeping($this->engine, $whitelist_prototypes);
         $this->whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
     }

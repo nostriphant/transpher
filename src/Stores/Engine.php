@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Relay;
+namespace nostriphant\Transpher\Stores;
 
 use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Stores\Results;

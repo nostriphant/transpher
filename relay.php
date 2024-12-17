@@ -29,10 +29,9 @@ if (isset($_SERVER['RELAY_DATA'])) {
 }
 
 $pubkey_owner = (new Bech32($_SERVER['RELAY_OWNER_NPUB']))();
-$pubkey_agent = Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public());
 $whitelisted_pubkeys = [
     $pubkey_owner,
-    $pubkey_agent
+    Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public())
 ];
 
 $follow_lists = $events(['kinds' => [3], 'authors' => [$pubkey_owner]]);

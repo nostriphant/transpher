@@ -43,12 +43,8 @@ foreach ($follow_lists as $follow_list) {
 }
 
 $store = new nostriphant\Transpher\Stores\Store($events, [
-    [
-        'authors' => $whitelisted_pubkeys,
-    ],
-    [
-        '#p' => $whitelisted_pubkeys
-    ]
+    ['authors' => $whitelisted_pubkeys],
+    ['#p' => $whitelisted_pubkeys]
         ]);
 
 $relay = new \nostriphant\Transpher\Amp\Relay($store, $files_path);

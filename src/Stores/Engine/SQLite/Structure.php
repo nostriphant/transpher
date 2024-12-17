@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Stores\SQLite;
+namespace nostriphant\Transpher\Stores\Engine\SQLite;
 
 readonly class Structure {
 

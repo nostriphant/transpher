@@ -1,11 +1,19 @@
 <?php
 
+use nostriphant\Transpher\Stores\Engine\Memory,
+    nostriphant\Transpher\Stores\Engine\SQLite,
+    nostriphant\Transpher\Stores\Engine\Disk;
+
+function wrapEngine(\nostriphant\Transpher\Stores\Engine $engine, array $whitelist_prototypes): nostriphant\Transpher\Stores\Store {
+    return new nostriphant\Transpher\Stores\Store($engine, $whitelist_prototypes);
+}
+
 dataset('stores', [
     'disk' => function (array $whitelist_prototype, nostriphant\NIP01\Event ...$events): array {
         $transpher_store = ROOT_DIR . '/data/disktest_' . uniqid();
         expect($transpher_store)->not()->toBeDirectory();
 
-        new \nostriphant\Transpher\Stores\Disk($transpher_store, []);
+        new Disk($transpher_store, []);
         expect($transpher_store)->toBeDirectory();
 
         $created_events = [];
@@ -14,9 +22,7 @@ dataset('stores', [
             $created_events[$event->id] = fn(bool $is_deleted) => expect(is_file($transpher_store . DIRECTORY_SEPARATOR . $event->id . '.php'))->toBe(!$is_deleted);
         }
 
-        $store = new \nostriphant\Transpher\Stores\Disk($transpher_store, [$whitelist_prototype]);
-
-        \nostriphant\Transpher\Stores\do_housekeeping($store, [$whitelist_prototype]);
+        $store = wrapEngine(new Disk($transpher_store), [$whitelist_prototype]);
 
         return [$store, $created_events];
     },
@@ -25,7 +31,7 @@ dataset('stores', [
         $sqlite = new SQLite3($db_file);
         expect($db_file)->toBeFile();
 
-        new \nostriphant\Transpher\Stores\SQLite($sqlite, []);
+        new SQLite($sqlite);
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
         $created_events = [];
@@ -66,11 +72,7 @@ dataset('stores', [
         }
 
 
-        $store = new \nostriphant\Transpher\Stores\SQLite($sqlite, [$whitelist_prototype]);
-        expect($sqlite->lastErrorMsg())->toBe('not an error');
-
-        \nostriphant\Transpher\Stores\do_housekeeping($store, [$whitelist_prototype]);
-
+        $store = wrapEngine(new SQLite($sqlite), [$whitelist_prototype]);
         expect($sqlite->lastErrorMsg())->toBe('not an error');
 
         return [$store, $created_events];
@@ -81,9 +83,7 @@ dataset('stores', [
             $created_events[$event->id] = $event;
         }
 
-        $store = new \nostriphant\Transpher\Stores\Memory($created_events, [$whitelist_prototype]);
-
-        \nostriphant\Transpher\Stores\do_housekeeping($store, [$whitelist_prototype]);
+        $store = wrapEngine(new Memory($created_events), [$whitelist_prototype]);
 
         return [$store, array_map(fn(nostriphant\NIP01\Event $event) => fn(bool $is_deleted) => expect(isset($store[$event->id]))->toBe($is_deleted === false), $created_events)];
     }

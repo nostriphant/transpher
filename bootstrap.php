@@ -74,20 +74,3 @@ return function (string $identifier, string $stdout_level, string $logfile_level
     return $log;
 };
 }
-
-namespace nostriphant\Transpher\Stores {
-
-    function do_housekeeping(\nostriphant\Transpher\Stores\Engine $store, array $whitelist_prototypes) {
-        if (\nostriphant\Transpher\Nostr\Subscription::disabled($whitelist_prototypes)) {
-            return;
-        }
-
-        return (match ($store::class) {
-                    Disk::class => new Disk\Housekeeper($store),
-            SQLite::class => new SQLite\Housekeeper($store),
-            Memory::class => new Memory\Housekeeper($store),
-            default => new NullHousekeeper()
-        })($whitelist_prototypes);
-    }
-
-}

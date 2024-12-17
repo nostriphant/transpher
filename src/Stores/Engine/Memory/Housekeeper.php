@@ -1,12 +1,12 @@
 <?php
 
-namespace nostriphant\Transpher\Stores\Memory;
+namespace nostriphant\Transpher\Stores\Engine\Memory;
 
 use nostriphant\Transpher\Nostr\Subscription;
 
 readonly class Housekeeper implements \nostriphant\Transpher\Stores\Housekeeper {
 
-    public function __construct(private \nostriphant\Transpher\Stores\Memory $store) {
+    public function __construct(private \nostriphant\Transpher\Stores\Engine\Memory $store) {
         
     }
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace nostriphant\Transpher\Stores\Disk;
+namespace nostriphant\Transpher\Stores\Engine\Disk;
 
-use nostriphant\Transpher\Stores\Disk;
+use nostriphant\Transpher\Stores\Engine\Disk;
 use nostriphant\NIP01\Event;
 
 use nostriphant\Transpher\Nostr\Subscription;

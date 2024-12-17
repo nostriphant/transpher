@@ -1,10 +1,10 @@
 <?php
 
-namespace nostriphant\Transpher\Stores\SQLite;
+namespace nostriphant\Transpher\Stores\Engine\SQLite;
 
 readonly class Housekeeper implements \nostriphant\Transpher\Stores\Housekeeper {
 
-    public function __construct(private \nostriphant\Transpher\Stores\SQLite $store) {
+    public function __construct(private \nostriphant\Transpher\Stores\Engine\SQLite $store) {
         
     }
 

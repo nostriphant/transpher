@@ -10,7 +10,16 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
     private \nostriphant\Transpher\Nostr\Subscription $whitelist;
 
     public function __construct(private Engine $engine, private array $whitelist_prototypes) {
-        \nostriphant\Transpher\Stores\do_housekeeping($this->engine, $whitelist_prototypes);
+        if (\nostriphant\Transpher\Nostr\Subscription::disabled($whitelist_prototypes) === false) {
+            (match ($this->engine::class) {
+                Engine\Disk::class => new Engine\Disk\Housekeeper($this->engine),
+                Engine\SQLite::class => new Engine\SQLite\Housekeeper($this->engine),
+                Engine\Memory::class => new Engine\Memory\Housekeeper($this->engine),
+                default => new NullHousekeeper()
+            })($whitelist_prototypes);
+            
+        }
+
         $this->whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
     }
 

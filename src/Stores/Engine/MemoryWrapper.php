@@ -1,8 +1,9 @@
 <?php
 
-namespace nostriphant\Transpher\Stores;
+namespace nostriphant\Transpher\Stores\Engine;
 
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Stores\Results;
 
 trait MemoryWrapper {
 

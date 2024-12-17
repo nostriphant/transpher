@@ -1,9 +1,10 @@
 <?php
 
-namespace nostriphant\Transpher\Stores;
+namespace nostriphant\Transpher\Stores\Engine;
 
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Stores\Results;
 
 readonly class SQLite implements \nostriphant\Transpher\Stores\Engine {
 

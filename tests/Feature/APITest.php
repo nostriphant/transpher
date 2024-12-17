@@ -130,7 +130,7 @@ describe('agent', function (): void {
 
         $agent();
 
-        $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
+        $events = new nostriphant\Transpher\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 
         $notes_alice = iterator_to_array($events(['authors' => [Pest\pubkey_recipient()]]));
         expect($notes_alice[0]->kind)->toBe(1);

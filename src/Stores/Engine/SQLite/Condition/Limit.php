@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Stores\SQLite\Condition;
+namespace nostriphant\Transpher\Stores\Engine\SQLite\Condition;
 
 class Limit implements Test {
 

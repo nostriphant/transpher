@@ -1,11 +1,11 @@
 <?php
 
-namespace nostriphant\Transpher\Stores;
+namespace nostriphant\Transpher\Stores\Engine;
 
 use nostriphant\NIP01\Event;
-use nostriphant\Transpher\Stores\Engine;
+use nostriphant\Transpher\Stores\Results;
 
-class Disk implements Engine {
+class Disk implements \nostriphant\Transpher\Stores\Engine {
 
     use MemoryWrapper {
         __construct As MW_Construct;

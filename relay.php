@@ -9,12 +9,12 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];
     is_dir($data_dir) || mkdir($data_dir);
 
-    $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
+    $events = new nostriphant\Transpher\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
 
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {
         $logger->debug('Starting migrating events...');
-        $logger->debug(\nostriphant\Transpher\Stores\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events) {
+        $logger->debug(\nostriphant\Transpher\Stores\Engine\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events) {
                     $events[$event->id] = $event;
                     return unlink($store_path . '/' . $event->id . '.php');
                 }) . ' events migrated.');
@@ -23,7 +23,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $data_dir . '/files';
 } else {
     $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-    $events = new \nostriphant\Transpher\Stores\Disk($store_path);
+    $events = new \nostriphant\Transpher\Stores\Engine\Disk($store_path);
 
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }

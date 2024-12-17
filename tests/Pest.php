@@ -92,7 +92,7 @@ namespace Pest {
     }
 
     function store(array $events = []) {
-        return new \nostriphant\Transpher\Stores\Store(new \nostriphant\Transpher\Stores\Memory($events), []);
+        return new \nostriphant\Transpher\Stores\Store(new \nostriphant\Transpher\Stores\Engine\Memory($events), []);
     }
 
     function files_path() {

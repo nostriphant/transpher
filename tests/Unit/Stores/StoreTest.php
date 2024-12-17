@@ -79,9 +79,7 @@ it('retrieves an event with tags', function (callable $factory) {
 })->with('stores');
 
 it('ignores an event that does not matches whitelist filter', function (callable $factory) {
-    list($engine, $created_events) = $factory([]);
-
-    $store = new nostriphant\Transpher\Stores\Store($engine, [['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']]]);
+    list($store, $created_events) = $factory(['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']]);
 
     expect(isset($store['non-matching']))->toBeFalse();
     expect(isset($store['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb']))->toBeFalse();

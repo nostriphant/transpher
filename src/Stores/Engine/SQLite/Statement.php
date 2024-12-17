@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Stores\SQLite;
+namespace nostriphant\Transpher\Stores\Engine\SQLite;
 
 use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Stores\Results;

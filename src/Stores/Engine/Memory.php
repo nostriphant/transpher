@@ -1,10 +1,11 @@
 <?php
 
 
-namespace nostriphant\Transpher\Stores;
+namespace nostriphant\Transpher\Stores\Engine;
 
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Stores\Results;
 
 final class Memory implements \nostriphant\Transpher\Stores\Engine {
 

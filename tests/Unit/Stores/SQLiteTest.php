@@ -1,11 +1,13 @@
 <?php
 
+use nostriphant\Transpher\Stores\Engine\SQLite;
+
 it('creates a table `event` if not exists', function () {
     $db_file = tempnam(sys_get_temp_dir(), 'test') . '.sqlite';
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, []);
+    $store = new SQLite($sqlite, []);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     $expected_tables = ['event', 'tag', 'tag_value'];
@@ -20,7 +22,7 @@ it('retrieves an event with a tag', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, []);
+    $store = new SQLite($sqlite, []);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -47,7 +49,7 @@ it('stores an event with tags', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, []);
+    $store = new SQLite($sqlite, []);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->querySingle("SELECT id FROM event WHERE id = '07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'"))->toBeNull();
@@ -92,7 +94,7 @@ it('deletes an event with tags', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, []);
+    $store = new SQLite($sqlite, []);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -127,7 +129,7 @@ it('counts events', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, []);
+    $store = new SQLite($sqlite, []);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -158,7 +160,7 @@ it('filters events', function (array $filter_prototype) {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, []);
+    $store = new SQLite($sqlite, []);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("
@@ -207,7 +209,7 @@ it('limits events in result set', function () {
     $sqlite = new SQLite3($db_file);
     expect($db_file)->toBeFile();
 
-    $store = new nostriphant\Transpher\Stores\SQLite($sqlite, []);
+    $store = new SQLite($sqlite, []);
     expect($sqlite->lastErrorMsg())->toBe('not an error');
 
     expect($sqlite->exec("INSERT INTO event (id, pubkey, created_at, kind, content, sig) VALUES ("

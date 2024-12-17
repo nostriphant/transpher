@@ -28,13 +28,12 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }
 
-$pubkey_owner = (new Bech32($_SERVER['RELAY_OWNER_NPUB']))();
 $whitelisted_pubkeys = [
-    $pubkey_owner,
+    (new Bech32($_SERVER['RELAY_OWNER_NPUB']))(),
     Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public())
 ];
 
-$follow_lists = $events(['kinds' => [3], 'authors' => [$pubkey_owner]]);
+$follow_lists = $events(['kinds' => [3], 'authors' => $whitelisted_pubkeys]);
 foreach ($follow_lists as $follow_list) {
     $whitelisted_pubkeys = array_reduce($follow_list->tags, function (array $whitelisted_pubkeys, array $tag) {
         $whitelisted_pubkeys[] = $tag[1];

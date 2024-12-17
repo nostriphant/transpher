@@ -5,8 +5,10 @@ namespace nostriphant\Transpher\Stores\Engine;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Stores\Results;
+use nostriphant\Transpher\Stores\Engine;
+use nostriphant\Transpher\Stores\Housekeeper;
 
-readonly class SQLite implements \nostriphant\Transpher\Stores\Engine {
+readonly class SQLite implements Engine {
 
     use MemoryWrapper {
         __construct As MW_Construct;
@@ -19,6 +21,11 @@ readonly class SQLite implements \nostriphant\Transpher\Stores\Engine {
         $structure($database);
 
         $this->MW_Construct(iterator_to_array($this()));
+    }
+
+    #[\Override]
+    static function housekeeper(Engine $engine): Housekeeper {
+        return new SQLite\Housekeeper($engine);
     }
 
     public function query(Subscription $conditions, string ...$fields): SQLite\Statement {

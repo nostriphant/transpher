@@ -3,9 +3,10 @@
 namespace nostriphant\Transpher\Stores\Engine;
 
 use nostriphant\NIP01\Event;
-use nostriphant\Transpher\Stores\Results;
+use nostriphant\Transpher\Stores\Engine;
+use nostriphant\Transpher\Stores\Housekeeper;
 
-class Disk implements \nostriphant\Transpher\Stores\Engine {
+class Disk implements Engine {
 
     use MemoryWrapper {
         __construct As MW_Construct;
@@ -23,6 +24,11 @@ class Disk implements \nostriphant\Transpher\Stores\Engine {
         });
 
         $this->MW_Construct($events);
+    }
+
+    #[\Override]
+    static function housekeeper(Engine $engine): Housekeeper {
+        return new Disk\Housekeeper($engine);
     }
 
     static function walk_store(string $store, callable $callback): int {

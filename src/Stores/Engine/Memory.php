@@ -6,11 +6,18 @@ namespace nostriphant\Transpher\Stores\Engine;
 use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Stores\Results;
+use nostriphant\Transpher\Stores\Engine;
+use nostriphant\Transpher\Stores\Housekeeper;
 
-final class Memory implements \nostriphant\Transpher\Stores\Engine {
+final class Memory implements Engine {
 
     public function __construct(private array $events) {
         
+    }
+
+    #[\Override]
+    static function housekeeper(Engine $engine): Housekeeper {
+        return new Memory\Housekeeper($engine);
     }
 
     #[\Override]

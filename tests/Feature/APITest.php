@@ -18,13 +18,21 @@ beforeAll(function () {
     $data_dir = ROOT_DIR . '/data/' . uniqid('relay_', true);
     is_dir($data_dir) || mkdir($data_dir);
 
-    $event = Pest\event(['id' => uniqid()]);
+    $event = call_user_func(new nostriphant\NIP59\Rumor(
+                    created_at: time(),
+                    pubkey: \Pest\pubkey_recipient(),
+                    kind: 3,
+                    content: '',
+                    tags: [
+                        ["p", \Pest\pubkey_sender(), $relay_url(), "bob"],
+                    ]
+            ), \Pest\key_recipient());
     is_dir($data_dir . '/events') || mkdir($data_dir . '/events');
     $event_file = $data_dir . '/events' . DIRECTORY_SEPARATOR . $event->id . '.php';
     file_put_contents($event_file, '<?php return ' . var_export($event, true) . ';');
 
     $relay = Functions::bootRelay($relay_url(''), $env = [
-        'AGENT_NSEC' => (string) Bech32::nsec(\Pest\key_sender()(Key::private())),
+        'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => $relay_url(),
         'RELAY_OWNER_NPUB' => (string) Bech32::npub(\Pest\pubkey_recipient()),
         'RELAY_NAME' => 'Really relay',
@@ -69,54 +77,49 @@ describe('agent', function (): void {
 
         $agent = Functions::bootAgent(8084, [
             'RELAY_OWNER_NPUB' => (string) Bech32::npub(Pest\pubkey_recipient()),
-            'AGENT_NSEC' => (string) Bech32::nsec(Pest\key_sender()(Key::private())),
+            'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => $relay_url()
         ]);
         sleep(1); // hack to give agent some time to boot...
-        $alice = new \nostriphant\Transpher\Amp\Client(5, $relay_url());
+        $alice = \Pest\client($relay_url());
         $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
 
         $subscriptionId = $subscription()[1];
         $recipient_key = Pest\key_recipient();
 
-        $expected_messages = [];
-        $send = $alice->start(function (Message $message) use (&$expected_messages) {
-            $expected_message = array_shift($expected_messages);
-            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
-            $expected_message[1]($message->payload);
-        });
-
-        $expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
-                expect($payload[0])->toBe($subscriptionId);
-
-            $gift = $payload[1];
-            expect($gift['kind'])->toBe(1059);
-
-            $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
-            expect($seal->kind)->toBe(13);
-            expect($seal->pubkey)->toBeString();
-            expect($seal->content)->toBeString();
-
-            $private_message = Seal::open($recipient_key, $seal);
-            expect($private_message)->toHaveKey('id');
-            expect($private_message)->toHaveKey('content');
-            expect($private_message->content)->toBe('Hello, I am your agent! The URL of your relay is ' . $relay_url());
-        }];
-        $expected_messages[] = ['EOSE', function (array $payload) use ($subscriptionId) {
-                expect($payload[0])->toBe($subscriptionId);
-        }];
+        $send_alice = $alice();
 
         $request = $subscription();
-        $send($subscription);
+        $send_alice($subscription,
+                    ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
+                        expect($payload[0])->toBe($subscriptionId);
+
+                        $gift = $payload[1];
+                        expect($gift['kind'])->toBe(1059);
+
+                        $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
+                        expect($seal->kind)->toBe(13);
+                        expect($seal->pubkey)->toBeString();
+                        expect($seal->content)->toBeString();
+
+                        $private_message = Seal::open($recipient_key, $seal);
+                        expect($private_message)->toHaveKey('id');
+                        expect($private_message)->toHaveKey('content');
+                        expect($private_message->content)->toBe('Hello, I am your agent! The URL of your relay is ' . $relay_url());
+                    }],
+                    ['EOSE', function (array $payload) use ($subscriptionId) {
+                        expect($payload[0])->toBe($subscriptionId);
+                    }]
+        );
         expect($request[2])->toBeArray();
         expect($request[2]['#p'])->toContain(Pest\pubkey_recipient());
 
         $signed_message = Factory::event(\Pest\key_recipient(), 1, 'Hello!');
-        $expected_messages[] = ['OK', function (array $payload) use ($signed_message) {
-                expect($payload[0])->toBe($signed_message()[1]['id']);
+        $send_alice($signed_message, ['OK', function (array $payload) use ($signed_message) {
+            expect($payload[0])->toBe($signed_message()[1]['id']);
                 expect($payload[1])->toBeTrue();
-        }];
-        $send($signed_message);
+            }]
+        );
 
         $agent();
 

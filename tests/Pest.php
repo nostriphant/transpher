@@ -128,4 +128,21 @@ namespace Pest {
         return $to;
     }
 
+    function client(string $relay_url) {
+        return function () use ($relay_url) {
+            $expected_messages = [];
+            $client = new \nostriphant\Transpher\Amp\Client(5, $relay_url);
+            $send = $client->start(function (Message $message) use (&$expected_messages) {
+                $expected_message = array_shift($expected_messages);
+                expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+                $expected_message[1]($message->payload);
+            });
+
+            return function (Message $message, array ...$expected_replies) use ($send, &$expected_messages) {
+                $send($message);
+                $expected_messages = array_merge($expected_messages, $expected_replies);
+            };
+        };
+    }
+
 }

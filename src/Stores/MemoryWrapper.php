@@ -8,14 +8,12 @@ trait MemoryWrapper {
 
     readonly private Memory $memory;
 
-    public function __construct(array $events, array $whitelist_prototypes) {
-        $this->memory = new Memory($events, $whitelist_prototypes);
+    public function __construct(array $events) {
+        $this->memory = new Memory($events);
     }
 
     public function offsetSet(mixed $offset, mixed $event): void {
-        if (call_user_func($this->whitelist, $event) !== false) {
-            $this->memory[$offset] = $event;
-        }
+        $this->memory[$offset] = $event;
     }
 
     public function offsetUnset(mixed $offset): void {

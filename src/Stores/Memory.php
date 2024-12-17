@@ -8,15 +8,8 @@ use nostriphant\NIP01\Event;
 
 final class Memory implements \nostriphant\Transpher\Relay\Store {
 
-    readonly public Subscription $whitelist;
-
-    public function __construct(private array $events, array $whitelist_prototypes) {
-        $this->whitelist = new Subscription($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
-    }
-
-    #[\Override]
-    public function recreate(array $whitelist_prototypes): self {
-        return new self($this->events, $whitelist_prototypes);
+    public function __construct(private array $events) {
+        
     }
 
     #[\Override]
@@ -39,9 +32,7 @@ final class Memory implements \nostriphant\Transpher\Relay\Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
-        if (call_user_func($this->whitelist, $value) === false) {
-            return;
-        } elseif (isset($offset)) {
+        if (isset($offset)) {
             $this->events[$offset] = $value;
         } else {
             $this->events[] = $value;

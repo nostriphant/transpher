@@ -7,8 +7,6 @@ use nostriphant\Transpher\Stores\Results;
 
 interface Store extends \ArrayAccess, \Countable, \IteratorAggregate {
 
-    public function recreate(array $whitelist_prototypes): self;
-
     public function __invoke(array ...$filter_prototypes): Results;
 
     #[\ReturnTypeWillChange]

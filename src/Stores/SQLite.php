@@ -13,16 +13,11 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         offsetUnset As MW_offsetUnset;
     }
 
-    public function __construct(public \SQLite3 $database, public array $whitelist_prototypes) {
+    public function __construct(public \SQLite3 $database) {
         $structure = new SQLite\Structure();
         $structure($database);
 
-        $this->MW_Construct(iterator_to_array($this()), $whitelist_prototypes);
-    }
-
-    #[\Override]
-    public function recreate(array $whitelist_prototypes): self {
-        return new self($this->database, $whitelist_prototypes);
+        $this->MW_Construct(iterator_to_array($this()));
     }
 
     public function query(Subscription $conditions, string ...$fields): SQLite\Statement {
@@ -76,11 +71,6 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
     #[\Override]
     public function offsetSet(mixed $offset, mixed $event): void {
         if (!$event instanceof Event) {
-            return;
-        }
-
-        $whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
-        if (call_user_func($whitelist, $event) === false) {
             return;
         }
 

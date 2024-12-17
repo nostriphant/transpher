@@ -3,7 +3,6 @@
 namespace nostriphant\Transpher\Stores;
 
 use nostriphant\NIP01\Event;
-use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\Transpher\Relay\Store;
 
 class Disk implements Store {
@@ -16,23 +15,14 @@ class Disk implements Store {
 
     const NIP01_EVENT_SPLITOFF_TIME = 1732125327;
 
-    public Subscription $whitelist;
-
-    public function __construct(public string $store, array $whitelist_prototypes) {
+    public function __construct(public string $store) {
         $events = [];
         is_dir($store) || mkdir($store);
-        $this->whitelist = new Subscription($whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
-
         self::walk_store($store, function (Event $event) use (&$events) {
             $events[$event->id] = $event;
         });
 
-        $this->MW_Construct($events, $whitelist_prototypes);
-    }
-
-    #[\Override]
-    public function recreate(array $whitelist_prototypes): self {
-        return new self($this->store, $whitelist_prototypes);
+        $this->MW_Construct($events);
     }
 
     static function walk_store(string $store, callable $callback): int {
@@ -64,10 +54,8 @@ class Disk implements Store {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $event): void {
-        if (call_user_func($this->whitelist, $event) !== false) {
-            $this->MW_offsetSet($offset, $event);
-            self::write($this->store, $event);
-        }
+        $this->MW_offsetSet($offset, $event);
+        self::write($this->store, $event);
     }
 
     #[\Override]

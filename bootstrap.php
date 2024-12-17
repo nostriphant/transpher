@@ -87,7 +87,7 @@ namespace nostriphant\Transpher\Stores {
             SQLite::class => new SQLite\Housekeeper($store),
             Memory::class => new Memory\Housekeeper($store),
             default => new NullHousekeeper()
-        })();
+        })($whitelist_prototypes);
     }
 
 }

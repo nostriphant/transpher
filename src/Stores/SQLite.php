@@ -20,6 +20,11 @@ readonly class SQLite implements \nostriphant\Transpher\Relay\Store {
         $this->MW_Construct(iterator_to_array($this()), $whitelist_prototypes);
     }
 
+    #[\Override]
+    public function recreate(array $whitelist_prototypes): self {
+        return new self($this->database, $whitelist_prototypes);
+    }
+
     public function query(Subscription $conditions, string ...$fields): SQLite\Statement {
         $query_prototype = $conditions([
             'where' => [],

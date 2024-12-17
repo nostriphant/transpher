@@ -1,6 +1,5 @@
 <?php
 
-use nostriphant\NIP01\Key;
 use nostriphant\TranspherTests\Feature\Functions;
 use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\Transpher\Nostr\Message\Factory;
@@ -9,7 +8,6 @@ use nostriphant\NIP01\Nostr;
 use nostriphant\NIP59\Gift;
 use nostriphant\NIP01\Event;
 use nostriphant\NIP59\Seal;
-use nostriphant\NIP01\Message;
 
 beforeAll(function () {
     global $relay, $env, $data_dir, $relay_url;
@@ -81,17 +79,18 @@ describe('agent', function (): void {
             'RELAY_URL' => $relay_url()
         ]);
         sleep(1); // hack to give agent some time to boot...
-        $alice = \Pest\client($relay_url());
+        $client_factory = \Pest\client($relay_url());
+
         $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
 
         $subscriptionId = $subscription()[1];
         $recipient_key = Pest\key_recipient();
 
-        $send_alice = $alice();
+        $alice = $client_factory();
 
         $request = $subscription();
-        $send_alice($subscription,
-                    ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
+        $alice($subscription,
+                ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
                         expect($payload[0])->toBe($subscriptionId);
 
                         $gift = $payload[1];
@@ -115,8 +114,16 @@ describe('agent', function (): void {
         expect($request[2]['#p'])->toContain(Pest\pubkey_recipient());
 
         $signed_message = Factory::event(\Pest\key_recipient(), 1, 'Hello!');
-        $send_alice($signed_message, ['OK', function (array $payload) use ($signed_message) {
-            expect($payload[0])->toBe($signed_message()[1]['id']);
+        $alice($signed_message, ['OK', function (array $payload) use ($signed_message) {
+                expect($payload[0])->toBe($signed_message()[1]['id']);
+                expect($payload[1])->toBeTrue();
+            }]
+        );
+
+        $bob = $client_factory();
+        $bob_message = Factory::event(\Pest\key_sender(), 1, 'Hello!');
+        $bob($bob_message, ['OK', function (array $payload) use ($bob_message) {
+                expect($payload[0])->toBe($bob_message()[1]['id']);
                 expect($payload[1])->toBeTrue();
             }]
         );
@@ -125,9 +132,13 @@ describe('agent', function (): void {
 
         $events = new nostriphant\Transpher\Stores\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 
-        $notes = iterator_to_array($events(['authors' => [Pest\pubkey_recipient()]]));
-        expect($notes[0]->kind)->toBe(1);
-        expect($notes[0]->content)->toBe('Hello!');
+        $notes_alice = iterator_to_array($events(['authors' => [Pest\pubkey_recipient()]]));
+        expect($notes_alice[0]->kind)->toBe(1);
+        expect($notes_alice[0]->content)->toBe('Hello!');
+
+        $notes_bob = iterator_to_array($events(['ids' => [$bob_message()[1]['id']]]));
+        expect($notes_bob[0]->kind)->toBe(1);
+        expect($notes_bob[0]->content)->toBe('Hello!');
 
         $pdms = iterator_to_array($events(['#p' => [Pest\pubkey_recipient()]]));
         expect($pdms[0]->kind)->toBe(1059);

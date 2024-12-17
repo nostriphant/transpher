@@ -15,6 +15,11 @@ final class Memory implements \nostriphant\Transpher\Relay\Store {
     }
 
     #[\Override]
+    public function recreate(array $whitelist_prototypes): self {
+        return new self($this->events, $whitelist_prototypes);
+    }
+
+    #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
         $subscription = new Subscription($filter_prototypes, \nostriphant\Transpher\Relay\Condition::class);
         return new Results(function () use ($subscription) {

@@ -30,6 +30,11 @@ class Disk implements Store {
         $this->MW_Construct($events, $whitelist_prototypes);
     }
 
+    #[\Override]
+    public function recreate(array $whitelist_prototypes): self {
+        return new self($this->store, $whitelist_prototypes);
+    }
+
     static function walk_store(string $store, callable $callback): int {
         $count = 0;
         foreach (glob($store . DIRECTORY_SEPARATOR . '*.php') as $event_file) {

@@ -39,7 +39,7 @@ readonly class SQLite implements Engine {
                 . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id ";
 
         $parameters = [];
-        if (isset($query_prototype['where'])) {
+        if (empty($query_prototype['where']) === false) {
             list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
                 $return[0][] = array_shift($condition);
                 $return[1] = array_merge($return[1], $condition);

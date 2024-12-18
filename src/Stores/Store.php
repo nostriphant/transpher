@@ -10,11 +10,12 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
     private \nostriphant\Transpher\Nostr\Subscription $whitelist;
 
     public function __construct(private Engine $engine, private array $whitelist_prototypes) {
-        if (\nostriphant\Transpher\Nostr\Subscription::disabled($whitelist_prototypes) === false) {
-            $this->engine::housekeeper($this->engine)($whitelist_prototypes);
-        }
+        $disabled = array_reduce($whitelist_prototypes, fn(bool $disabled, array $filter_prototype) => empty($filter_prototype), empty($whitelist_prototypes));
 
-        $this->whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
+        if ($disabled === false) {
+            $this->engine::housekeeper($this->engine)($whitelist_prototypes);
+            $this->whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
+        }
     }
 
     public function __invoke(array ...$filter_prototypes): Results {
@@ -33,7 +34,7 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
-        if (call_user_func($this->whitelist, $value) === false) {
+        if (isset($this->whitelist) && call_user_func($this->whitelist, $value) === false) {
             return;
         } elseif (isset($offset)) {
             $this->engine[$offset] = $value;

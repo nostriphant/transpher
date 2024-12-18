@@ -13,20 +13,19 @@ readonly class Conditions {
         'until' => 'until'
     ];
 
-    public function __construct(private string $mapperClass) {
+    static function createFromPrototypes(string $mapperClass, array $filter_prototypes) {
+        $mapper = function (array $filter_prototype) use ($mapperClass) {
+            $conditions = [];
+            foreach ($filter_prototype as $filter_field => $expected_value) {
+                $method = $filter_field;
+                if (isset(self::MAP[$method])) {
+                    $method = self::MAP[$method];
+                }
 
-    }
-
-    public function __invoke(array $filter_prototype) {
-        $conditions = [];
-        foreach ($filter_prototype as $filter_field => $expected_value) {
-            $method = $filter_field;
-            if (isset(self::MAP[$method])) {
-                $method = self::MAP[$method];
+                $conditions[$filter_field] = $mapperClass::$method($expected_value);
             }
-
-            $conditions[$filter_field] = $this->mapperClass::$method($expected_value);
-        }
-        return $conditions;
+            return $conditions;
+        };
+        return array_map($mapper, $filter_prototypes);
     }
 }

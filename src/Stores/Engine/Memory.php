@@ -21,7 +21,7 @@ final class Memory implements Engine {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        $subscription = \nostriphant\Transpher\Relay\Condition::makeConditions($filter_prototypes);
+        $subscription = \nostriphant\Transpher\Relay\Condition::makeConditions(new \nostriphant\Transpher\Relay\Conditions($filter_prototypes));
         return new Results(function () use ($subscription) {
                     yield from array_filter($this->events, $subscription);
                 });

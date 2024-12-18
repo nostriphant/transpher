@@ -20,8 +20,4 @@ readonly class Conditions {
                                 $this->filter_prototypes
                         ));
     }
-
-    static function createFromPrototypes(callable $conditionFactory, array $filter_prototypes): callable {
-        return (new self($filter_prototypes))($conditionFactory);
-    }
 }

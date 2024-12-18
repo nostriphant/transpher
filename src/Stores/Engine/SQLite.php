@@ -27,10 +27,10 @@ readonly class SQLite implements Engine {
         return new SQLite\Housekeeper($engine);
     }
 
-    public function query(array $prototypes, string ...$fields): SQLite\Statement {
-        $conditionsFactory = \nostriphant\Transpher\Relay\Conditions::createFromPrototypes(function (string $filter_field, mixed $expected_value) {
+    public function query(\nostriphant\Transpher\Relay\Conditions $conditions, string ...$fields): SQLite\Statement {
+        $conditionsFactory = $conditions(function (string $filter_field, mixed $expected_value) {
             return SQLite\Condition::$filter_field($expected_value);
-        }, $prototypes);
+        });
         $conditions = $conditionsFactory(fn(array $conditions) => fn(array $query): array => array_reduce($conditions, fn(array $query, SQLite\Condition $condition) => $condition($query), $query));
         $filters = fn(array $query): array => array_reduce($conditions, fn(array $query, callable $filter) => $filter($query), $query);
         $query_prototype = $filters([
@@ -66,7 +66,7 @@ readonly class SQLite implements Engine {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        return $this->query($filter_prototypes, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
+        return $this->query(new \nostriphant\Transpher\Relay\Conditions($filter_prototypes), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
     }
 
     #[\Override]

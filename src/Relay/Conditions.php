@@ -8,7 +8,7 @@ readonly class Conditions {
 
     }
 
-    public function __invoke(callable $conditionFactory): callable {
+    public function __invoke(ConditionFactory $conditionFactory): callable {
         return fn(callable $executeCondition) => array_map(
                         $executeCondition,
                         array_map(

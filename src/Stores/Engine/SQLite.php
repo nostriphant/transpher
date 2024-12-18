@@ -28,9 +28,7 @@ readonly class SQLite implements Engine {
     }
 
     public function query(\nostriphant\Transpher\Relay\Conditions $conditions, string ...$fields): SQLite\Statement {
-        $conditionsFactory = $conditions(function (string $filter_field, mixed $expected_value) {
-            return SQLite\Condition::$filter_field($expected_value);
-        });
+        $conditionsFactory = $conditions(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition::class));
         $conditions = $conditionsFactory(fn(array $conditions) => fn(array $query): array => array_reduce($conditions, fn(array $query, SQLite\Condition $condition) => $condition($query), $query));
         $filters = fn(array $query): array => array_reduce($conditions, fn(array $query, callable $filter) => $filter($query), $query);
         $query_prototype = $filters([

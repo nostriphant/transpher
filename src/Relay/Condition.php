@@ -14,15 +14,15 @@ readonly class Condition {
         return call_user_func($this->test, $event);
     }
 
-    static function authors(mixed $expected_value) {
+    static function authors(mixed $expected_value): self {
         return self::scalar('pubkey', $expected_value);
     }
 
-    static function ids(mixed $expected_value) {
+    static function ids(mixed $expected_value): self {
         return self::scalar('id', $expected_value);
     }
 
-    static function kinds(mixed $expected_value) {
+    static function kinds(mixed $expected_value): self {
         return self::scalar('kind', $expected_value);
     }
 
@@ -51,9 +51,7 @@ readonly class Condition {
     }
 
     static function makeConditions(Conditions $conditions): callable {
-        $conditionsFactory = $conditions(function (string $filter_field, mixed $expected_value) {
-            return Condition::$filter_field($expected_value);
-        });
+        $conditionsFactory = $conditions(new \nostriphant\Transpher\Relay\ConditionFactory(self::class));
         $conditions = $conditionsFactory(fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true));
         return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, callable $filter) => $result || $filter($event), false);
     }

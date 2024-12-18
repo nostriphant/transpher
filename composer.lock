@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7eb1001d66dbaa41338e523761a36700",
+    "content-hash": "11c568d61cb351d62627622070c91b9f",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2439,6 +2439,51 @@
                 "source": "https://github.com/nostriphant/nip-01/tree/1.9"
             },
             "time": "2024-12-16T12:23:09+00:00"
+        },
+        {
+            "name": "nostriphant/nip-17",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nostriphant/nip-17.git",
+                "reference": "242ed5143c9245b93a2c2e9afc728fd1c8802393"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nostriphant/nip-17/zipball/242ed5143c9245b93a2c2e9afc728fd1c8802393",
+                "reference": "242ed5143c9245b93a2c2e9afc728fd1c8802393",
+                "shasum": ""
+            },
+            "require": {
+                "nostriphant/nip-59": "^1.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "pestphp/pest": "^2.35"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "nostriphant\\NIP17\\": "src/",
+                    "nostriphant\\NIP17Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rik Meijer",
+                    "email": "rik@nostriphant.dev"
+                }
+            ],
+            "description": "Nostr NIP-17 implementation in PHP",
+            "support": {
+                "issues": "https://github.com/nostriphant/nip-17/issues",
+                "source": "https://github.com/nostriphant/nip-17/tree/1.0"
+            },
+            "time": "2024-12-18T13:09:04+00:00"
         },
         {
             "name": "nostriphant/nip-19",

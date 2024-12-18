@@ -5,7 +5,7 @@ namespace nostriphant\Transpher\Amp;
 use Psr\Log\LoggerInterface;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\NIP01\Message;
 
 readonly class Agent {
     
@@ -26,7 +26,8 @@ readonly class Agent {
 
         $log->info('Running agent with public key ' . Bech32::npub(($this->key)(Key::public())));
         $log->info('Sending Private Direct Message event');
-        $send(\nostriphant\Transpher\Nostr\Message\PrivateDirect::make($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url));
+        $gift = \nostriphant\NIP17\PrivateDirect::make($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url);
+        $send(Message::event($gift));
 
         return new AwaitSignal(fn() => $client->stop());
     }

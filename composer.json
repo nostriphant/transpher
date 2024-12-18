@@ -19,7 +19,8 @@
         "nostriphant/nip-19": "^2.0",
         "nostriphant/nip-44": "^1.0",
         "nostriphant/functional-alternate": "^1.0",
-        "nostriphant/nip-59": "^1.0"
+        "nostriphant/nip-59": "^1.0",
+        "nostriphant/nip-17": "^1.0"
     },
     "license": "MIT",
     "autoload": {

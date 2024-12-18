@@ -17,7 +17,7 @@ readonly class Conditions {
 
     }
 
-    public function __invoke(array $filter_prototypes): callable {
+    public function __invoke(array $filter_prototypes): array {
         $filters = [];
         foreach ($filter_prototypes as $filter_prototype) {
             $conditions = [];
@@ -31,6 +31,6 @@ readonly class Conditions {
             }
             $filters[] = $this->mapperClass::makeFilter(...$conditions);
         }
-        return $this->mapperClass::wrapFilters($filters);
+        return $filters;
     }
 }

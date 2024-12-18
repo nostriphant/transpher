@@ -52,7 +52,7 @@ readonly class Condition {
 
     static function makeConditions(array $filter_prototypes): callable {
         $mapper = new \nostriphant\Transpher\Relay\Conditions(__CLASS__);
-        return $mapper($filter_prototypes);
+        return self::wrapFilters($mapper($filter_prototypes));
     }
 
     static function wrapFilters(array $filters): callable {

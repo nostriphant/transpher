@@ -48,11 +48,6 @@ readonly class Condition {
         return self::tag(ltrim($name, '#'), ...$arguments);
     }
 
-    static function makeConditions(array $filter_prototypes): callable {
-        $mapper = new \nostriphant\Transpher\Relay\Conditions(__CLASS__);
-        return $mapper($filter_prototypes);
-    }
-
     static function wrapFilters(array $filters): callable {
         return fn(array $query): array => array_reduce($filters, fn(array $query, callable $filter) => $filter($query), $query);
     }

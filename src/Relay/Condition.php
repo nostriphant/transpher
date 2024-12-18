@@ -51,7 +51,7 @@ readonly class Condition {
     }
 
     static function makeConditions(array $filter_prototypes): callable {
-        $conditionsFactory = \nostriphant\Transpher\Relay\Conditions::createFromPrototypes(__CLASS__, $filter_prototypes);
+        $conditionsFactory = Conditions::createFromPrototypes(__CLASS__, $filter_prototypes);
         $conditions = $conditionsFactory(fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true));
         return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, callable $filter) => $result || $filter($event), false);
     }

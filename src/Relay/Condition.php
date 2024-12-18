@@ -51,8 +51,8 @@ readonly class Condition {
     }
 
     static function makeConditions(array $filter_prototypes): callable {
-        $conditionsFactory = Conditions::createFromPrototypes(function (string $method, mixed $expected_value) {
-            return Condition::$method($expected_value);
+        $conditionsFactory = Conditions::createFromPrototypes(function (string $filter_field, mixed $expected_value) {
+            return Condition::$filter_field($expected_value);
         }, $filter_prototypes);
         $conditions = $conditionsFactory(fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true));
         return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, callable $filter) => $result || $filter($event), false);

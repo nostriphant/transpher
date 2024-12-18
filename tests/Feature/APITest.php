@@ -2,11 +2,14 @@
 
 use nostriphant\TranspherTests\Feature\Functions;
 use nostriphant\Transpher\Relay\InformationDocument;
-use nostriphant\Transpher\Nostr\Message\Factory;
-use nostriphant\NIP19\Bech32;
-use nostriphant\NIP01\Nostr;
-use nostriphant\NIP59\Gift;
+use nostriphant\TranspherTests\Factory;
+
+use nostriphant\NIP01\Key;
+use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Event;
+use nostriphant\NIP01\Nostr;
+use nostriphant\NIP19\Bech32;
+use nostriphant\NIP59\Gift;
 use nostriphant\NIP59\Seal;
 
 beforeAll(function () {

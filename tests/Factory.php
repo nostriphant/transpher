@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Nostr\Message;
+namespace nostriphant\TranspherTests;
 
 use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Key;

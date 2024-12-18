@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\TranspherTests\Factory;
 use nostriphant\NIP01\Message;
 
 it('SHOULD send the client an OK result saying the event was not stored for the created_at timestamp not being within the permitted limits.', function (int $kind) {

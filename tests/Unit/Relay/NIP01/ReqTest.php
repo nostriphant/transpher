@@ -1,7 +1,7 @@
 <?php
 
 use nostriphant\NIP01\Key;
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\TranspherTests\Factory;
 use nostriphant\NIP01\Message;
 use function Pest\incoming;
 

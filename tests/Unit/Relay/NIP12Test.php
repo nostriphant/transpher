@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\TranspherTests\Factory;
 use function Pest\incoming,
              Pest\store;
 use nostriphant\NIP01\Event;

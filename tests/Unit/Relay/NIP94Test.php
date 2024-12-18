@@ -1,7 +1,7 @@
 <?php
 
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\TranspherTests\Factory;
 use function Pest\incoming;
 
 it('downloads NIP-94 files (kind 1063) into a data folder', function () {

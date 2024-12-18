@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\TranspherTests\Factory;
 use function Pest\incoming;
 
 it('downloads NIP-92 files (kind 1, with imeta tag) into a data folder', function () {

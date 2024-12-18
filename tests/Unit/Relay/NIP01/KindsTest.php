@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\TranspherTests\Factory;
 
 describe('Kinds (https://nips.nostr.com/1#kinds)', function () {
 

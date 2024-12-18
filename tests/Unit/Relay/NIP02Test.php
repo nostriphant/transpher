@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Message\Factory;
+use nostriphant\TranspherTests\Factory;
 use function Pest\incoming;
 
 it('replaces replaceable (n == 3; follow list) events, keeping only the last one (based on pubkey & kind)', function () {

@@ -9,7 +9,7 @@ readonly class Housekeeper implements \nostriphant\Transpher\Stores\Housekeeper 
     }
 
     public function __invoke(array $whitelist_prototypes): void {
-        $select_statement = $this->store->query(new \nostriphant\Transpher\Nostr\Subscription($whitelist_prototypes, Condition::class), "event.id");
+        $select_statement = $this->store->query($whitelist_prototypes, "event.id");
         $statement = Statement::nest("DELETE FROM event WHERE event.id NOT IN (", $select_statement, ") RETURNING *");
         $statement($this->store->database);
     }

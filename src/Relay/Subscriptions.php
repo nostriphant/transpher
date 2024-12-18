@@ -1,7 +1,7 @@
 <?php
 
 namespace nostriphant\Transpher\Relay;
-use nostriphant\Transpher\Nostr\Subscription;
+
 use function \Functional\if_else;
 use \nostriphant\Transpher\Relay\Sender;
 use nostriphant\NIP01\Message;
@@ -38,7 +38,8 @@ class Subscriptions {
     }
 
     static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, array $filter_prototypes): void {
-        $subscriptions[$subscription_id] = if_else(new Subscription($filter_prototypes, \nostriphant\Transpher\Relay\Condition::class), fn() => $relay, fn() => false);
+        $test = \nostriphant\Transpher\Relay\Condition::makeConditions($filter_prototypes);
+        $subscriptions[$subscription_id] = if_else($test, fn() => $relay, fn() => false);
     }
 
     static function unsubscribe(array &$subscriptions, string $subscription_id): void {

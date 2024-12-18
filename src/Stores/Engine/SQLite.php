@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Stores\Engine;
 
-use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Stores\Results;
 use nostriphant\Transpher\Stores\Engine;
@@ -28,7 +27,8 @@ readonly class SQLite implements Engine {
         return new SQLite\Housekeeper($engine);
     }
 
-    public function query(Subscription $conditions, string ...$fields): SQLite\Statement {
+    public function query(array $prototypes, string ...$fields): SQLite\Statement {
+        $conditions = SQLite\Condition::makeConditions($prototypes);
         $query_prototype = $conditions([
             'where' => [],
             'limit' => null
@@ -62,7 +62,7 @@ readonly class SQLite implements Engine {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        return $this->query(new Subscription($filter_prototypes, SQLite\Condition::class), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
+        return $this->query($filter_prototypes, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
     }
 
     #[\Override]

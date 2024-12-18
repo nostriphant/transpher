@@ -3,7 +3,6 @@
 
 namespace nostriphant\Transpher\Stores\Engine;
 
-use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Stores\Results;
 use nostriphant\Transpher\Stores\Engine;
@@ -22,7 +21,7 @@ final class Memory implements Engine {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        $subscription = new Subscription($filter_prototypes, \nostriphant\Transpher\Relay\Condition::class);
+        $subscription = \nostriphant\Transpher\Relay\Condition::makeConditions($filter_prototypes);
         return new Results(function () use ($subscription) {
                     yield from array_filter($this->events, $subscription);
                 });

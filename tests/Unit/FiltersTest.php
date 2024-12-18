@@ -1,10 +1,9 @@
 <?php
 
-use nostriphant\Transpher\Nostr\Subscription;
 use function \Pest\event;
 
 function subscription(array $filter_prototypes) {
-    return new Subscription($filter_prototypes, \nostriphant\Transpher\Relay\Condition::class);
+    return \nostriphant\Transpher\Relay\Condition::makeConditions($filter_prototypes);
 }
 
 it('filters p-tags', function() {

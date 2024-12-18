@@ -2,19 +2,20 @@
 
 namespace nostriphant\Transpher\Stores;
 
-use nostriphant\Transpher\Nostr\Subscription;
 use nostriphant\NIP01\Event;
 
 readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
 
-    private \nostriphant\Transpher\Nostr\Subscription $whitelist;
+    private \Closure $whitelist;
 
-    public function __construct(private Engine $engine, private array $whitelist_prototypes) {
+    public function __construct(private Engine $engine, array $whitelist_prototypes) {
         $disabled = array_reduce($whitelist_prototypes, fn(bool $disabled, array $filter_prototype) => empty($filter_prototype), empty($whitelist_prototypes));
 
         if ($disabled === false) {
             $this->engine::housekeeper($this->engine)($whitelist_prototypes);
-            $this->whitelist = new Subscription($this->whitelist_prototypes, \nostriphant\Transpher\Relay\Condition::class);
+            $this->whitelist = \nostriphant\Transpher\Relay\Condition::makeConditions($whitelist_prototypes);
+        } else {
+            $this->whitelist = fn() => true;
         }
     }
 
@@ -34,7 +35,7 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
 
     #[\Override]
     public function offsetSet(mixed $offset, mixed $value): void {
-        if (isset($this->whitelist) && call_user_func($this->whitelist, $value) === false) {
+        if (call_user_func($this->whitelist, $value) === false) {
             return;
         } elseif (isset($offset)) {
             $this->engine[$offset] = $value;

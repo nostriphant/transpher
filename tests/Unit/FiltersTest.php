@@ -6,12 +6,11 @@ function subscription(array $filter_prototypes) {
     return \nostriphant\Transpher\Relay\Condition::makeConditions($filter_prototypes);
 }
 
-it('filters p-tags', function() {
+it('filters p-tags', function () {
     $subscription = subscription([['#p' => ['RandomPTag']]]);
 
     expect($subscription(event(['tags' => [['p', 'RandomPTag']]])))->toBeTrue();
 });
-
 
 it('filters e-tags', function() {
     $subscription = subscription([['#e' => ['RandomEventId']]]);

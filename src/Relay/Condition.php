@@ -14,15 +14,15 @@ readonly class Condition {
         return call_user_func($this->test, $event);
     }
 
-    static function pubkey(mixed $expected_value) {
+    static function authors(mixed $expected_value) {
         return self::scalar('pubkey', $expected_value);
     }
 
-    static function id(mixed $expected_value) {
+    static function ids(mixed $expected_value) {
         return self::scalar('id', $expected_value);
     }
 
-    static function kind(mixed $expected_value) {
+    static function kinds(mixed $expected_value) {
         return self::scalar('kind', $expected_value);
     }
 

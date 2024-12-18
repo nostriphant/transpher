@@ -51,7 +51,10 @@ readonly class Condition {
     }
 
     static function makeConditions(Conditions $conditionsFactory): callable {
-        $conditions = $conditionsFactory(new ConditionFactory(self::class), fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true));
+        $conditions = $conditionsFactory(
+                new ConditionFactory(self::class),
+                fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true)
+        );
         return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, callable $filter) => $result || $filter($event), false);
     }
 }

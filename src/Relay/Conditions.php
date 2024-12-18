@@ -17,7 +17,7 @@ readonly class Conditions {
 
     }
 
-    public function __invoke(array $filter_prototypes): array {
+    public function __invoke(array $filter_prototypes, callable $makeFilter): array {
         $filters = [];
         foreach ($filter_prototypes as $filter_prototype) {
             $conditions = [];
@@ -29,7 +29,7 @@ readonly class Conditions {
 
                 $conditions[$filter_field] = $this->mapperClass::$method($expected_value);
             }
-            $filters[] = $this->mapperClass::makeFilter(...$conditions);
+            $filters[] = $makeFilter(...$conditions);
         }
         return $filters;
     }

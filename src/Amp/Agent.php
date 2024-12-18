@@ -26,7 +26,7 @@ readonly class Agent {
 
         $log->info('Running agent with public key ' . Bech32::npub(($this->key)(Key::public())));
         $log->info('Sending Private Direct Message event');
-        $send(Factory::privateDirect($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url));
+        $send(\nostriphant\Transpher\Nostr\Message\PrivateDirect::make($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url));
 
         return new AwaitSignal(fn() => $client->stop());
     }

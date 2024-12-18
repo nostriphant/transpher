@@ -23,9 +23,9 @@ class RequestHandler implements IRequestHandler {
             return new Response(
                 headers: ['Content-Type' => 'application/json'],
                 body: json_encode(InformationDocument::generate(
-                    $_SERVER['RELAY_NAME'],
-                    $_SERVER['RELAY_DESCRIPTION'],
-                    (new \nostriphant\NIP19\Bech32($_SERVER['RELAY_OWNER_NPUB']))(),
+                                    $_SERVER['RELAY_NAME'],
+                                    $_SERVER['RELAY_DESCRIPTION'],
+                                    (new \nostriphant\NIP19\Bech32($_SERVER['RELAY_OWNER_NPUB']))(),
                                     $_SERVER['RELAY_CONTACT']
                             ))
             );

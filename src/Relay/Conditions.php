@@ -26,6 +26,6 @@ readonly class Conditions {
             }
             return $conditions;
         };
-        return array_map($mapper, $filter_prototypes);
+        return fn(callable $executeCondition) => array_map($executeCondition, array_map($mapper, $filter_prototypes));
     }
 }

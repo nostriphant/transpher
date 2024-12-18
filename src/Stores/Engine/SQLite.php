@@ -28,8 +28,8 @@ readonly class SQLite implements Engine {
     }
 
     public function query(array $prototypes, string ...$fields): SQLite\Statement {
-        $filters = \nostriphant\Transpher\Relay\Conditions::createFromPrototypes(SQLite\Condition::class, $prototypes);
-        $filters = array_map(fn(array $conditions) => fn(array $query): array => array_reduce($conditions, fn(array $query, SQLite\Condition $condition) => $condition($query), $query), $filters);
+        $filtersFactory = \nostriphant\Transpher\Relay\Conditions::createFromPrototypes(SQLite\Condition::class, $prototypes);
+        $filters = $filtersFactory(fn(array $conditions) => fn(array $query): array => array_reduce($conditions, fn(array $query, SQLite\Condition $condition) => $condition($query), $query));
         $conditions = fn(array $query): array => array_reduce($filters, fn(array $query, callable $filter) => $filter($query), $query);
         $query_prototype = $conditions([
             'where' => [],

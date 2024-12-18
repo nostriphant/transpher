@@ -51,8 +51,8 @@ readonly class Condition {
     }
 
     static function makeConditions(array $filter_prototypes): callable {
-        $filters = \nostriphant\Transpher\Relay\Conditions::createFromPrototypes(__CLASS__, $filter_prototypes);
-        $filters = array_map(fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true), $filters);
+        $filtersFactory = \nostriphant\Transpher\Relay\Conditions::createFromPrototypes(__CLASS__, $filter_prototypes);
+        $filters = $filtersFactory(fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true));
         return fn(Event $event): bool => array_reduce($filters, fn(bool $result, callable $filter) => $result || $filter($event), false);
     }
 }

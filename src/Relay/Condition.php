@@ -50,9 +50,8 @@ readonly class Condition {
         return self::tag(ltrim($name, '#'), ...$arguments);
     }
 
-    static function makeConditions(Conditions $conditions): callable {
-        $conditionsFactory = $conditions(new \nostriphant\Transpher\Relay\ConditionFactory(self::class));
-        $conditions = $conditionsFactory(fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true));
+    static function makeConditions(Conditions $conditionsFactory): callable {
+        $conditions = $conditionsFactory(new ConditionFactory(self::class), fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true));
         return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, callable $filter) => $result || $filter($event), false);
     }
 }

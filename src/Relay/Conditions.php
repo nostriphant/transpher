@@ -4,12 +4,12 @@ namespace nostriphant\Transpher\Relay;
 
 readonly class Conditions {
 
-    static function createFromPrototypes(string $mapperClass, array $filter_prototypes) {
+    static function createFromPrototypes(callable $conditionFactory, array $filter_prototypes) {
         return fn(callable $executeCondition) => array_map(
                         $executeCondition,
                         array_map(
                                 fn(array $filter_prototype) => array_map(
-                                        fn(string $method, mixed $expected_value) => $mapperClass::$method($expected_value),
+                                        $conditionFactory,
                                         array_keys($filter_prototype),
                                         $filter_prototype
                                 ),

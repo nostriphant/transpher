@@ -29,12 +29,9 @@ readonly class SQLite implements Engine {
 
     public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
         $query_prototypes = array_map(
-                new SQLite\Condition([
-                            'where' => [],
-                            'limit' => null
-                        ]),
-                        $conditionsFactory(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class))
-                );
+                new SQLite\Condition(),
+                $conditionsFactory(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class))
+        );
 
         $limit = '';
         $wheres = [];

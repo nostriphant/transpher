@@ -30,7 +30,7 @@ readonly class SQLite implements Engine {
     public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
         $conditionFactory = new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class);
 
-        $limit = '';
+        $limit = null;
         $wheres = [];
         $parameters = [];
         foreach ($conditionsFactory($conditionFactory) as $query_conditions) {
@@ -40,7 +40,7 @@ readonly class SQLite implements Engine {
             ]);
             
 
-            $limit = (isset($query_prototype['limit']) ? "LIMIT " . $query_prototype['limit'] : "");
+            $limit = (isset($query_prototype['limit']) ? $query_prototype['limit'] : null);
             if (empty($query_prototype['where']) === false) {
                 list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
                     $return[0][] = array_shift($condition);
@@ -56,7 +56,7 @@ readonly class SQLite implements Engine {
                 . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
                 . (empty($wheres) ? '' : "WHERE (" . implode(') OR (', $wheres) . ") ")
                 . 'GROUP BY event.id '
-                . $limit;
+                . (isset($limit) ? "LIMIT " . $limit : "");
 
         return new SQLite\Statement($query, $parameters);
     }

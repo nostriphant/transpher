@@ -54,6 +54,11 @@
         "test": [
             "@clearCache @no_additional_args",
             "./vendor/bin/pest"
+        ],
+        "next": [
+            "git tag -d `cat VERSION` @no_additional_args",
+            "echo @additional_args > VERSION",
+            "git commit -am 'start VERSION @additional_args'"
         ]
     }
 }

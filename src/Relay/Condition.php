@@ -7,6 +7,10 @@ use nostriphant\Transpher\Relay\Condition\Test;
 
 readonly class Condition {
 
+    public function __invoke(array $conditions) {
+        return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, Test $condition) => $result && $condition($event), true);
+    }
+
     static function authors(mixed $expected_value): Test {
         return self::scalar('pubkey', $expected_value);
     }
@@ -45,7 +49,7 @@ readonly class Condition {
 
     static function makeConditions(Conditions $conditionsFactory): callable {
         $conditions = array_map(
-                fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, Test $condition) => $result && $condition($event), true),
+                new self(),
                 $conditionsFactory(new ConditionFactory(self::class))
         );
         return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, callable $filter) => $result || $filter($event), false);

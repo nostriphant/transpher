@@ -28,13 +28,13 @@ readonly class SQLite implements Engine {
     }
 
     public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
-        $query_prototype = array_reduce(array_map(
-                        new SQLite\Condition(),
+        $query_prototype = array_merge_recursive(...array_map(
+                        new SQLite\Condition([
+                            'where' => [],
+                            'limit' => null
+                        ]),
                         $conditionsFactory(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class))
-                ), fn(array $query, callable $filter) => $filter($query), [
-            'where' => [],
-            'limit' => null
-        ]);
+                ));
 
         $query = "SELECT " . implode(',', $fields) . " FROM event "
                 . "LEFT JOIN tag ON tag.event_id = event.id "

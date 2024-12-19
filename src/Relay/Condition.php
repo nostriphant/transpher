@@ -3,56 +3,49 @@
 namespace nostriphant\Transpher\Relay;
 
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Relay\Condition\Test;
 
 readonly class Condition {
 
-    public function __construct(private Condition\Test $test) {
-        
-    }
-
-    public function __invoke(Event $event): bool {
-        return call_user_func($this->test, $event);
-    }
-
-    static function authors(mixed $expected_value): self {
+    static function authors(mixed $expected_value): Test {
         return self::scalar('pubkey', $expected_value);
     }
 
-    static function ids(mixed $expected_value): self {
+    static function ids(mixed $expected_value): Test {
         return self::scalar('id', $expected_value);
     }
 
-    static function kinds(mixed $expected_value): self {
+    static function kinds(mixed $expected_value): Test {
         return self::scalar('kind', $expected_value);
     }
 
-    static function scalar(string $event_field, mixed $expected_value): self {
-        return new self(new Condition\Scalar($event_field, $expected_value));
+    static function scalar(string $event_field, mixed $expected_value): Test {
+        return new Condition\Scalar($event_field, $expected_value);
     }
 
-    static function until(mixed $expected_value): self {
-        return new self(new Condition\Until('created_at', $expected_value));
+    static function until(mixed $expected_value): Test {
+        return new Condition\Until('created_at', $expected_value);
     }
 
-    static function since(mixed $expected_value): self {
-        return new self(new Condition\Since('created_at', $expected_value));
+    static function since(mixed $expected_value): Test {
+        return new Condition\Since('created_at', $expected_value);
     }
 
-    static function tag(string $tag, mixed $expected_value): self {
-        return new self(new Condition\Tag($tag, $expected_value));
+    static function tag(string $tag, mixed $expected_value): Test {
+        return new Condition\Tag($tag, $expected_value);
     }
 
-    static function limit(int $expected_value): self {
-        return new self(new Condition\Limit($expected_value));
+    static function limit(int $expected_value): Test {
+        return new Condition\Limit($expected_value);
     }
 
-    static function __callStatic(string $name, array $arguments): self {
+    static function __callStatic(string $name, array $arguments): Test {
         return self::tag(ltrim($name, '#'), ...$arguments);
     }
 
     static function makeConditions(Conditions $conditionsFactory): callable {
         $conditions = array_map(
-                fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, self $condition) => $result && $condition($event), true),
+                fn(array $conditions) => fn(Event $event): bool => array_reduce($conditions, fn(bool $result, Test $condition) => $result && $condition($event), true),
                 $conditionsFactory(new ConditionFactory(self::class))
         );
         return fn(Event $event): bool => array_reduce($conditions, fn(bool $result, callable $filter) => $result || $filter($event), false);

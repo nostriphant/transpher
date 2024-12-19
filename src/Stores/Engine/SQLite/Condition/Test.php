@@ -14,6 +14,10 @@ class Test {
         return call_user_func($this->test, $query);
     }
 
+    static function fake(): self {
+        return new self(fn(array $query) => $query);
+    }
+
     static function authors(mixed $expected_value): self {
         return self::scalar('pubkey', $expected_value);
     }
@@ -27,23 +31,35 @@ class Test {
     }
 
     static function scalar(string $event_field, mixed $expected_value): self {
-        return new Test(new Scalar($event_field, $expected_value));
+        if (is_array($expected_value) === false) {
+            return self::fake();
+        }
+        return new self(new Scalar($event_field, $expected_value));
     }
 
     static function until(mixed $expected_value): self {
-        return new Test(new Until($expected_value));
+        if (is_int($expected_value) === false) {
+            return self::fake();
+        }
+        return new self(new Until($expected_value));
     }
 
     static function since(mixed $expected_value): self {
-        return new Test(new Since($expected_value));
+        if (is_int($expected_value) === false) {
+            return self::fake();
+        }
+        return new self(new Since($expected_value));
     }
 
     static function tag(string $tag, mixed $expected_value): self {
-        return new Test(new Tag($tag, $expected_value));
+        if (is_array($expected_value) === false) {
+            return self::fake();
+        }
+        return new self(new Tag($tag, $expected_value));
     }
 
     static function limit(int $expected_value): Test {
-        return new self(fn(array $query) => $query);
+        return self::fake();
     }
 
     static function __callStatic(string $name, array $arguments): self {

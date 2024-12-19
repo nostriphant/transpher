@@ -16,6 +16,10 @@ class Test {
         return call_user_func($this->test, $event);
     }
 
+    static function fake(): self {
+        return new self(fn() => true);
+    }
+
     static function authors(mixed $expected_value): Test {
         return self::scalar('pubkey', $expected_value);
     }
@@ -29,18 +33,30 @@ class Test {
     }
 
     static function scalar(string $event_field, mixed $expected_value): Test {
+        if (is_array($expected_value) === false) {
+            return self::fake();
+        }
         return new self(new Scalar($event_field, $expected_value));
     }
 
     static function until(mixed $expected_value): Test {
+        if (is_int($expected_value) === false) {
+            return self::fake();
+        }
         return new self(new Until($expected_value));
     }
 
     static function since(mixed $expected_value): Test {
+        if (is_int($expected_value) === false) {
+            return self::fake();
+        }
         return new self(new Since($expected_value));
     }
 
     static function tag(string $tag, mixed $expected_value): Test {
+        if (is_array($expected_value) === false) {
+            return self::fake();
+        }
         return new self(new Tag($tag, $expected_value));
     }
 

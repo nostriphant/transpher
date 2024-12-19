@@ -7,12 +7,12 @@ use function Functional\some;
 
 readonly class Tag {
 
-    public function __construct(private string $tag, private mixed $expected_value) {
+    public function __construct(private string $tag, private array $expected_value) {
         
     }
 
     
     public function __invoke(Event $event): bool {
-        return is_array($this->expected_value) === false || some($event->tags, fn(array $event_tag) => $event_tag[0] === $this->tag && in_array($event_tag[1], $this->expected_value));
+        return some($event->tags, fn(array $event_tag) => $event_tag[0] === $this->tag && in_array($event_tag[1], $this->expected_value));
     }
 }

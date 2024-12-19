@@ -8,11 +8,7 @@ readonly class Until {
         
     }
 
-    
     public function __invoke(): array {
-        return [
-            'where' => "event.created_at <= ?",
-            'param' => $this->expected_value
-        ];
+        return ["event.created_at <= ?", $this->expected_value];
     }
 }

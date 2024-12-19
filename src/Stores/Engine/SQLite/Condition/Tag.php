@@ -8,12 +8,8 @@ readonly class Tag {
         
     }
 
-    
     public function __invoke(): array {
         $positionals = array_fill(0, count($this->expected_value), '?');
-        return [
-            'where' => "tag.name = ? AND tag_value.value IN (" . implode(', ', $positionals) . ")",
-            'param' => array_merge([$this->tag], $this->expected_value)
-        ];
+        return array_merge(["tag.name = ? AND tag_value.value IN (" . implode(', ', $positionals) . ")", $this->tag], $this->expected_value);
     }
 }

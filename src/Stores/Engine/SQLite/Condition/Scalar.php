@@ -11,9 +11,6 @@ readonly class Scalar {
     
     public function __invoke(): array {
         $positionals = array_fill(0, count($this->expected_value), '?');
-        return [
-            'where' => "event.{$this->event_field} IN (" . implode(', ', $positionals) . ")",
-            'param' => $this->expected_value
-        ];
+        return array_merge(["event.{$this->event_field} IN (" . implode(', ', $positionals) . ")"], $this->expected_value);
     }
 }

@@ -11,7 +11,15 @@ class Test {
     }
 
     public function __invoke(array $where): array {
-        return array_merge_recursive($where, call_user_func($this->test));
+        $condition_and_parameters = call_user_func($this->test);
+        if (empty($condition_and_parameters)) {
+            return $where;
+        }
+        $condition = array_shift($condition_and_parameters);
+        return array_merge_recursive($where, [
+            'where' => $condition,
+            'param' => $condition_and_parameters
+        ]);
     }
 
     static function fake(): self {

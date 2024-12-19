@@ -4,7 +4,7 @@ namespace nostriphant\Transpher\Relay\Condition;
 
 use nostriphant\NIP01\Event;
 
-class Limit implements Test {
+class Limit {
 
     private int $hits = 0;
 
@@ -12,7 +12,7 @@ class Limit implements Test {
         
     }
 
-    #[\Override]
+    
     public function __invoke(Event $event): bool {
         $this->hits++;
         return is_int($this->expected_value) === false || $this->expected_value >= $this->hits;

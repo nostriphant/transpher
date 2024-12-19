@@ -4,13 +4,13 @@ namespace nostriphant\Transpher\Stores\Engine\SQLite\Condition;
 
 use function Functional\some;
 
-readonly class Tag implements Test {
+readonly class Tag {
 
     public function __construct(private string $tag, private mixed $expected_value) {
         
     }
 
-    #[\Override]
+    
     public function __invoke(array $query): array {
         if (is_array($this->expected_value) === false) {
             return $query;

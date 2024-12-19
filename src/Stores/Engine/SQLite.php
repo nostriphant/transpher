@@ -30,7 +30,7 @@ readonly class SQLite implements Engine {
     public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
         $conditions = array_map(
                 new SQLite\Condition(),
-                $conditionsFactory(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition::class))
+                $conditionsFactory(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class))
         );
         $query_prototype = array_reduce($conditions, fn(array $query, callable $filter) => $filter($query), [
             'where' => [],

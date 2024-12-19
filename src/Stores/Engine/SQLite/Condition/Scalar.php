@@ -2,13 +2,13 @@
 
 namespace nostriphant\Transpher\Stores\Engine\SQLite\Condition;
 
-readonly class Scalar implements Test {
+readonly class Scalar {
 
     public function __construct(private string $event_field, private mixed $expected_value) {
         
     }
 
-    #[\Override]
+    
     public function __invoke(array $query): array {
         if (is_array($this->expected_value) === false) {
             return $query;

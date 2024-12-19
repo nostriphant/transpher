@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Stores\Engine\SQLite\Condition;
 
-class Limit implements Test {
+class Limit {
 
     private int $hits = 0;
 
@@ -10,7 +10,7 @@ class Limit implements Test {
         
     }
 
-    #[\Override]
+    
     public function __invoke(array $query): array {
         $query['limit'] = $this->expected_value;
         return $query;

@@ -30,19 +30,17 @@ readonly class SQLite implements Engine {
     public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
         $conditionFactory = new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class);
 
-        $limit = array_reduce($conditionsFactory->filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
         $wheres = [];
         $parameters = [];
         foreach ($conditionsFactory($conditionFactory) as $query_conditions) {
-            $where = array_reduce($query_conditions, fn(array $where, SQLite\Condition\Test $condition) => $condition($where), []);
+            $where = array_reduce($query_conditions, fn(array $where, SQLite\Condition\Test $condition) => $condition($where), [
+                'where' => [],
+                'param' => []
+            ]);
 
-            if (empty($where) === false) {
-                list($where, $parameters) = array_reduce($where, function (array $return, array $condition) {
-                    $return[0][] = array_shift($condition);
-                    $return[1] = array_merge($return[1], $condition);
-                    return $return;
-                }, [[], $parameters]);
-                $wheres[] = implode(' AND ', $where);
+            if (empty($where['where']) === false) {
+                $wheres[] = implode(' AND ', $where['where']);
+                $parameters = array_merge($parameters, $where['param']);
             }
         }
 
@@ -51,6 +49,8 @@ readonly class SQLite implements Engine {
                 . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
                 . (empty($wheres) ? '' : "WHERE (" . implode(') OR (', $wheres) . ") ")
                 . 'GROUP BY event.id ';
+
+        $limit = array_reduce($conditionsFactory->filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
         if (isset($limit)) {
             $query .= 'ORDER BY event.created_at DESC, event.id ASC '
                     . 'LIMIT ' . $limit;

@@ -10,12 +10,12 @@ class Test {
         $this->test = $test;
     }
 
-    public function __invoke(array $query): array {
-        return call_user_func($this->test, $query);
+    public function __invoke(array $where): array {
+        return array_merge_recursive($where, call_user_func($this->test));
     }
 
     static function fake(): self {
-        return new self(fn(array $query) => $query);
+        return new self(fn() => []);
     }
 
     static function authors(mixed $expected_value): self {

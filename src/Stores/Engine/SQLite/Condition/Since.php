@@ -9,8 +9,10 @@ readonly class Since {
     }
 
     
-    public function __invoke(array $where): array {
-        $where[] = ["event.created_at >= ?", $this->expected_value];
-        return $where;
+    public function __invoke(): array {
+        return [
+            'where' => ["event.created_at >= ?"],
+            'param' => [$this->expected_value]
+        ];
     }
 }

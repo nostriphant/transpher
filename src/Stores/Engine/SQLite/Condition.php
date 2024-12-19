@@ -27,11 +27,11 @@ readonly class Condition {
     }
 
     static function until(mixed $expected_value): Test {
-        return new Condition\Until('created_at', $expected_value);
+        return new Condition\Until($expected_value);
     }
 
     static function since(mixed $expected_value): Test {
-        return new Condition\Since('created_at', $expected_value);
+        return new Condition\Since($expected_value);
     }
 
     static function tag(string $tag, mixed $expected_value): Test {

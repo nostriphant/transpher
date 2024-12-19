@@ -30,17 +30,14 @@ readonly class SQLite implements Engine {
     public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
         $conditionFactory = new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class);
 
-        $limit = null;
+        $limit = array_reduce($conditionsFactory->filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
         $wheres = [];
         $parameters = [];
         foreach ($conditionsFactory($conditionFactory) as $query_conditions) {
             $query_prototype = array_reduce($query_conditions, fn(array $query, SQLite\Condition\Test $condition) => $condition($query), [
-                'where' => [],
-                'limit' => null
+                'where' => []
             ]);
             
-
-            $limit = (isset($query_prototype['limit']) ? $query_prototype['limit'] : null);
             if (empty($query_prototype['where']) === false) {
                 list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
                     $return[0][] = array_shift($condition);
@@ -55,8 +52,11 @@ readonly class SQLite implements Engine {
                 . "LEFT JOIN tag ON tag.event_id = event.id "
                 . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
                 . (empty($wheres) ? '' : "WHERE (" . implode(') OR (', $wheres) . ") ")
-                . 'GROUP BY event.id '
-                . (isset($limit) ? "LIMIT " . $limit : "");
+                . 'GROUP BY event.id ';
+        if (isset($limit)) {
+            $query .= 'ORDER BY event.created_at DESC, event.id ASC '
+                    . 'LIMIT ' . $limit;
+        }
 
         return new SQLite\Statement($query, $parameters);
     }

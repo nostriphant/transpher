@@ -45,7 +45,7 @@ class Test {
     }
 
     static function limit(int $expected_value): Test {
-        return new self(new Limit($expected_value));
+        return new self(fn() => true);
     }
 
     static function __callStatic(string $name, array $arguments): Test {

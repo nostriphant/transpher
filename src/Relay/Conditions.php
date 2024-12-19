@@ -4,8 +4,8 @@ namespace nostriphant\Transpher\Relay;
 
 readonly class Conditions {
 
-    public function __construct(private array $filter_prototypes) {
-
+    public function __construct(public array $filter_prototypes) {
+        
     }
 
     public function __invoke(ConditionFactory $conditionFactory): array {

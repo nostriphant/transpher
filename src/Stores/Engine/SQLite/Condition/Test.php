@@ -42,8 +42,8 @@ class Test {
         return new Test(new Tag($tag, $expected_value));
     }
 
-    static function limit(int $expected_value): self {
-        return new Test(new Limit($expected_value));
+    static function limit(int $expected_value): Test {
+        return new self(fn(array $query) => $query);
     }
 
     static function __callStatic(string $name, array $arguments): self {

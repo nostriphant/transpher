@@ -21,9 +21,20 @@ final class Memory implements Engine {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
+        $limit = array_reduce($filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
         $subscription = \nostriphant\Transpher\Relay\Condition::makeConditions(new \nostriphant\Transpher\Relay\Conditions($filter_prototypes));
-        return new Results(function () use ($subscription) {
-                    yield from array_filter($this->events, $subscription);
+        return new Results(function () use ($subscription, $limit) {
+                    $events = array_filter($this->events, $subscription);
+                    if (isset($limit)) {
+                        usort($events, function (Event $event1, Event $event2): int {
+                            if ($event1->created_at !== $event2->created_at) {
+                                return $event2->created_at - $event1->created_at;
+                            }
+                            return strcasecmp($event1->id, $event2->id);
+                        });
+                        $events = array_slice($events, 0, $limit);
+                    }
+                    yield from $events;
                 });
     }
 

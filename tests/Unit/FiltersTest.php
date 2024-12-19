@@ -32,19 +32,6 @@ it('filters created until', function() {
     expect($subscription(event(['created_at' => $time])))->toBeTrue();
 });
 
-
-it('filters maximum number of items', function() {
-    $time = time();
-    $subscription = subscription([['until' => $time + 100, 'limit' => 5]]);
-
-    expect($subscription(event(['created_at' => $time])))->toBeTrue();
-    expect($subscription(event(['created_at' => $time])))->toBeTrue();
-    expect($subscription(event(['created_at' => $time])))->toBeTrue();
-    expect($subscription(event(['created_at' => $time])))->toBeTrue();
-    expect($subscription(event(['created_at' => $time])))->toBeTrue();
-    expect($subscription(event(['created_at' => $time])))->toBeFalse();
-});
-
 it('handlers multiple filters', function() {
     $subscription = subscription([['#p' => ['RandomPTag']], ['#p' => ['RandomPTag2']]]);
 

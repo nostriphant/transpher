@@ -28,15 +28,14 @@ readonly class SQLite implements Engine {
     }
 
     public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
-        $query_prototypes = array_map(
-                new SQLite\Condition(),
-                $conditionsFactory(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class))
-        );
+        $conditionFactory = new SQLite\Condition();
 
         $limit = '';
         $wheres = [];
         $parameters = [];
-        foreach ($query_prototypes as $query_prototype) {
+        foreach ($conditionsFactory(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class)) as $query_conditions) {
+            $query_prototype = $conditionFactory($query_conditions);
+
             $limit = (isset($query_prototype['limit']) ? "LIMIT " . $query_prototype['limit'] : "");
             if (empty($query_prototype['where']) === false) {
                 list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {

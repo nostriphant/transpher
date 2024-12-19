@@ -34,12 +34,10 @@ readonly class SQLite implements Engine {
         $wheres = [];
         $parameters = [];
         foreach ($conditionsFactory($conditionFactory) as $query_conditions) {
-            $query_prototype = array_reduce($query_conditions, fn(array $query, SQLite\Condition\Test $condition) => $condition($query), [
-                'where' => []
-            ]);
-            
-            if (empty($query_prototype['where']) === false) {
-                list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
+            $where = array_reduce($query_conditions, fn(array $where, SQLite\Condition\Test $condition) => $condition($where), []);
+
+            if (empty($where) === false) {
+                list($where, $parameters) = array_reduce($where, function (array $return, array $condition) {
                     $return[0][] = array_shift($condition);
                     $return[1] = array_merge($return[1], $condition);
                     return $return;

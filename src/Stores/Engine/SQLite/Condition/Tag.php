@@ -11,13 +11,13 @@ readonly class Tag {
     }
 
     
-    public function __invoke(array $query): array {
+    public function __invoke(array $where): array {
         if (is_array($this->expected_value) === false) {
-            return $query;
+            return $where;
         }
 
         $positionals = array_fill(0, count($this->expected_value), '?');
-        $query['where'][] = array_merge(["tag.name = ? AND tag_value.value IN (" . implode(', ', $positionals) . ")", $this->tag], $this->expected_value);
-        return $query;
+        $where[] = array_merge(["tag.name = ? AND tag_value.value IN (" . implode(', ', $positionals) . ")", $this->tag], $this->expected_value);
+        return $where;
     }
 }

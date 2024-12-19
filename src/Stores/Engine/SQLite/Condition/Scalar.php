@@ -9,12 +9,12 @@ readonly class Scalar {
     }
 
     
-    public function __invoke(array $query): array {
+    public function __invoke(array $where): array {
         if (is_array($this->expected_value) === false) {
-            return $query;
+            return $where;
         }
         $positionals = array_fill(0, count($this->expected_value), '?');
-        $query['where'][] = array_merge(["event.{$this->event_field} IN (" . implode(', ', $positionals) . ")"], $this->expected_value);
-        return $query;
+        $where[] = array_merge(["event.{$this->event_field} IN (" . implode(', ', $positionals) . ")"], $this->expected_value);
+        return $where;
     }
 }

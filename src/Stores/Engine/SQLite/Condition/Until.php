@@ -9,11 +9,11 @@ readonly class Until {
     }
 
     
-    public function __invoke(array $query): array {
+    public function __invoke(array $where): array {
         if (is_int($this->expected_value) === false) {
-            return $query;
+            return $where;
         }
-        $query['where'][] = ["event.created_at <= ?", $this->expected_value];
-        return $query;
+        $where[] = ["event.created_at <= ?", $this->expected_value];
+        return $where;
     }
 }

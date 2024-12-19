@@ -28,30 +28,36 @@ readonly class SQLite implements Engine {
     }
 
     public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
-        $query_prototype = array_merge_recursive(...array_map(
-                        new SQLite\Condition([
+        $query_prototypes = array_map(
+                new SQLite\Condition([
                             'where' => [],
                             'limit' => null
                         ]),
                         $conditionsFactory(new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class))
-                ));
+                );
+
+        $limit = '';
+        $wheres = [];
+        $parameters = [];
+        foreach ($query_prototypes as $query_prototype) {
+            $limit = (isset($query_prototype['limit']) ? "LIMIT " . $query_prototype['limit'] : "");
+            if (empty($query_prototype['where']) === false) {
+                list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
+                    $return[0][] = array_shift($condition);
+                    $return[1] = array_merge($return[1], $condition);
+                    return $return;
+                }, [[], $parameters]);
+                $wheres[] = implode(' AND ', $where);
+            }
+        }
 
         $query = "SELECT " . implode(',', $fields) . " FROM event "
                 . "LEFT JOIN tag ON tag.event_id = event.id "
-                . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id ";
+                . "LEFT JOIN tag_value ON tag.id = tag_value.tag_id "
+                . (empty($wheres) ? '' : "WHERE (" . implode(') OR (', $wheres) . ") ")
+                . 'GROUP BY event.id '
+                . $limit;
 
-        $parameters = [];
-        if (empty($query_prototype['where']) === false) {
-            list($where, $parameters) = array_reduce($query_prototype['where'], function (array $return, array $condition) {
-                $return[0][] = array_shift($condition);
-                $return[1] = array_merge($return[1], $condition);
-                return $return;
-            }, [[], []]);
-            $query .= "WHERE (" . implode(') AND (', $where) . ") ";
-        }
-
-        $query .= 'GROUP BY event.id '
-                . (isset($query_prototype['limit']) ? "LIMIT " . $query_prototype['limit'] : "");
         return new SQLite\Statement($query, $parameters);
     }
 

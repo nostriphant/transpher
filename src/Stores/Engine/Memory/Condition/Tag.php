@@ -3,7 +3,6 @@
 namespace nostriphant\Transpher\Stores\Engine\Memory\Condition;
 
 use nostriphant\NIP01\Event;
-use function Functional\some;
 
 readonly class Tag {
 
@@ -13,6 +12,6 @@ readonly class Tag {
 
     
     public function __invoke(Event $event): bool {
-        return some($event->tags, fn(array $event_tag) => $event_tag[0] === $this->tag && in_array($event_tag[1], $this->expected_value));
+        return array_reduce($event->tags, fn(bool $carry, array $event_tag) => $carry || $event_tag[0] === $this->tag && in_array($event_tag[1], $this->expected_value), false);
     }
 }

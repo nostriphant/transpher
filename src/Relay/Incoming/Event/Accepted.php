@@ -7,7 +7,7 @@ use nostriphant\NIP01\Event;
 class Accepted {
 
     public function __construct(
-            private \nostriphant\Transpher\Stores\Store $events,
+            private \nostriphant\Stores\Store $events,
             private \nostriphant\Transpher\Files $files,
             private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
     ) {

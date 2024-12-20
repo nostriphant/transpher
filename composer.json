@@ -20,7 +20,8 @@
         "nostriphant/nip-44": "^1.0",
         "nostriphant/functional-alternate": "^1.0",
         "nostriphant/nip-59": "^1.0",
-        "nostriphant/nip-17": "^1.0"
+        "nostriphant/nip-17": "^1.0",
+        "nostriphant/stores": "^1.0"
     },
     "license": "MIT",
     "autoload": {
@@ -48,7 +49,6 @@
         "clearCache": [
             "rm -rf ./data/events/*",
             "rm -rf ./data/files/*",
-            "rm -rf ./data/disktest_*",
             "rm -rf ./data/relay_*"
         ],
         "test": [

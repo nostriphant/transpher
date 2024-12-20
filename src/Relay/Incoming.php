@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay;
 
-use nostriphant\Transpher\Stores\Store;
+use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Subscriptions;
 use nostriphant\NIP01\Message;
 

@@ -7,7 +7,7 @@ use nostriphant\NIP01\Message;
 readonly class Count implements Type {
 
     public function __construct(
-            private \nostriphant\Transpher\Stores\Store $events,
+            private \nostriphant\Stores\Store $events,
             private \nostriphant\Transpher\Relay\Limits $limits
     ) {
         

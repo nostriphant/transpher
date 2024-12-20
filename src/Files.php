@@ -2,9 +2,11 @@
 
 namespace nostriphant\Transpher;
 
+use nostriphant\Stores\Store;
+
 readonly class Files {
 
-    public function __construct(private string $path, private Stores\Store $store) {
+    public function __construct(private string $path, private Store $store) {
         is_dir($path) || mkdir($path);
 
         foreach (glob($path . DIRECTORY_SEPARATOR . '*') as $file) {
@@ -47,7 +49,7 @@ readonly class Files {
     public function __invoke(string $hash): object {
         return new class($this->path . DIRECTORY_SEPARATOR . $hash, $this->store) {
 
-            public function __construct(public string $path, private Stores\Store $store) {
+            public function __construct(public string $path, private Store $store) {
                 
             }
 

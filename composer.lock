@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "11c568d61cb351d62627622070c91b9f",
+    "content-hash": "75f6a567b6e98f9737350d04e8b4474f",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2620,6 +2620,53 @@
                 "source": "https://github.com/nostriphant/nip-59/tree/1.0"
             },
             "time": "2024-11-20T14:04:55+00:00"
+        },
+        {
+            "name": "nostriphant/stores",
+            "version": "1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nostriphant/stores.git",
+                "reference": "df19241936be61ac97044b230d45885fbd91de62"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nostriphant/stores/zipball/df19241936be61ac97044b230d45885fbd91de62",
+                "reference": "df19241936be61ac97044b230d45885fbd91de62",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pcntl": "*",
+                "nostriphant/nip-01": "^1.0",
+                "php": "^8.3"
+            },
+            "require-dev": {
+                "mockery/mockery": "^1.6",
+                "pestphp/pest": "^2.35"
+            },
+            "type": "project",
+            "autoload": {
+                "psr-4": {
+                    "nostriphant\\Stores\\": "src/",
+                    "nostriphant\\StoresTests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rik Meijer",
+                    "email": "rik@nostriphant.dev"
+                }
+            ],
+            "description": "Nostr storage back-ends: sql, memory and disk",
+            "support": {
+                "issues": "https://github.com/nostriphant/stores/issues",
+                "source": "https://github.com/nostriphant/stores/tree/1.0"
+            },
+            "time": "2024-12-20T14:30:33+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",

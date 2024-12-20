@@ -22,7 +22,7 @@ use Amp\Http\Server\RequestHandler\ClosureRequestHandler;
 
 use nostriphant\Transpher\Files;
 use nostriphant\Transpher\Relay\Incoming;
-use nostriphant\Transpher\Stores\Store;
+use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Blossom;
 use nostriphant\Transpher\Relay\Subscriptions;
 

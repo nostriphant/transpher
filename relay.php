@@ -9,12 +9,12 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $data_dir = $_SERVER['RELAY_DATA'];
     is_dir($data_dir) || mkdir($data_dir);
 
-    $events = new nostriphant\Transpher\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
+    $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
 
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {
         $logger->debug('Starting migrating events...');
-        $logger->debug(\nostriphant\Transpher\Stores\Engine\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events) {
+        $logger->debug(\nostriphant\Stores\Engine\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events) {
                     $events[$event->id] = $event;
                     return unlink($store_path . '/' . $event->id . '.php');
                 }) . ' events migrated.');
@@ -23,7 +23,7 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $data_dir . '/files';
 } else {
     $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-    $events = new \nostriphant\Transpher\Stores\Engine\Disk($store_path);
+    $events = new \nostriphant\Stores\Engine\Disk($store_path);
 
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }
@@ -33,7 +33,7 @@ $whitelisted_pubkeys = [
     Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public())
 ];
 
-$follow_lists = nostriphant\Transpher\Stores\Store::query($events, ['kinds' => [3], 'authors' => $whitelisted_pubkeys]);
+$follow_lists = nostriphant\Stores\Store::query($events, ['kinds' => [3], 'authors' => $whitelisted_pubkeys]);
 foreach ($follow_lists as $follow_list) {
     $whitelisted_pubkeys = array_reduce($follow_list->tags, function (array $whitelisted_pubkeys, array $tag) {
         $whitelisted_pubkeys[] = $tag[1];
@@ -41,7 +41,7 @@ foreach ($follow_lists as $follow_list) {
     }, $whitelisted_pubkeys);
 }
 
-$store = new nostriphant\Transpher\Stores\Store($events, [
+$store = new nostriphant\Stores\Store($events, [
     ['authors' => $whitelisted_pubkeys],
     ['#p' => $whitelisted_pubkeys]
         ]);

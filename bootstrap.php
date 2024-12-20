@@ -38,13 +38,6 @@ function iterator_map(\Traversable $iterator, callable $callback): \Traversable 
     }
 }
 
-function file_append_contents(string $filename, string $contents): int {
-    $handle = fopen($filename, 'a');
-    $written = fwrite($handle, $contents);
-    fclose($handle);
-    return $written !== false ? $written : 0;
-}
-
 function in_range(string|int|float $value, string|int|float $start, string|int|float $end): bool {
     return in_array($value, range($start, $end));
 }

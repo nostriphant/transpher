@@ -6,8 +6,8 @@ use function \Functional\if_else;
 use \nostriphant\Transpher\Relay\Sender;
 use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Event;
-use nostriphant\Transpher\Stores\Engine\Memory\Condition;
-use nostriphant\Transpher\Stores\Conditions;
+use nostriphant\Stores\Engine\Memory\Condition;
+use nostriphant\Stores\Conditions;
 
 class Subscriptions {
 

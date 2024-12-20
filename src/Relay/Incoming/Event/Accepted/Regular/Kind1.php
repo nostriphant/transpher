@@ -8,7 +8,7 @@ use nostriphant\FunctionalAlternate\Alternate;
 class Kind1 implements Kind {
 
     #[\Override]
-    public function __construct(private \nostriphant\Transpher\Stores\Store $store, private \nostriphant\Transpher\Files $files) {
+    public function __construct(private \nostriphant\Stores\Store $store, private \nostriphant\Transpher\Files $files) {
         
     }
 

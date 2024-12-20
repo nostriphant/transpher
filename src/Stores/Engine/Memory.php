@@ -21,9 +21,9 @@ final class Memory implements Engine {
     }
 
     #[\Override]
-    public function __invoke(array ...$filter_prototypes): Results {
-        $limit = array_reduce($filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
-        $subscription = Memory\Condition::makeConditions(new Conditions($filter_prototypes));
+    public function __invoke(Conditions $filter_conditions): Results {
+        $limit = array_reduce($filter_conditions->filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
+        $subscription = Memory\Condition::makeConditions($filter_conditions);
         return new Results(function () use ($subscription, $limit) {
                     $events = array_filter($this->events, $subscription);
                     if (isset($limit)) {

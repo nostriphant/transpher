@@ -189,7 +189,7 @@ it('filters events', function (array $filter_prototype) {
     $data = $result->fetchArray();
     expect($data['id'])->toBe('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb');
 
-    $events = iterator_to_array($store($filter_prototype));
+    $events = iterator_to_array(nostriphant\Transpher\Stores\Store::query($store, $filter_prototype));
     expect($sqlite->lastErrorMsg())->toBe('not an error');
     expect($events)->toHaveCount(1);
     expect($events[0])->toBeInstanceOf(nostriphant\NIP01\Event::class);
@@ -238,9 +238,9 @@ it('limits events in result set', function () {
     $data = $result->fetchArray();
     expect($data['id'])->toBe('07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb');
 
-    $events = $store(['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'], 'limit' => 1]);
+    $events = nostriphant\Transpher\Stores\Store::query($store, ['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'], 'limit' => 1]);
     expect(iterator_count($events))->toBe(1);
 
-    $events = $store(['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'], 'limit' => 0]);
+    $events = nostriphant\Transpher\Stores\Store::query($store, ['ids' => ['07cf455963bffe4ef851e4983df2d1495602714abc6c0e028c02752b16e11bcb'], 'limit' => 0]);
     expect(iterator_count($events))->toBe(0);
 });

@@ -20,8 +20,12 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
         }
     }
 
+    static function query(Engine $engine, array ...$filter_prototypes): Results {
+        return call_user_func($engine, new Conditions($filter_prototypes));
+    }
+
     public function __invoke(array ...$filter_prototypes): Results {
-        return call_user_func_array($this->engine, $filter_prototypes);
+        return self::query($this->engine, ...$filter_prototypes);
     }
 
     #[\Override]

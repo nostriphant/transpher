@@ -33,7 +33,7 @@ $whitelisted_pubkeys = [
     Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public())
 ];
 
-$follow_lists = $events(['kinds' => [3], 'authors' => $whitelisted_pubkeys]);
+$follow_lists = nostriphant\Transpher\Stores\Store::query($events, ['kinds' => [3], 'authors' => $whitelisted_pubkeys]);
 foreach ($follow_lists as $follow_list) {
     $whitelisted_pubkeys = array_reduce($follow_list->tags, function (array $whitelisted_pubkeys, array $tag) {
         $whitelisted_pubkeys[] = $tag[1];

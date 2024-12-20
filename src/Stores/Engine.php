@@ -6,7 +6,7 @@ use nostriphant\NIP01\Event;
 
 interface Engine extends \ArrayAccess, \Countable, \IteratorAggregate {
 
-    public function __invoke(array ...$filter_prototypes): Results;
+    public function __invoke(Conditions $filter_conditions): Results;
 
     static function housekeeper(Engine $engine): Housekeeper;
 

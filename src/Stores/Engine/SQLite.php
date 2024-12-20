@@ -6,6 +6,7 @@ use nostriphant\NIP01\Event;
 use nostriphant\Transpher\Stores\Results;
 use nostriphant\Transpher\Stores\Engine;
 use nostriphant\Transpher\Stores\Housekeeper;
+use nostriphant\Transpher\Stores\Conditions;
 
 readonly class SQLite implements Engine {
 
@@ -19,7 +20,7 @@ readonly class SQLite implements Engine {
         $structure = new SQLite\Structure();
         $structure($database);
 
-        $this->MW_Construct(iterator_to_array($this()));
+        $this->MW_Construct(iterator_to_array(\nostriphant\Transpher\Stores\Store::query($this, [])));
     }
 
     #[\Override]
@@ -60,15 +61,15 @@ readonly class SQLite implements Engine {
     }
 
     private function queryEvent(string $event_id): Results {
-        return $this([
-            'ids' => [$event_id],
-            'limit' => 1
+        return \nostriphant\Transpher\Stores\Store::query($this, [
+                    'ids' => [$event_id],
+                    'limit' => 1
         ]);
     }
 
     #[\Override]
-    public function __invoke(array ...$filter_prototypes): Results {
-        return $this->query(new \nostriphant\Transpher\Stores\Conditions($filter_prototypes), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
+    public function __invoke(Conditions $filter_conditions): Results {
+        return $this->query($filter_conditions, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
     }
 
     #[\Override]

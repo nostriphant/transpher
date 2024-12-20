@@ -135,15 +135,15 @@ describe('agent', function (): void {
 
         $events = new nostriphant\Transpher\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 
-        $notes_alice = iterator_to_array($events(['authors' => [Pest\pubkey_recipient()], 'kinds' => [1]]));
+        $notes_alice = iterator_to_array(nostriphant\Transpher\Stores\Store::query($events, ['authors' => [Pest\pubkey_recipient()], 'kinds' => [1]]));
         expect($notes_alice[0]->kind)->toBe(1);
         expect($notes_alice[0]->content)->toBe('Hello!');
 
-        $notes_bob = iterator_to_array($events(['ids' => [$bob_message()[1]['id']]]));
+        $notes_bob = iterator_to_array(nostriphant\Transpher\Stores\Store::query($events, ['ids' => [$bob_message()[1]['id']]]));
         expect($notes_bob[0]->kind)->toBe(1);
         expect($notes_bob[0]->content)->toBe('Hello!');
 
-        $pdms = iterator_to_array($events(['#p' => [Pest\pubkey_recipient()]]));
+        $pdms = iterator_to_array(nostriphant\Transpher\Stores\Store::query($events, ['#p' => [Pest\pubkey_recipient()]]));
         expect($pdms[0]->kind)->toBe(1059);
     });
 });

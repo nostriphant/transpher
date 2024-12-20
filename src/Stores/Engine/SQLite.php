@@ -28,7 +28,7 @@ readonly class SQLite implements Engine {
         return new SQLite\Housekeeper($engine);
     }
 
-    public function query(\nostriphant\Transpher\Stores\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
+    public function query(\nostriphant\Transpher\Stores\Conditions $conditionsFactory, ?int $limit, string ...$fields): SQLite\Statement {
         $conditionFactory = new \nostriphant\Transpher\Stores\ConditionFactory(SQLite\Condition\Test::class);
 
         $wheres = [];
@@ -51,7 +51,6 @@ readonly class SQLite implements Engine {
                 . (empty($wheres) ? '' : "WHERE (" . implode(') OR (', $wheres) . ") ")
                 . 'GROUP BY event.id ';
 
-        $limit = array_reduce($conditionsFactory->filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
         if (isset($limit)) {
             $query .= 'ORDER BY event.created_at DESC, event.id ASC '
                     . 'LIMIT ' . $limit;
@@ -68,8 +67,8 @@ readonly class SQLite implements Engine {
     }
 
     #[\Override]
-    public function __invoke(Conditions $filter_conditions): Results {
-        return $this->query($filter_conditions, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
+    public function __invoke(Conditions $filter_conditions, ?int $limit): Results {
+        return $this->query($filter_conditions, $limit, "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
     }
 
     #[\Override]

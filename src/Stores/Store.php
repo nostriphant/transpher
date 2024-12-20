@@ -21,7 +21,8 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
     }
 
     static function query(Engine $engine, array ...$filter_prototypes): Results {
-        return call_user_func($engine, new Conditions($filter_prototypes));
+        $limit = array_reduce($filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
+        return call_user_func($engine, new Conditions($filter_prototypes), $limit);
     }
 
     public function __invoke(array ...$filter_prototypes): Results {

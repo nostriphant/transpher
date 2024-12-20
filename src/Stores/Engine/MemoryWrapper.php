@@ -29,8 +29,8 @@ trait MemoryWrapper {
         return $this->memory[$offset];
     }
 
-    public function __invoke(\nostriphant\Transpher\Stores\Conditions $filter_conditions): Results {
-        return call_user_func($this->memory, $filter_conditions);
+    public function __invoke(\nostriphant\Transpher\Stores\Conditions $filter_conditions, ?int $limit): Results {
+        return call_user_func($this->memory, $filter_conditions, $limit);
     }
 
     public function count(): int {

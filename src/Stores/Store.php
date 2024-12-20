@@ -57,11 +57,11 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
 
     #[\Override]
     public function count(): int {
-        return count($this->engine);
+        return iterator_count(self::query($this->engine, []));
     }
 
     #[\Override]
     public function getIterator(): \Traversable {
-        yield from $this->engine;
+        return self::query($this->engine, []);
     }
 }

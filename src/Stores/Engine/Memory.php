@@ -61,15 +61,4 @@ final class Memory implements Engine {
     public function offsetUnset(mixed $offset): void {
         unset($this->events[$offset]);
     }
-
-    #[\Override]
-    public function count(): int {
-        return count($this->events);
-    }
-
-    #[\Override]
-    public function getIterator(): \Traversable {
-        yield from $this->events;
-    }
-
 }

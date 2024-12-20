@@ -190,7 +190,6 @@ it('deletes no events when whitelist empty', function (callable $factory) {
     array_walk($created_events, fn(callable $is_deleted) => $is_deleted(false));
 })->with('stores');
 
-
 describe('The limit property of a filter', function () {
     $limit = 100;
 
@@ -213,6 +212,12 @@ describe('The limit property of a filter', function () {
         }
 
         expect($i)->toBe(89);
+    })->with('stores');
+
+    it('counts events', function (callable $factory) use ($events) {
+        list($store, $created_events) = $factory([], ...$events);
+
+        expect($store)->toHaveCount(100);
     })->with('stores');
 
     it('in the case of [created_at] ties the event with the lowest id (first in lexical order) should be first.', function (callable $factory) use ($start, $key_sender) {

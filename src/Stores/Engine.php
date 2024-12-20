@@ -4,7 +4,7 @@ namespace nostriphant\Transpher\Stores;
 
 use nostriphant\NIP01\Event;
 
-interface Engine extends \ArrayAccess, \Countable, \IteratorAggregate {
+interface Engine extends \ArrayAccess {
 
     public function __invoke(Conditions $filter_conditions, ?int $limit): Results;
 

@@ -145,9 +145,4 @@ readonly class SQLite implements Engine {
         $query->bindValue('event_id', $offset);
         $query->execute();
     }
-
-    #[\Override]
-    public function count(): int {
-        return $this->database->querySingle("SELECT COUNT(id) FROM event");
-    }
 }

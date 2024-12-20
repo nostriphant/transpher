@@ -32,13 +32,4 @@ trait MemoryWrapper {
     public function __invoke(\nostriphant\Transpher\Stores\Conditions $filter_conditions, ?int $limit): Results {
         return call_user_func($this->memory, $filter_conditions, $limit);
     }
-
-    public function count(): int {
-        return count($this->memory);
-    }
-
-    #[\Override]
-    public function getIterator(): \Traversable {
-        return $this->memory;
-    }
 }

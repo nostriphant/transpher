@@ -12,9 +12,9 @@ readonly class Store implements \ArrayAccess, \Countable, \IteratorAggregate {
         $disabled = array_reduce($whitelist_prototypes, fn(bool $disabled, array $filter_prototype) => empty($filter_prototype), empty($whitelist_prototypes));
 
         if ($disabled === false) {
-            $conditions = new \nostriphant\Transpher\Relay\Conditions($whitelist_prototypes);
+            $conditions = new Conditions($whitelist_prototypes);
             $this->engine::housekeeper($this->engine)($conditions);
-            $this->whitelist = \nostriphant\Transpher\Relay\Condition::makeConditions($conditions);
+            $this->whitelist = Engine\Memory\Condition::makeConditions($conditions);
         } else {
             $this->whitelist = fn() => true;
         }

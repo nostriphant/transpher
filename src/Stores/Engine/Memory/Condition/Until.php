@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Relay\Condition;
+namespace nostriphant\Transpher\Stores\Engine\Memory\Condition;
 
 use nostriphant\NIP01\Event;
 

@@ -6,6 +6,8 @@ use function \Functional\if_else;
 use \nostriphant\Transpher\Relay\Sender;
 use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Stores\Engine\Memory\Condition;
+use nostriphant\Transpher\Stores\Conditions;
 
 class Subscriptions {
 
@@ -38,7 +40,7 @@ class Subscriptions {
     }
 
     static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, array $filter_prototypes): void {
-        $test = \nostriphant\Transpher\Relay\Condition::makeConditions(new Conditions($filter_prototypes));
+        $test = Condition::makeConditions(new Conditions($filter_prototypes));
         $subscriptions[$subscription_id] = if_else($test, fn() => $relay, fn() => false);
     }
 

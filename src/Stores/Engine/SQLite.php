@@ -27,8 +27,8 @@ readonly class SQLite implements Engine {
         return new SQLite\Housekeeper($engine);
     }
 
-    public function query(\nostriphant\Transpher\Relay\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
-        $conditionFactory = new \nostriphant\Transpher\Relay\ConditionFactory(SQLite\Condition\Test::class);
+    public function query(\nostriphant\Transpher\Stores\Conditions $conditionsFactory, string ...$fields): SQLite\Statement {
+        $conditionFactory = new \nostriphant\Transpher\Stores\ConditionFactory(SQLite\Condition\Test::class);
 
         $wheres = [];
         $parameters = [];
@@ -68,7 +68,7 @@ readonly class SQLite implements Engine {
 
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
-        return $this->query(new \nostriphant\Transpher\Relay\Conditions($filter_prototypes), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
+        return $this->query(new \nostriphant\Transpher\Stores\Conditions($filter_prototypes), "event.id", "pubkey", "created_at", "kind", "content", "sig", "tags_json")($this->database);
     }
 
     #[\Override]

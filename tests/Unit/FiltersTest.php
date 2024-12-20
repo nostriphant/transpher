@@ -3,7 +3,7 @@
 use function \Pest\event;
 
 function subscription(array $filter_prototypes) {
-    return \nostriphant\Transpher\Relay\Condition::makeConditions(new \nostriphant\Transpher\Relay\Conditions($filter_prototypes));
+    return \nostriphant\Transpher\Stores\Engine\Memory\Condition::makeConditions(new \nostriphant\Transpher\Stores\Conditions($filter_prototypes));
 }
 
 it('filters p-tags', function () {

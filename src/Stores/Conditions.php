@@ -1,6 +1,6 @@
 <?php
 
-namespace nostriphant\Transpher\Relay;
+namespace nostriphant\Transpher\Stores;
 
 readonly class Conditions {
 

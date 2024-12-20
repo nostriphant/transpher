@@ -4,6 +4,7 @@
 namespace nostriphant\Transpher\Stores\Engine;
 
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Stores\Conditions;
 use nostriphant\Transpher\Stores\Results;
 use nostriphant\Transpher\Stores\Engine;
 use nostriphant\Transpher\Stores\Housekeeper;
@@ -22,7 +23,7 @@ final class Memory implements Engine {
     #[\Override]
     public function __invoke(array ...$filter_prototypes): Results {
         $limit = array_reduce($filter_prototypes, fn(?int $limit, array $filter_prototype) => $filter_prototype['limit'] ?? $limit, null);
-        $subscription = \nostriphant\Transpher\Relay\Condition::makeConditions(new \nostriphant\Transpher\Relay\Conditions($filter_prototypes));
+        $subscription = Memory\Condition::makeConditions(new Conditions($filter_prototypes));
         return new Results(function () use ($subscription, $limit) {
                     $events = array_filter($this->events, $subscription);
                     if (isset($limit)) {

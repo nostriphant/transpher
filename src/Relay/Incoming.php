@@ -12,7 +12,7 @@ readonly class Incoming {
         
     }
 
-    public function __invoke(Subscriptions $subscriptions, Message $message): \Generator {
+    public function __invoke(Subscriptions $subscriptions, Message $message): \Traversable {
         yield from (match (strtoupper($message->type)) {
                     'EVENT' => new Incoming\Event(new Incoming\Event\Accepted($this->events, $this->files, $subscriptions), Incoming\Event\Limits::fromEnv()),
                     'CLOSE' => new Incoming\Close($subscriptions),

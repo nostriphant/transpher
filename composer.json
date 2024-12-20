@@ -7,7 +7,6 @@
         "ext-pcntl": "*",
         "vlucas/phpdotenv": "^5.6",
         "monolog/monolog": "^3.7",
-        "rikmeijer/functional-php": "^1.0",
         "amphp/http-server": "^3.3",
         "amphp/byte-stream": "^2.1",
         "amphp/log": "^2.0",

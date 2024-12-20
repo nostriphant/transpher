@@ -2,7 +2,6 @@
 
 namespace nostriphant\Transpher\Amp;
 
-use function \Functional\each;
 use \Psr\Log\LoggerInterface;
 use Amp\Websocket\Server\WebsocketClientHandler;
 use Amp\Websocket\Server\WebsocketGateway;
@@ -75,7 +74,9 @@ class Relay implements WebsocketClientHandler {
         foreach ($client as $message) {
             $payload = (string) $message;
             try {
-                each(($this->incoming)($client_subscriptions, Message::decode($payload)), $wrapped_client);
+                foreach (call_user_func($this->incoming, $client_subscriptions, Message::decode($payload)) as $reply) {
+                    $wrapped_client($reply);
+                }
             } catch (\InvalidArgumentException $ex) {
                 $wrapped_client(Message::notice($ex->getMessage()));
             }

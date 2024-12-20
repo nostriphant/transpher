@@ -115,16 +115,20 @@ namespace Pest {
     }
 
     function handle(Message $message, ?Incoming $incoming = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null): Sender {
-        \Functional\each(($incoming ?? incoming())($subscriptions ?? subscriptions(), $message), $to = new class implements \nostriphant\Transpher\Relay\Sender {
+        $to = new class implements \nostriphant\Transpher\Relay\Sender {
 
-                    public array $messages = [];
+            public array $messages = [];
 
-                    #[\Override]
-                    public function __invoke(mixed $json): bool {
-                        $this->messages[] = $json;
-                        return true;
-                    }
-                });
+            #[\Override]
+            public function __invoke(mixed $json): bool {
+                $this->messages[] = $json;
+                return true;
+            }
+        };
+
+        foreach (($incoming ?? incoming())($subscriptions ?? subscriptions(), $message) as $reply) {
+            $to($reply);
+        }
         return $to;
     }
 

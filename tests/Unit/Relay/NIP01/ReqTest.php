@@ -34,6 +34,14 @@ describe('REQ', function () {
         );
     });
 
+    it('does not break with a broken REQ messagae', function () {
+        $recipient = \Pest\handle(new nostriphant\NIP01\Message('REQ', 'some-subscription-id', 'REQ'));
+
+        expect($recipient)->toHaveReceived(
+                ['CLOSED']
+        );
+    });
+
     it('can handle a subscription request, for existing events', function () {
         $store = \Pest\store();
 

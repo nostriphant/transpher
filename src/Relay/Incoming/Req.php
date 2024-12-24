@@ -18,7 +18,7 @@ readonly class Req implements Type {
         if (count($payload) < 2) {
             yield Message::notice('Invalid message');
         } else {
-            yield from ($this->limits)(array_filter(array_slice($payload, 1)))(
+            yield from ($this->limits)(array_filter(array_filter(array_slice($payload, 1), 'is_array')))(
                             rejected: fn(string $reason) => yield Message::closed($payload[0], $reason),
                             accepted: fn(array $filter_prototypes) => yield from ($this->accepted)($payload[0], $filter_prototypes)
                     );

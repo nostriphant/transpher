@@ -96,6 +96,7 @@ describe('agent', function (): void {
 
                         $gift = $payload[1];
                         expect($gift['kind'])->toBe(1059);
+                        expect($gift['tags'][0])->toBe(['p', Pest\pubkey_recipient()]);
 
                         $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
                         expect($seal->kind)->toBe(13);
@@ -129,6 +130,10 @@ describe('agent', function (): void {
             }]
         );
 
+
+        $bob(new nostriphant\NIP01\Message('REQ', 'sddf', [["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]]),
+                ['EOSE']);
+
         $agent();
 
         $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
@@ -143,6 +148,8 @@ describe('agent', function (): void {
 
         $pdms = iterator_to_array(nostriphant\Stores\Store::query($events, ['#p' => [Pest\pubkey_recipient()]]));
         expect($pdms[0]->kind)->toBe(1059);
+
+        expect(file_get_contents(ROOT_DIR . '/logs/relay-8087-output.log'))->not()->toContain('ERROR');
     });
 });
 

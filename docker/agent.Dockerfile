@@ -23,7 +23,7 @@ RUN ["make", "install"]
 ADD ["./docker/ext-secp256k1-nostr-php.ini", "$PHP_INI_DIR/conf.d/ext-secp256k1-nostr-php.ini"]
 
 WORKDIR "/app"
-COPY ["composer.json", "composer.lock", "bootstrap.php", "agent.php", "."]
+COPY ["VERSION", "composer.json", "composer.lock", "bootstrap.php", "agent.php", "."]
 COPY ["src", "src"]
 
 RUN ["/usr/local/bin/php", "-r", "copy('https://getcomposer.org/installer', 'composer-setup.php');"]

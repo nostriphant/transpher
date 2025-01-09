@@ -8,9 +8,8 @@ RUN ["apt-get", "install", "-y", "libzip-dev", "zip", "libgmp-dev", "libsodium-d
 RUN ["docker-php-ext-configure", "pcntl", "--enable-pcntl"]
 RUN ["docker-php-ext-install", "zip", "gmp", "pcntl"]
 
-RUN ["pecl", "install", "--force", "redis"]
 RUN ["rm", "-rf", "/tmp/pear"]
-RUN ["docker-php-ext-enable", "redis", "sodium"]
+RUN ["docker-php-ext-enable", "sodium"]
 
 WORKDIR "/opt"
 RUN ["git", "clone", "https://github.com/1ma/secp256k1-nostr-php"]

@@ -32,7 +32,7 @@ class Relay implements WebsocketClientHandler {
     private ErrorHandler $errorHandler;
     private Files $files;
 
-    public function __construct(Store $events, string $files_path) {
+    public function __construct(Store $events, string $files_path, readonly bool $authentication = false) {
         $this->files = new Files($files_path, $events);
         $this->incoming = new Incoming($events, $this->files);
         $this->gateway = new WebsocketClientGateway();
@@ -71,6 +71,13 @@ class Relay implements WebsocketClientHandler {
         $this->gateway->addClient($client);
         $wrapped_client = SendNostr::send($client);
         $client_subscriptions = new Subscriptions($wrapped_client);
+
+
+        if ($this->authentication) {
+            $wrapped_client(Message::auth(bin2hex(random_bytes(32))));
+        }
+
+
         foreach ($client as $message) {
             $payload = (string) $message;
             try {

@@ -14,6 +14,7 @@ readonly class Incoming {
 
     public function __invoke(Subscriptions $subscriptions, Message $message): \Traversable {
         yield from (match (strtoupper($message->type)) {
+                    'AUTH' => new Incoming\Auth(Incoming\Auth\Limits::fromEnv()),
                     'EVENT' => new Incoming\Event(new Incoming\Event\Accepted($this->events, $this->files, $subscriptions), Incoming\Event\Limits::fromEnv()),
                     'CLOSE' => new Incoming\Close($subscriptions),
                     'REQ' => new Incoming\Req(new Incoming\Req\Accepted($this->events, $subscriptions, Incoming\Req\Accepted\Limits::fromEnv()), Incoming\Req\Limits::fromEnv()),

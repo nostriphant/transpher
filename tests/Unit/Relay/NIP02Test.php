@@ -1,7 +1,6 @@
 <?php
 
 use nostriphant\TranspherTests\Factory;
-use function Pest\incoming;
 
 it('replaces replaceable (n == 3; follow list) events, keeping only the last one (based on pubkey & kind)', function () {
     $store = \Pest\store();
@@ -9,12 +8,12 @@ it('replaces replaceable (n == 3; follow list) events, keeping only the last one
     $kind = 3;
     $sender_key = \Pest\key_sender();
     $original_event = Factory::event($sender_key, $kind, 'Hello World');
-    $recipient = \Pest\handle($original_event, incoming(store: $store));
+    $recipient = \Pest\handle($original_event, store: $store);
 
     expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
     $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 10);
-    $recipient = \Pest\handle($updated_event, incoming(store: $store));
+    $recipient = \Pest\handle($updated_event, store: $store);
 
     expect(isset($store[$original_event()[1]['id']]))->ToBeFalse();
     expect(isset($store[$updated_event()[1]['id']]))->toBeTrue();
@@ -36,11 +35,11 @@ it('keeps replaceable (n == 3; follow list) events, when same created_at with lo
         $updated_event = $event1;
     }
 
-    $recipient = \Pest\handle($original_event, incoming(store: $store));
+    $recipient = \Pest\handle($original_event, store: $store);
 
     expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
-    $recipient = \Pest\handle($updated_event, incoming(store: $store));
+    $recipient = \Pest\handle($updated_event, store: $store);
 
     expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
     expect(isset($store[$updated_event()[1]['id']]))->toBeFalse();

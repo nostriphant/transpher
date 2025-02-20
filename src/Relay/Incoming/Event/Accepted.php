@@ -4,23 +4,21 @@ namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\NIP01\Event;
 
-class Accepted {
+readonly class Accepted {
 
     public function __construct(
-            private \nostriphant\Stores\Store $events,
-            private \nostriphant\Transpher\Files $files,
-            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
+            private \nostriphant\Transpher\Relay\Incoming\Context $context
     ) {
         
     }
 
     public function __invoke(Event $event): \Generator {
         yield from Event::alternateClass($event)(
-                        regular: new Accepted\Regular($this->events, $this->files, $this->subscriptions),
-                        replaceable: new Accepted\Replaceable($this->events, $this->subscriptions),
-                        ephemeral: new Accepted\Ephemeral($this->subscriptions),
-                        addressable: new Accepted\Addressable($this->events, $this->subscriptions),
-                        undefined: new Accepted\Undefined()
+                        regular: new Accepted\Regular($this->context),
+                        replaceable: new Accepted\Replaceable($this->context),
+                        ephemeral: new Accepted\Ephemeral($this->context),
+                        addressable: new Accepted\Addressable($this->context),
+                        undefined: new Accepted\Undefined($this->context)
                 );
     }
 }

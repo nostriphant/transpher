@@ -6,7 +6,7 @@ use nostriphant\NIP01\Message;
 
 readonly class Close implements Type {
 
-    public function __construct(private \nostriphant\Transpher\Relay\Subscriptions $subscriptions) {
+    public function __construct(private \nostriphant\Transpher\Relay\Incoming\Context $context) {
         
     }
 
@@ -15,7 +15,7 @@ readonly class Close implements Type {
         if (count($payload) < 1) {
             yield Message::notice('Missing subscription ID');
         } else {
-            ($this->subscriptions)($payload[0]);
+            ($this->context->subscriptions)($payload[0]);
             yield Message::closed($payload[0]);
         }
     }

@@ -114,7 +114,7 @@ namespace Pest {
         );
     }
 
-    function handle(Message $message, ?Incoming $incoming = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null): Sender {
+    function handle(Message $message, ?\nostriphant\Stores\Store $store = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null): Sender {
         $to = new class implements \nostriphant\Transpher\Relay\Sender {
 
             public array $messages = [];
@@ -126,7 +126,11 @@ namespace Pest {
             }
         };
 
-        foreach (($incoming ?? incoming())($subscriptions ?? subscriptions(), $message) as $reply) {
+        $incoming = new Incoming();
+        $store = $store ?? store();
+        $context = new Incoming\Context($store, new \nostriphant\Transpher\Files($files ?? ROOT_DIR . '/data/files', $store), $subscriptions ?? subscriptions());
+
+        foreach ($incoming($context, $message) as $reply) {
             $to($reply);
         }
         return $to;

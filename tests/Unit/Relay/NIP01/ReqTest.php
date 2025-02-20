@@ -3,7 +3,6 @@
 use nostriphant\NIP01\Key;
 use nostriphant\TranspherTests\Factory;
 use nostriphant\NIP01\Message;
-use function Pest\incoming;
 
 describe('REQ', function () {
     it('replies NOTICE Invalid message on non-existing filters', function () {
@@ -47,12 +46,12 @@ describe('REQ', function () {
 
         $sender_key = \Pest\key_sender();
         $event = Factory::event($sender_key, 1, 'Hello World');
-        $recipient = \Pest\handle($event, incoming(store: $store));
+        $recipient = \Pest\handle($event, store: $store);
         expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
-        $recipient = \Pest\handle(Message::req($id = uniqid(), ['authors' => [$sender_key(Key::public())]]), incoming(store: $store));
+        $recipient = \Pest\handle(Message::req($id = uniqid(), ['authors' => [$sender_key(Key::public())]]), store: $store);
         expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
                         expect($event['content'])->toBe('Hello World');
@@ -66,7 +65,7 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
         $alice_event = Factory::event($alice_key, 1, 'Hello worlda!');
-        $alice = \Pest\handle($alice_event, incoming(store: $store));
+        $alice = \Pest\handle($alice_event, store: $store);
         expect($alice)->toHaveReceived(
                 ['OK', $alice_event()[1]['id'], true]
         );
@@ -74,7 +73,7 @@ describe('REQ', function () {
 
         $key_charlie = \Pest\key_recipient();
         $note2 = Factory::event($key_charlie, 1, 'Hello worldi!');
-        $charlie = \Pest\handle($note2, incoming(store: $store));
+        $charlie = \Pest\handle($note2, store: $store);
         expect($charlie)->toHaveReceived(
                 ['OK', $note2()[1]['id'], true]
         );
@@ -82,7 +81,7 @@ describe('REQ', function () {
         $subscription = Factory::subscribe(
                 ["ids" => [$note2()[1]['id']]]
         );
-        $bob = \Pest\handle($subscription, incoming(store: $store));
+        $bob = \Pest\handle($subscription, store: $store);
         expect($bob)->toHaveReceived(
                 ['EVENT', $subscription()[1], function (array $event) {
                         expect($event['content'])->toBe('Hello worldi!');
@@ -96,7 +95,7 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
         $alice_event = Factory::event($alice_key, 1, 'Hello world!');
-        $alice = \Pest\handle($alice_event, incoming(store: $store));
+        $alice = \Pest\handle($alice_event, store: $store);
         expect($alice)->toHaveReceived(
                 ['OK', $alice_event()[1]['id'], true]
         );
@@ -104,7 +103,7 @@ describe('REQ', function () {
         $subscription = Factory::subscribe(
                 ["authors" => [$alice_key(Key::public())]]
         );
-        $bob = \Pest\handle($subscription, incoming(store: $store));
+        $bob = \Pest\handle($subscription, store: $store);
         expect($bob)->toHaveReceived(
                 ['EVENT', $subscription()[1], function (array $event) {
                         expect($event['content'])->toBe('Hello world!');
@@ -119,14 +118,14 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
         $event_alice = Factory::event($alice_key, 1, 'Hello world, from Alice!');
-        $recipient = \Pest\handle($event_alice, incoming(store: $store), subscriptions: $subscriptions);
+        $recipient = \Pest\handle($event_alice, store: $store, subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
         $bob_key = Key::generate();
         $event_bob = Factory::event($bob_key, 1, 'Hello world, from Bob!');
-        $recipient = \Pest\handle($event_bob, incoming(store: $store), subscriptions: $subscriptions);
+        $recipient = \Pest\handle($event_bob, store: $store, subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['OK']
         );
@@ -135,7 +134,7 @@ describe('REQ', function () {
                     'authors' => [$alice_key(Key::public())]
             ], [
                 'authors' => [$bob_key(Key::public())]
-        ]), incoming(store: $store), subscriptions: $subscriptions);
+        ]), store: $store, subscriptions: $subscriptions);
 
         expect($recipient)->toHaveReceived(
                 ['EVENT', $id, function (array $event) {
@@ -155,7 +154,7 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
         $alice_event = Factory::event($alice_key, 1, 'Hello world!');
-        $alice = \Pest\handle($alice_event, incoming(store: $store));
+        $alice = \Pest\handle($alice_event, store: $store);
         expect($alice)->toHaveReceived(
                 ['OK', $alice_event()[1]['id'], true]
         );
@@ -163,7 +162,7 @@ describe('REQ', function () {
         $subscription = Factory::subscribe(
                 ["authors" => [$alice_key(Key::public())]]
         );
-        $bob = \Pest\handle($subscription, incoming(store: $store), subscriptions: $subscriptions);
+        $bob = \Pest\handle($subscription, store: $store, subscriptions: $subscriptions);
         expect($bob)->toHaveReceived(
                 ['EVENT', $subscription()[1], function (array $event) {
                         expect($event['content'])->toBe('Hello world!');
@@ -171,13 +170,13 @@ describe('REQ', function () {
                 ['EOSE', $subscription()[1]]
         );
 
-        $bob = \Pest\handle(Message::close($subscription()[1]), incoming(store: $store), subscriptions: $subscriptions);
+        $bob = \Pest\handle(Message::close($subscription()[1]), store: $store, subscriptions: $subscriptions);
         expect($bob)->toHaveReceived(
                 ['CLOSED', $subscription()[1], '']
         );
 
         $alice_event2 = Factory::event($alice_key, 1, 'Hello world!');
-        $alice = \Pest\handle($alice_event2, incoming(store: $store));
+        $alice = \Pest\handle($alice_event2, store: $store);
         expect($alice)->toHaveReceived(
                 ['OK', $alice_event2()[1]['id'], true]
         );
@@ -190,7 +189,7 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
         $alice_event = Factory::event($alice_key, 3, 'Hello world!');
-        $alice = \Pest\handle($alice_event, incoming(store: $store));
+        $alice = \Pest\handle($alice_event, store: $store);
         expect($alice)->toHaveReceived(
                 ['OK', $alice_event()[1]['id'], true]
         );
@@ -198,7 +197,7 @@ describe('REQ', function () {
         $subscription = Factory::subscribe(
                ["kinds" => [3]]
         );
-        $bob = \Pest\handle($subscription, incoming(store: $store));
+        $bob = \Pest\handle($subscription, store: $store);
         expect($bob)->toHaveReceived(
                 ['EVENT', $subscription()[1], function (array $event) {
                         expect($event['content'])->toBe('Hello world!');
@@ -215,20 +214,20 @@ describe('REQ', function () {
         $alice_key = \Pest\key_sender();
 
         $subscription = Message::req($id = uniqid(), ['authors' => [$alice_key(Key::public())]]);
-        $recipient = \Pest\handle($subscription, incoming(store: $store), subscriptions: $subscriptions);
+        $recipient = \Pest\handle($subscription, store: $store, subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['EOSE', $id]
         );
 
         $key_charlie = \Pest\key_recipient();
         $event_charlie = Factory::event($key_charlie, 1, 'Hello world!');
-        $recipient = \Pest\handle($event_charlie, incoming(store: $store));
+        $recipient = \Pest\handle($event_charlie, store: $store);
         expect($recipient)->toHaveReceived(
                 ['OK']
         );
 
         $event = Factory::event($alice_key, 1, 'Relayable Hello worlda!');
-        $recipient = \Pest\handle($event, incoming(store: $store), subscriptions: $subscriptions);
+        $recipient = \Pest\handle($event, store: $store, subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
                 ['OK']
         );
@@ -245,7 +244,7 @@ describe('REQ', function () {
 
         $alice_key = \Pest\key_sender();
         $alice_event = Factory::event($alice_key, 1, 'Hello wirld!');
-        $alice = \Pest\handle($alice_event, incoming(store: $store));
+        $alice = \Pest\handle($alice_event, store: $store);
         expect($alice)->toHaveReceived(
                 ['OK', $alice_event()[1]['id'], true]
         );
@@ -255,7 +254,7 @@ describe('REQ', function () {
         $subscription = Factory::subscribe(
                 ["authors" => [$alice_key(Key::public())]]
                 );
-        $bob = \Pest\handle($subscription, incoming(store: $store));
+        $bob = \Pest\handle($subscription, store: $store);
         expect($bob)->toHaveReceived(
                 ['EVENT', $subscription()[1], function (array $event) {
                         expect($event['content'])->toBe('Hello wirld!');

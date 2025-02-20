@@ -7,15 +7,14 @@ use nostriphant\NIP01\Event;
 class Addressable {
 
     public function __construct(
-            private \nostriphant\Stores\Store $events,
-            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
+            private \nostriphant\Transpher\Relay\Incoming\Context $context
     ) {
 
     }
 
     public function __invoke(Event $event) {
-        $this->events[$event->id] = $event;
-        $replaceable_events = ($this->events)([
+        $this->context->events[$event->id] = $event;
+        $replaceable_events = ($this->context->events)([
             'kinds' => [$event->kind],
             'authors' => [$event->pubkey],
             '#d' => array_map(fn(array $tag_values) => $tag_values[0], Event::extractTagValues($event, 'd'))
@@ -28,8 +27,8 @@ class Addressable {
             if ($replaceable_event->created_at === $event->created_at) {
                 $replace_id = max($replaceable_event->id, $event->id);
             }
-            unset($this->events[$replace_id]);
+            unset($this->context->events[$replace_id]);
         }
-        yield from ($this->subscriptions)($event);
+        yield from ($this->context->subscriptions)($event);
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
 use nostriphant\TranspherTests\Factory;
-use function Pest\incoming;
 
 it('downloads NIP-92 files (kind 1, with imeta tag) into a data folder', function () {
     $file = tempnam(sys_get_temp_dir(), 'file');
@@ -22,7 +21,7 @@ it('downloads NIP-92 files (kind 1, with imeta tag) into a data folder', functio
 
     $store = \Pest\store();
 
-    expect(\Pest\handle($message, incoming($store)))->toHaveReceived(
+    expect(\Pest\handle($message, store: $store))->toHaveReceived(
             ['OK', $message()[1]['id'], true]
     );
 

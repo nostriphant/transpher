@@ -2,7 +2,6 @@
 
 
 use nostriphant\TranspherTests\Factory;
-use function Pest\incoming;
 
 it('downloads NIP-94 files (kind 1063) into a data folder', function () {
     $file = tempnam(sys_get_temp_dir(), 'file');
@@ -20,7 +19,7 @@ it('downloads NIP-94 files (kind 1063) into a data folder', function () {
             ['ox', $hash]
     );
 
-    expect(\Pest\handle($message, incoming()))->toHaveReceived(
+    expect(\Pest\handle($message))->toHaveReceived(
             ['OK', $message()[1]['id'], true]
     );
 
@@ -39,7 +38,7 @@ it('refuses NIP-94 files with missing url-tag', function () {
             ['ox', $hash]
     );
 
-    expect(\Pest\handle($message, incoming()))->toHaveReceived(
+    expect(\Pest\handle($message))->toHaveReceived(
             ['OK', $message()[1]['id'], false, 'invalid:missing url-tag']
     );
 });
@@ -58,7 +57,7 @@ it('refuses NIP-94 files (kind 1063) with missing hash (x)', function () {
             ['ox', $hash]
     );
 
-    expect(\Pest\handle($message, incoming()))->toHaveReceived(
+    expect(\Pest\handle($message))->toHaveReceived(
             ['OK', $message()[1]['id'], false, 'invalid:missing x-tag']
     );
 
@@ -79,7 +78,7 @@ it('refuses NIP-94 files (kind 1063) with missing original hash (ox)', function 
             ['x', $hash]
     );
 
-    expect(\Pest\handle($message, incoming()))->toHaveReceived(
+    expect(\Pest\handle($message))->toHaveReceived(
             ['OK', $message()[1]['id'], false, 'invalid:missing ox-tag']
     );
 

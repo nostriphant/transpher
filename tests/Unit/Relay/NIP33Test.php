@@ -2,7 +2,6 @@
 
 use nostriphant\TranspherTests\Factory;
 use nostriphant\NIP01\Key;
-use function Pest\incoming;
 
 /**
  * https://github.com/nostr-protocol/nips/commit/72bb8a128b2d7d3c2c654644cd68d0d0fe58a3b1#diff-13387ea5b220b50dc20daca792c07b3b3d2b278dcafc8f134e4369468cab6440
@@ -12,13 +11,13 @@ it('replaces addressable (30000 <= n < 40000) events, keeping only the last one 
         $store = \Pest\store();
 
         $original_event = Factory::event($sender_key, $kind, 'Hello World', ['d', 'my-d-tag-value']);
-        $recipient = \Pest\handle($original_event, incoming(store: $store));
+        $recipient = \Pest\handle($original_event, store: $store);
 
         expect($recipient)->toHaveReceived(['OK', $original_id = $original_event()[1]['id'], true]);
         expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
         $updated_event = Factory::eventAt($sender_key, $kind, 'Updated: hello World', time() + 10, ['d', 'my-d-tag-value']);
-        $recipient = \Pest\handle($updated_event, incoming(store: $store));
+        $recipient = \Pest\handle($updated_event, store: $store);
 
         expect($recipient)->toHaveReceived(['OK', $updated_id = $updated_event()[1]['id'], true]);
 
@@ -46,11 +45,11 @@ it('keeps addressable (30000 <= n < 40000) events, when same created_at with low
             $updated_event = $event1;
         }
 
-        $recipient = \Pest\handle($original_event, incoming(store: $store));
+        $recipient = \Pest\handle($original_event, store: $store);
 
         expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
 
-        $recipient = \Pest\handle($updated_event, incoming(store: $store));
+        $recipient = \Pest\handle($updated_event, store: $store);
 
         expect(isset($store[$original_event()[1]['id']]))->toBeTrue();
         expect(isset($store[$updated_event()[1]['id']]))->toBeFalse();

@@ -7,8 +7,10 @@ use nostriphant\NIP01\Message;
 
 class Undefined {
 
-    public function __construct() {
-        
+    public function __construct(
+            private \nostriphant\Transpher\Relay\Incoming\Context $context
+    ) {
+
     }
 
     public function __invoke(Event $event) {

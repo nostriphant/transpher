@@ -8,23 +8,21 @@ use nostriphant\NIP01\Event;
 class Regular {
 
     public function __construct(
-            private \nostriphant\Stores\Store $events,
-            private \nostriphant\Transpher\Files $files,
-            private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
+            private \nostriphant\Transpher\Relay\Incoming\Context $context
     ) {
-        
+
     }
 
     public function __invoke(Event $event) {
-        $this->events[$event->id] = $event;
+        $this->context->events[$event->id] = $event;
         $kindClass = Regular\Kind::class . $event->kind;
         if (class_exists($kindClass) === false) {
-            yield from ($this->subscriptions)($event);
+            yield from ($this->context->subscriptions)($event);
         } else {
             yield from $kindClass::validate($event)(
                     accepted: function (Event $event) use ($kindClass) {
-                                (new $kindClass($this->events, $this->files))($event);
-                                yield from ($this->subscriptions)($event);
+                                (new $kindClass($this->context->events, $this->context->files))($event);
+                                yield from ($this->context->subscriptions)($event);
                             },
                             rejected: fn(string $reason) => yield Message::ok($event->id, false, 'invalid:' . $reason)
                     );

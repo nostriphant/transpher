@@ -15,7 +15,7 @@ readonly class Close implements Type {
         if (count($payload) < 1) {
             yield Message::notice('Missing subscription ID');
         } else {
-            ($this->context->subscriptions)($payload[0]);
+            $this->context->subscriptions($payload[0]);
             yield Message::closed($payload[0]);
         }
     }

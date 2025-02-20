@@ -13,6 +13,6 @@ class Ephemeral {
     }
 
     public function __invoke(Event $event) {
-        yield from ($this->context->subscriptions)($event);
+        yield from $this->context->subscriptions($event);
     }
 }

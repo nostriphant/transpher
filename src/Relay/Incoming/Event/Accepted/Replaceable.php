@@ -14,7 +14,7 @@ class Replaceable {
 
     public function __invoke(Event $event) {
         $this->context->events[$event->id] = $event;
-        $replaceable_events = ($this->context->events)([
+        $replaceable_events = $this->context->events([
             'kinds' => [$event->kind],
             'authors' => [$event->pubkey]
         ]);
@@ -29,6 +29,6 @@ class Replaceable {
             }
             unset($this->context->events[$replace_id]);
         }
-        yield from ($this->context->subscriptions)($event);
+        yield from $this->context->subscriptions($event);
     }
 }

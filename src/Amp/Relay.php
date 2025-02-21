@@ -70,17 +70,19 @@ readonly class Relay implements WebsocketClientHandler {
         $wrapped_client = SendNostr::send($client);
         $client_context = new Incoming\Context($this->events, $this->files, new Subscriptions($wrapped_client));
 
+        $enabled_types = [
+            new Incoming\Event(new Incoming\Event\Accepted($client_context), Incoming\Event\Limits::fromEnv()),
+            new Incoming\Close($client_context),
+            new Incoming\Req(new Incoming\Req\Accepted($client_context, Incoming\Req\Accepted\Limits::fromEnv()), Incoming\Req\Limits::fromEnv()),
+            new Incoming\Count($client_context, Incoming\Count\Limits::fromEnv())
+        ];
+
         if ($this->authentication) {
             $wrapped_client(Message::auth(bin2hex(random_bytes(32))));
+            $enabled_types[] = new Incoming\Auth(Incoming\Auth\Limits::fromEnv());
         }
 
-        $incoming = new Incoming(
-                new Incoming\Auth(Incoming\Auth\Limits::fromEnv()),
-                new Incoming\Event(new Incoming\Event\Accepted($client_context), Incoming\Event\Limits::fromEnv()),
-                new Incoming\Close($client_context),
-                new Incoming\Req(new Incoming\Req\Accepted($client_context, Incoming\Req\Accepted\Limits::fromEnv()), Incoming\Req\Limits::fromEnv()),
-                new Incoming\Count($client_context, Incoming\Count\Limits::fromEnv())
-        );
+        $incoming = new Incoming(...$enabled_types);
 
         foreach ($client as $message) {
             $payload = (string) $message;

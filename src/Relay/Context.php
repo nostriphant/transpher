@@ -8,12 +8,12 @@ use nostriphant\NIP01\Message;
 
 readonly class Context {
 
-    public Files $files;
-
     public function __construct(
-            private Store $events, string $files_path, private bool $authentication
+            public Store $events,
+            public Files $files,
+            private bool $authentication
     ) {
-        $this->files = new Files($files_path, $events);
+        
     }
 
     public function __invoke(Sender $client): Incoming {

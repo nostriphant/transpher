@@ -32,7 +32,7 @@ readonly class Relay implements WebsocketClientHandler {
     }
 
 
-    public function __invoke(string $ip, string $port, int $max_connections_per_ip, LoggerInterface $log): AwaitSignal {
+    public function __invoke(string $ip, string $port, int $max_connections_per_ip, Blossom $blossom, LoggerInterface $log): AwaitSignal {
         $server = SocketHttpServer::createForDirectAccess($log, connectionLimitPerIp: $max_connections_per_ip);
         $server->expose(new Socket\InternetAddress($ip, $port));
 
@@ -43,7 +43,6 @@ readonly class Relay implements WebsocketClientHandler {
         //);
         $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $log, $acceptor, $this)));
 
-        $blossom = new Blossom($this->context->files);
         $blossom_handler = new ClosureRequestHandler(fn(Request $request) => new Response(...$blossom(...$request->getAttribute(Router::class))));
         $routes = Blossom::ROUTES;
         array_walk($routes, fn(string $route, string $method) => $router->addRoute($method, $route, $blossom_handler));

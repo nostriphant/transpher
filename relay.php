@@ -46,11 +46,12 @@ $store = new nostriphant\Stores\Store($events, [
     ['#p' => $whitelisted_pubkeys]
         ]);
 
-$relay_context = new nostriphant\Transpher\Relay\Context($store, $files_path, $_SERVER['RELAY_ENABLE_AUTHENTICATION'] === '1');
+$relay_context = new nostriphant\Transpher\Relay\Context($store, new \nostriphant\Transpher\Files($files_path, $store), ($_SERVER['RELAY_ENABLE_AUTHENTICATION'] ?? '0') === '1');
 $relay = new \nostriphant\Transpher\Amp\Relay($relay_context);
 
 $args = explode(":", $_SERVER['argv'][1]);
 $args[] = $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000;
+$args[] = new nostriphant\Transpher\Relay\Blossom($relay_context->files);
 $args[] = $logger;
 $await = $relay(...$args);
 

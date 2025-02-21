@@ -19,20 +19,14 @@ use Amp\Http\Server\ErrorHandler;
 use Amp\Websocket\Server\Rfc6455Acceptor;
 use Amp\Http\Server\RequestHandler\ClosureRequestHandler;
 
-use nostriphant\Transpher\Files;
-use nostriphant\Transpher\Relay\Incoming;
-use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Blossom;
-use nostriphant\Transpher\Relay\Subscriptions;
 
 readonly class Relay implements WebsocketClientHandler {
 
     private WebsocketGateway $gateway;
     private ErrorHandler $errorHandler;
-    private Files $files;
 
-    public function __construct(private Store $events, string $files_path, readonly bool $authentication = false) {
-        $this->files = new Files($files_path, $events);
+    public function __construct(private \nostriphant\Transpher\Relay\Context $context) {
         $this->gateway = new WebsocketClientGateway();
         $this->errorHandler = new DefaultErrorHandler();
     }
@@ -49,7 +43,7 @@ readonly class Relay implements WebsocketClientHandler {
         //);
         $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $log, $acceptor, $this)));
 
-        $blossom = new Blossom($this->files);
+        $blossom = new Blossom($this->context->files);
         $blossom_handler = new ClosureRequestHandler(fn(Request $request) => new Response(...$blossom(...$request->getAttribute(Router::class))));
         $routes = Blossom::ROUTES;
         array_walk($routes, fn(string $route, string $method) => $router->addRoute($method, $route, $blossom_handler));
@@ -67,27 +61,12 @@ readonly class Relay implements WebsocketClientHandler {
     ): void {
 
         $this->gateway->addClient($client);
+
         $wrapped_client = SendNostr::send($client);
-        $client_context = new Incoming\Context($this->events, $this->files, new Subscriptions($wrapped_client));
-
-        $enabled_types = [
-            new Incoming\Event(new Incoming\Event\Accepted($client_context), Incoming\Event\Limits::fromEnv()),
-            new Incoming\Close($client_context),
-            new Incoming\Req(new Incoming\Req\Accepted($client_context, Incoming\Req\Accepted\Limits::fromEnv()), Incoming\Req\Limits::fromEnv()),
-            new Incoming\Count($client_context, Incoming\Count\Limits::fromEnv())
-        ];
-
-        if ($this->authentication) {
-            $wrapped_client(Message::auth(bin2hex(random_bytes(32))));
-            $enabled_types[] = new Incoming\Auth(Incoming\Auth\Limits::fromEnv());
-        }
-
-        $incoming = new Incoming(...$enabled_types);
-
+        $incoming = call_user_func($this->context, $wrapped_client);
         foreach ($client as $message) {
-            $payload = (string) $message;
             try {
-                foreach ($incoming(Message::decode($payload)) as $reply) {
+                foreach ($incoming(Message::decode((string) $message)) as $reply) {
                     $wrapped_client($reply);
                 }
             } catch (\InvalidArgumentException $ex) {

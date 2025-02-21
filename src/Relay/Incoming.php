@@ -6,13 +6,20 @@ use nostriphant\NIP01\Message;
 
 readonly class Incoming {
 
-    public function __invoke(\nostriphant\Transpher\Relay\Incoming\Context $context, Message $message): \Traversable {
+    private array $types_enabled;
+
+    public function __construct(Incoming\Type ...$types_enabled) {
+        $types = [];
+        foreach ($types_enabled as $type_enabled) {
+            $classname = get_class($type_enabled);
+            $types[strtoupper(substr($classname, strrpos($classname, '\\') + 1))] = $type_enabled;
+        }
+        $this->types_enabled = $types;
+    }
+
+    public function __invoke(Message $message): \Traversable {
         yield from \nostriphant\FunctionalAlternate\Alternate::{$message->type}($message->payload)(
-                        AUTH: new Incoming\Auth(Incoming\Auth\Limits::fromEnv()),
-                        EVENT: new Incoming\Event(new Incoming\Event\Accepted($context), Incoming\Event\Limits::fromEnv()),
-                        CLOSE: new Incoming\Close($context),
-                        REQ: new Incoming\Req(new Incoming\Req\Accepted($context, Incoming\Req\Accepted\Limits::fromEnv()), Incoming\Req\Limits::fromEnv()),
-                        COUNT: new Incoming\Count($context, Incoming\Count\Limits::fromEnv()),
+                        ...$this->types_enabled,
                         default: new Incoming\Unknown($message->type)
                 );
     }

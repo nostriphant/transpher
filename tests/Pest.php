@@ -126,11 +126,16 @@ namespace Pest {
             }
         };
 
-        $incoming = new Incoming();
         $store = $store ?? store();
         $context = new Incoming\Context($store, new \nostriphant\Transpher\Files($files ?? ROOT_DIR . '/data/files', $store), $subscriptions ?? subscriptions());
-
-        foreach ($incoming($context, $message) as $reply) {
+        $incoming = new Incoming(
+                new Incoming\Auth(Incoming\Auth\Limits::fromEnv()),
+                new Incoming\Event(new Incoming\Event\Accepted($context), Incoming\Event\Limits::fromEnv()),
+                new Incoming\Close($context),
+                new Incoming\Req(new Incoming\Req\Accepted($context, Incoming\Req\Accepted\Limits::fromEnv()), Incoming\Req\Limits::fromEnv()),
+                new Incoming\Count($context, Incoming\Count\Limits::fromEnv())
+        );
+        foreach ($incoming($message) as $reply) {
             $to($reply);
         }
         return $to;

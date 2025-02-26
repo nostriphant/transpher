@@ -47,9 +47,9 @@ $store = new nostriphant\Stores\Store($events, [
         ]);
 
 $files = new \nostriphant\Transpher\Files($files_path, $store);
-$relay_context = new \nostriphant\Transpher\Relay\Context\Unrestricted($store, $files);
+$relay_context = new \nostriphant\Transpher\Relay\Unrestricted($store, $files);
 if (($_SERVER['RELAY_ENABLE_AUTHENTICATION'] ?? '0') === '1') {
-    $relay_context = new nostriphant\Transpher\Relay\Context\Authenticated($relay_context);
+    $relay_context = new nostriphant\Transpher\Relay\Authenticated($relay_context);
 }
 $relay = new \nostriphant\Transpher\Amp\Relay($relay_context);
 

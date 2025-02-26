@@ -4,8 +4,8 @@ it('SHOULD send the client an AUTH request with challenge when RELAY_ENABLE_AUTH
     putenv('RELAY_ENABLE_AUTHENTICATION=1');
 
     $store = Pest\store();
-    $relay_context = new nostriphant\Transpher\Relay\Context\Unrestricted($store, new \nostriphant\Transpher\Files(ROOT_DIR . '/data/files', $store), true);
-    $relay = new \nostriphant\Transpher\Amp\Relay(new nostriphant\Transpher\Relay\Context\Authenticated($relay_context));
+    $relay_context = new nostriphant\Transpher\Relay\Unrestricted($store, new \nostriphant\Transpher\Files(ROOT_DIR . '/data/files', $store), true);
+    $relay = new \nostriphant\Transpher\Amp\Relay(new nostriphant\Transpher\Relay\Authenticated($relay_context));
 
     $request = new \Amp\Http\Server\Request(
             mock(Amp\Http\Server\Driver\Client::class),

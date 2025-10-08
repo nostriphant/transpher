@@ -2,13 +2,15 @@
 
 $log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', $_SERVER['AGENT_LOG_LEVEL'] ?? 'INFO');
 
-use nostriphant\Transpher\Amp\Client;
-
 $agent = new nostriphant\Transpher\Amp\Agent(
-        $_SERVER['AGENT_NSEC'],
-        $_SERVER['RELAY_OWNER_NPUB']
+        Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))()),
+        new Bech32($_SERVER['RELAY_OWNER_NPUB'])
 );
 
-$await = $agent(new Client(0, $_SERVER['RELAY_URL']), $log);
+$log->info('Client connecting to ' . $_SERVER['RELAY_URL']);
+$log->info('Listening to relay...');
+$await = $agent($_SERVER['RELAY_URL']);
+$log->info('Running agent with public key ' . Bech32::npub(($_SERVER['AGENT_NSEC'])(Key::public())));
+$log->info('Sending Private Direct Message event');
 
 $await(fn(int $signal) => $log->info(sprintf("Received signal %d, stopping agent", $signal)));

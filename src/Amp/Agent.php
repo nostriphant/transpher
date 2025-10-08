@@ -2,31 +2,25 @@
 
 namespace nostriphant\Transpher\Amp;
 
-use Psr\Log\LoggerInterface;
+use nostriphant\Transpher\Amp\Client;
+
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Message;
+use nostriphant\NIP17\PrivateDirect;
 
 readonly class Agent {
-    
-    private Key $key;
-    private Bech32 $relay_owner_npub;
 
-    public function __construct(#[\SensitiveParameter] string $agent_nsec, string $relay_owner_npub) {
-        $this->key = Key::fromHex((new Bech32($agent_nsec))());
-        $this->relay_owner_npub = new Bech32($relay_owner_npub);
+    public function __construct(#[\SensitiveParameter] private Key $key, private Bech32 $relay_owner_npub) {
     }
     
-    public function __invoke(Client $client, LoggerInterface $log): AwaitSignal {
-        $log->info('Client connecting to ' . $client->url);
-        $log->info('Listening to relay...');
-        $send = $client->start(function (\nostriphant\NIP01\Message $message) {
+    public function __invoke(string $relay_url): AwaitSignal {
+        $client = new Client(0, $relay_url);
+        $send = $client->start(function (Message $message) {
             
         });
 
-        $log->info('Running agent with public key ' . Bech32::npub(($this->key)(Key::public())));
-        $log->info('Sending Private Direct Message event');
-        $gift = \nostriphant\NIP17\PrivateDirect::make($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url);
+        $gift = PrivateDirect::make($this->key, call_user_func($this->relay_owner_npub), 'Hello, I am your agent! The URL of your relay is ' . $client->url);
         $send(Message::event($gift));
 
         return new AwaitSignal(fn() => $client->stop());

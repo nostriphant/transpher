@@ -1,8 +1,9 @@
 <?php
 
-namespace nostriphant\Transpher\Amp;
+namespace nostriphant\Transpher;
 
 use nostriphant\Transpher\Amp\Client;
+use nostriphant\Transpher\Amp\AwaitSignal;
 
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;

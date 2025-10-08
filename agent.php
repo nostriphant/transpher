@@ -2,7 +2,7 @@
 
 $log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', $_SERVER['AGENT_LOG_LEVEL'] ?? 'INFO');
 
-$agent = new nostriphant\Transpher\Amp\Agent(
+$agent = new nostriphant\Transpher\Agent(
         Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))()),
         new Bech32($_SERVER['RELAY_OWNER_NPUB'])
 );

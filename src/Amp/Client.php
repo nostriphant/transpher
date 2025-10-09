@@ -20,7 +20,7 @@ class Client {
                 $callback(Message::decode($message->buffer()));
             }
         });
-        return \nostriphant\Transpher\Relay\Sender::send($this->connection);
+        return SendNostr::send($this->connection);
     }
 
     public function stop(): void {

@@ -37,6 +37,7 @@
         }
     ],
     "require-dev": {
+        "ext-curl": "*",
         "pestphp/pest": "^2.35",
         "mockery/mockery": "^1.6"
     },

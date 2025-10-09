@@ -12,6 +12,7 @@ RUN ["rm", "-rf", "/tmp/pear"]
 RUN ["docker-php-ext-enable", "sodium"]
 
 WORKDIR "/opt"
+RUN ["sudo", "apt", "install", "--yes", "autoconf", "build-essential", "git", "libsecp256k1-dev", "libsodium-dev", "libtool", "php8.4-dev", "pkgconf"]
 RUN ["git", "clone", "https://github.com/1ma/secp256k1-nostr-php"]
 WORKDIR "/opt/secp256k1-nostr-php"
 RUN ["git", "submodule", "init"]

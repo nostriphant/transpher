@@ -6,7 +6,7 @@ RUN ["apt", "update"]
 RUN ["apt-get", "install", "-y", "libzip-dev", "zip", "libgmp-dev", "libsodium-dev", "autoconf", "build-essential", "git", "libtool", "pkgconf"]
 
 RUN ["docker-php-ext-configure", "pcntl", "--enable-pcntl"]
-RUN ["docker-php-ext-install", "zip", "gmp", "pcntl"]
+RUN ["docker-php-ext-install", "zip", "gmp", "pcntl", "sqlite3"]
 
 RUN ["rm", "-rf", "/tmp/pear"]
 RUN ["docker-php-ext-enable", "sodium"]

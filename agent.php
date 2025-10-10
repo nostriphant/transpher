@@ -11,9 +11,9 @@ $agent = new Agent(
         new Bech32($_SERVER['RELAY_OWNER_NPUB'])
 );
 
-$log->info('Client connecting to ' . $_SERVER['RELAY_URL']);
+$log->info('Client connecting to ' . $_SERVER['RELAY_URL'], $_SERVER['RELAY_URL']);
 $log->info('Listening to relay...');
-$await = $agent($_SERVER['RELAY_URL']);
+$await = $agent();
 $log->info('Running agent with public key ' . Bech32::npub(($_SERVER['AGENT_NSEC'])(Key::public())));
 $log->info('Sending Private Direct Message event');
 

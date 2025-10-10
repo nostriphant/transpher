@@ -23,8 +23,8 @@ class Client {
         return SendNostr::send($this->connection);
     }
 
-    public function stop(): void {
-        $this->connection->close();
+    public function listen(): AwaitSignal {
+        return new AwaitSignal(fn() => $this->connection->close());
     }
     
 }

@@ -8,7 +8,8 @@ $log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', $_SERVER['AGEN
 
 $agent = new Agent(
         Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))()),
-        new Bech32($_SERVER['RELAY_OWNER_NPUB'])
+        new Bech32($_SERVER['RELAY_OWNER_NPUB']),
+        $_SERVER['RELAY_URL']
 );
 
 $log->info('Client connecting to ' . $_SERVER['RELAY_URL'], $_SERVER['RELAY_URL']);

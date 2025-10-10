@@ -24,7 +24,7 @@ WORKDIR "/app"
 COPY ["VERSION", "composer.json", "composer.lock", "bootstrap.php", "agent.php", "."]
 COPY ["src", "src"]
 
-RUN ["curl", "-sS", "https://getcomposer.org/installer", "|", "php", "--", "--install-dir=/usr/local/bin", "--filename=composer"]
-RUN ["/usr/local/bin/composer", "--no-dev", "install"]
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+RUN ["composer", "--no-dev", "install"]
 
 CMD ["/usr/local/bin/php", "/app/agent.php"]

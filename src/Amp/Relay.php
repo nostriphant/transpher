@@ -87,9 +87,8 @@ class Relay implements WebsocketClientHandler {
         
         $client_subscriptions = new Subscriptions($wrapped_client);
         foreach ($client as $message) {
-            $payload = (string) $message;
             try {
-                foreach (call_user_func($this->incoming, $client_subscriptions, Message::decode($payload)) as $reply) {
+                foreach (call_user_func($this->incoming, $client_subscriptions, Message::decode($message)) as $reply) {
                     $wrapped_client($reply);
                 }
             } catch (\InvalidArgumentException $ex) {

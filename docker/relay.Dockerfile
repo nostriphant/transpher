@@ -1,4 +1,4 @@
-FROM nostriphant/nip-01
+FROM nostriphant/nip-01:main
 
 RUN ["apt", "update"]
 RUN ["apt-get", "install", "-y", "libzip-dev", "zip"]

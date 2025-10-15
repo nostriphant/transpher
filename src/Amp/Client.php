@@ -23,8 +23,11 @@ class Client {
         return SendNostr::send($this->connection);
     }
 
-    public function listen(): Await {
-        return new Await(fn() => \Amp\trapSignal([SIGINT, SIGTERM]), fn() => $this->connection->close());
+    public function listen(callable $shutdown_callback): void {
+        (new Await(fn() => \Amp\trapSignal([SIGINT, SIGTERM])))(function(int $signal) use ($shutdown_callback) {
+            $shutdown_callback($signal);
+            $this->connection->close();
+        });
     }
     
 }

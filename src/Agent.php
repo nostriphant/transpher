@@ -14,6 +14,6 @@ readonly class Agent {
     
     public function __invoke(callable $bootstrap_callback, callable $shutdown_callback): void {
         $bootstrap_callback($this->client->start($this->response_callback));
-        $this->client->listen()($shutdown_callback);
+        $this->client->listen($shutdown_callback);
     }
 }

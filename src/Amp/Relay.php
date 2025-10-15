@@ -58,7 +58,10 @@ class Relay implements WebsocketClientHandler {
 
         $server->start($router, $this->errorHandler);
 
-        (new Await(fn() => \Amp\trapSignal([SIGINT, SIGTERM]), fn() => $server->stop()))($shutdown_callback);
+        (new Await(fn() => \Amp\trapSignal([SIGINT, SIGTERM])))(function(int $signal) use ($shutdown_callback, $server) {
+            $shutdown_callback($signal);
+            $server->stop();
+        });
     }
 
     #[\Override]

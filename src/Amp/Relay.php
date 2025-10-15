@@ -24,7 +24,7 @@ use nostriphant\Transpher\Relay\Incoming;
 use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Blossom;
 use nostriphant\Transpher\Relay\Subscriptions;
-use nostriphant\Transpher\Nostr\Send;
+use nostriphant\Transpher\Nostr\Transmission;
 
 class Relay implements WebsocketClientHandler {
 
@@ -73,7 +73,23 @@ class Relay implements WebsocketClientHandler {
     ): void {
 
         $this->gateway->addClient($client);
-        $wrapped_client = new Send($client);
+        $wrapped_client = new class($client) implements Transmission {
+            public function __construct(private WebsocketClient $client) {
+
+            }
+            #[\Override]
+            public function __invoke(mixed $json): bool {
+                if ($json instanceof Message) {
+                    $text = $json;
+                } else {
+                    $text = Nostr::encode($json);
+                }
+                $this->client->sendText($text);
+                return true;
+            }
+
+        };
+        
         $client_subscriptions = new Subscriptions($wrapped_client);
         foreach ($client as $message) {
             $payload = (string) $message;

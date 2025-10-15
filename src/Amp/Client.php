@@ -3,8 +3,8 @@
 namespace nostriphant\Transpher\Amp;
 
 use function Amp\Websocket\Client\connect;
+use nostriphant\Transpher\Nostr\Transmission;
 use nostriphant\NIP01\Message;
-use nostriphant\Transpher\Nostr\Send;
 
 class Client {
 
@@ -15,13 +15,29 @@ class Client {
         $this->connection = connect($this->url, $cancellation);
     }
 
-    public function start(callable $response_callback): \nostriphant\Transpher\Nostr\Transmission {
+    public function start(callable $response_callback): Transmission {
         \Amp\async(function () use ($response_callback) {
             foreach ($this->connection as $message) {
                 $response_callback(Message::decode($message->buffer()));
             }
         });
-        return new Send($this->connection);
+        return new class($this->connection) implements Transmission {
+            public function __construct(private \Amp\Websocket\Client\WebsocketConnection $connection) {
+
+            }
+
+            #[\Override]
+            public function __invoke(mixed $json): bool {
+                if ($json instanceof Message) {
+                    $text = $json;
+                } else {
+                    $text = Nostr::encode($json);
+                }
+                $this->connection->sendText($text);
+                return true;
+            }
+
+        };
     }
 
     public function listen(callable $shutdown_callback): void {

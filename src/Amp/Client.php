@@ -14,10 +14,10 @@ class Client {
         $this->connection = connect($this->url, $cancellation);
     }
 
-    public function start(callable $callback): \nostriphant\Transpher\Relay\Sender {
-        \Amp\async(function () use ($callback) {
+    public function start(callable $response_callback): \nostriphant\Transpher\Relay\Sender {
+        \Amp\async(function () use ($response_callback) {
             foreach ($this->connection as $message) {
-                $callback(Message::decode($message->buffer()));
+                $response_callback(Message::decode($message->buffer()));
             }
         });
         return SendNostr::send($this->connection);

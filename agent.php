@@ -10,7 +10,9 @@ $log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', $_SERVER['AGEN
 
 
 $log->info('Client connecting to ' . $_SERVER['RELAY_URL']);
-$agent = new Agent($_SERVER['RELAY_URL']);
+$agent = new Agent($_SERVER['RELAY_URL'], function (Message $message) {
+
+});
 
 $await = $agent(function(callable $send) use ($log) {
     $key = Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))());

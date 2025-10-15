@@ -2,7 +2,7 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
-use nostriphant\Transpher\Nostr\Client;
+use nostriphant\Client\Client;
 use nostriphant\NIP17\PrivateDirect;
 use nostriphant\NIP01\Message;
 

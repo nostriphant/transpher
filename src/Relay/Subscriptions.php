@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay;
 
-use \nostriphant\Transpher\Nostr\Transmission;
+use \nostriphant\NIP01\Transmission;
 use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Event;
 use nostriphant\Stores\Engine\Memory\Condition;

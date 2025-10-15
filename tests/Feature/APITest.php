@@ -5,6 +5,7 @@ use nostriphant\TranspherTests\Feature\Functions;
 use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\TranspherTests\Factory;
 
+use nostriphant\Client\Client;
 use nostriphant\NIP01\Event;
 use nostriphant\NIP01\Nostr;
 use nostriphant\NIP19\Bech32;
@@ -84,7 +85,7 @@ describe('agent', function (): void {
         sleep(1); // hack to give agent some time to boot...
         
         $alices_expected_messages = [];
-        $alice = new \nostriphant\Transpher\Nostr\Client($relay_url(), function (Message $message) use (&$alices_expected_messages) {
+        $alice = new Client($relay_url(), function (Message $message) use (&$alices_expected_messages) {
             $expected_message = array_shift($alices_expected_messages);
             expect($message->type)->toBe($expected_message[0], 'Message type checks out');
             $expected_message[1]($message->payload);
@@ -135,7 +136,7 @@ describe('agent', function (): void {
         
         $bobs_expected_messages = [];
         
-        $bob = new \nostriphant\Transpher\Nostr\Client($relay_url(), function (Message $message) use (&$bobs_expected_messages) {
+        $bob = new Client($relay_url(), function (Message $message) use (&$bobs_expected_messages) {
             $expected_message = array_shift($bobs_expected_messages);
             expect($message->type)->toBe($expected_message[0], 'Message type checks out');
             $expected_message[1]($message->payload);

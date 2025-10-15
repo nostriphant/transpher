@@ -130,12 +130,4 @@ namespace Pest {
         }
         return $to;
     }
-
-    function client(string $relay_url, callable $response_callback) {
-        return function (callable $bootstrap_callback) use ($relay_url, $response_callback) : void {
-            $client = new \nostriphant\Transpher\Amp\Client(0, $relay_url);
-            $bootstrap_callback($client->start($response_callback));
-        };
-    }
-
 }

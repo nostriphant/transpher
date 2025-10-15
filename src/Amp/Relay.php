@@ -25,6 +25,7 @@ use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Blossom;
 use nostriphant\Transpher\Relay\Subscriptions;
 use nostriphant\Transpher\Nostr\Transmission;
+use nostriphant\Functional\Await;
 
 class Relay implements WebsocketClientHandler {
 

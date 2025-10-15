@@ -135,7 +135,7 @@ namespace Pest {
     function client(string $relay_url) {
         return function () use ($relay_url) {
             $expected_messages = [];
-            $client = new \nostriphant\Transpher\Amp\Client(5, $relay_url);
+            $client = new \nostriphant\Transpher\Amp\Client(0, $relay_url);
             $send = $client->start(function (Message $message) use (&$expected_messages) {
                 $expected_message = array_shift($expected_messages);
                 expect($message->type)->toBe($expected_message[0], 'Message type checks out');

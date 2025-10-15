@@ -1,5 +1,6 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\TranspherTests\Feature\Functions;
 use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\TranspherTests\Factory;
@@ -19,13 +20,13 @@ beforeAll(function () {
 
     $event = call_user_func(new nostriphant\NIP59\Rumor(
                     created_at: time(),
-                    pubkey: \Pest\pubkey_recipient(),
+                    pubkey: NIP01TestFunctions::pubkey_recipient(),
                     kind: 3,
                     content: '',
                     tags: [
-                        ["p", \Pest\pubkey_sender(), $relay_url(), "bob"],
+                        ["p", NIP01TestFunctions::pubkey_sender(), $relay_url(), "bob"],
                     ]
-            ), \Pest\key_recipient());
+            ), NIP01TestFunctions::key_recipient());
     is_dir($data_dir . '/events') || mkdir($data_dir . '/events');
     $event_file = $data_dir . '/events' . DIRECTORY_SEPARATOR . $event->id . '.php';
     file_put_contents($event_file, '<?php return ' . var_export($event, true) . ';');
@@ -33,7 +34,7 @@ beforeAll(function () {
     $relay = Functions::bootRelay($relay_url(''), $env = [
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => $relay_url(),
-        'RELAY_OWNER_NPUB' => (string) Bech32::npub(\Pest\pubkey_recipient()),
+        'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
         'RELAY_NAME' => 'Really relay',
         'RELAY_DESCRIPTION' => 'This is my dev relay',
         'RELAY_CONTACT' => 'transpher@nostriphant.dev',
@@ -64,7 +65,7 @@ describe('relay', function () {
         $response = Nostr::decode($responseText);
 
         expect($response)->not()->toBeNull($responseText);
-        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', \Pest\pubkey_recipient(), 'transpher@nostriphant.dev'));
+        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', NIP01TestFunctions::pubkey_recipient(), 'transpher@nostriphant.dev'));
     });
 });
 
@@ -75,17 +76,17 @@ describe('agent', function (): void {
         global $data_dir, $relay_url;
 
         $agent = Functions::bootAgent(8084, [
-            'RELAY_OWNER_NPUB' => (string) Bech32::npub(Pest\pubkey_recipient()),
+            'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => $relay_url()
         ]);
         sleep(1); // hack to give agent some time to boot...
         $client_factory = \Pest\client($relay_url());
 
-        $subscription = Factory::subscribe(['#p' => [Pest\pubkey_recipient()]]);
+        $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
 
         $subscriptionId = $subscription()[1];
-        $recipient_key = Pest\key_recipient();
+        $recipient_key = NIP01TestFunctions::key_recipient();
 
         $alice = $client_factory();
 
@@ -96,7 +97,7 @@ describe('agent', function (): void {
 
                         $gift = $payload[1];
                         expect($gift['kind'])->toBe(1059);
-                        expect($gift['tags'][0])->toBe(['p', Pest\pubkey_recipient()]);
+                        expect($gift['tags'][0])->toBe(['p', NIP01TestFunctions::pubkey_recipient()]);
 
                         $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
                         expect($seal->kind)->toBe(13);
@@ -113,9 +114,9 @@ describe('agent', function (): void {
                     }]
         );
         expect($request[2])->toBeArray();
-        expect($request[2]['#p'])->toContain(Pest\pubkey_recipient());
+        expect($request[2]['#p'])->toContain(NIP01TestFunctions::pubkey_recipient());
 
-        $signed_message = Factory::event(\Pest\key_recipient(), 1, 'Hello!');
+        $signed_message = Factory::event(NIP01TestFunctions::key_recipient(), 1, 'Hello!');
         $alice($signed_message, ['OK', function (array $payload) use ($signed_message) {
                 expect($payload[0])->toBe($signed_message()[1]['id']);
                 expect($payload[1])->toBeTrue();
@@ -123,7 +124,7 @@ describe('agent', function (): void {
         );
 
         $bob = $client_factory();
-        $bob_message = Factory::event(\Pest\key_sender(), 1, 'Hello!');
+        $bob_message = Factory::event(NIP01TestFunctions::key_sender(), 1, 'Hello!');
         $bob($bob_message, ['OK', function (array $payload) use ($bob_message) {
                 expect($payload[0])->toBe($bob_message()[1]['id']);
                 expect($payload[1])->toBeTrue();
@@ -138,7 +139,7 @@ describe('agent', function (): void {
 
         $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
 
-        $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [Pest\pubkey_recipient()], 'kinds' => [1]]));
+        $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [NIP01TestFunctions::pubkey_recipient()], 'kinds' => [1]]));
         expect($notes_alice[0]->kind)->toBe(1);
         expect($notes_alice[0]->content)->toBe('Hello!');
 
@@ -146,7 +147,7 @@ describe('agent', function (): void {
         expect($notes_bob[0]->kind)->toBe(1);
         expect($notes_bob[0]->content)->toBe('Hello!');
 
-        $pdms = iterator_to_array(nostriphant\Stores\Store::query($events, ['#p' => [Pest\pubkey_recipient()]]));
+        $pdms = iterator_to_array(nostriphant\Stores\Store::query($events, ['#p' => [NIP01TestFunctions::pubkey_recipient()]]));
         expect($pdms[0]->kind)->toBe(1059);
 
         expect(file_get_contents(ROOT_DIR . '/logs/relay-8087-output.log'))->not()->toContain('ERROR');

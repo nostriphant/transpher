@@ -1,6 +1,7 @@
 <?php
 
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\TranspherTests\Factory;
 use function Pest\incoming;
 
@@ -12,7 +13,7 @@ it('downloads NIP-94 files (kind 1063) into a data folder', function () {
     expect(ROOT_DIR . '/data/files/' . $hash)->not()->toBeFile();
     expect(ROOT_DIR . '/data/files/' . $hash . '.events')->not()->toBeDirectory();
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1063, 'File caption with the description of its contents',
             ['url', 'file://' . $file],
             ['m', 'text/plain'],
@@ -32,7 +33,7 @@ it('downloads NIP-94 files (kind 1063) into a data folder', function () {
 it('refuses NIP-94 files with missing url-tag', function () {
     $hash = hash('sha256', 'Hello world 2!');
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1063, 'File caption with the description of its contents',
             ['m', 'text/plain'],
             ['x', $hash],
@@ -51,7 +52,7 @@ it('refuses NIP-94 files (kind 1063) with missing hash (x)', function () {
 
     expect(ROOT_DIR . '/data/files/' . $hash)->not()->toBeFile();
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1063, 'File caption with the description of its contents',
             ['url', 'file://' . $file],
             ['m', 'text/plain'],
@@ -72,7 +73,7 @@ it('refuses NIP-94 files (kind 1063) with missing original hash (ox)', function 
 
     expect(ROOT_DIR . '/data/files/' . $hash)->not()->toBeFile();
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1063, 'File caption with the description of its contents',
             ['url', 'file://' . $file],
             ['m', 'text/plain'],

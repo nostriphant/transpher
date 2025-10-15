@@ -1,11 +1,12 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP59\Rumor;
 use nostriphant\NIP01\Message;
 
 it('accepts a simple COUNT message and returns the number of matching events', function () {
-    $alice_key = \Pest\key_sender();
+    $alice_key = NIP01TestFunctions::key_sender();
     $bob_key = Key::generate();
     $store = \Pest\store([
         (new Rumor(time(), $alice_key(Key::public()), 1, 'Hello world, from Alice!', []))($alice_key),

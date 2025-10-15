@@ -15,13 +15,13 @@
         "amphp/http-server-router": "^2.0",
         "amphp/http-server-static-content": "^2.0",
         "amphp/websocket-client": "^2.0",
-        "nostriphant/nip-01": "^1.0",
+        "nostriphant/nip-01": "^2.0",
         "nostriphant/nip-19": "^2.0",
-        "nostriphant/nip-44": "^1.0",
-        "nostriphant/functional-alternate": "^1.0",
-        "nostriphant/nip-59": "^1.0",
-        "nostriphant/nip-17": "^1.0",
-        "nostriphant/stores": "^1.0"
+        "nostriphant/nip-44": "^2.0",
+        "nostriphant/nip-59": "^2.0",
+        "nostriphant/nip-17": "^2.0",
+        "nostriphant/stores": "^2.0",
+        "nostriphant/functional": "^2.2"
     },
     "license": "MIT",
     "autoload": {

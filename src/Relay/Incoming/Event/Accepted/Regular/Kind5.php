@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay\Incoming\Event\Accepted\Regular;
 
-use nostriphant\FunctionalAlternate\Alternate;
+use nostriphant\Functional\Alternate;
 use nostriphant\NIP01\Event;
 
 readonly class Kind5 implements Kind {

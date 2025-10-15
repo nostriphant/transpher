@@ -1,5 +1,6 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\Transpher\Relay\Incoming\Event\Limits;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP01\Event;
@@ -14,7 +15,7 @@ $event_ids = [
 ];
 
 it('should check for expected amount of leading zeros for an event-id', function ($id, $difficulty) {
-    $signer = \Pest\key_sender();
+    $signer = NIP01TestFunctions::key_sender();
     $event = Event::__set_state(json_decode('{
         "id": "' . $id . '",
         "pubkey": "' . $signer(Key::public()) . '",
@@ -35,7 +36,7 @@ it('should check for expected amount of leading zeros for an event-id', function
 })->with($event_ids);
 
 it('should check for expected amount of leading zeros for an event-id, configured through ENV-vars', function ($id, $difficulty) {
-    $signer = \Pest\key_sender();
+    $signer = NIP01TestFunctions::key_sender();
     $event = Event::__set_state(json_decode('{
         "id": "' . $id . '",
         "pubkey": "' . $signer(Key::public()) . '",

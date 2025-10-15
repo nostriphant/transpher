@@ -1,5 +1,7 @@
 <?php
 
+
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\TranspherTests\Factory;
 use nostriphant\NIP01\Key;
 use function Pest\incoming;
@@ -26,7 +28,7 @@ it('replaces addressable (30000 <= n < 40000) events, keeping only the last one 
         expect(isset($store[$updated_id]))->toBeTrue();
     }
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     for ($kind = 30000; $kind < 40000; $kind += rand(100, 5000)) {
         replaceAddressable($sender_key, $kind);
     }
@@ -56,7 +58,7 @@ it('keeps addressable (30000 <= n < 40000) events, when same created_at with low
         expect(isset($store[$updated_event()[1]['id']]))->toBeFalse();
     }
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     for ($kind = 30000; $kind < 40000; $kind += 5000) {
         keepAddressable($sender_key, $kind);
     }

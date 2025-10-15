@@ -1,5 +1,6 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\TranspherTests\Factory;
 use function Pest\incoming;
 
@@ -11,7 +12,7 @@ it('downloads NIP-92 files (kind 1, with imeta tag) into a data folder', functio
     expect(ROOT_DIR . '/data/files/' . $hash)->not()->toBeFile();
     expect(ROOT_DIR . '/data/files/' . $hash . '.events')->not()->toBeDirectory();
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1, 'Note with a reference to file://' . $file,
             ['imeta',
                 'url file://' . $file,

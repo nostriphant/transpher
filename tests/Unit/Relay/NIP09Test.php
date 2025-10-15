@@ -1,5 +1,6 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\TranspherTests\Factory;
 use nostriphant\NIP01\Key;
 use nostriphant\NIP01\Message;
@@ -15,7 +16,7 @@ $references = [
 it('SHOULD delete or stop publishing any referenced events that have an identical pubkey as the deletion request.', function ($tag, $value_callback) {
     $store = store();
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
     $referenced_value = $value_callback($message);
 
@@ -52,7 +53,7 @@ it('SHOULD delete or stop publishing any referenced events that have an identica
 it('SHOULD NOT delete or stop publishing any referenced events that have an different pubkey as the deletion request.', function ($tag, $value_callback) {
     $store = store();
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
     $referenced_value = $value_callback($message);
 
@@ -90,7 +91,7 @@ it('SHOULD NOT delete or stop publishing any referenced events that have an diff
 it('When an a tag is used, relays SHOULD delete all versions of the replaceable event up to the created_at timestamp of the deletion request event.', function () {
     $store = store();
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1, 'Hello World', ['d', 'a-random-d-tag']);
 
     $recipient = \Pest\handle($message, incoming(store: $store));

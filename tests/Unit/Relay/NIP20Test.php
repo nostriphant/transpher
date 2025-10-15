@@ -1,5 +1,6 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\TranspherTests\Factory;
 use nostriphant\NIP01\Key;
 
@@ -9,7 +10,7 @@ use nostriphant\NIP01\Key;
 it('accepts a kind 1 and answers with OK', function () {
     
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1, 'Hello World');
     $recipient = \Pest\handle($message);
 
@@ -19,10 +20,10 @@ it('accepts a kind 1 and answers with OK', function () {
 });
 
 it('rejects a kind 1 and answers with OK, false, when signature is wrong', function () {
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $message = Factory::event($sender_key, 1, 'Hello World');
     $message_raw = $message();
-    $message_raw[1]['sig'] = \Pest\key_recipient()(Key::signer(hash('sha256', 'improper signature here')));
+    $message_raw[1]['sig'] = NIP01TestFunctions::key_recipient()(Key::signer(hash('sha256', 'improper signature here')));
     $recipient = \Pest\handle(new nostriphant\NIP01\Message(...$message_raw));
 
     expect($recipient)->toHaveReceived(

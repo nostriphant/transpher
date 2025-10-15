@@ -1,5 +1,6 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\TranspherTests\Factory;
 use function Pest\incoming;
 
@@ -7,7 +8,7 @@ use function Pest\incoming;
  * https://github.com/nostr-protocol/nips/commit/72bb8a128b2d7d3c2c654644cd68d0d0fe58a3b1#diff-323123c7f16af7e22b59e4e5649aa3efb339b4c07fb75f91cfe73ceacd276593L12
  */
 it('stores regular (1000 lte n < 10000) events', function () {
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     for ($kind = 1000; $kind < 10000; $kind += 5000) {
         $store = \Pest\store();
 
@@ -19,7 +20,7 @@ it('stores regular (1000 lte n < 10000) events', function () {
 });
 
 it('stores regular (4 <= n < 45) events', function () {
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     for ($kind = 4; $kind < 45; $kind++) {
         $store = \Pest\store();
 
@@ -34,7 +35,7 @@ it('stores regular (4 <= n < 45) events', function () {
 });
 
 it('stores regular (n == 1 || n == 2) events', function () {
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     for ($kind = 1; $kind < 3; $kind++) {
         $store = \Pest\store();
 
@@ -46,7 +47,7 @@ it('stores regular (n == 1 || n == 2) events', function () {
 });
 
 it('replaces replaceable (10000 lte n < 20000) events, keeping only the last one (based on pubkey & kind)', function () {
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     for ($kind = 10000; $kind < 20000; $kind += 5000) {
         $store = \Pest\store();
 
@@ -68,7 +69,7 @@ it('replaces replaceable (10000 lte n < 20000) events, keeping only the last one
 
 it('keeps replaceable (10000 lte n < 20000) events, when same created_at with lowest id (based on pubkey & kind)', function () {
 
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     for ($kind = 10000; $kind < 20000; $kind += 5000) {
         $store = \Pest\store();
 
@@ -98,7 +99,7 @@ it('replaces replaceable (n == 0) events, keeping only the last one (based on pu
     $store = \Pest\store();
 
     $kind = 0;
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $original_event = Factory::event($sender_key, $kind, 'Hello World');
     $recipient = \Pest\handle($original_event, incoming(store: $store));
 
@@ -114,7 +115,7 @@ it('keeps replaceable (n == 0) events, when same created_at with lowest id (base
     $store = \Pest\store();
 
     $kind = 0;
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     $time = time();
     $event1 = Factory::eventAt($sender_key, $kind, 'Hello World', $time);
     $event2 = Factory::eventAt($sender_key, $kind, 'Updated: hello World', $time);
@@ -137,7 +138,7 @@ it('keeps replaceable (n == 0) events, when same created_at with lowest id (base
 });
 
 it('does not store ephemeral (20000 <= kind < 30000) events', function () {
-    $sender_key = \Pest\key_sender();
+    $sender_key = NIP01TestFunctions::key_sender();
     for ($kind = 20000; $kind < 30000; $kind += 5000) {
         $store = \Pest\store();
 

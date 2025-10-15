@@ -1,5 +1,6 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\NIP01\Key;
 use nostriphant\TranspherTests\Factory;
 use nostriphant\NIP01\Message;
@@ -45,7 +46,7 @@ describe('REQ', function () {
     it('can handle a subscription request, for existing events', function () {
         $store = \Pest\store();
 
-        $sender_key = \Pest\key_sender();
+        $sender_key = NIP01TestFunctions::key_sender();
         $event = Factory::event($sender_key, 1, 'Hello World');
         $recipient = \Pest\handle($event, incoming(store: $store));
         expect($recipient)->toHaveReceived(
@@ -64,7 +65,7 @@ describe('REQ', function () {
     it('sends events to all clients subscribed on event id', function () {
         $store = \Pest\store();
 
-        $alice_key = \Pest\key_sender();
+        $alice_key = NIP01TestFunctions::key_sender();
         $alice_event = Factory::event($alice_key, 1, 'Hello worlda!');
         $alice = \Pest\handle($alice_event, incoming(store: $store));
         expect($alice)->toHaveReceived(
@@ -72,7 +73,7 @@ describe('REQ', function () {
         );
 
 
-        $key_charlie = \Pest\key_recipient();
+        $key_charlie = NIP01TestFunctions::key_recipient();
         $note2 = Factory::event($key_charlie, 1, 'Hello worldi!');
         $charlie = \Pest\handle($note2, incoming(store: $store));
         expect($charlie)->toHaveReceived(
@@ -94,7 +95,7 @@ describe('REQ', function () {
     it('sends events to all clients subscribed on author (pubkey)', function () {
         $store = \Pest\store();
 
-        $alice_key = \Pest\key_sender();
+        $alice_key = NIP01TestFunctions::key_sender();
         $alice_event = Factory::event($alice_key, 1, 'Hello world!');
         $alice = \Pest\handle($alice_event, incoming(store: $store));
         expect($alice)->toHaveReceived(
@@ -117,7 +118,7 @@ describe('REQ', function () {
         $store = \Pest\store();
         $subscriptions = \Pest\subscriptions();
 
-        $alice_key = \Pest\key_sender();
+        $alice_key = NIP01TestFunctions::key_sender();
         $event_alice = Factory::event($alice_key, 1, 'Hello world, from Alice!');
         $recipient = \Pest\handle($event_alice, incoming(store: $store), subscriptions: $subscriptions);
         expect($recipient)->toHaveReceived(
@@ -153,7 +154,7 @@ describe('REQ', function () {
         $relay = \Pest\relay();
         $subscriptions = \Pest\subscriptions(relay: $relay);
 
-        $alice_key = \Pest\key_sender();
+        $alice_key = NIP01TestFunctions::key_sender();
         $alice_event = Factory::event($alice_key, 1, 'Hello world!');
         $alice = \Pest\handle($alice_event, incoming(store: $store));
         expect($alice)->toHaveReceived(
@@ -188,7 +189,7 @@ describe('REQ', function () {
     it('sends events to all clients subscribed on kind', function () {
         $store = \Pest\store();
 
-        $alice_key = \Pest\key_sender();
+        $alice_key = NIP01TestFunctions::key_sender();
         $alice_event = Factory::event($alice_key, 3, 'Hello world!');
         $alice = \Pest\handle($alice_event, incoming(store: $store));
         expect($alice)->toHaveReceived(
@@ -212,7 +213,7 @@ describe('REQ', function () {
         $relay = \Pest\relay();
         $subscriptions = \Pest\subscriptions(relay: $relay);
 
-        $alice_key = \Pest\key_sender();
+        $alice_key = NIP01TestFunctions::key_sender();
 
         $subscription = Message::req($id = uniqid(), ['authors' => [$alice_key(Key::public())]]);
         $recipient = \Pest\handle($subscription, incoming(store: $store), subscriptions: $subscriptions);
@@ -220,7 +221,7 @@ describe('REQ', function () {
                 ['EOSE', $id]
         );
 
-        $key_charlie = \Pest\key_recipient();
+        $key_charlie = NIP01TestFunctions::key_recipient();
         $event_charlie = Factory::event($key_charlie, 1, 'Hello world!');
         $recipient = \Pest\handle($event_charlie, incoming(store: $store));
         expect($recipient)->toHaveReceived(
@@ -243,7 +244,7 @@ describe('REQ', function () {
     it('sends events to all clients subscribed on author (pubkey), even after restarting the server', function () {
         $store = \Pest\store();
 
-        $alice_key = \Pest\key_sender();
+        $alice_key = NIP01TestFunctions::key_sender();
         $alice_event = Factory::event($alice_key, 1, 'Hello wirld!');
         $alice = \Pest\handle($alice_event, incoming(store: $store));
         expect($alice)->toHaveReceived(

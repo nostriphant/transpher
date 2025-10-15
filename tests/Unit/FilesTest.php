@@ -1,12 +1,13 @@
 <?php
 
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\Transpher\Files;
 
 it('stores file, when event is in store', function () {
     $event_id = uniqid();
 
     $store = \Pest\store();
-    $store[$event_id] = \Pest\event(['id' => $event_id = uniqid()]);
+    $store[$event_id] = NIP01TestFunctions::event(['id' => $event_id = uniqid()]);
     expect(isset($store[$event_id]))->toBeTrue();
 
     $files = new Files(ROOT_DIR . '/data/files/', $store);

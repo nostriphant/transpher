@@ -53,8 +53,7 @@ namespace {
         expect($this->value->messages)->toHaveCount(0);
     });
 
-    nostriphant\FunctionalAlternate\extend_pest('expect');
-    nostriphant\NIP01\extend_pest('expect');
+    nostriphant\FunctionalTests\Pest::extend('expect');
 }
 
 /*

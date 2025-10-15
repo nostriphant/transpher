@@ -3,7 +3,7 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event\Accepted\Regular;
 
 use nostriphant\NIP01\Event;
-use nostriphant\FunctionalAlternate\Alternate;
+use nostriphant\Functional\Alternate;
 
 class Kind1063 implements Kind {
 

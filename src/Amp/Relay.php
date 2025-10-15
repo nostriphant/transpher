@@ -40,7 +40,7 @@ class Relay implements WebsocketClientHandler {
     }
 
 
-    public function __invoke(string $ip, string $port, int $max_connections_per_ip, LoggerInterface $log): Await {
+    public function __invoke(string $ip, string $port, int $max_connections_per_ip, LoggerInterface $log, callable $shutdown_callback): void {
         $server = SocketHttpServer::createForDirectAccess($log, connectionLimitPerIp: $max_connections_per_ip);
         $server->expose(new Socket\InternetAddress($ip, $port));
 
@@ -58,7 +58,7 @@ class Relay implements WebsocketClientHandler {
 
         $server->start($router, $this->errorHandler);
 
-        return new Await(fn() => \Amp\trapSignal([SIGINT, SIGTERM]), fn() => $server->stop());
+        (new Await(fn() => \Amp\trapSignal([SIGINT, SIGTERM]), fn() => $server->stop()))($shutdown_callback);
     }
 
     #[\Override]

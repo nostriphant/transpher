@@ -27,11 +27,11 @@ class Client {
             }
 
             #[\Override]
-            public function __invoke(mixed $json): bool {
-                if ($json instanceof Message) {
-                    $text = $json;
+            public function __invoke(Message $message): bool {
+                if ($message instanceof Message) {
+                    $text = $message;
                 } else {
-                    $text = Nostr::encode($json);
+                    $text = Nostr::encode($message);
                 }
                 $this->connection->sendText($text);
                 return true;

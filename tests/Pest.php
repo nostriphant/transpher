@@ -80,8 +80,8 @@ namespace Pest {
             public array $messages = [];
 
             #[\Override]
-            public function __invoke(mixed $json): bool {
-                $this->messages[] = $json;
+            public function __invoke(Message $message): bool {
+                $this->messages[] = $message;
                 return true;
             }
         };

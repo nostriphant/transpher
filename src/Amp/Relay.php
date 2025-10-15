@@ -24,6 +24,7 @@ use nostriphant\Transpher\Relay\Incoming;
 use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Blossom;
 use nostriphant\Transpher\Relay\Subscriptions;
+use nostriphant\Transpher\Nostr\Send;
 
 class Relay implements WebsocketClientHandler {
 
@@ -72,7 +73,7 @@ class Relay implements WebsocketClientHandler {
     ): void {
 
         $this->gateway->addClient($client);
-        $wrapped_client = SendNostr::send($client);
+        $wrapped_client = Send::send($client);
         $client_subscriptions = new Subscriptions($wrapped_client);
         foreach ($client as $message) {
             $payload = (string) $message;

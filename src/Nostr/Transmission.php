@@ -1,8 +1,8 @@
 <?php
 
-namespace nostriphant\Transpher\Relay;
+namespace nostriphant\Transpher\Nostr;
 
-interface Sender {
+interface Transmission {
     
     public function __invoke(mixed $json) : bool;
     

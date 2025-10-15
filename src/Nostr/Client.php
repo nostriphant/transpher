@@ -1,15 +1,13 @@
 <?php
 
-namespace nostriphant\Transpher;
+namespace nostriphant\Transpher\Nostr;
 
-use nostriphant\Transpher\Amp\Client;
+readonly class Client {
 
-readonly class Agent {
-
-    private Client $client;
+    private \nostriphant\Transpher\Amp\Client $client;
     
     public function __construct(string $relay_url, private \Closure $response_callback) {
-        $this->client = new Client(0, $relay_url);
+        $this->client = new \nostriphant\Transpher\Amp\Client(0, $relay_url);
     }
     
     public function __invoke(callable $bootstrap_callback, callable $shutdown_callback): void {

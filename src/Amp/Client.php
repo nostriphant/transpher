@@ -4,6 +4,7 @@ namespace nostriphant\Transpher\Amp;
 
 use function Amp\Websocket\Client\connect;
 use nostriphant\NIP01\Message;
+use nostriphant\Transpher\Nostr\Send;
 
 class Client {
 
@@ -14,13 +15,13 @@ class Client {
         $this->connection = connect($this->url, $cancellation);
     }
 
-    public function start(callable $response_callback): \nostriphant\Transpher\Relay\Sender {
+    public function start(callable $response_callback): \nostriphant\Transpher\Nostr\Transmission {
         \Amp\async(function () use ($response_callback) {
             foreach ($this->connection as $message) {
                 $response_callback(Message::decode($message->buffer()));
             }
         });
-        return SendNostr::send($this->connection);
+        return Send::send($this->connection);
     }
 
     public function listen(callable $shutdown_callback): void {

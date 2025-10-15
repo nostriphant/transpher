@@ -2,7 +2,7 @@
 
 use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
-use nostriphant\Transpher\Agent;
+use nostriphant\Transpher\Nostr\Client;
 use nostriphant\NIP17\PrivateDirect;
 use nostriphant\NIP01\Message;
 
@@ -10,7 +10,7 @@ $log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', $_SERVER['AGEN
 
 
 $log->info('Client connecting to ' . $_SERVER['RELAY_URL']);
-$agent = new Agent($_SERVER['RELAY_URL'], function (Message $message) {});
+$agent = new Client($_SERVER['RELAY_URL'], function (Message $message) {});
 
 $log->info('Listening to relay...');
 

@@ -71,11 +71,11 @@ namespace Pest {
 
     use nostriphant\NIP01\Message;
     use nostriphant\Transpher\Relay\Incoming;
-    use nostriphant\Transpher\Relay\Sender;
+    use nostriphant\Transpher\Nostr\Transmission;
 
 
-    function relay(): Sender {
-        return new class implements Sender {
+    function relay(): Transmission {
+        return new class implements Transmission {
 
             public array $messages = [];
 
@@ -87,7 +87,7 @@ namespace Pest {
         };
     }
 
-    function subscriptions(?Sender $relay = null) {
+    function subscriptions(?Transmission $relay = null) {
         return new \nostriphant\Transpher\Relay\Subscriptions($relay ?? relay());
     }
 
@@ -114,8 +114,8 @@ namespace Pest {
         );
     }
 
-    function handle(Message $message, ?Incoming $incoming = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null): Sender {
-        $to = new class implements \nostriphant\Transpher\Relay\Sender {
+    function handle(Message $message, ?Incoming $incoming = null, ?\nostriphant\Transpher\Relay\Subscriptions $subscriptions = null): Transmission {
+        $to = new class implements \nostriphant\Transpher\Nostr\Transmission {
 
             public array $messages = [];
 

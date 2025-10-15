@@ -1,13 +1,12 @@
 <?php
 
-namespace nostriphant\Transpher\Amp;
+namespace nostriphant\Transpher\Nostr;
 
 use Amp\Websocket\WebsocketClient;
-use nostriphant\Transpher\Relay\Sender;
 use nostriphant\NIP01\Nostr;
 use nostriphant\NIP01\Message;
 
-readonly class SendNostr implements Sender {
+readonly class Send implements Transmission {
     
     private function __construct(private string $action, private WebsocketClient $client) {
         

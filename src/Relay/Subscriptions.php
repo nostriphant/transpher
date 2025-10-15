@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay;
 
-use \nostriphant\Transpher\Relay\Sender;
+use \nostriphant\Transpher\Nostr\Transmission;
 use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Event;
 use nostriphant\Stores\Engine\Memory\Condition;
@@ -12,7 +12,7 @@ class Subscriptions {
 
     private array $subscriptions = [];
 
-    public function __construct(private Sender $relay) {
+    public function __construct(private Transmission $relay) {
         
     }
 
@@ -38,7 +38,7 @@ class Subscriptions {
         yield Message::ok($event->id, true, '');
     }
 
-    static function subscribe(array &$subscriptions, Sender $relay, string $subscription_id, array $filter_prototypes): void {
+    static function subscribe(array &$subscriptions, Transmission $relay, string $subscription_id, array $filter_prototypes): void {
         $test = Condition::makeConditions(new Conditions($filter_prototypes));
         $subscriptions[$subscription_id] = fn(Event $event) => $test($event) ? $relay : fn() => false;
     }

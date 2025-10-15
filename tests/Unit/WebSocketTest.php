@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\Transpher\Amp\SendNostr;
+use nostriphant\Transpher\Nostr\Send;
 
 it('can provide a Nostr-reply callable', function() {
     $client = Mockery::mock(\Amp\Websocket\WebsocketClient::class);
@@ -9,7 +9,7 @@ it('can provide a Nostr-reply callable', function() {
     $logger = Mockery::mock(\Monolog\Logger::class);
     $logger->shouldReceive('debug')->with('Reply message ["EVENT",{"id":"12345"}]');
 
-    $replier = SendNostr::reply($client, $logger);
+    $replier = Send::reply($client, $logger);
    
     expect($replier(['EVENT', ['id' => '12345']]))->toBeTrue();
 });
@@ -21,7 +21,7 @@ it('can provide a Nostr-relay callable', function() {
     $logger = Mockery::mock(\Monolog\Logger::class);
     $logger->shouldReceive('debug')->with('Relay message ["EVENT",{"id":"12345"}]');
 
-    $replier = SendNostr::relay($client, $logger);
+    $replier = Send::relay($client, $logger);
    
     expect($replier(['EVENT', ['id' => '12345']]))->toBeTrue();
 });

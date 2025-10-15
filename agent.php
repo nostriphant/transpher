@@ -15,7 +15,7 @@ $agent = new Client($_SERVER['RELAY_URL'], function (Message $message) {});
 $log->info('Listening to relay...');
 
 
-$agent(function(callable $send) use ($log) {
+$listen = $agent(function(callable $send) use ($log) {
     $key = Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))());
     $relay_owner_npub = new Bech32($_SERVER['RELAY_OWNER_NPUB']);
     
@@ -23,6 +23,6 @@ $agent(function(callable $send) use ($log) {
     $log->info('Sending Private Direct Message event');
     $gift = PrivateDirect::make($key, $relay_owner_npub(), 'Hello, I am your agent! The URL of your relay is ' . $_SERVER['RELAY_URL']);
     $send(Message::event($gift));
-    
-    return fn(int $signal) => $log->info(sprintf("Received signal %d, stopping agent", $signal));
 });
+
+$listen(fn(int $signal) => $log->info(sprintf("Received signal %d, stopping agent", $signal)));

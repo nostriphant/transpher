@@ -131,17 +131,10 @@ namespace Pest {
         return $to;
     }
 
-    function client(string $relay_url) {
-        return function (callable $bootstrap_callback) use ($relay_url) : void {
-            $expected_messages;
+    function client(string $relay_url, callable $response_callback) {
+        return function (callable $bootstrap_callback) use ($relay_url, $response_callback) : void {
             $client = new \nostriphant\Transpher\Amp\Client(0, $relay_url);
-            $send = $client->start(function (Message $message) use (&$expected_messages) {
-                $expected_message = array_shift($expected_messages);
-                expect($message->type)->toBe($expected_message[0], 'Message type checks out');
-                $expected_message[1]($message->payload);
-            });
-
-            $expected_messages = $bootstrap_callback(fn(Message $message) => $send($message));
+            $bootstrap_callback($client->start($response_callback));
         };
     }
 

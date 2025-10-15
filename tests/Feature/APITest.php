@@ -10,6 +10,7 @@ use nostriphant\NIP01\Nostr;
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP59\Gift;
 use nostriphant\NIP59\Seal;
+use nostriphant\NIP01\Message;
 
 beforeAll(function () {
     global $relay, $env, $data_dir, $relay_url;
@@ -81,17 +82,22 @@ describe('agent', function (): void {
             'RELAY_URL' => $relay_url()
         ]);
         sleep(1); // hack to give agent some time to boot...
-        $client_factory = \Pest\client($relay_url());
+        
+        $alices_expected_messages = [];
+        $alice = new \nostriphant\Transpher\Nostr\Client($relay_url(), function (Message $message) use (&$alices_expected_messages) {
+            $expected_message = array_shift($alices_expected_messages);
+            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+            $expected_message[1]($message->payload);
+        });
 
-        $client_factory(function(callable $alice) use ($relay_url) {
-            $expected_messages = [];
+        $alice(function(callable $send) use ($relay_url, &$alices_expected_messages) {
             $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
 
             $subscriptionId = $subscription()[1];
             $recipient_key = NIP01TestFunctions::key_recipient();
-            $alice($subscription);
+            $send($subscription);
             
-            $expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
+            $alices_expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
                 expect($payload[0])->toBe($subscriptionId);
 
                 $gift = $payload[1];
@@ -109,7 +115,7 @@ describe('agent', function (): void {
                 expect($private_message->content)->toBe('Hello, I am your agent! The URL of your relay is ' . $relay_url());
             }];
                         
-            $expected_messages[] = ['EOSE', function (array $payload) use ($subscriptionId) {
+            $alices_expected_messages[] = ['EOSE', function (array $payload) use ($subscriptionId) {
                             expect($payload[0])->toBe($subscriptionId);
                         }];
                         
@@ -118,29 +124,32 @@ describe('agent', function (): void {
             expect($request[2]['#p'])->toContain(NIP01TestFunctions::pubkey_recipient());
 
             $signed_message = Factory::event(NIP01TestFunctions::key_recipient(), 1, 'Hello!');
-            $alice($signed_message);
-            $expected_messages[] = ['OK', function (array $payload) use ($signed_message) {
+            $send($signed_message);
+            $alices_expected_messages[] = ['OK', function (array $payload) use ($signed_message) {
                     expect($payload[0])->toBe($signed_message()[1]['id']);
                     expect($payload[1])->toBeTrue();
                 }];
-
-            return $expected_messages;
         });
 
         $bob_message = Factory::event(NIP01TestFunctions::key_sender(), 1, 'Hello!');
         
-        $client_factory(function(callable $bob) use ($bob_message) {
-            $expected_messages = [];
-            $bob($bob_message);
-            $expected_messages[] = ['OK', function (array $payload) use ($bob_message) {
+        $bobs_expected_messages = [];
+        
+        $bob = new \nostriphant\Transpher\Nostr\Client($relay_url(), function (Message $message) use (&$bobs_expected_messages) {
+            $expected_message = array_shift($bobs_expected_messages);
+            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+            $expected_message[1]($message->payload);
+        });
+        
+        $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
+            $send($bob_message);
+            $bobs_expected_messages[] = ['OK', function (array $payload) use ($bob_message) {
                     expect($payload[0])->toBe($bob_message()[1]['id']);
                     expect($payload[1])->toBeTrue();
                 }];
 
-            $bob(new nostriphant\NIP01\Message('REQ', 'sddf', [["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]]));
-            $expected_messages[] = ['EOSE'];
-            
-            return $expected_messages;
+            $send(new nostriphant\NIP01\Message('REQ', 'sddf', [["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]]));
+            $bobs_expected_messages[] = ['EOSE'];
         });
 
         $agent();

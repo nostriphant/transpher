@@ -21,7 +21,7 @@ class Client {
                 $response_callback(Message::decode($message->buffer()));
             }
         });
-        return Send::send($this->connection);
+        return new Send($this->connection);
     }
 
     public function listen(callable $shutdown_callback): void {

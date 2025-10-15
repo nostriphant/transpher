@@ -73,7 +73,7 @@ class Relay implements WebsocketClientHandler {
     ): void {
 
         $this->gateway->addClient($client);
-        $wrapped_client = Send::send($client);
+        $wrapped_client = new Send($client);
         $client_subscriptions = new Subscriptions($wrapped_client);
         foreach ($client as $message) {
             $payload = (string) $message;

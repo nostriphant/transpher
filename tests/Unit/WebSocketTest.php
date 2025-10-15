@@ -9,7 +9,7 @@ it('can provide a Nostr-reply callable', function() {
     $logger = Mockery::mock(\Monolog\Logger::class);
     $logger->shouldReceive('debug')->with('Reply message ["EVENT",{"id":"12345"}]');
 
-    $replier = Send::reply($client, $logger);
+    $replier = new Send($client);
    
     expect($replier(['EVENT', ['id' => '12345']]))->toBeTrue();
 });
@@ -21,7 +21,7 @@ it('can provide a Nostr-relay callable', function() {
     $logger = Mockery::mock(\Monolog\Logger::class);
     $logger->shouldReceive('debug')->with('Relay message ["EVENT",{"id":"12345"}]');
 
-    $replier = Send::relay($client, $logger);
+    $replier = new Send($client);
    
     expect($replier(['EVENT', ['id' => '12345']]))->toBeTrue();
 });

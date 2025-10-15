@@ -8,7 +8,7 @@ use nostriphant\NIP01\Message;
 
 readonly class Send implements Transmission {
     
-    private function __construct(private string $action, private WebsocketClient $client) {
+    public function __construct(private WebsocketClient $client) {
         
     }
 
@@ -21,10 +21,6 @@ readonly class Send implements Transmission {
         }
         $this->client->sendText($text);
         return true;
-    }
-    
-    static function __callStatic(string $name, array $arguments): mixed {
-        return new self(ucwords($name), ...$arguments);
     }
     
 }

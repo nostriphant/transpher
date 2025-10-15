@@ -6,12 +6,12 @@ RUN ["apt-get", "install", "-y", "libzip-dev", "zip"]
 RUN ["docker-php-ext-configure", "pcntl", "--enable-pcntl"]
 RUN ["docker-php-ext-install", "zip", "pcntl"]
 
-COPY --from=composer /usr/bin/composer /usr/bin/composer
-RUN ["composer", "--no-dev", "install"]
-
 WORKDIR "/app"
 COPY ["VERSION", "composer.json", "composer.lock", "bootstrap.php", "relay.php", "."]
 COPY ["src", "src"]
+
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+RUN ["composer", "--no-dev", "install"]
 
 EXPOSE 80
 

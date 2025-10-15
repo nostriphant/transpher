@@ -23,4 +23,6 @@ $agent(function(callable $send) use ($log) {
     $log->info('Sending Private Direct Message event');
     $gift = PrivateDirect::make($key, $relay_owner_npub(), 'Hello, I am your agent! The URL of your relay is ' . $_SERVER['RELAY_URL']);
     $send(Message::event($gift));
-}, fn(int $signal) => $log->info(sprintf("Received signal %d, stopping agent", $signal)));
+    
+    return fn(int $signal) => $log->info(sprintf("Received signal %d, stopping agent", $signal));
+});

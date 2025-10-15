@@ -132,8 +132,8 @@ namespace Pest {
     }
 
     function client(string $relay_url) {
-        return function () use ($relay_url) {
-            $expected_messages = [];
+        return function (callable $bootstrap_callback) use ($relay_url) : void {
+            $expected_messages;
             $client = new \nostriphant\Transpher\Amp\Client(0, $relay_url);
             $send = $client->start(function (Message $message) use (&$expected_messages) {
                 $expected_message = array_shift($expected_messages);
@@ -141,10 +141,7 @@ namespace Pest {
                 $expected_message[1]($message->payload);
             });
 
-            return function (Message $message, array ...$expected_replies) use ($send, &$expected_messages) {
-                $send($message);
-                $expected_messages = array_merge($expected_messages, $expected_replies);
-            };
+            $expected_messages = $bootstrap_callback(fn(Message $message) => $send($message));
         };
     }
 

@@ -83,57 +83,65 @@ describe('agent', function (): void {
         sleep(1); // hack to give agent some time to boot...
         $client_factory = \Pest\client($relay_url());
 
-        $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
+        $client_factory(function(callable $alice) use ($relay_url) {
+            $expected_messages = [];
+            $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
 
-        $subscriptionId = $subscription()[1];
-        $recipient_key = NIP01TestFunctions::key_recipient();
+            $subscriptionId = $subscription()[1];
+            $recipient_key = NIP01TestFunctions::key_recipient();
+            $alice($subscription);
+            
+            $expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
+                expect($payload[0])->toBe($subscriptionId);
 
-        $alice = $client_factory();
+                $gift = $payload[1];
+                expect($gift['kind'])->toBe(1059);
+                expect($gift['tags'][0])->toBe(['p', NIP01TestFunctions::pubkey_recipient()]);
 
-        $request = $subscription();
-        $alice($subscription,
-                ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
-                        expect($payload[0])->toBe($subscriptionId);
+                $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
+                expect($seal->kind)->toBe(13);
+                expect($seal->pubkey)->toBeString();
+                expect($seal->content)->toBeString();
 
-                        $gift = $payload[1];
-                        expect($gift['kind'])->toBe(1059);
-                        expect($gift['tags'][0])->toBe(['p', NIP01TestFunctions::pubkey_recipient()]);
+                $private_message = Seal::open($recipient_key, $seal);
+                expect($private_message)->toHaveKey('id');
+                expect($private_message)->toHaveKey('content');
+                expect($private_message->content)->toBe('Hello, I am your agent! The URL of your relay is ' . $relay_url());
+            }];
+                        
+            $expected_messages[] = ['EOSE', function (array $payload) use ($subscriptionId) {
+                            expect($payload[0])->toBe($subscriptionId);
+                        }];
+                        
+            $request = $subscription();
+            expect($request[2])->toBeArray();
+            expect($request[2]['#p'])->toContain(NIP01TestFunctions::pubkey_recipient());
 
-                        $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
-                        expect($seal->kind)->toBe(13);
-                        expect($seal->pubkey)->toBeString();
-                        expect($seal->content)->toBeString();
+            $signed_message = Factory::event(NIP01TestFunctions::key_recipient(), 1, 'Hello!');
+            $alice($signed_message);
+            $expected_messages[] = ['OK', function (array $payload) use ($signed_message) {
+                    expect($payload[0])->toBe($signed_message()[1]['id']);
+                    expect($payload[1])->toBeTrue();
+                }];
 
-                        $private_message = Seal::open($recipient_key, $seal);
-                        expect($private_message)->toHaveKey('id');
-                        expect($private_message)->toHaveKey('content');
-                        expect($private_message->content)->toBe('Hello, I am your agent! The URL of your relay is ' . $relay_url());
-                    }],
-                    ['EOSE', function (array $payload) use ($subscriptionId) {
-                        expect($payload[0])->toBe($subscriptionId);
-                    }]
-        );
-        expect($request[2])->toBeArray();
-        expect($request[2]['#p'])->toContain(NIP01TestFunctions::pubkey_recipient());
+            return $expected_messages;
+        });
 
-        $signed_message = Factory::event(NIP01TestFunctions::key_recipient(), 1, 'Hello!');
-        $alice($signed_message, ['OK', function (array $payload) use ($signed_message) {
-                expect($payload[0])->toBe($signed_message()[1]['id']);
-                expect($payload[1])->toBeTrue();
-            }]
-        );
-
-        $bob = $client_factory();
         $bob_message = Factory::event(NIP01TestFunctions::key_sender(), 1, 'Hello!');
-        $bob($bob_message, ['OK', function (array $payload) use ($bob_message) {
-                expect($payload[0])->toBe($bob_message()[1]['id']);
-                expect($payload[1])->toBeTrue();
-            }]
-        );
+        
+        $client_factory(function(callable $bob) use ($bob_message) {
+            $expected_messages = [];
+            $bob($bob_message);
+            $expected_messages[] = ['OK', function (array $payload) use ($bob_message) {
+                    expect($payload[0])->toBe($bob_message()[1]['id']);
+                    expect($payload[1])->toBeTrue();
+                }];
 
-
-        $bob(new nostriphant\NIP01\Message('REQ', 'sddf', [["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]]),
-                ['EOSE']);
+            $bob(new nostriphant\NIP01\Message('REQ', 'sddf', [["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]]));
+            $expected_messages[] = ['EOSE'];
+            
+            return $expected_messages;
+        });
 
         $agent();
 

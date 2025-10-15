@@ -28,12 +28,7 @@ class Client {
 
             #[\Override]
             public function __invoke(Message $message): bool {
-                if ($message instanceof Message) {
-                    $text = $message;
-                } else {
-                    $text = Nostr::encode($message);
-                }
-                $this->connection->sendText($text);
+                $this->connection->sendText($message);
                 return true;
             }
 

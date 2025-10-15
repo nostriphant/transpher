@@ -79,12 +79,7 @@ class Relay implements WebsocketClientHandler {
             }
             #[\Override]
             public function __invoke(Message $message): bool {
-                if ($message instanceof Message) {
-                    $text = $message;
-                } else {
-                    $text = Nostr::encode($message);
-                }
-                $this->client->sendText($text);
+                $this->client->sendText($message);
                 return true;
             }
 

@@ -21,7 +21,7 @@ use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Blossom;
 use nostriphant\Functional\Await;
 
-class Relay {
+class WebsocketServer {
     private ErrorHandler $errorHandler;
     private Files $files;
 

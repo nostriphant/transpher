@@ -16,11 +16,7 @@ class WebsocketClientHandler implements \Amp\Websocket\Server\WebsocketClientHan
     }
 
     #[\Override]
-    public function handleClient(
-            WebsocketClient $client,
-            Request $request,
-            Response $response,
-    ): void {
+    public function handleClient(WebsocketClient $client, Request $request, Response $response): void {
         $this->gateway->addClient($client);
         
         $message_handler = ($this->message_handler_factory)(new class($client) implements Transmission {

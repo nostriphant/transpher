@@ -3,13 +3,10 @@
 namespace nostriphant\Transpher\Amp;
 
 use \Psr\Log\LoggerInterface;
-use Amp\Websocket\Server\WebsocketClientHandler;
-use Amp\Websocket\Server\WebsocketGateway;
+use nostriphant\Transpher\Amp\WebsocketClientHandler;
 use Amp\Websocket\Server\WebsocketClientGateway;
-use Amp\Websocket\WebsocketClient;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
-use nostriphant\NIP01\Message;
 use Amp\Http\Server\DefaultErrorHandler;
 use Amp\Http\Server\Router;
 use Amp\Http\Server\SocketHttpServer;
@@ -23,24 +20,17 @@ use nostriphant\Transpher\Files;
 use nostriphant\Transpher\Relay\Incoming;
 use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Blossom;
-use nostriphant\Transpher\Relay\Subscriptions;
-use nostriphant\NIP01\Transmission;
 use nostriphant\Functional\Await;
 
-class Relay implements WebsocketClientHandler {
-
-    private WebsocketGateway $gateway;
-    private Incoming $incoming;
+class Relay {
     private ErrorHandler $errorHandler;
     private Files $files;
 
     public function __construct(Store $events, string $files_path) {
         $this->files = new Files($files_path, $events);
-        $this->incoming = new Incoming($events, $this->files);
-        $this->gateway = new WebsocketClientGateway();
         $this->errorHandler = new DefaultErrorHandler();
+        $this->clientHandler = new WebsocketClientHandler(new Incoming($events, $this->files), new WebsocketClientGateway());   
     }
-
 
     public function __invoke(string $ip, string $port, int $max_connections_per_ip, LoggerInterface $log, callable $shutdown_callback): void {
         $server = SocketHttpServer::createForDirectAccess($log, connectionLimitPerIp: $max_connections_per_ip);
@@ -51,7 +41,7 @@ class Relay implements WebsocketClientHandler {
         //$acceptor = new AllowOriginAcceptor(
         //    ['http://localhost:' . $port, 'http://127.0.0.1:' . $port, 'http://[::1]:' . $port],
         //);
-        $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $log, $acceptor, $this)));
+        $router->addRoute('GET', '/', new RequestHandler(new Websocket($server, $log, $acceptor, $this->clientHandler)));
 
         $blossom = new Blossom($this->files);
         $blossom_handler = new ClosureRequestHandler(fn(Request $request) => new Response(...$blossom(...$request->getAttribute(Router::class))));
@@ -66,35 +56,4 @@ class Relay implements WebsocketClientHandler {
         });
     }
 
-    #[\Override]
-    public function handleClient(
-            WebsocketClient $client,
-            Request $request,
-            Response $response,
-    ): void {
-
-        $this->gateway->addClient($client);
-        $wrapped_client = new class($client) implements Transmission {
-            public function __construct(private WebsocketClient $client) {
-
-            }
-            #[\Override]
-            public function __invoke(Message $message): bool {
-                $this->client->sendText($message);
-                return true;
-            }
-
-        };
-        
-        $client_subscriptions = new Subscriptions($wrapped_client);
-        foreach ($client as $message) {
-            try {
-                foreach (call_user_func($this->incoming, $client_subscriptions, Message::decode($message)) as $reply) {
-                    $wrapped_client($reply);
-                }
-            } catch (\InvalidArgumentException $ex) {
-                $wrapped_client(Message::notice($ex->getMessage()));
-            }
-        }
-    }
 }

@@ -11,7 +11,7 @@ use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
 
 class WebsocketClientHandler implements \Amp\Websocket\Server\WebsocketClientHandler {
-    public function __construct(private MessageHandlerFactory $incoming_factory,  private WebsocketGateway $gateway) {
+    public function __construct(private MessageHandlerFactory $message_handler_factory,  private WebsocketGateway $gateway) {
 
     }
 
@@ -21,9 +21,9 @@ class WebsocketClientHandler implements \Amp\Websocket\Server\WebsocketClientHan
             Request $request,
             Response $response,
     ): void {
-
         $this->gateway->addClient($client);
-        $wrapped_client = new class($client) implements Transmission {
+        
+        $message_handler = ($this->message_handler_factory)(new class($client) implements Transmission {
             public function __construct(private WebsocketClient $client) {
 
             }
@@ -33,18 +33,10 @@ class WebsocketClientHandler implements \Amp\Websocket\Server\WebsocketClientHan
                 return true;
             }
 
-        };
-
+        });
         
-        $message_handler = ($this->incoming_factory)($wrapped_client);
         foreach ($client as $message) {
-            try {
-                foreach ($message_handler($message) as $reply) {
-                    $wrapped_client($reply);
-                }
-            } catch (\InvalidArgumentException $ex) {
-                $wrapped_client(Message::notice($ex->getMessage()));
-            }
+            $message_handler($message);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace nostriphant\Transpher\Relay;
 
-class MessageHandlerFactory implements \nostriphant\Transpher\Amp\MessageHandlerFactory {
+readonly class MessageHandlerFactory implements \nostriphant\Transpher\Amp\MessageHandlerFactory {
     
     private Incoming $incoming;
     
@@ -12,6 +12,6 @@ class MessageHandlerFactory implements \nostriphant\Transpher\Amp\MessageHandler
     
     #[\Override]
     public function __invoke(\nostriphant\NIP01\Transmission $transmission) : \nostriphant\Transpher\Amp\MessageHandler {
-        return new MessageHandler($this->incoming, new Subscriptions($transmission));
+        return new MessageHandler($this->incoming, $transmission);
     }
 }

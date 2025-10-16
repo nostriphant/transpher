@@ -49,4 +49,4 @@ $store = new nostriphant\Stores\Store($events, [
 $relay = new \nostriphant\Transpher\Relay($store, $files_path);
 
 list($ip, $port) = explode(":", $_SERVER['argv'][1], 2);
-$relay($ip, $port, $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, fn(int $signal) => $logger->info(sprintf("Received signal %d, stopping Relay server", $signal)));
+$relay($ip, $port, $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger);

@@ -46,7 +46,7 @@ $store = new nostriphant\Stores\Store($events, [
     ['#p' => $whitelisted_pubkeys]
         ]);
 
-$relay = new \nostriphant\Transpher\Amp\WebsocketServer($store, $files_path);
+$relay = new \nostriphant\Transpher\Relay($store, $files_path);
 
 list($ip, $port) = explode(":", $_SERVER['argv'][1], 2);
 $relay($ip, $port, $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, fn(int $signal) => $logger->info(sprintf("Received signal %d, stopping Relay server", $signal)));

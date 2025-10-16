@@ -17,7 +17,6 @@ use Amp\Websocket\Server\Rfc6455Acceptor;
 use Amp\Http\Server\RequestHandler\ClosureRequestHandler;
 
 use nostriphant\Transpher\Files;
-use nostriphant\Transpher\Relay\Incoming;
 use nostriphant\Stores\Store;
 use nostriphant\Transpher\Relay\Blossom;
 use nostriphant\Functional\Await;
@@ -29,7 +28,9 @@ class Relay {
     public function __construct(Store $events, string $files_path) {
         $this->files = new Files($files_path, $events);
         $this->errorHandler = new DefaultErrorHandler();
-        $this->clientHandler = new WebsocketClientHandler(new Incoming($events, $this->files), new WebsocketClientGateway());   
+        
+        $messageHandlerFactory = new \nostriphant\Transpher\Relay\MessageHandlerFactory($events, $this->files);
+        $this->clientHandler = new WebsocketClientHandler($messageHandlerFactory, new WebsocketClientGateway());   
     }
 
     public function __invoke(string $ip, string $port, int $max_connections_per_ip, LoggerInterface $log, callable $shutdown_callback): void {

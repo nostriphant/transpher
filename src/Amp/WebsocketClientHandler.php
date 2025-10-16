@@ -5,15 +5,13 @@ namespace nostriphant\Transpher\Amp;
 use Amp\Websocket\Server\WebsocketGateway;
 use Amp\Websocket\WebsocketClient;
 use nostriphant\NIP01\Message;
-use nostriphant\Transpher\Relay\Subscriptions;
 use nostriphant\NIP01\Transmission;
 
-use nostriphant\Transpher\Relay\Incoming;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
 
 class WebsocketClientHandler implements \Amp\Websocket\Server\WebsocketClientHandler {
-    public function __construct(private Incoming $incoming,  private WebsocketGateway $gateway) {
+    public function __construct(private MessageHandlerFactory $incoming_factory,  private WebsocketGateway $gateway) {
 
     }
 
@@ -37,10 +35,11 @@ class WebsocketClientHandler implements \Amp\Websocket\Server\WebsocketClientHan
 
         };
 
-        $client_subscriptions = new Subscriptions($wrapped_client);
+        
+        $message_handler = ($this->incoming_factory)($wrapped_client);
         foreach ($client as $message) {
             try {
-                foreach (($this->incoming)($client_subscriptions, Message::decode($message)) as $reply) {
+                foreach ($message_handler($message) as $reply) {
                     $wrapped_client($reply);
                 }
             } catch (\InvalidArgumentException $ex) {

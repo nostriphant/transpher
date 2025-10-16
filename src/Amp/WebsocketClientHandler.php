@@ -40,7 +40,7 @@ class WebsocketClientHandler implements \Amp\Websocket\Server\WebsocketClientHan
         $client_subscriptions = new Subscriptions($wrapped_client);
         foreach ($client as $message) {
             try {
-                foreach (call_user_func($this->incoming, $client_subscriptions, Message::decode($message)) as $reply) {
+                foreach (($this->incoming)($client_subscriptions, Message::decode($message)) as $reply) {
                     $wrapped_client($reply);
                 }
             } catch (\InvalidArgumentException $ex) {

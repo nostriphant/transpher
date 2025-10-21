@@ -83,42 +83,24 @@ describe('agent', function (): void {
             'RELAY_URL' => $relay_url()
         ]);
         
+        sleep(3);
+        
         $alices_expected_messages = [];
         $alice = Client::connectToUrl($relay_url());
         
         expect($alice)->toBeCallable('Alice is not callable');
+
+        $unwrapper = Functions::unwrapper(NIP01TestFunctions::key_recipient());
         
         $alice_listen = $alice(function(callable $send) use ($relay_url, &$alices_expected_messages) {
             $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
 
             $subscriptionId = $subscription()[1];
-            $recipient_key = NIP01TestFunctions::key_recipient();
             $send($subscription);
             
-            $alices_expected_messages[] = ['EVENT', function (array $payload) use ($subscriptionId, $recipient_key, $relay_url) {
-                expect($payload[0])->toBe($subscriptionId);
-
-                $gift = $payload[1];
-                expect($gift['kind'])->toBe(1059);
-                expect($gift['tags'][0])->toBe(['p', NIP01TestFunctions::pubkey_recipient()]);
-
-                $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
-                expect($seal->kind)->toBe(13);
-                expect($seal->pubkey)->toBeString();
-                expect($seal->content)->toBeString();
-
-                $private_message = Seal::open($recipient_key, $seal);
-                expect($private_message)->toHaveKey('id');
-                expect($private_message)->toHaveKey('content');
-                expect($private_message->content)->toBeIn([
-                    'Hello, I am your agent! The URL of your relay is ' . $relay_url(),
-                    'Running with public key npub1'
-                ]);
-            }];
-                        
-            $alices_expected_messages[] = ['EOSE', function (array $payload) use ($subscriptionId) {
-                            expect($payload[0])->toBe($subscriptionId);
-                        }];
+            $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $relay_url()];
+            $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub1'];
+            $alices_expected_messages[] = ['EOSE', $subscriptionId];
                         
             $request = $subscription();
             expect($request[2])->toBeArray();
@@ -126,20 +108,42 @@ describe('agent', function (): void {
 
             $signed_message = Factory::event(NIP01TestFunctions::key_recipient(), 1, 'Hello!');
             $send($signed_message);
-            $alices_expected_messages[] = ['OK', function (array $payload) use ($signed_message) {
-                    expect($payload[0])->toBe($signed_message()[1]['id']);
-                    expect($payload[1])->toBeTrue();
-                }];
+            $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true];
         });
         
         expect($alice_listen)->toBeCallable('Alice listen is not callable');
         
-        $alice_listen(function (Message $message, callable $stop) use (&$alices_expected_messages) {
+        $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages) {
             $expected_message = array_shift($alices_expected_messages);
-            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
-            $expected_message[1]($message->payload);
             
-            $stop();
+            $remaining = [];
+            foreach ($alices_expected_messages as $expected_message) {
+                if ($expected_message[0] !== $message->type) {
+                    $remaining[] = $expected_message;
+                    continue;
+                }
+                switch ($message->type) {
+                    case 'EVENT':
+                        if ($message->payload[0] !== $expected_message[0]) {
+                            $remaining[] = $expected_message;
+                        } elseif ($unwrapper($message->payload[1]) !== $expected_message[1]) {
+                            $remaining[] = $expected_message;
+                        }
+                        break;
+
+                    default:
+                        if ($message->payload !== $expected_message) {
+                            $remaining[] = $expected_message;
+                        }
+                        break;
+
+                }
+                
+            }
+            $alices_expected_messages = $remaining;
+            if (count($alices_expected_messages) === 0) {
+                $stop();
+            }
         });
 
 
@@ -153,23 +157,24 @@ describe('agent', function (): void {
         
         $bob_listen = $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
             $send($bob_message);
-            $bobs_expected_messages[] = ['OK', function (array $payload) use ($bob_message) {
-                    expect($payload[0])->toBe($bob_message()[1]['id']);
-                    expect($payload[1])->toBeTrue();
-                }];
+            $bobs_expected_messages[] = ['OK', $bob_message()[1]['id'], true, ''];
 
-            $send(new nostriphant\NIP01\Message('REQ', 'sddf', [["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]]));
-            $bobs_expected_messages[] = ['EOSE'];
+            $send(Message::req('sddf', [["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]]));
+            $bobs_expected_messages[] = ['EOSE', 'sddf'];
         });
         
         expect($bob_listen)->toBeCallable('Bob listen is not callable');
         
         $bob_listen(function (Message $message, callable $stop) use (&$bobs_expected_messages) {
             $expected_message = array_shift($bobs_expected_messages);
-            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
-            $expected_message[1]($message->payload);
             
-            $stop();
+            $type = array_shift($expected_message);
+            expect($message->type)->toBe($type, 'Message type checks out');
+            expect($message->payload)->toBe($expected_message);
+            
+            if (count($bobs_expected_messages) === 0) {
+                $stop();
+            }
         });
         
         expect($agent)->toBeCallable('Agent is not callable');

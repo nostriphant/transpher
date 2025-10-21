@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69c16961c96540bbb5577f67262bd0dc",
+    "content-hash": "fa3ccb686698833c057a2510b5f52d5c",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2296,16 +2296,16 @@
         },
         {
             "name": "nostriphant/client",
-            "version": "0.1.0",
+            "version": "0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/client.git",
-                "reference": "5a8421aa5d2cb913268ded4f2e731161720a3c51"
+                "reference": "2a814e511d680cd55636c07466e258620f9b52a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/client/zipball/5a8421aa5d2cb913268ded4f2e731161720a3c51",
-                "reference": "5a8421aa5d2cb913268ded4f2e731161720a3c51",
+                "url": "https://api.github.com/repos/nostriphant/client/zipball/2a814e511d680cd55636c07466e258620f9b52a6",
+                "reference": "2a814e511d680cd55636c07466e258620f9b52a6",
                 "shasum": ""
             },
             "require": {
@@ -2315,7 +2315,8 @@
                 "php": "^8.4"
             },
             "require-dev": {
-                "pestphp/pest": "^2.35"
+                "mockery/mockery": "^1.6",
+                "pestphp/pest": "^4.0"
             },
             "type": "project",
             "autoload": {
@@ -2337,9 +2338,9 @@
             "description": "Simple Nostr client",
             "support": {
                 "issues": "https://github.com/nostriphant/client/issues",
-                "source": "https://github.com/nostriphant/client/tree/0.1.0"
+                "source": "https://github.com/nostriphant/client/tree/0.3.1"
             },
-            "time": "2025-10-15T21:06:13+00:00"
+            "time": "2025-10-21T11:35:25+00:00"
         },
         {
             "name": "nostriphant/functional",

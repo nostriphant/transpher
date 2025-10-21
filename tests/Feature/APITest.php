@@ -85,13 +85,9 @@ describe('agent', function (): void {
         sleep(1); // hack to give agent some time to boot...
         
         $alices_expected_messages = [];
-        $alice = new Client($relay_url(), function (Message $message) use (&$alices_expected_messages) {
-            $expected_message = array_shift($alices_expected_messages);
-            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
-            $expected_message[1]($message->payload);
-        });
-
-        $alice(function(callable $send) use ($relay_url, &$alices_expected_messages) {
+        $alice = Client::connectToUrl($relay_url());
+        
+        $alice_listen = $alice(function(callable $send) use ($relay_url, &$alices_expected_messages) {
             $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
 
             $subscriptionId = $subscription()[1];
@@ -131,18 +127,23 @@ describe('agent', function (): void {
                     expect($payload[1])->toBeTrue();
                 }];
         });
+        
+        $alice_listen(function (Message $message, callable $stop) use (&$alices_expected_messages) {
+            $expected_message = array_shift($alices_expected_messages);
+            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+            $expected_message[1]($message->payload);
+            
+            $stop();
+        });
+
 
         $bob_message = Factory::event(NIP01TestFunctions::key_sender(), 1, 'Hello!');
         
         $bobs_expected_messages = [];
         
-        $bob = new Client($relay_url(), function (Message $message) use (&$bobs_expected_messages) {
-            $expected_message = array_shift($bobs_expected_messages);
-            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
-            $expected_message[1]($message->payload);
-        });
+        $bob = Client::connectToUrl($relay_url());
         
-        $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
+        $bob_listen = $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
             $send($bob_message);
             $bobs_expected_messages[] = ['OK', function (array $payload) use ($bob_message) {
                     expect($payload[0])->toBe($bob_message()[1]['id']);
@@ -151,6 +152,14 @@ describe('agent', function (): void {
 
             $send(new nostriphant\NIP01\Message('REQ', 'sddf', [["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]]));
             $bobs_expected_messages[] = ['EOSE'];
+        });
+        
+        $bob_listen(function (Message $message, callable $stop) use (&$bobs_expected_messages) {
+            $expected_message = array_shift($bobs_expected_messages);
+            expect($message->type)->toBe($expected_message[0], 'Message type checks out');
+            $expected_message[1]($message->payload);
+            
+            $stop();
         });
 
         $agent();

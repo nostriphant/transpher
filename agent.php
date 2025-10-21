@@ -10,11 +10,9 @@ $log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', $_SERVER['AGEN
 
 
 $log->info('Client connecting to ' . $_SERVER['RELAY_URL']);
-$agent = new Client($_SERVER['RELAY_URL'], function (Message $message) {});
+$agent = Client::connectToUrl($_SERVER['RELAY_URL']);
 
 $log->info('Listening to relay...');
-
-
 $listen = $agent(function(callable $send) use ($log) {
     $key = Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))());
     $relay_owner_npub = new Bech32($_SERVER['RELAY_OWNER_NPUB']);
@@ -24,5 +22,6 @@ $listen = $agent(function(callable $send) use ($log) {
     $gift = PrivateDirect::make($key, $relay_owner_npub(), 'Hello, I am your agent! The URL of your relay is ' . $_SERVER['RELAY_URL']);
     $send(Message::event($gift));
 });
-
-$listen(fn(int $signal) => $log->info(sprintf("Received signal %d, stopping agent", $signal)));
+$listen(function (Message $message) {
+    
+});

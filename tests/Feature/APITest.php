@@ -74,7 +74,7 @@ describe('relay', function () {
 
 
 describe('agent', function (): void {
-    it('starts relay and sends private direct messsage to relay owner', function (): void {
+    it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFunctions::pubkey_recipient().')', function (): void {
         global $data_dir, $relay_url;
 
         $agent = Functions::bootAgent(8084, [
@@ -82,10 +82,11 @@ describe('agent', function (): void {
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => $relay_url()
         ]);
-        sleep(1); // hack to give agent some time to boot...
         
         $alices_expected_messages = [];
         $alice = Client::connectToUrl($relay_url());
+        
+        expect($alice)->toBeCallable('Alice is not callable');
         
         $alice_listen = $alice(function(callable $send) use ($relay_url, &$alices_expected_messages) {
             $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
@@ -109,7 +110,10 @@ describe('agent', function (): void {
                 $private_message = Seal::open($recipient_key, $seal);
                 expect($private_message)->toHaveKey('id');
                 expect($private_message)->toHaveKey('content');
-                expect($private_message->content)->toBe('Hello, I am your agent! The URL of your relay is ' . $relay_url());
+                expect($private_message->content)->toBeIn([
+                    'Hello, I am your agent! The URL of your relay is ' . $relay_url(),
+                    'Running with public key npub1'
+                ]);
             }];
                         
             $alices_expected_messages[] = ['EOSE', function (array $payload) use ($subscriptionId) {
@@ -128,6 +132,8 @@ describe('agent', function (): void {
                 }];
         });
         
+        expect($alice_listen)->toBeCallable('Alice listen is not callable');
+        
         $alice_listen(function (Message $message, callable $stop) use (&$alices_expected_messages) {
             $expected_message = array_shift($alices_expected_messages);
             expect($message->type)->toBe($expected_message[0], 'Message type checks out');
@@ -143,6 +149,8 @@ describe('agent', function (): void {
         
         $bob = Client::connectToUrl($relay_url());
         
+        expect($bob)->toBeCallable('Bob is not callable');
+        
         $bob_listen = $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
             $send($bob_message);
             $bobs_expected_messages[] = ['OK', function (array $payload) use ($bob_message) {
@@ -154,6 +162,8 @@ describe('agent', function (): void {
             $bobs_expected_messages[] = ['EOSE'];
         });
         
+        expect($bob_listen)->toBeCallable('Bob listen is not callable');
+        
         $bob_listen(function (Message $message, callable $stop) use (&$bobs_expected_messages) {
             $expected_message = array_shift($bobs_expected_messages);
             expect($message->type)->toBe($expected_message[0], 'Message type checks out');
@@ -161,6 +171,8 @@ describe('agent', function (): void {
             
             $stop();
         });
+        
+        expect($agent)->toBeCallable('Agent is not callable');
 
         $agent();
 

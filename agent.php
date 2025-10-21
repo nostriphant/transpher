@@ -1,27 +1,9 @@
 <?php
 
-use nostriphant\NIP01\Key;
-use nostriphant\NIP19\Bech32;
-use nostriphant\Client\Client;
-use nostriphant\NIP17\PrivateDirect;
-use nostriphant\NIP01\Message;
-
 $log = (require_once __DIR__ . '/bootstrap.php')('agent', 'INFO', $_SERVER['AGENT_LOG_LEVEL'] ?? 'INFO');
 
-
 $log->info('Client connecting to ' . $_SERVER['RELAY_URL']);
-$agent = Client::connectToUrl($_SERVER['RELAY_URL']);
+$agent = new \nostriphant\Transpher\Agent($_SERVER['RELAY_URL'], $_SERVER['AGENT_NSEC'], $_SERVER['RELAY_OWNER_NPUB']);
 
 $log->info('Listening to relay...');
-$listen = $agent(function(callable $send) use ($log) {
-    $key = Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))());
-    $relay_owner_npub = new Bech32($_SERVER['RELAY_OWNER_NPUB']);
-    
-    $log->info('Running agent with public key ' . $key(Key::public()));
-    $log->info('Sending Private Direct Message event');
-    $gift = PrivateDirect::make($key, $relay_owner_npub(), 'Hello, I am your agent! The URL of your relay is ' . $_SERVER['RELAY_URL']);
-    $send(Message::event($gift));
-});
-$listen(function (Message $message) {
-    
-});
+$agent();

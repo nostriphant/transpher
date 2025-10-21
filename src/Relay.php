@@ -7,7 +7,7 @@ use nostriphant\Transpher\Relay\Blossom;
 
 class Relay {
     public function __construct(Store $events, string $files_path) {
-        $files = new Files($files_path, $events);
+        $files = new Relay\Files($files_path, $events);
         $messageHandlerFactory =  new \nostriphant\Transpher\Relay\MessageHandlerFactory($events, $files);
         
         

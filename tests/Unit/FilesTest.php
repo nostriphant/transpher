@@ -1,7 +1,7 @@
 <?php
 
 use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
-use nostriphant\Transpher\Files;
+use nostriphant\Transpher\Relay\Files;
 
 it('stores file, when event is in store', function () {
     $event_id = uniqid();

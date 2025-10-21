@@ -6,7 +6,7 @@ readonly class MessageHandlerFactory implements \nostriphant\Transpher\Amp\Messa
     
     private Incoming $incoming;
     
-    public function __construct(\nostriphant\Stores\Store $store, \nostriphant\Transpher\Files $files) {
+    public function __construct(\nostriphant\Stores\Store $store, Files $files) {
         $this->incoming = new Incoming($store, $files);
     }
     

@@ -3,12 +3,13 @@
 namespace nostriphant\Transpher\Relay\Incoming\Event;
 
 use nostriphant\NIP01\Event;
+use nostriphant\Transpher\Relay\Files;
 
 class Accepted {
 
     public function __construct(
             private \nostriphant\Stores\Store $events,
-            private \nostriphant\Transpher\Files $files,
+            private Files $files,
             private \nostriphant\Transpher\Relay\Subscriptions $subscriptions
     ) {
         

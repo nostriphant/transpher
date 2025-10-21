@@ -8,7 +8,7 @@ use nostriphant\NIP01\Message;
 
 readonly class Incoming {
 
-    public function __construct(private Store $events, private \nostriphant\Transpher\Files $files) {
+    public function __construct(private Store $events, private Files $files) {
         
     }
 

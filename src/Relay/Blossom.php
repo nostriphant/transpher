@@ -9,7 +9,7 @@ readonly class Blossom {
         'GET' => '/{hash:\w+}'
     ];
 
-    public function __construct(private \nostriphant\Transpher\Files $files) {
+    public function __construct(private Files $files) {
         
     }
 

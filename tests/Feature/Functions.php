@@ -9,10 +9,11 @@ class Functions {
         return new Process('agent-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Client connecting to ws://127.0.0.1'));
     }
 
-    static function bootRelay(string $address, array $env): Process {
-        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $address];
-        list($ip, $port) = explode(':', $address);
-        return new Process('relay-' . $port, $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http://127.0.0.1:' . $port . '/'));
+    static function bootRelay(string $socket, array $env): Process {
+        $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $socket];
+        
+        list($scheme, $uri) = explode(":", $socket, 2);
+        return new Process('relay-' . substr(sha1($socket), 0, 6), $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http:' . $uri . '/'));
     }
     
     static function unwrapper(\nostriphant\NIP01\Key $recipient_key) {

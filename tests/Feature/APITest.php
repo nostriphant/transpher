@@ -6,11 +6,8 @@ use nostriphant\Transpher\Relay\InformationDocument;
 use nostriphant\TranspherTests\Factory;
 
 use nostriphant\Client\Client;
-use nostriphant\NIP01\Event;
 use nostriphant\NIP01\Nostr;
 use nostriphant\NIP19\Bech32;
-use nostriphant\NIP59\Gift;
-use nostriphant\NIP59\Seal;
 use nostriphant\NIP01\Message;
 
 beforeAll(function () {
@@ -33,7 +30,7 @@ beforeAll(function () {
     $event_file = $data_dir . '/events' . DIRECTORY_SEPARATOR . $event->id . '.php';
     file_put_contents($event_file, '<?php return ' . var_export($event, true) . ';');
 
-    $relay = Functions::bootRelay($relay_url(''), $env = [
+    $relay = Functions::bootRelay($relay_url('tcp://'), $env = [
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => $relay_url(),
         'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
@@ -42,7 +39,9 @@ beforeAll(function () {
         'RELAY_CONTACT' => 'transpher@nostriphant.dev',
         'RELAY_DATA' => $data_dir,
         'RELAY_LOG_LEVEL' => 'DEBUG',
-        'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72 // to accept NIP17 pdm created_at randomness
+        'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
+        'RELAY_SOFTWARE' => 'Transpher',
+        'RELAY_VERSION' => TRANSPHER_VERSION
     ]);
 
     expect($event_file)->not()->toBeFile();
@@ -67,7 +66,7 @@ describe('relay', function () {
         $response = Nostr::decode($responseText);
 
         expect($response)->not()->toBeNull($responseText);
-        expect($response)->toBe(InformationDocument::generate('Really relay', 'This is my dev relay', NIP01TestFunctions::pubkey_recipient(), 'transpher@nostriphant.dev'));
+        expect($response)->toBe(\nostriphant\Relay\InformationDocument::generate('Really relay', 'This is my dev relay', NIP01TestFunctions::pubkey_recipient(), 'transpher@nostriphant.dev'));
     });
 });
 
@@ -194,7 +193,7 @@ describe('agent', function (): void {
         $pdms = iterator_to_array(nostriphant\Stores\Store::query($events, ['#p' => [NIP01TestFunctions::pubkey_recipient()]]));
         expect($pdms[0]->kind)->toBe(1059);
 
-        expect(file_get_contents(ROOT_DIR . '/logs/relay-8087-output.log'))->not()->toContain('ERROR');
+        expect(file_get_contents(ROOT_DIR . '/logs/relay-6c0de3-output.log'))->not()->toContain('ERROR');
     });
 });
 

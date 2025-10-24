@@ -46,7 +46,11 @@ $store = new nostriphant\Stores\Store($events, [
     ['#p' => $whitelisted_pubkeys]
         ]);
 
-$relay = new \nostriphant\Transpher\Relay($store, $files_path);
+$relay = new \nostriphant\Relay\Relay($store, $files_path);
 
-list($ip, $port) = explode(":", $_SERVER['argv'][1], 2);
-$relay($ip, $port, $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger);
+$stop = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger);
+
+new nostriphant\Relay\AwaitSignal(function(int $signal) use ($stop, $logger) {
+    $logger->info(sprintf("Received signal %d, stopping Relay server", $signal));
+    $stop();
+});

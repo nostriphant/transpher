@@ -8,20 +8,8 @@
         "ext-sqlite3" : "*",
         "vlucas/phpdotenv": "^5.6",
         "monolog/monolog": "^3.7",
-        "amphp/http-server": "^3.3",
-        "amphp/byte-stream": "^2.1",
-        "amphp/log": "^2.0",
-        "amphp/websocket-server": "^4.0",
-        "amphp/http-server-router": "^2.0",
-        "amphp/http-server-static-content": "^2.0",
         "nostriphant/client": "^0.3",
-        "nostriphant/nip-01": "^2.0",
-        "nostriphant/nip-19": "^2.0",
-        "nostriphant/nip-44": "^2.0",
-        "nostriphant/nip-59": "^2.0",
-        "nostriphant/nip-17": "^2.0",
-        "nostriphant/stores": "^2.0",
-        "nostriphant/functional": "^2.2"
+        "nostriphant/relay": "^1.1"
     },
     "license": "MIT",
     "autoload": {

@@ -1,4 +1,4 @@
-FROM nostriphant/nip-01:main
+FROM nostriphant/php-secp256k1:main
 
 RUN ["apt", "update"]
 RUN ["apt-get", "install", "-y", "libzip-dev", "zip"]

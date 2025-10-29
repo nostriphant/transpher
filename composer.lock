@@ -2616,16 +2616,16 @@
         },
         {
             "name": "nostriphant/relay",
-            "version": "1.2.3",
+            "version": "1.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "0d960d9f0fbbf481a69a63705d4b823bea4f184b"
+                "reference": "0498c414cfa76b88f043fdfcf63dd9e038277f96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/0d960d9f0fbbf481a69a63705d4b823bea4f184b",
-                "reference": "0d960d9f0fbbf481a69a63705d4b823bea4f184b",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/0498c414cfa76b88f043fdfcf63dd9e038277f96",
+                "reference": "0498c414cfa76b88f043fdfcf63dd9e038277f96",
                 "shasum": ""
             },
             "require": {
@@ -2670,12 +2670,13 @@
                     "email": "rik@nostriphant.dev"
                 }
             ],
-            "description": "Nostr Relay in PHP",
+            "description": "'Nostriphant Relay'",
+            "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/1.2.3"
+                "source": "https://github.com/nostriphant/relay/tree/1.4.3"
             },
-            "time": "2025-10-24T07:34:25+00:00"
+            "time": "2025-10-28T09:40:03+00:00"
         },
         {
             "name": "nostriphant/stores",
@@ -4848,16 +4849,16 @@
         },
         {
             "name": "pestphp/pest-plugin-profanity",
-            "version": "v4.1.0",
+            "version": "v4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest-plugin-profanity.git",
-                "reference": "e279c844b6868da92052be27b5202c2ad7216e80"
+                "reference": "c37e5e2c7136ee4eae12082e7952332bc1c6600a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest-plugin-profanity/zipball/e279c844b6868da92052be27b5202c2ad7216e80",
-                "reference": "e279c844b6868da92052be27b5202c2ad7216e80",
+                "url": "https://api.github.com/repos/pestphp/pest-plugin-profanity/zipball/c37e5e2c7136ee4eae12082e7952332bc1c6600a",
+                "reference": "c37e5e2c7136ee4eae12082e7952332bc1c6600a",
                 "shasum": ""
             },
             "require": {
@@ -4898,9 +4899,9 @@
                 "unit"
             ],
             "support": {
-                "source": "https://github.com/pestphp/pest-plugin-profanity/tree/v4.1.0"
+                "source": "https://github.com/pestphp/pest-plugin-profanity/tree/v4.2.0"
             },
-            "time": "2025-09-10T06:17:03+00:00"
+            "time": "2025-10-28T23:14:11+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -6736,16 +6737,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.3.4",
+            "version": "v7.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "2b9c5fafbac0399a20a2e82429e2bd735dcfb7db"
+                "reference": "cdb80fa5869653c83cfe1a9084a673b6daf57ea7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/2b9c5fafbac0399a20a2e82429e2bd735dcfb7db",
-                "reference": "2b9c5fafbac0399a20a2e82429e2bd735dcfb7db",
+                "url": "https://api.github.com/repos/symfony/console/zipball/cdb80fa5869653c83cfe1a9084a673b6daf57ea7",
+                "reference": "cdb80fa5869653c83cfe1a9084a673b6daf57ea7",
                 "shasum": ""
             },
             "require": {
@@ -6810,7 +6811,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.3.4"
+                "source": "https://github.com/symfony/console/tree/v7.3.5"
             },
             "funding": [
                 {
@@ -6830,7 +6831,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-09-22T15:31:00+00:00"
+            "time": "2025-10-14T15:46:26+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -6901,16 +6902,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v7.3.2",
+            "version": "v7.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "2a6614966ba1074fa93dae0bc804227422df4dfe"
+                "reference": "9f696d2f1e340484b4683f7853b273abff94421f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/2a6614966ba1074fa93dae0bc804227422df4dfe",
-                "reference": "2a6614966ba1074fa93dae0bc804227422df4dfe",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/9f696d2f1e340484b4683f7853b273abff94421f",
+                "reference": "9f696d2f1e340484b4683f7853b273abff94421f",
                 "shasum": ""
             },
             "require": {
@@ -6945,7 +6946,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v7.3.2"
+                "source": "https://github.com/symfony/finder/tree/v7.3.5"
             },
             "funding": [
                 {
@@ -6965,7 +6966,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-07-15T13:41:35+00:00"
+            "time": "2025-10-15T18:45:57+00:00"
         },
         {
             "name": "symfony/polyfill-intl-grapheme",

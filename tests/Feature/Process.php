@@ -45,15 +45,16 @@ readonly class Process {
                 fwrite($meta, 'SCANNING FOR  RUNNING EVIDENCE IN OUTPUT>> `' . $line . '` -- `'.$errline.'` >> ' . var_export($result, true) . PHP_EOL);
             }
             
+
+            if (isset($_SERVER['GITHUB_OUTPUT'])) {
+                echo $line . PHP_EOL;
+            }
+            
         } while ($result === false);
         fwrite($meta, 'FOUND RUNNING EVIDENCE IN OUPUT>> `' . $line . '` -- `'.$errline.'`' . PHP_EOL);
         fclose($output);
         fclose($error);
         fclose($meta);
-        
-        if (isset($_SERVER['GITHUB_OUTPUT'])) {
-            echo file_get_contents($cwd . '/logs/relay.log');
-        }
     }
     
     public function __invoke(int $signal = 15) : array {

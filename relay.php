@@ -14,12 +14,13 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $store_path = $data_dir . '/events';
     if (is_dir($store_path)) {
         $logger->debug('Starting migrating events...');
-        $logger->debug(\nostriphant\Stores\Engine\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events, $logger) {
+        $migrated = \nostriphant\Stores\Engine\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events, $logger) {
                     $event_id = $event->id;
                     $events[$event_id] = $event;
                     $logger->debug('Event ' . $event_id . ' migrated, removing old file ' . $store_path . '/' . $event_id . '.php');
                     return unlink($store_path . '/' . $event_id . '.php');
-                }) . ' events migrated.');
+                });
+        $logger->debug($migrated . ' events migrated.');
     }
 
     $files_path = $data_dir . '/files';

@@ -63,3 +63,7 @@ jobs:
           
       - name: Tests
         run: ./vendor/bin/pest --debug
+        
+      - name: Print relay output
+        if: ${{ cancelled() || failure() }}
+        run: cat logs/relay.log

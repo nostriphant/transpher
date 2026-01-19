@@ -10,6 +10,15 @@ readonly class Process {
         $cwd = getcwd();
         $output_file = $cwd . "/logs/{$process_id}-output.log";
         $error_file = $cwd . "/logs/{$process_id}-errors.log";
+        
+        $meta = fopen($cwd . "/logs/{$process_id}-meta.log", 'w');
+        fwrite($meta, 'Environment for ' . implode(' ', $cmd) . ': '.PHP_EOL);
+        foreach ($env as $env_key => $env_value) {
+            fwrite($meta, $env_key.'='.$env_value.PHP_EOL);
+        }
+        fwrite($meta, str_repeat('=', 50) . PHP_EOL);
+        fwrite($meta, 'Running command... ');
+        
         $descriptorspec = [
             0 => ["pipe", "r"],  
             1 => ["file", $output_file, "w"],  
@@ -17,9 +26,30 @@ readonly class Process {
         ];
 
         $this->process = proc_open($cmd, $descriptorspec, $pipes, $cwd, $env);
-        while ($runtest(file_get_contents($output_file))  === false && (is_file($error_file) === false || $runtest(file_get_contents($error_file)) === false)) {
-            // wait till process is ready
+        if ($this->process === false) {
+            fwrite($meta, 'FAIL' . PHP_EOL);
+            
         }
+        fwrite($meta, 'OK' . PHP_EOL);
+        
+        
+        $output = fopen($output_file, 'r');
+        $error = fopen($error_file, 'r');
+        
+        do {
+            $line = fread($output, 512);
+            $errline = fread($error, 512);
+            
+            $result = $runtest($line) || $runtest($errline);
+            if (!empty($line) || !empty($errline)) {
+                fwrite($meta, 'SCANNING FOR  RUNNING EVIDENCE IN OUTPUT>> `' . $line . '` -- `'.$errline.'` >> ' . var_export($result, true) . PHP_EOL);
+            }
+            
+        } while ($result === false);
+        fwrite($meta, 'FOUND RUNNING EVIDENCE IN OUPUT>> `' . $line . '` -- `'.$errline.'`' . PHP_EOL);
+        fclose($output);
+        fclose($error);
+        fclose($meta);
     }
     
     public function __invoke(int $signal = 15) : array {
@@ -38,6 +68,10 @@ readonly class Process {
 
         proc_close($this->process);
         return $status;
+    }
+    
+    public function __destruct() {
+        $this->__invoke();
     }
     
     static function gracefulExit() {

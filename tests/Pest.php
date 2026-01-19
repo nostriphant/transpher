@@ -12,5 +12,7 @@
 */
 namespace Pest {
 
-
+    pest()->extend(\nostriphant\TranspherTests\AcceptanceCase::class)
+        ->group('acceptance')
+        ->in('Acceptance');
 }

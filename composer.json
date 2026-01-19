@@ -27,7 +27,8 @@
     "require-dev": {
         "ext-curl": "*",
         "pestphp/pest": "^4.0",
-        "mockery/mockery": "^1.6"
+        "mockery/mockery": "^1.6",
+        "filp/whoops": "^2.18"
     },
     "config": {
         "allow-plugins": {

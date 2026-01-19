@@ -67,3 +67,7 @@ jobs:
       - name: Print relay output
         if: ${{ cancelled() || failure() }}
         run: cat logs/relay.log
+        
+      - name: Print agent output
+        if: ${{ cancelled() || failure() }}
+        run: cat logs/agent.log

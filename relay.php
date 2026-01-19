@@ -30,10 +30,8 @@ if (isset($_SERVER['RELAY_DATA'])) {
     $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
 }
 
-if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false) == false) {
-    $logger->info('Loading store.');
-    $store = new nostriphant\Stores\Store($events, []);
-} else {
+$whitelist = [];
+if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
     $agent_pubkey = Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public());
     $logger->debug('Whitelisting owner ('.$_SERVER['RELAY_OWNER_NPUB'].') and agent ('.$agent_pubkey.')');
     $whitelisted_pubkeys = array_merge([
@@ -52,13 +50,12 @@ if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false) == false) {
         }, $whitelisted_pubkeys);
     }
 
-    $logger->info('Loading store with whitelist.');
-    $store = new nostriphant\Stores\Store($events, [
-        ['authors' => $whitelisted_pubkeys],
-        ['#p' => $whitelisted_pubkeys]
-            ]);
-    
+    $whitelist[0] = ['authors' => $whitelisted_pubkeys];
+    $whitelist[1] = ['#p' => $whitelisted_pubkeys];
 }
+
+$logger->info('Loading store ' . (!empty($whitelist) ? ' with withlist' : '')  . '.');
+$store = new nostriphant\Stores\Store($events, $whitelist);
 
 $relay = new \nostriphant\Relay\Relay($store, $files_path,
         $_SERVER['RELAY_NAME'],

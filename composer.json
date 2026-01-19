@@ -41,17 +41,10 @@
             "rm -rf ./data/files/*",
             "rm -rf ./data/relay_*"
         ],
-        "test": [
-            "@clearCache @no_additional_args",
-            "./vendor/bin/pest"
-        ],
         "next": [
             "git tag -f `cat VERSION` @no_additional_args",
             "echo @additional_args > VERSION",
             "git commit -am 'start VERSION @additional_args'"
-        ],
-        "build-docker": [
-            "docker compose -f docker-compose.local.yml build @no_additional_args"
         ]
     }
 }

@@ -59,4 +59,4 @@ jobs:
           mkdir ./data
           mkdir ./data/events
           mkdir ./data/files
-          composer test
+          ./vendor/bin/pest

@@ -62,4 +62,4 @@ jobs:
           mkdir ./data/files
           
       - name: Tests
-        run: ./vendor/bin/pest
+        run: ./vendor/bin/pest --debug

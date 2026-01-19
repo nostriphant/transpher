@@ -54,10 +54,12 @@ jobs:
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Tests
+      - name: Prepare test environment
         run: |
           mkdir ./logs
           mkdir ./data
           mkdir ./data/events
           mkdir ./data/files
-          ./vendor/bin/pest
+          
+      - name: Tests
+        run: ./vendor/bin/pest

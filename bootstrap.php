@@ -32,9 +32,6 @@ return function (string $identifier, string $stdout_level, string $logfile_level
     $log = new Monolog\Logger($identifier);
 
     $log->pushHandler(new Monolog\Handler\StreamHandler(__DIR__ . '/logs/' . $identifier . '.log', translate_loglevel($logfile_level)));
-    if (isset($_SERVER['GITHUB_OUTPUT'])) {
-        $log->pushHandler(new Monolog\Handler\StreamHandler($_SERVER['GITHUB_OUTPUT'], translate_loglevel($logfile_level)));
-    }
     $log->pushHandler(new Monolog\Handler\StreamHandler(STDOUT, translate_loglevel($stdout_level)));
 
     Monolog\ErrorHandler::register($log);

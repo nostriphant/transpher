@@ -15,11 +15,6 @@ abstract class AcceptanceCase extends BaseTestCase
 
     static function bootRelay(string $socket, array $env): Process {
         $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $socket];
-        
-        if (isset($_SERVER['GITHUB_OUTPUT'])) {
-            $env['GITHUB_OUTPUT'] = $_SERVER['GITHUB_OUTPUT'];
-        }
-        
         list($scheme, $uri) = explode(":", $socket, 2);
         return new Process('relay-' . substr(sha1($socket), 0, 6), $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http:' . $uri . '/'));
     }

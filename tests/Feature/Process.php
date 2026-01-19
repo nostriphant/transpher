@@ -50,6 +50,10 @@ readonly class Process {
         fclose($output);
         fclose($error);
         fclose($meta);
+        
+        if (isset($_SERVER['GITHUB_OUTPUT'])) {
+            echo file_get_contents($cwd . '/logs/relay.log');
+        }
     }
     
     public function __invoke(int $signal = 15) : array {

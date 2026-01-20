@@ -77,6 +77,8 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
 
     $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir) {
         $expected_message = array_shift($alices_expected_messages);
+    echo 'Got until here' . __LINE__;
+    exit;
 
         $remaining = [];
         foreach ($alices_expected_messages as $expected_message) {
@@ -104,8 +106,6 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
         }
         $alices_expected_messages = $remaining;
         if (count($alices_expected_messages) === 0) {
-    echo 'Got until here' . __LINE__;
-    exit;
             $stop();
         }
     });

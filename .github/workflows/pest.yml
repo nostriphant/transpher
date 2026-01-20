@@ -12,7 +12,7 @@ jobs:
         with:
           php-version: 8.4
           tools: composer:v2
-          coverage: xdebug
+          #coverage: xdebug
           
       - name: Install secp256k1_nostr extension for PHP
         run: sudo apt install autoconf build-essential git libtool pkgconf
@@ -48,7 +48,7 @@ jobs:
         with:
           php-version: 8.4
           tools: composer:v2
-          coverage: xdebug
+          #coverage: xdebug
           ini-values: extension=secp256k1_nostr.so
 
       - name: Install Dependencies

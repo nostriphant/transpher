@@ -22,11 +22,13 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
         'RELAY_LOG_LEVEL' => 'DEBUG',
         'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
     ]);
+    expect($relay)->toBeCallable('Relay is not callable');
     $agent = AcceptanceCase::bootAgent(8087, [
         'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => AcceptanceCase::relay_url()
     ]);
+    expect($agent)->toBeCallable('Agent is not callable');
     
     try {
         $alices_expected_messages = [];

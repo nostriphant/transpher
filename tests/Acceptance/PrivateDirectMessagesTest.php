@@ -49,9 +49,6 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
     $alices_expected_messages = [];
     $alice = Client::connectToUrl($this->relay_url());
     $bob = Client::connectToUrl($this->relay_url());
-    
-    echo 'Got until here' . __LINE__;
-    exit;
 
     expect($alice)->toBeCallable('Alice is not callable');
 
@@ -76,6 +73,8 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
         $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true];
     });
 
+    echo 'Got until here' . __LINE__;
+    exit;
     expect($alice_listen)->toBeCallable('Alice listen is not callable');
 
     $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir) {

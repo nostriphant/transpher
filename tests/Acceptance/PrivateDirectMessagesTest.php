@@ -45,9 +45,10 @@ beforeAll(function() use (&$cleanup) {
 
 it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFunctions::pubkey_recipient().')', function () {
     $data_dir = AcceptanceCase::data_dir('8087');
-    exit('Go until here' . __LINE__);
+    
     $alices_expected_messages = [];
     $alice = Client::connectToUrl($this->relay_url());
+    exit('Go until here' . __LINE__);
     $bob = Client::connectToUrl($this->relay_url());
 
     expect($alice)->toBeCallable('Alice is not callable');

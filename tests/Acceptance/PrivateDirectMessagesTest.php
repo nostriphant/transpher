@@ -10,7 +10,10 @@ use nostriphant\NIP01\Message;
 
 
 it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFunctions::pubkey_recipient().')', function () {
+    echo "::debug::Initializing test";
+    
     $data_dir = AcceptanceCase::data_dir('8087');
+    echo "::debug::Data dir $data_dir available";
     $relay = AcceptanceCase::bootRelay(AcceptanceCase::relay_url('tcp://'), [
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => AcceptanceCase::relay_url(),
@@ -23,12 +26,14 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
         'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
     ]);
     expect($relay)->toBeCallable('Relay is not callable');
+    echo "::debug::Relay started";
     $agent = AcceptanceCase::bootAgent(8087, [
         'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => AcceptanceCase::relay_url()
     ]);
     expect($agent)->toBeCallable('Agent is not callable');
+    echo "::debug::Agent started";
     
     try {
         $alices_expected_messages = [];

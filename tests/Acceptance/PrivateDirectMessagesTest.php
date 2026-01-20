@@ -48,8 +48,10 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
     
     $alices_expected_messages = [];
     $alice = Client::connectToUrl($this->relay_url());
-    exit('Go until here' . __LINE__);
     $bob = Client::connectToUrl($this->relay_url());
+    
+    echo 'Got until here' . __LINE__;
+    exit;
 
     expect($alice)->toBeCallable('Alice is not callable');
 

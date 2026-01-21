@@ -2627,16 +2627,16 @@
         },
         {
             "name": "nostriphant/relay",
-            "version": "1.4.6",
+            "version": "1.4.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "49febac8324067c0a16ee2fa90277c8ec53c6485"
+                "reference": "5cd5348764b8126ec2392fc7986b7fe92e1842b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/49febac8324067c0a16ee2fa90277c8ec53c6485",
-                "reference": "49febac8324067c0a16ee2fa90277c8ec53c6485",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/5cd5348764b8126ec2392fc7986b7fe92e1842b6",
+                "reference": "5cd5348764b8126ec2392fc7986b7fe92e1842b6",
                 "shasum": ""
             },
             "require": {
@@ -2685,9 +2685,9 @@
             "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/1.4.6"
+                "source": "https://github.com/nostriphant/relay/tree/1.4.7"
             },
-            "time": "2026-01-21T09:05:47+00:00"
+            "time": "2026-01-21T09:09:30+00:00"
         },
         {
             "name": "nostriphant/stores",

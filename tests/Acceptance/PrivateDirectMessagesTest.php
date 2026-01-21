@@ -8,11 +8,11 @@ use nostriphant\TranspherTests\Factory;
 use nostriphant\Client\Client;
 use nostriphant\NIP01\Message;
 
-function client_log(string $client) {
+function client_log(string $client, string $pubkey) {
     $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log', 'w');
     $log = fn(string $message) => fwrite($handle, $message . PHP_EOL);
     
-    $log('>>> Starting log for client ' . $client);
+    $log('>>> Starting log for client ' . $client . ' ('.$pubkey.')');
     
     return $log;
 }
@@ -36,7 +36,6 @@ beforeAll(function() use (&$cleanup) {
         'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
     ]);
     
-    sleep(2);
     expect($relay)->toBeCallable('Relay is not callable');
     echo "::debug::Relay started";
     $agent = AcceptanceCase::bootAgent(8087, [
@@ -47,6 +46,7 @@ beforeAll(function() use (&$cleanup) {
     ]);
     expect($agent)->toBeCallable('Agent is not callable');
     echo "::debug::Agent started";
+    sleep(3);
     
     $cleanup = function() use ($agent, $relay) {
         $agent();
@@ -60,10 +60,10 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
     
     $alices_expected_messages = [];
     $alice = Client::connectToUrl(AcceptanceCase::relay_url());
-    $alice_log = client_log('alice');
+    $alice_log = client_log('alice', NIP01TestFunctions::pubkey_recipient());
     
     $bob = Client::connectToUrl(AcceptanceCase::relay_url());
-    $bob_log = client_log('bob');
+    $bob_log = client_log('bob', NIP01TestFunctions::pubkey_sender());
 
     expect($alice)->toBeCallable('Alice is not callable');
 

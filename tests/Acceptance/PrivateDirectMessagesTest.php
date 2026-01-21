@@ -95,24 +95,34 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
         
         $remaining = [];
         foreach ($alices_expected_messages as $expected_message) {
-            if ($expected_message[0] !== $message->type) {
-                $alice_log('Expected type ' . $expected_message[0] . ' received ' . $message->type . ', skipping...');
+            $expected_type = array_slice($expected_message, 0, 1);
+            $expected_payload = array_slice($expected_message, 1);
+            
+            if ($expected_type !== $message->type) {
+                $alice_log('Expected type ' . $expected_type . ' received ' . $message->type . ', skipping...');
                 $remaining[] = $expected_message;
                 continue;
             }
+            
             switch ($message->type) {
                 case 'EVENT':
-                    if ($message->payload[0] !== $expected_message[1]) {
+                    if ($message->payload[0] !== $expected_payload[0]) {
                         $remaining[] = $expected_message;
-                        $alice_log('Expected type ' . $expected_message[1] . ' received ' . $message->payload[0] . ', skipping...');
-                    } elseif ($unwrapper($message->payload[1]) !== $expected_message[2]) {
+                        $alice_log('Expected type ' . $expected_payload[0] . ' received ' . $message->payload[0] . ', skipping...');
+                    } elseif ($unwrapper($message->payload[1]) !== $expected_payload[1]) {
+                        $alice_log('Expected message "'. $expected_payload[1]. '", received "'.$unwrapper($message->payload[1]).'", skipping...');
                         $remaining[] = $expected_message;
+                    } else {
+                        $alice_log('OK, removing expected message from stack...');
                     }
                     break;
 
                 default:
-                    if ($message->payload !== $expected_message) {
+                    if ($message->payload !== $expected_payload) {
+                        $alice_log('OK, removing expected message from stack...');
                         $remaining[] = $expected_message;
+                    } else {
+                        $alice_log('OK, removing expected message from stack...');
                     }
                     break;
 

@@ -24,7 +24,7 @@ abstract class AcceptanceCase extends BaseTestCase
             expect($gift['kind'])->toBe(1059);
             expect($gift['tags'])->toContain(['p', $recipient_key(\nostriphant\NIP01\Key::public())]);
 
-            $seal = \nostriphant\NIP59\Gift::unwrap($recipient_key, Event::__set_state($gift));
+            $seal = \nostriphant\NIP59\Gift::unwrap($recipient_key, \nostriphant\NIP01\Event::__set_state($gift));
             expect($seal->kind)->toBe(13);
             expect($seal->pubkey)->toBeString();
             expect($seal->content)->toBeString();

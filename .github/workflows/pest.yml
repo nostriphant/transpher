@@ -62,7 +62,7 @@ jobs:
           mkdir ./data/files
           
       - name: Tests
-        run: ./vendor/bin/pest
+        run: ./vendor/bin/pest --debug
         
       - name: Print outputs
         if: ${{ always() }}

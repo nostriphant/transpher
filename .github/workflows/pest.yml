@@ -65,5 +65,5 @@ jobs:
         run: ./vendor/bin/pest --debug
         
       - name: Print outputs
-        if: ${{ cancelled() || failure() }}
+        if: ${{ always() }}
         run: cat logs/*.log

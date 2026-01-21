@@ -8,6 +8,15 @@ use nostriphant\TranspherTests\Factory;
 use nostriphant\Client\Client;
 use nostriphant\NIP01\Message;
 
+function client_log(string $client) {
+    $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log');
+    $log = fn(string $message) => fwrite($handle, $message . PHP_EOL);
+    
+    $log('>>> Starting log for client ' . $client);
+    
+    return $log;
+}
+
 
 $cleanup;
 beforeAll(function() use (&$cleanup) {
@@ -51,7 +60,10 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
     
     $alices_expected_messages = [];
     $alice = Client::connectToUrl(AcceptanceCase::relay_url());
+    $alice_log = client_log('alice');
+    
     $bob = Client::connectToUrl(AcceptanceCase::relay_url());
+    $bob_log = client_log('bob');
 
     expect($alice)->toBeCallable('Alice is not callable');
 
@@ -78,7 +90,9 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
 
     expect($alice_listen)->toBeCallable('Alice listen is not callable');
 
-    $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir) {
+    $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir, $alice_log) {
+        $alice_log('Received ' . $message);
+        
         $remaining = [];
         foreach ($alices_expected_messages as $expected_message) {
             if ($expected_message[0] !== $message->type) {
@@ -103,6 +117,8 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
             }
 
         }
+        
+        $alice_log('Expected messages remaining ' . count($alices_expected_messages));
         $alices_expected_messages = $remaining;
         if (count($alices_expected_messages) === 0) {
             $stop();

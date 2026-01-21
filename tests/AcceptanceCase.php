@@ -32,7 +32,7 @@ abstract class AcceptanceCase extends BaseTestCase
             $private_message = \nostriphant\NIP59\Seal::open($recipient_key, $seal);
             expect($private_message)->toHaveKey('id');
             expect($private_message)->toHaveKey('content');
-            return $private_message['content'];
+            return $private_message->content;
         };
     }
     

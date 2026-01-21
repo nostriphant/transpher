@@ -76,8 +76,8 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
     expect($alice_listen)->toBeCallable('Alice listen is not callable');
 
     $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir) {
-    file_put_contents(ROOT_DIR . '/logs/debug.log', var_Export($alices_expected_messages, true));
-    trigger_error('Got until here' . __LINE__ .  ': ' . var_export($alices_expected_messages, true), E_ERROR);
+    file_put_contents(ROOT_DIR . '/logs/debug.log', var_Export($alices_expected_messages, true) . PHP_EOL . var_export($message, true));
+    trigger_error('Got until here' . __LINE__ .  ': ' . var_export($alices_expected_messages, true) . PHP_EOL . var_export($message, true), E_ERROR);
     exit;
         $expected_message = array_shift($alices_expected_messages);
 

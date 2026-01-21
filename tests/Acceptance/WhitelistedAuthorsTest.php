@@ -42,8 +42,8 @@ describe('only events from whitelisted authors/recipients are stored', function(
 
         try {
             $alices_expected_messages = [];
-            $alice = Client::connectToUrl($this->relay_url());
-            $bob = Client::connectToUrl($this->relay_url());
+            $alice = Client::connectToUrl(AcceptanceCase::relay_url());
+            $bob = Client::connectToUrl(AcceptanceCase::relay_url());
 
             $unwrapper = $this->unwrap(NIP01TestFunctions::key_recipient());
             $subscriptionAlice = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
@@ -53,7 +53,7 @@ describe('only events from whitelisted authors/recipients are stored', function(
                 $subscriptionId = $subscriptionAlice()[1];
                 $send($subscriptionAlice);
 
-                $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $this->relay_url()];
+                $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . AcceptanceCase::relay_url()];
                 $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub1'];
                 $alices_expected_messages[] = ['EOSE', $subscriptionId];
 
@@ -153,8 +153,8 @@ describe('only events from whitelisted authors/recipients are stored', function(
 
         try {
             $alices_expected_messages = [];
-            $alice = Client::connectToUrl($this->relay_url());
-            $bob = Client::connectToUrl($this->relay_url());
+            $alice = Client::connectToUrl(AcceptanceCase::relay_url());
+            $bob = Client::connectToUrl(AcceptanceCase::relay_url());
 
             $unwrapper = $this->unwrap(NIP01TestFunctions::key_recipient());
 
@@ -164,7 +164,7 @@ describe('only events from whitelisted authors/recipients are stored', function(
                 $subscriptionId = $subscription()[1];
                 $send($subscription);
 
-                $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $this->relay_url()];
+                $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . AcceptanceCase::relay_url()];
                 $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub1'];
                 $alices_expected_messages[] = ['EOSE', $subscriptionId];
 

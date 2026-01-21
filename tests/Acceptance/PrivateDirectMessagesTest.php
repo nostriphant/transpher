@@ -47,8 +47,8 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
     $data_dir = AcceptanceCase::data_dir('8087');
     
     $alices_expected_messages = [];
-    $alice = Client::connectToUrl($this->relay_url());
-    $bob = Client::connectToUrl($this->relay_url());
+    $alice = Client::connectToUrl(AcceptanceCase::relay_url());
+    $bob = Client::connectToUrl(AcceptanceCase::relay_url());
 
     expect($alice)->toBeCallable('Alice is not callable');
 
@@ -60,7 +60,7 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
         $subscriptionId = $subscription()[1];
         $send($subscription);
 
-        $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $this->relay_url()];
+        $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . AcceptanceCase::relay_url()];
         $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub1'];
         $alices_expected_messages[] = ['EOSE', $subscriptionId];
 

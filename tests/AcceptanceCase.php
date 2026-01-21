@@ -19,7 +19,7 @@ abstract class AcceptanceCase extends BaseTestCase
         return new Process('relay-' . substr(sha1($socket), 0, 6), $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http:' . $uri . '/'));
     }
     
-    public function unwrap(\nostriphant\NIP01\Key $recipient_key) {
+    static public function unwrap(\nostriphant\NIP01\Key $recipient_key) {
         return function(array $gift) use ($recipient_key) {
             expect($gift['kind'])->toBe(1059);
             expect($gift['tags'])->toContain(['p', $recipient_key(\nostriphant\NIP01\Key::public())]);

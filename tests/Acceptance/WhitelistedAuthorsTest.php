@@ -46,7 +46,7 @@ describe('only events from whitelisted authors/recipients are stored', function(
             $alice = Client::connectToUrl(AcceptanceCase::relay_url());
             $bob = Client::connectToUrl(AcceptanceCase::relay_url());
 
-            $unwrapper = $this->unwrap(NIP01TestFunctions::key_recipient());
+            $unwrapper = AcceptanceCase::unwrap(NIP01TestFunctions::key_recipient());
             $subscriptionAlice = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
 
             $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages, $subscriptionAlice) {
@@ -92,8 +92,6 @@ describe('only events from whitelisted authors/recipients are stored', function(
             });
 
             $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir) {
-                $expected_message = array_shift($alices_expected_messages);
-                
                 $remaining = [];
                 foreach ($alices_expected_messages as $expected_message) {
                     if ($expected_message[0] !== $message->type) {
@@ -102,9 +100,9 @@ describe('only events from whitelisted authors/recipients are stored', function(
                     }
                     switch ($message->type) {
                         case 'EVENT':
-                            if ($message->payload[0] !== $expected_message[0]) {
+                            if ($message->payload[0] !== $expected_message[1]) {
                                 $remaining[] = $expected_message;
-                            } elseif ($unwrapper($message->payload[1]) !== $expected_message[1]) {
+                            } elseif ($unwrapper($message->payload[1]) !== $expected_message[2]) {
                                 $remaining[] = $expected_message;
                             }
                             break;
@@ -157,7 +155,7 @@ describe('only events from whitelisted authors/recipients are stored', function(
             $alice = Client::connectToUrl(AcceptanceCase::relay_url());
             $bob = Client::connectToUrl(AcceptanceCase::relay_url());
 
-            $unwrapper = $this->unwrap(NIP01TestFunctions::key_recipient());
+            $unwrapper = AcceptanceCase::unwrap(NIP01TestFunctions::key_recipient());
 
             $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages) {
                 $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);

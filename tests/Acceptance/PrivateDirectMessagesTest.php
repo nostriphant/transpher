@@ -67,7 +67,7 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
 
     expect($alice)->toBeCallable('Alice is not callable');
 
-    $unwrapper = $this->unwrap(NIP01TestFunctions::key_recipient());
+    $unwrapper = AcceptanceCase::unwrap(NIP01TestFunctions::key_recipient());
 
     $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages) {
         $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
@@ -96,14 +96,16 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
         $remaining = [];
         foreach ($alices_expected_messages as $expected_message) {
             if ($expected_message[0] !== $message->type) {
+                $alice_log('Expected type ' . $expected_message[0] . ' received ' . $message->type . ', skipping...');
                 $remaining[] = $expected_message;
                 continue;
             }
             switch ($message->type) {
                 case 'EVENT':
-                    if ($message->payload[0] !== $expected_message[0]) {
+                    if ($message->payload[0] !== $expected_message[1]) {
                         $remaining[] = $expected_message;
-                    } elseif ($unwrapper($message->payload[1]) !== $expected_message[1]) {
+                        $alice_log('Expected type ' . $expected_message[1] . ' received ' . $message->payload[0] . ', skipping...');
+                    } elseif ($unwrapper($message->payload[1]) !== $expected_message[2]) {
                         $remaining[] = $expected_message;
                     }
                     break;

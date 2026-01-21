@@ -24,12 +24,12 @@ abstract class AcceptanceCase extends BaseTestCase
             expect($gift['kind'])->toBe(1059);
             expect($gift['tags'])->toContain(['p', $recipient_key(\nostriphant\NIP01\Key::public())]);
 
-            $seal = Gift::unwrap($recipient_key, Event::__set_state($gift));
+            $seal = \nostriphant\NIP59\Gift::unwrap($recipient_key, Event::__set_state($gift));
             expect($seal->kind)->toBe(13);
             expect($seal->pubkey)->toBeString();
             expect($seal->content)->toBeString();
 
-            $private_message = Seal::open($recipient_key, $seal);
+            $private_message = \nostriphant\NIP59\Seal::open($recipient_key, $seal);
             expect($private_message)->toHaveKey('id');
             expect($private_message)->toHaveKey('content');
             return $private_message['content'];

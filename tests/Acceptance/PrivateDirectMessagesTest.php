@@ -26,6 +26,8 @@ beforeAll(function() use (&$cleanup) {
         'RELAY_LOG_LEVEL' => 'DEBUG',
         'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
     ]);
+    
+    sleep(2);
     expect($relay)->toBeCallable('Relay is not callable');
     echo "::debug::Relay started";
     $agent = AcceptanceCase::bootAgent(8087, [

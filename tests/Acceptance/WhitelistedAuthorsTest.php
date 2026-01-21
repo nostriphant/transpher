@@ -29,7 +29,8 @@ describe('only events from whitelisted authors/recipients are stored', function(
         return AcceptanceCase::bootAgent(8087, [
             'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
-            'RELAY_URL' => AcceptanceCase::relay_url()
+            'RELAY_URL' => AcceptanceCase::relay_url(),
+            'AGENT_LOG_LEVEL' => 'DEBUG',
         ]);
     }
     

@@ -21,13 +21,19 @@ readonly class Agent {
         $this->relay_owner_hex = (new Bech32($this->relay_owner_npub))(); 
     }
     
-    private static function createPrivateDirectMessageFactory(Key $nsec, string $recipient_pubkey) : callable {
+    private static function createPrivateDirectMessageFactory(Key $nsec, string $recipient_pubkey, \Psr\Log\LoggerInterface $logger) : callable {
+        $logger->debug('Create transmitter to ' . $recipient_pubkey);
         $gift = fn(string $message) => Message::event(PrivateDirect::make($nsec, $recipient_pubkey, $message));
-        return fn(Transmission $send) => fn(string $message) => $send($gift($message));
+        return function(Transmission $send) use ($gift, $logger) { 
+            return function(string $message) use ($gift, $send, $logger) { 
+                $logger->debug('Sending encrypted message "' . $message . '".');
+                return $send($gift($message));
+            };
+        };
     }
     
-    public function __invoke() : void {
-        $private_transmitter_factory = self::createPrivateDirectMessageFactory($this->nsec, $this->relay_owner_hex);
+    public function __invoke(\Psr\Log\LoggerInterface $logger) : void {
+        $private_transmitter_factory = self::createPrivateDirectMessageFactory($this->nsec, $this->relay_owner_hex, $logger);
         
         $listen = ($this->client)(function(Transmission $send) use ($private_transmitter_factory) {
             $private_transmitter = $private_transmitter_factory($send);

@@ -78,7 +78,7 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
     $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir) {
     echo 'Got until here' . __LINE__;
     file_put_contents(ROOT_DIR . '/logs/debug.log', var_Export($alices_expected_messages));
-    var_dump($expected_message, $alices_expected_messages);
+    var_dump($alices_expected_messages);
     exit;
         $expected_message = array_shift($alices_expected_messages);
 

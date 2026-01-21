@@ -8,16 +8,6 @@ use nostriphant\TranspherTests\Factory;
 use nostriphant\Client\Client;
 use nostriphant\NIP01\Message;
 
-function client_log(string $client, string $pubkey) {
-    $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log', 'w');
-    $log = fn(string $message) => fwrite($handle, $message . PHP_EOL);
-    
-    $log('>>> Starting log for client ' . $client . ' ('.$pubkey.')');
-    
-    return $log;
-}
-
-
 $cleanup;
 beforeAll(function() use (&$cleanup) {
     echo "::debug::Initializing test";
@@ -60,10 +50,10 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
     
     $alices_expected_messages = [];
     $alice = Client::connectToUrl(AcceptanceCase::relay_url());
-    $alice_log = client_log('alice', NIP01TestFunctions::pubkey_recipient());
+    $alice_log = AcceptanceCase::client_log('alice', NIP01TestFunctions::pubkey_recipient());
     
     $bob = Client::connectToUrl(AcceptanceCase::relay_url());
-    $bob_log = client_log('bob', NIP01TestFunctions::pubkey_sender());
+    $bob_log = AcceptanceCase::client_log('bob', NIP01TestFunctions::pubkey_sender());
 
     expect($alice)->toBeCallable('Alice is not callable');
 

@@ -45,4 +45,13 @@ abstract class AcceptanceCase extends BaseTestCase
         is_dir($data_dir) || mkdir($data_dir);
         return $data_dir;
     }
+    
+    static function client_log(string $client, string $pubkey) {
+        $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log', 'w');
+        $log = fn(string $message) => fwrite($handle, $message . PHP_EOL);
+
+        $log('>>> Starting log for client ' . $client . ' ('.$pubkey.')');
+
+        return $log;
+    }
 }

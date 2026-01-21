@@ -64,11 +64,12 @@ $relay = new \nostriphant\Relay\Relay($store, $files_path,
         $_SERVER['RELAY_NAME'],
         $_SERVER['RELAY_DESCRIPTION'],
         $_SERVER['RELAY_OWNER_NPUB'],
-        $_SERVER['RELAY_CONTACT']
+        $_SERVER['RELAY_CONTACT'], 
+        $logger
         );
 
 $logger->debug('Starting relay.');
-$stop = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger);
+$stop = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000);
 
 new nostriphant\Relay\AwaitSignal(function(int $signal) use ($stop, $logger) {
     $logger->info(sprintf("Received signal %d, stopping Relay server", $signal));

@@ -9,7 +9,7 @@ use nostriphant\Client\Client;
 use nostriphant\NIP01\Message;
 
 function client_log(string $client) {
-    $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log');
+    $handle = fopen(ROOT_DIR . '/logs/' . $client . '.log', 'w');
     $log = fn(string $message) => fwrite($handle, $message . PHP_EOL);
     
     $log('>>> Starting log for client ' . $client);

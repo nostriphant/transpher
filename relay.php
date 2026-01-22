@@ -42,13 +42,14 @@ if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
 $logger->info('Loading store ' . (!empty($whitelist) ? ' with whitelist' : '')  . '.');
 $store = new nostriphant\Stores\Store($events, $whitelist);
 $files = new nostriphant\Relay\Files($files_path, fn(string $event_id) => isset($store[$event_id]) === false);
+$blossom = new nostriphant\Relay\Blossom($files);
+$server = new nostriphant\Relay\Amp\WebsocketServer(new \nostriphant\Relay\MessageHandlerFactory($store, $logger), $logger, fn(callable $define) => $blossom($define));
 
-$relay = new \nostriphant\Relay\Relay($store, $files,
+$relay = new \nostriphant\Relay\Relay($server,
         $_SERVER['RELAY_NAME'],
         $_SERVER['RELAY_DESCRIPTION'],
         $_SERVER['RELAY_OWNER_NPUB'],
-        $_SERVER['RELAY_CONTACT'], 
-        $logger
+        $_SERVER['RELAY_CONTACT']
         );
 
 $logger->debug('Starting relay.');

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "186b21e2122e7823d6be6a291182ca74",
+    "content-hash": "22f6dfef68b635c4bf493451f3f0cca1",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2626,16 +2626,16 @@
         },
         {
             "name": "nostriphant/relay",
-            "version": "1.5.2",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "d4f7170bcf57d5705bed05ff1d4ec04902fc98ec"
+                "reference": "d861cda86b30bd6d087298a082e67bd4de590937"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/d4f7170bcf57d5705bed05ff1d4ec04902fc98ec",
-                "reference": "d4f7170bcf57d5705bed05ff1d4ec04902fc98ec",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/d861cda86b30bd6d087298a082e67bd4de590937",
+                "reference": "d861cda86b30bd6d087298a082e67bd4de590937",
                 "shasum": ""
             },
             "require": {
@@ -2684,9 +2684,9 @@
             "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/1.5.2"
+                "source": "https://github.com/nostriphant/relay/tree/2.0.1"
             },
-            "time": "2026-01-22T14:28:02+00:00"
+            "time": "2026-01-22T16:00:13+00:00"
         },
         {
             "name": "nostriphant/stores",

@@ -7,31 +7,24 @@ $logger->info('Log level ' . $_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO');
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Key;
 
-if (isset($_SERVER['RELAY_DATA'])) {
-    $data_dir = $_SERVER['RELAY_DATA'];
-    is_dir($data_dir) || mkdir($data_dir);
+$data_dir = $_SERVER['RELAY_DATA'];
+is_dir($data_dir) || mkdir($data_dir);
 
-    $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
+$events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
 
-    $store_path = $data_dir . '/events';
-    if (is_dir($store_path)) {
-        $logger->debug('Starting migrating events...');
-        $migrated = \nostriphant\Stores\Engine\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events, $logger) {
-                    $event_id = $event->id;
-                    $events[$event_id] = $event;
-                    $logger->debug('Event ' . $event_id . ' migrated, removing old file ' . $store_path . '/' . $event_id . '.php');
-                    return unlink($store_path . '/' . $event_id . '.php');
-                });
-        $logger->debug($migrated . ' events migrated.');
-    }
-
-    $files_path = $data_dir . '/files';
-} else {
-    $store_path = $_SERVER['RELAY_STORE'] ?? ROOT_DIR . '/data/events';
-    $events = new \nostriphant\Stores\Engine\Disk($store_path);
-
-    $files_path = $_SERVER['RELAY_FILES'] ?? ROOT_DIR . '/data/files';
+$store_path = $data_dir . '/events';
+if (is_dir($store_path)) {
+    $logger->debug('Starting migrating events...');
+    $migrated = \nostriphant\Stores\Engine\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events, $logger) {
+                $event_id = $event->id;
+                $events[$event_id] = $event;
+                $logger->debug('Event ' . $event_id . ' migrated, removing old file ' . $store_path . '/' . $event_id . '.php');
+                return unlink($store_path . '/' . $event_id . '.php');
+            });
+    $logger->debug($migrated . ' events migrated.');
 }
+
+$files_path = $data_dir . '/files';
 
 $whitelist = [];
 if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {

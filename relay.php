@@ -11,19 +11,6 @@ $data_dir = $_SERVER['RELAY_DATA'];
 is_dir($data_dir) || mkdir($data_dir);
 
 $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
-
-$store_path = $data_dir . '/events';
-if (is_dir($store_path)) {
-    $logger->debug('Starting migrating events...');
-    $migrated = \nostriphant\Stores\Engine\Disk::walk_store($store_path, function (nostriphant\NIP01\Event $event) use ($store_path, &$events, $logger) {
-                $event_id = $event->id;
-                $events[$event_id] = $event;
-                $logger->debug('Event ' . $event_id . ' migrated, removing old file ' . $store_path . '/' . $event_id . '.php');
-                return unlink($store_path . '/' . $event_id . '.php');
-            });
-    $logger->debug($migrated . ' events migrated.');
-}
-
 $files_path = $data_dir . '/files';
 
 $whitelist = [];

@@ -1,6 +1,8 @@
 <?php
 
-$logger = (require_once __DIR__ . '/bootstrap.php')('relay', 'INFO', $_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO');
+$loglevel = $_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO';
+$logger = (require_once __DIR__ . '/bootstrap.php')('relay', $loglevel);
+$logger->info('Log level ' . $_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO');
 
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Key;
@@ -57,7 +59,7 @@ if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
     $whitelist[1] = ['#p' => $whitelisted_pubkeys];
 }
 
-$logger->info('Loading store ' . (!empty($whitelist) ? ' with withlist' : '')  . '.');
+$logger->info('Loading store ' . (!empty($whitelist) ? ' with whitelist' : '')  . '.');
 $store = new nostriphant\Stores\Store($events, $whitelist);
 
 $relay = new \nostriphant\Relay\Relay($store, $files_path,

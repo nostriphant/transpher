@@ -10,10 +10,10 @@ use nostriphant\NIP01\Message;
 
 $cleanup;
 beforeAll(function() use (&$cleanup) {
-    echo "::debug::Initializing test";
-    
     $data_dir = AcceptanceCase::data_dir('8087');
-    echo "::debug::Data dir $data_dir available";
+    (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
+    expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
+    
     $relay = AcceptanceCase::bootRelay(AcceptanceCase::relay_url('tcp://'), [
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => AcceptanceCase::relay_url(),
@@ -27,7 +27,7 @@ beforeAll(function() use (&$cleanup) {
     ]);
     
     expect($relay)->toBeCallable('Relay is not callable');
-    echo "::debug::Relay started";
+    
     $agent = AcceptanceCase::bootAgent(8087, [
         'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
@@ -35,7 +35,7 @@ beforeAll(function() use (&$cleanup) {
         'AGENT_LOG_LEVEL' => 'DEBUG',
     ]);
     expect($agent)->toBeCallable('Agent is not callable');
-    echo "::debug::Agent started";
+    
     sleep(3);
     
     $cleanup = function() use ($agent, $relay) {
@@ -66,7 +66,7 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
         $send($subscription);
 
         $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . AcceptanceCase::relay_url()];
-        $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub1'];
+        $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
         $alices_expected_messages[] = ['EOSE', $subscriptionId];
 
         $request = $subscription();
@@ -75,58 +75,12 @@ it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFu
 
         $signed_message = Factory::event(NIP01TestFunctions::key_recipient(), 1, 'Hello!');
         $send($signed_message);
-        $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true];
+        $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
     });
 
     expect($alice_listen)->toBeCallable('Alice listen is not callable');
 
-    $alice_listen(function (Message $message, callable $stop) use ($unwrapper, &$alices_expected_messages, $data_dir, $alice_log) {
-        $alice_log('Received ' . $message);
-        
-        $remaining = [];
-        foreach ($alices_expected_messages as $expected_message) {
-            $expected_type = array_slice($expected_message, 0, 1);
-            $expected_payload = array_slice($expected_message, 1);
-            
-            if ($expected_type !== $message->type) {
-                $alice_log('Expected type ' . $expected_type . ' received ' . $message->type . ', skipping...');
-                $remaining[] = $expected_message;
-                continue;
-            }
-            
-            switch ($message->type) {
-                case 'EVENT':
-                    if ($message->payload[0] !== $expected_payload[0]) {
-                        $remaining[] = $expected_message;
-                        $alice_log('Expected type ' . $expected_payload[0] . ' received ' . $message->payload[0] . ', skipping...');
-                    } elseif ($unwrapper($message->payload[1]) !== $expected_payload[1]) {
-                        $alice_log('Expected message "'. $expected_payload[1]. '", received "'.$unwrapper($message->payload[1]).'", skipping...');
-                        $remaining[] = $expected_message;
-                    } else {
-                        $alice_log('OK, removing expected message from stack...');
-                    }
-                    break;
-
-                default:
-                    if ($message->payload !== $expected_payload) {
-                        $alice_log('OK, removing expected message from stack...');
-                        $remaining[] = $expected_message;
-                    } else {
-                        $alice_log('OK, removing expected message from stack...');
-                    }
-                    break;
-
-            }
-
-        }
-        
-        $alice_log('Expected messages remaining ' . count($alices_expected_messages));
-        $alices_expected_messages = $remaining;
-        if (count($alices_expected_messages) === 0) {
-            $stop();
-        }
-    });
-
+    $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $data_dir, $alice_log));
 
     $bob_message = Factory::event(NIP01TestFunctions::key_sender(), 1, 'Hello!');
 

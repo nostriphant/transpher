@@ -28,11 +28,10 @@ namespace {
         };
     }
 
-    return function (string $identifier, string $stdout_level, string $logfile_level): Psr\Log\LoggerInterface {
+    return function (string $identifier, string $logfile_level): Psr\Log\LoggerInterface {
         $log = new Monolog\Logger($identifier);
 
-        $log->pushHandler(new Monolog\Handler\StreamHandler(__DIR__ . '/logs/' . $identifier . '.log', translate_loglevel($logfile_level)));
-        $log->pushHandler(new Monolog\Handler\StreamHandler(STDOUT, translate_loglevel($stdout_level)));
+        $log->pushHandler(new Monolog\Handler\StreamHandler(STDOUT, translate_loglevel($logfile_level)));
 
         Monolog\ErrorHandler::register($log);
 

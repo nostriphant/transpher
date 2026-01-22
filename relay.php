@@ -41,8 +41,9 @@ if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
 
 $logger->info('Loading store ' . (!empty($whitelist) ? ' with whitelist' : '')  . '.');
 $store = new nostriphant\Stores\Store($events, $whitelist);
+$files = new nostriphant\Relay\Files($files_path, fn(string $event_id) => isset($store[$event_id]) === false);
 
-$relay = new \nostriphant\Relay\Relay($store, $files_path,
+$relay = new \nostriphant\Relay\Relay($store, $files,
         $_SERVER['RELAY_NAME'],
         $_SERVER['RELAY_DESCRIPTION'],
         $_SERVER['RELAY_OWNER_NPUB'],

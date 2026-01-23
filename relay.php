@@ -42,7 +42,7 @@ if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
 $logger->info('Loading store ' . (!empty($whitelist) ? ' with whitelist' : '')  . '.');
 $store = new nostriphant\Stores\Store($events, $whitelist);
 $blossom = new nostriphant\Relay\Blossom($files_path);
-$server = new nostriphant\Relay\Amp\WebsocketServer(new \nostriphant\Relay\MessageHandlerFactory($store, $logger), $logger, fn(callable $define) => $blossom($define));
+$server = new nostriphant\Relay\Amp\WebsocketServer($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger);
 
 $relay = new \nostriphant\Relay\Relay($server,
         $_SERVER['RELAY_NAME'],
@@ -52,7 +52,7 @@ $relay = new \nostriphant\Relay\Relay($server,
         );
 
 $logger->debug('Starting relay.');
-$stop = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000);
+$stop = $relay($store, fn(callable $define) => $blossom($define));
 
 new nostriphant\Relay\AwaitSignal(function(int $signal) use ($stop, $logger) {
     $logger->info(sprintf("Received signal %d, stopping Relay server", $signal));

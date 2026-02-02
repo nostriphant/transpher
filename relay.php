@@ -10,8 +10,18 @@ use nostriphant\NIP01\Key;
 $data_dir = $_SERVER['RELAY_DATA'];
 is_dir($data_dir) || mkdir($data_dir);
 
+$blossom = new nostriphant\Relay\Blossom($data_dir . '/files');
+
+$relay = new \nostriphant\Relay\Relay(
+        $_SERVER['RELAY_NAME'],
+        $_SERVER['RELAY_DESCRIPTION'],
+        $_SERVER['RELAY_OWNER_NPUB'],
+        $_SERVER['RELAY_CONTACT']
+    );
+
+$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, $blossom);
+
 $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
-$files_path = $data_dir . '/files';
 
 $whitelist = [];
 if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
@@ -41,18 +51,9 @@ if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
 
 $logger->info('Loading store ' . (!empty($whitelist) ? ' with whitelist' : '')  . '.');
 $store = new nostriphant\Stores\Store($events, $whitelist);
-$blossom = new nostriphant\Relay\Blossom($files_path);
-$server = new nostriphant\Relay\Amp\WebsocketServer($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger);
-
-$relay = new \nostriphant\Relay\Relay($server,
-        $_SERVER['RELAY_NAME'],
-        $_SERVER['RELAY_DESCRIPTION'],
-        $_SERVER['RELAY_OWNER_NPUB'],
-        $_SERVER['RELAY_CONTACT']
-        );
 
 $logger->debug('Starting relay.');
-$stop = $relay($store, fn(callable $define) => $blossom($define));
+$stop = $server($store);
 
 new nostriphant\Relay\AwaitSignal(function(int $signal) use ($stop, $logger) {
     $logger->info(sprintf("Received signal %d, stopping Relay server", $signal));

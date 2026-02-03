@@ -12,14 +12,17 @@ is_dir($data_dir) || mkdir($data_dir);
 
 $blossom = new nostriphant\Relay\Blossom($data_dir . '/files');
 
-$relay = new \nostriphant\Relay\Relay(
-        $_SERVER['RELAY_NAME'],
-        $_SERVER['RELAY_DESCRIPTION'],
-        $_SERVER['RELAY_OWNER_NPUB'],
-        $_SERVER['RELAY_CONTACT']
-    );
+$relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument(
+    name: $_SERVER['RELAY_NAME'],
+    description: $_SERVER['RELAY_DESCRIPTION'],
+    pubkey: (new \nostriphant\NIP19\Bech32($_SERVER['RELAY_OWNER_NPUB']))(),
+    contact: $_SERVER['RELAY_CONTACT'],
+    supported_nips: [1, 2, 9, 11, 12, 13, 16, 20, 22, 33, 45],
+    software: json_decode(file_get_contents(__DIR__ . '/composer.json'))->homepage,
+    version: file_get_contents(__DIR__ . '/VERSION')
+));
 
-$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, $blossom);
+$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, $blossom(new \nostriphant\Relay\Routes()));
 
 $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
 

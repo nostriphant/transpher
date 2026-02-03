@@ -2,6 +2,7 @@
     "name": "nostriphant/transpher",
     "description": "Nostr Relay in PHP",
     "type": "project",
+    "homepage" : "https://github.com/nostriphant/transpher",
     "require": {
         "php": "^8.4",
         "ext-pcntl": "*",

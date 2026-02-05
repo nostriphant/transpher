@@ -10,7 +10,8 @@
         "vlucas/phpdotenv": "^5.6",
         "monolog/monolog": "^3.7",
         "nostriphant/client": "^0.3",
-        "nostriphant/relay": "^2.0"
+        "nostriphant/relay": "^2.0",
+        "nostriphant/blossom": "^0.1"
     },
     "license": "MIT",
     "autoload": {
@@ -46,6 +47,10 @@
             "git tag -f `cat VERSION` @no_additional_args",
             "echo @additional_args > VERSION",
             "git commit -am 'start VERSION @additional_args'"
+        ],
+        "test": [
+            "@clearCache @no_additional_args",
+            "./vendor/bin/pest"
         ]
     }
 }

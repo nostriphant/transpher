@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "22f6dfef68b635c4bf493451f3f0cca1",
+    "content-hash": "44155e6a28123ff54e4c45ee3b9d9b86",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2305,6 +2305,54 @@
             "time": "2018-02-13T20:26:39+00:00"
         },
         {
+            "name": "nostriphant/blossom",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nostriphant/blossom.git",
+                "reference": "35e74d8c403e20d1c72f19f4f36e15c1d92f7894"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/35e74d8c403e20d1c72f19f4f36e15c1d92f7894",
+                "reference": "35e74d8c403e20d1c72f19f4f36e15c1d92f7894",
+                "shasum": ""
+            },
+            "require": {
+                "nostriphant/functional": "^2.3",
+                "php": "^8.4"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "nikic/fast-route": "^1.3",
+                "pestphp/pest": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "nostriphant\\Blossom\\": "src/",
+                    "nostriphant\\BlossomTests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rik Meijer",
+                    "email": "nostriphant@rikmeijer.nl"
+                }
+            ],
+            "description": "Blossom implementation in PHP",
+            "homepage": "https://github.com/nostriphant/blossom",
+            "support": {
+                "issues": "https://github.com/nostriphant/blossom/issues",
+                "source": "https://github.com/nostriphant/blossom/tree/0.1.0"
+            },
+            "time": "2026-02-05T09:13:13+00:00"
+        },
+        {
             "name": "nostriphant/client",
             "version": "0.3.2",
             "source": {
@@ -2354,16 +2402,16 @@
         },
         {
             "name": "nostriphant/functional",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/functional.git",
-                "reference": "76c1b1a9e5f1db6e356b3591eb434e3ce1d95d76"
+                "reference": "9b417fb74112a380d5cec89050be400e45951d72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/functional/zipball/76c1b1a9e5f1db6e356b3591eb434e3ce1d95d76",
-                "reference": "76c1b1a9e5f1db6e356b3591eb434e3ce1d95d76",
+                "url": "https://api.github.com/repos/nostriphant/functional/zipball/9b417fb74112a380d5cec89050be400e45951d72",
+                "reference": "9b417fb74112a380d5cec89050be400e45951d72",
                 "shasum": ""
             },
             "require": {
@@ -2392,9 +2440,9 @@
             "description": "Functional helper classes for nostriphant projects",
             "support": {
                 "issues": "https://github.com/nostriphant/functional/issues",
-                "source": "https://github.com/nostriphant/functional/tree/2.3.0"
+                "source": "https://github.com/nostriphant/functional/tree/2.3.1"
             },
-            "time": "2025-10-22T08:04:22+00:00"
+            "time": "2026-02-03T09:28:54+00:00"
         },
         {
             "name": "nostriphant/nip-01",
@@ -2626,16 +2674,16 @@
         },
         {
             "name": "nostriphant/relay",
-            "version": "2.3.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "15c645b16743549afc502852871ead7aff2e1755"
+                "reference": "64708b3d36eb46eb807322851d7cf564a07fbf09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/15c645b16743549afc502852871ead7aff2e1755",
-                "reference": "15c645b16743549afc502852871ead7aff2e1755",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/64708b3d36eb46eb807322851d7cf564a07fbf09",
+                "reference": "64708b3d36eb46eb807322851d7cf564a07fbf09",
                 "shasum": ""
             },
             "require": {
@@ -2647,7 +2695,7 @@
                 "amphp/websocket-server": "^4.0",
                 "ext-pcntl": "*",
                 "nostriphant/client": "^0.3",
-                "nostriphant/functional": "^2.2",
+                "nostriphant/functional": "^2.3",
                 "nostriphant/nip-01": "^2.0",
                 "nostriphant/nip-17": "^2.0",
                 "nostriphant/nip-19": "^2.0",
@@ -2677,16 +2725,16 @@
             "authors": [
                 {
                     "name": "Rik Meijer",
-                    "email": "rik@nostriphant.dev"
+                    "email": "nostriphant@rikmeijer.nl"
                 }
             ],
-            "description": "'Nostriphant Relay'",
+            "description": "Nostriphant Relay",
             "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/2.3.0"
+                "source": "https://github.com/nostriphant/relay/tree/2.4.1"
             },
-            "time": "2026-02-03T09:02:38+00:00"
+            "time": "2026-02-05T09:41:12+00:00"
         },
         {
             "name": "nostriphant/stores",
@@ -3756,16 +3804,16 @@
     "packages-dev": [
         {
             "name": "brianium/paratest",
-            "version": "v7.16.1",
+            "version": "v7.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paratestphp/paratest.git",
-                "reference": "f0fdfd8e654e0d38bc2ba756a6cabe7be287390b"
+                "reference": "53cb90a6aa3ef3840458781600628ade058a18b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paratestphp/paratest/zipball/f0fdfd8e654e0d38bc2ba756a6cabe7be287390b",
-                "reference": "f0fdfd8e654e0d38bc2ba756a6cabe7be287390b",
+                "url": "https://api.github.com/repos/paratestphp/paratest/zipball/53cb90a6aa3ef3840458781600628ade058a18b9",
+                "reference": "53cb90a6aa3ef3840458781600628ade058a18b9",
                 "shasum": ""
             },
             "require": {
@@ -3779,7 +3827,7 @@
                 "phpunit/php-code-coverage": "^12.5.2",
                 "phpunit/php-file-iterator": "^6",
                 "phpunit/php-timer": "^8",
-                "phpunit/phpunit": "^12.5.4",
+                "phpunit/phpunit": "^12.5.8",
                 "sebastian/environment": "^8.0.3",
                 "symfony/console": "^7.3.4 || ^8.0.0",
                 "symfony/process": "^7.3.4 || ^8.0.0"
@@ -3789,10 +3837,10 @@
                 "ext-pcntl": "*",
                 "ext-pcov": "*",
                 "ext-posix": "*",
-                "phpstan/phpstan": "^2.1.33",
+                "phpstan/phpstan": "^2.1.38",
                 "phpstan/phpstan-deprecation-rules": "^2.0.3",
-                "phpstan/phpstan-phpunit": "^2.0.11",
-                "phpstan/phpstan-strict-rules": "^2.0.7",
+                "phpstan/phpstan-phpunit": "^2.0.12",
+                "phpstan/phpstan-strict-rules": "^2.0.8",
                 "symfony/filesystem": "^7.3.2 || ^8.0.0"
             },
             "bin": [
@@ -3833,7 +3881,7 @@
             ],
             "support": {
                 "issues": "https://github.com/paratestphp/paratest/issues",
-                "source": "https://github.com/paratestphp/paratest/tree/v7.16.1"
+                "source": "https://github.com/paratestphp/paratest/tree/v7.17.0"
             },
             "funding": [
                 {
@@ -3845,7 +3893,7 @@
                     "type": "paypal"
                 }
             ],
-            "time": "2026-01-08T07:23:06+00:00"
+            "time": "2026-02-05T09:14:44+00:00"
         },
         {
             "name": "doctrine/deprecations",

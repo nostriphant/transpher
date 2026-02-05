@@ -10,7 +10,7 @@ use nostriphant\NIP01\Key;
 $data_dir = $_SERVER['RELAY_DATA'];
 is_dir($data_dir) || mkdir($data_dir);
 
-$blossom = new nostriphant\Relay\Blossom($data_dir . '/files');
+$blossom = new nostriphant\Blossom\Blossom($data_dir . '/files');
 
 $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument(
     name: $_SERVER['RELAY_NAME'],
@@ -22,7 +22,7 @@ $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument
     version: file_get_contents(__DIR__ . '/VERSION')
 ));
 
-$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, $blossom(new \nostriphant\Relay\Routes()));
+$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, $blossom(new \nostriphant\Functional\FunctionList()));
 
 $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
 

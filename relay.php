@@ -10,7 +10,10 @@ use nostriphant\NIP01\Key;
 $data_dir = $_SERVER['RELAY_DATA'];
 is_dir($data_dir) || mkdir($data_dir);
 
-$blossom = new nostriphant\Blossom\Blossom($data_dir . '/files');
+$files_dir = $data_dir . '/files';
+is_dir($files_dir) || mkdir($files_dir);
+
+$blossom = new nostriphant\Blossom\Blossom($files_dir);
 
 $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument(
     name: $_SERVER['RELAY_NAME'],

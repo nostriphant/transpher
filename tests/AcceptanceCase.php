@@ -4,6 +4,8 @@ namespace nostriphant\TranspherTests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use nostriphant\TranspherTests\Feature\Process;
+use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
+use nostriphant\NIP19\Bech32;
 
 
 abstract class AcceptanceCase extends BaseTestCase
@@ -17,6 +19,36 @@ abstract class AcceptanceCase extends BaseTestCase
         $cmd = [PHP_BINARY, ROOT_DIR . DIRECTORY_SEPARATOR . 'relay.php', $socket];
         list($scheme, $uri) = explode(":", $socket, 2);
         return new Process('relay-' . substr(sha1($socket), 0, 6), $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http:' . $uri . '/'));
+    }
+    
+    static function start_transpher(string $port, string $data_dir, array $whitelisted_npubs) {
+        (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
+        expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
+
+        $relay = AcceptanceCase::bootRelay(AcceptanceCase::relay_url('tcp://', $port), [
+            'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
+            'RELAY_URL' => AcceptanceCase::relay_url(port:$port),
+            'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
+            'RELAY_NAME' => 'Really relay',
+            'RELAY_DESCRIPTION' => 'This is my dev relay',
+            'RELAY_CONTACT' => 'transpher@nostriphant.dev',
+            'RELAY_DATA' => $data_dir,
+            'RELAY_LOG_LEVEL' => 'DEBUG',
+            'RELAY_WHITELISTED_AUTHORS_ONLY' => 1,
+            'RELAY_WHITELISTED_AUTHORS' => implode(',', $whitelisted_npubs),
+            'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
+        ]);
+        
+        $agent = AcceptanceCase::bootAgent($port, [
+            'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
+            'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
+            'RELAY_URL' => AcceptanceCase::relay_url(port: $port),
+            'AGENT_LOG_LEVEL' => 'DEBUG',
+        ]);
+        
+        sleep(4);
+        
+        return fn() => $relay() || $agent;
     }
     
     static public function unwrap(\nostriphant\NIP01\Key $recipient_key) {

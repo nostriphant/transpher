@@ -2306,16 +2306,16 @@
         },
         {
             "name": "nostriphant/blossom",
-            "version": "0.1.0",
+            "version": "0.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/blossom.git",
-                "reference": "35e74d8c403e20d1c72f19f4f36e15c1d92f7894"
+                "reference": "89ab791f5b96457a4d08811a1c6a4c5292e6d477"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/35e74d8c403e20d1c72f19f4f36e15c1d92f7894",
-                "reference": "35e74d8c403e20d1c72f19f4f36e15c1d92f7894",
+                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/89ab791f5b96457a4d08811a1c6a4c5292e6d477",
+                "reference": "89ab791f5b96457a4d08811a1c6a4c5292e6d477",
                 "shasum": ""
             },
             "require": {
@@ -2329,9 +2329,11 @@
             },
             "type": "library",
             "autoload": {
+                "files": [
+                    "functions.php"
+                ],
                 "psr-4": {
-                    "nostriphant\\Blossom\\": "src/",
-                    "nostriphant\\BlossomTests\\": "tests/"
+                    "nostriphant\\Blossom\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2348,9 +2350,9 @@
             "homepage": "https://github.com/nostriphant/blossom",
             "support": {
                 "issues": "https://github.com/nostriphant/blossom/issues",
-                "source": "https://github.com/nostriphant/blossom/tree/0.1.0"
+                "source": "https://github.com/nostriphant/blossom/tree/0.1.3"
             },
-            "time": "2026-02-05T09:13:13+00:00"
+            "time": "2026-02-05T12:19:07+00:00"
         },
         {
             "name": "nostriphant/client",

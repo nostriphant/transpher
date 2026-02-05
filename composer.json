@@ -16,7 +16,11 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "nostriphant\\Transpher\\": "src/",
+            "nostriphant\\Transpher\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "nostriphant\\TranspherTests\\": "tests/"
         }
     },

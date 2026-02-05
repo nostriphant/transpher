@@ -9,41 +9,11 @@ use nostriphant\Client\Client;
 use nostriphant\NIP01\Message;
 
 describe('only events from whitelisted authors/recipients are stored', function() {
-    
-    function start_relay(string $port, string $data_dir, array $whitelisted_npubs) {
-        (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
-        expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
-
-        return AcceptanceCase::bootRelay(AcceptanceCase::relay_url('tcp://', $port), [
-            'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
-            'RELAY_URL' => AcceptanceCase::relay_url(port:$port),
-            'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
-            'RELAY_NAME' => 'Really relay',
-            'RELAY_DESCRIPTION' => 'This is my dev relay',
-            'RELAY_CONTACT' => 'transpher@nostriphant.dev',
-            'RELAY_DATA' => $data_dir,
-            'RELAY_LOG_LEVEL' => 'DEBUG',
-            'RELAY_WHITELISTED_AUTHORS_ONLY' => 1,
-            'RELAY_WHITELISTED_AUTHORS' => implode(',', $whitelisted_npubs),
-            'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
-        ]);
-    }
-    function start_agent(string $port) {
-        return AcceptanceCase::bootAgent($port, [
-            'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
-            'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
-            'RELAY_URL' => AcceptanceCase::relay_url(port: $port),
-            'AGENT_LOG_LEVEL' => 'DEBUG',
-        ]);
-    }
-    
 
     it('only stores messages from owner and agent, but they are still being delivered', function () {
         $data_dir = AcceptanceCase::data_dir('8088');
         
-        $relay = start_relay('8088', $data_dir, []);
-        $agent = start_agent('8088');
-        sleep(3);
+        $transpher = AcceptanceCase::start_transpher('8088', $data_dir, []);
 
         try {
             $alices_expected_messages = [];
@@ -104,22 +74,18 @@ describe('only events from whitelisted authors/recipients are stored', function(
             $notes_bob = iterator_to_array(nostriphant\Stores\Store::query($events, ['ids' => [$bob_message()[1]['id']]]));
             expect($notes_bob)->toHaveLength(0);
         } catch (\Exception $e) {
-            $agent();
-            $relay();
+            $transpher();
             throw $e;
         }
 
-        $agent();
-        $relay();
+        $transpher();
     });
     
     
     it('stores messages from owner, agent and whitelisted', function () {
         $data_dir = AcceptanceCase::data_dir('8090');
         
-        $relay = start_relay('8090', $data_dir, [(string) Bech32::npub(NIP01TestFunctions::pubkey_sender())]);
-        $agent = start_agent('8090');
-        sleep(4);
+        $transpher = AcceptanceCase::start_transpher('8090', $data_dir, [(string) Bech32::npub(NIP01TestFunctions::pubkey_sender())]);
 
         try {
             $alices_expected_messages = [];
@@ -190,12 +156,10 @@ describe('only events from whitelisted authors/recipients are stored', function(
             expect($notes_bob[0]->content)->toBe('Hello!');
             
         } catch (\Exception $e) {
-            $agent();
-            $relay();
+            $transpher();
             throw $e;
         }
 
-        $agent();
-        $relay();
+        $transpher();
     });
 });

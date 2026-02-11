@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "44155e6a28123ff54e4c45ee3b9d9b86",
+    "content-hash": "fa4ef46282f3d3bbe81bcd886c1687a1",
     "packages": [
         {
             "name": "amphp/amp",
@@ -639,16 +639,16 @@
         },
         {
             "name": "amphp/http-server",
-            "version": "v3.4.3",
+            "version": "v3.4.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/http-server.git",
-                "reference": "7aa962b0569f664af3ba23bc819f2a69884329cd"
+                "reference": "8dc32cc6a65c12a3543276305796b993c56b76ef"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/http-server/zipball/7aa962b0569f664af3ba23bc819f2a69884329cd",
-                "reference": "7aa962b0569f664af3ba23bc819f2a69884329cd",
+                "url": "https://api.github.com/repos/amphp/http-server/zipball/8dc32cc6a65c12a3543276305796b993c56b76ef",
+                "reference": "8dc32cc6a65c12a3543276305796b993c56b76ef",
                 "shasum": ""
             },
             "require": {
@@ -724,7 +724,7 @@
             ],
             "support": {
                 "issues": "https://github.com/amphp/http-server/issues",
-                "source": "https://github.com/amphp/http-server/tree/v3.4.3"
+                "source": "https://github.com/amphp/http-server/tree/v3.4.4"
             },
             "funding": [
                 {
@@ -732,7 +732,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-05-18T15:43:42+00:00"
+            "time": "2026-02-08T18:16:29+00:00"
         },
         {
             "name": "amphp/http-server-router",
@@ -2306,16 +2306,16 @@
         },
         {
             "name": "nostriphant/blossom",
-            "version": "0.1.3",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/blossom.git",
-                "reference": "89ab791f5b96457a4d08811a1c6a4c5292e6d477"
+                "reference": "829cb0217ad5efc081aa4562aed58d5012e5b27c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/89ab791f5b96457a4d08811a1c6a4c5292e6d477",
-                "reference": "89ab791f5b96457a4d08811a1c6a4c5292e6d477",
+                "url": "https://api.github.com/repos/nostriphant/blossom/zipball/829cb0217ad5efc081aa4562aed58d5012e5b27c",
+                "reference": "829cb0217ad5efc081aa4562aed58d5012e5b27c",
                 "shasum": ""
             },
             "require": {
@@ -2350,9 +2350,9 @@
             "homepage": "https://github.com/nostriphant/blossom",
             "support": {
                 "issues": "https://github.com/nostriphant/blossom/issues",
-                "source": "https://github.com/nostriphant/blossom/tree/0.1.3"
+                "source": "https://github.com/nostriphant/blossom/tree/0.2.0"
             },
-            "time": "2026-02-05T12:19:07+00:00"
+            "time": "2026-02-10T15:17:29+00:00"
         },
         {
             "name": "nostriphant/client",
@@ -2404,20 +2404,20 @@
         },
         {
             "name": "nostriphant/functional",
-            "version": "2.3.1",
+            "version": "2.5.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/functional.git",
-                "reference": "9b417fb74112a380d5cec89050be400e45951d72"
+                "reference": "ce27fe952aae09b66c814ca76c5112b0808545a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/functional/zipball/9b417fb74112a380d5cec89050be400e45951d72",
-                "reference": "9b417fb74112a380d5cec89050be400e45951d72",
+                "url": "https://api.github.com/repos/nostriphant/functional/zipball/ce27fe952aae09b66c814ca76c5112b0808545a9",
+                "reference": "ce27fe952aae09b66c814ca76c5112b0808545a9",
                 "shasum": ""
             },
             "require": {
-                "php": "^8.3"
+                "php": "^8.4"
             },
             "require-dev": {
                 "pestphp/pest": "^2.35"
@@ -2436,15 +2436,15 @@
             "authors": [
                 {
                     "name": "Rik Meijer",
-                    "email": "rik@nostriphant.dev"
+                    "email": "nostriphant@rikmeijer.nl"
                 }
             ],
             "description": "Functional helper classes for nostriphant projects",
             "support": {
                 "issues": "https://github.com/nostriphant/functional/issues",
-                "source": "https://github.com/nostriphant/functional/tree/2.3.1"
+                "source": "https://github.com/nostriphant/functional/tree/2.5.4"
             },
-            "time": "2026-02-03T09:28:54+00:00"
+            "time": "2026-02-11T10:04:33+00:00"
         },
         {
             "name": "nostriphant/nip-01",
@@ -2676,16 +2676,16 @@
         },
         {
             "name": "nostriphant/relay",
-            "version": "2.4.1",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "64708b3d36eb46eb807322851d7cf564a07fbf09"
+                "reference": "09d01986e64eae9ac859b687e5f3b702b96f2153"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/64708b3d36eb46eb807322851d7cf564a07fbf09",
-                "reference": "64708b3d36eb46eb807322851d7cf564a07fbf09",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/09d01986e64eae9ac859b687e5f3b702b96f2153",
+                "reference": "09d01986e64eae9ac859b687e5f3b702b96f2153",
                 "shasum": ""
             },
             "require": {
@@ -2716,8 +2716,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "nostriphant\\Relay\\": "src/",
-                    "nostriphant\\RelayTests\\": "tests/"
+                    "nostriphant\\Relay\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2734,9 +2733,9 @@
             "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/2.4.1"
+                "source": "https://github.com/nostriphant/relay/tree/2.5.0"
             },
-            "time": "2026-02-05T09:41:12+00:00"
+            "time": "2026-02-11T10:15:23+00:00"
         },
         {
             "name": "nostriphant/stores",
@@ -3899,29 +3898,29 @@
         },
         {
             "name": "doctrine/deprecations",
-            "version": "1.1.5",
+            "version": "1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/deprecations.git",
-                "reference": "459c2f5dd3d6a4633d3b5f46ee2b1c40f57d3f38"
+                "reference": "d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/deprecations/zipball/459c2f5dd3d6a4633d3b5f46ee2b1c40f57d3f38",
-                "reference": "459c2f5dd3d6a4633d3b5f46ee2b1c40f57d3f38",
+                "url": "https://api.github.com/repos/doctrine/deprecations/zipball/d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca",
+                "reference": "d4fe3e6fd9bb9e72557a19674f44d8ac7db4c6ca",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1 || ^8.0"
             },
             "conflict": {
-                "phpunit/phpunit": "<=7.5 || >=13"
+                "phpunit/phpunit": "<=7.5 || >=14"
             },
             "require-dev": {
-                "doctrine/coding-standard": "^9 || ^12 || ^13",
-                "phpstan/phpstan": "1.4.10 || 2.1.11",
+                "doctrine/coding-standard": "^9 || ^12 || ^14",
+                "phpstan/phpstan": "1.4.10 || 2.1.30",
                 "phpstan/phpstan-phpunit": "^1.0 || ^2",
-                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.6 || ^10.5 || ^11.5 || ^12",
+                "phpunit/phpunit": "^7.5 || ^8.5 || ^9.6 || ^10.5 || ^11.5 || ^12.4 || ^13.0",
                 "psr/log": "^1 || ^2 || ^3"
             },
             "suggest": {
@@ -3941,9 +3940,9 @@
             "homepage": "https://www.doctrine-project.org/",
             "support": {
                 "issues": "https://github.com/doctrine/deprecations/issues",
-                "source": "https://github.com/doctrine/deprecations/tree/1.1.5"
+                "source": "https://github.com/doctrine/deprecations/tree/1.1.6"
             },
-            "time": "2025-04-07T20:06:18+00:00"
+            "time": "2026-02-07T07:09:04+00:00"
         },
         {
             "name": "fidry/cpu-core-counter",
@@ -5306,16 +5305,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "12.5.2",
+            "version": "12.5.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "4a9739b51cbcb355f6e95659612f92e282a7077b"
+                "reference": "b015312f28dd75b75d3422ca37dff2cd1a565e8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/4a9739b51cbcb355f6e95659612f92e282a7077b",
-                "reference": "4a9739b51cbcb355f6e95659612f92e282a7077b",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/b015312f28dd75b75d3422ca37dff2cd1a565e8d",
+                "reference": "b015312f28dd75b75d3422ca37dff2cd1a565e8d",
                 "shasum": ""
             },
             "require": {
@@ -5371,7 +5370,7 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/php-code-coverage/issues",
                 "security": "https://github.com/sebastianbergmann/php-code-coverage/security/policy",
-                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.5.2"
+                "source": "https://github.com/sebastianbergmann/php-code-coverage/tree/12.5.3"
             },
             "funding": [
                 {
@@ -5391,7 +5390,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-12-24T07:03:04+00:00"
+            "time": "2026-02-06T06:01:44+00:00"
         },
         {
             "name": "phpunit/php-file-iterator",

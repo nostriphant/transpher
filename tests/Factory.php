@@ -4,7 +4,7 @@ namespace nostriphant\TranspherTests;
 
 use nostriphant\NIP01\Message;
 use nostriphant\NIP01\Key;
-use nostriphant\NIP59\Rumor;
+use nostriphant\NIP01\Rumor;
 
 class Factory {
 

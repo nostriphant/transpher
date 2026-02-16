@@ -1,6 +1,6 @@
 <?php
 
-use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
+use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
 use nostriphant\TranspherTests\AcceptanceCase;
 use nostriphant\TranspherTests\Factory;
@@ -8,8 +8,11 @@ use nostriphant\TranspherTests\Factory;
 use nostriphant\Client\Client;
 use nostriphant\NIP01\Message;
 
-$cleanup;
-beforeAll(function() use (&$cleanup) {
+
+it('starts relay and sends private direct messsage to relay owner', function (string $sender_hex, string $recipient_hex) {
+    $sender = Key::fromHex($sender_hex);
+    $recipient = Key::fromHex($recipient_hex);
+    
     $data_dir = AcceptanceCase::data_dir('8087');
     (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
     expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
@@ -17,7 +20,7 @@ beforeAll(function() use (&$cleanup) {
     $relay = AcceptanceCase::bootRelay(AcceptanceCase::relay_url('tcp://'), [
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => AcceptanceCase::relay_url(),
-        'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
+        'RELAY_OWNER_NPUB' => (string) Bech32::npub($recipient(Key::public())),
         'RELAY_NAME' => 'Really relay',
         'RELAY_DESCRIPTION' => 'This is my dev relay',
         'RELAY_CONTACT' => 'transpher@nostriphant.dev',
@@ -29,7 +32,7 @@ beforeAll(function() use (&$cleanup) {
     expect($relay)->toBeCallable('Relay is not callable');
     
     $agent = AcceptanceCase::bootAgent(8087, [
-        'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
+        'RELAY_OWNER_NPUB' => (string) Bech32::npub($recipient(Key::public())),
         'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
         'RELAY_URL' => AcceptanceCase::relay_url(),
         'AGENT_LOG_LEVEL' => 'DEBUG',
@@ -37,100 +40,99 @@ beforeAll(function() use (&$cleanup) {
     expect($agent)->toBeCallable('Agent is not callable');
     
     sleep(3);
-    
+
     $cleanup = function() use ($agent, $relay) {
         $agent();
         $relay();
     };
-});
-
-
-it('starts relay and sends private direct messsage to relay owner ('.NIP01TestFunctions::pubkey_recipient().')', function () {
-    $data_dir = AcceptanceCase::data_dir('8087');
     
-    $alices_expected_messages = [];
-    $alice = Client::connectToUrl(AcceptanceCase::relay_url());
-    $alice_log = AcceptanceCase::client_log('alice', NIP01TestFunctions::pubkey_recipient());
+    try {
+        $alices_expected_messages = [];
+        $alice = Client::connectToUrl(AcceptanceCase::relay_url());
+        $alice_log = AcceptanceCase::client_log('alice-8087', $recipient(Key::public()));
+
+        $bob = Client::connectToUrl(AcceptanceCase::relay_url());
+        $bob_log = AcceptanceCase::client_log('bob-8087', $sender(Key::public()));
+
+        expect($alice)->toBeCallable('Alice is not callable');
+
+        $unwrapper = AcceptanceCase::unwrap($recipient);
+
+        $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages, $recipient) {
+            $subscription = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
+
+            $subscriptionId = $subscription()[1];
+            $send($subscription);
+
+            $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . AcceptanceCase::relay_url()];
+            $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
+            $alices_expected_messages[] = ['EOSE', $subscriptionId];
+
+            $request = $subscription();
+            expect($request[2])->toBeArray();
+            expect($request[2]['#p'])->toContain($recipient(Key::public()));
+
+            $signed_message = Factory::event($recipient, 1, 'Hello!');
+            $send($signed_message);
+            $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
+        });
+
+        expect($alice_listen)->toBeCallable('Alice listen is not callable');
+
+        $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $data_dir, $alice_log));
+
+        $bob_message = Factory::event($sender, 1, 'Hello!');
+
+        $bobs_expected_messages = [];
+
+        expect($bob)->toBeCallable('Bob is not callable');
+
+        $bob_listen = $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
+            $send($bob_message);
+            $bobs_expected_messages[] = ['OK', $bob_message()[1]['id'], true, ''];
+
+            $send(Message::req('sddf', ["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]));
+            $bobs_expected_messages[] = ['EOSE', 'sddf'];
+        });
+
+        expect($bobs_expected_messages)->toHaveCount(2);
+        expect($bob_listen)->toBeCallable('Bob listen is not callable');
+
+        $bob_listen(function (Message $message, callable $stop) use (&$bobs_expected_messages) {
+            $expected_message = array_shift($bobs_expected_messages);
+
+            $type = array_shift($expected_message);
+            expect($message->type)->toBe($type, 'Message type checks out');
+            expect($message->payload)->toBe($expected_message);
+
+            if (count($bobs_expected_messages) === 0) {
+                $stop();
+            }
+        });
+
+
+        $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
+
+        $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [$recipient(Key::public())], 'kinds' => [1]]));
+        expect($notes_alice[0]->kind)->toBe(1);
+        expect($notes_alice[0]->content)->toBe('Hello!');
+
+        $notes_bob = iterator_to_array(nostriphant\Stores\Store::query($events, ['ids' => [$bob_message()[1]['id']]]));
+        expect($notes_bob)->toHaveLength(1);
+        expect($notes_bob[0]->kind)->toBe(1);
+        expect($notes_bob[0]->content)->toBe('Hello!');
+
+        $pdms = iterator_to_array(nostriphant\Stores\Store::query($events, ['#p' => [$recipient(Key::public())]]));
+        expect($pdms[0]->kind)->toBe(1059);
+
+        expect(file_get_contents(ROOT_DIR . '/logs/relay-6c0de3-output.log'))->not()->toContain('ERROR');
+    } catch (\Exception $e) {
+        $cleanup();
+        throw $e;
+    }
     
-    $bob = Client::connectToUrl(AcceptanceCase::relay_url());
-    $bob_log = AcceptanceCase::client_log('bob', NIP01TestFunctions::pubkey_sender());
-
-    expect($alice)->toBeCallable('Alice is not callable');
-
-    $unwrapper = AcceptanceCase::unwrap(NIP01TestFunctions::key_recipient());
-
-    $alice_listen = $alice(function(callable $send) use (&$alices_expected_messages) {
-        $subscription = Factory::subscribe(['#p' => [NIP01TestFunctions::pubkey_recipient()]]);
-
-        $subscriptionId = $subscription()[1];
-        $send($subscription);
-
-        $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . AcceptanceCase::relay_url()];
-        $alices_expected_messages[] = ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036'];
-        $alices_expected_messages[] = ['EOSE', $subscriptionId];
-
-        $request = $subscription();
-        expect($request[2])->toBeArray();
-        expect($request[2]['#p'])->toContain(NIP01TestFunctions::pubkey_recipient());
-
-        $signed_message = Factory::event(NIP01TestFunctions::key_recipient(), 1, 'Hello!');
-        $send($signed_message);
-        $alices_expected_messages[] = ['OK', $signed_message()[1]['id'], true, ""];
-    });
-
-    expect($alice_listen)->toBeCallable('Alice listen is not callable');
-
-    $alice_listen(AcceptanceCase::createListener($unwrapper, $alices_expected_messages, $data_dir, $alice_log));
-
-    $bob_message = Factory::event(NIP01TestFunctions::key_sender(), 1, 'Hello!');
-
-    $bobs_expected_messages = [];
-
-    expect($bob)->toBeCallable('Bob is not callable');
-
-    $bob_listen = $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
-        $send($bob_message);
-        $bobs_expected_messages[] = ['OK', $bob_message()[1]['id'], true, ''];
-
-        $send(Message::req('sddf', ["kinds" => [1059], "#p" => ["ca447ffbd98356176bf1a1612676dbf744c2335bb70c1bc9b68b122b20d6eac6"]]));
-        $bobs_expected_messages[] = ['EOSE', 'sddf'];
-    });
-
-    expect($bobs_expected_messages)->toHaveCount(2);
-    expect($bob_listen)->toBeCallable('Bob listen is not callable');
-
-    $bob_listen(function (Message $message, callable $stop) use (&$bobs_expected_messages) {
-        $expected_message = array_shift($bobs_expected_messages);
-
-        $type = array_shift($expected_message);
-        expect($message->type)->toBe($type, 'Message type checks out');
-        expect($message->payload)->toBe($expected_message);
-
-        if (count($bobs_expected_messages) === 0) {
-            $stop();
-        }
-    });
-
-
-    $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'), []);
-
-    $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [NIP01TestFunctions::pubkey_recipient()], 'kinds' => [1]]));
-    expect($notes_alice[0]->kind)->toBe(1);
-    expect($notes_alice[0]->content)->toBe('Hello!');
-
-    $notes_bob = iterator_to_array(nostriphant\Stores\Store::query($events, ['ids' => [$bob_message()[1]['id']]]));
-
-
-    expect($notes_bob)->toHaveLength(1);
-    expect($notes_bob[0]->kind)->toBe(1);
-    expect($notes_bob[0]->content)->toBe('Hello!');
-
-    $pdms = iterator_to_array(nostriphant\Stores\Store::query($events, ['#p' => [NIP01TestFunctions::pubkey_recipient()]]));
-    expect($pdms[0]->kind)->toBe(1059);
-
-    expect(file_get_contents(ROOT_DIR . '/logs/relay-6c0de3-output.log'))->not()->toContain('ERROR');
-});
-
-afterAll(function() use (&$cleanup) {
     $cleanup();
-});
+    
+})->with([
+    ['a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3', '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']
+]);

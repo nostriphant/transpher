@@ -13,8 +13,6 @@ is_dir($data_dir) || mkdir($data_dir);
 $files_dir = $data_dir . '/files';
 is_dir($files_dir) || mkdir($files_dir);
 
-$blob_factory = new \nostriphant\Blossom\Blob\Factory($files_dir, fn() => ['status' => 404]);
-$blossom = new nostriphant\Blossom\Blossom($blob_factory);
 
 $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument(
     name: $_SERVER['RELAY_NAME'],
@@ -26,7 +24,27 @@ $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument
     version: file_get_contents(__DIR__ . '/VERSION')
 ));
 
-$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, $blossom());
+$blossom = nostriphant\Blossom\Blossom::fromPath($files_dir);
+$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, call_user_func(function() use ($blossom) {
+    foreach ($blossom() as $route_factory) {
+        yield function(callable $define) use ($route_factory) {
+            
+            $redefine = fn($method, $endoint, $handler) => $define($method, $endoint, function(array $attributes, array $amp_headers) use ($handler) {
+                
+                $headers = [];
+                foreach ($amp_headers as $header => $values) {
+                    $headers['HTTP_' . strtoupper($header)] = join(', ', $values);
+                }
+                
+                
+                return $handler(new nostriphant\Blossom\HTTP\ServerRequest($headers, $attributes, fopen('php://input', 'rb')));
+            });
+
+            return $route_factory($redefine);
+        };
+    }
+    
+}));
 
 $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
 

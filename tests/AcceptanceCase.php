@@ -2,9 +2,9 @@
 
 namespace nostriphant\TranspherTests;
 
+use nostriphant\NIP01\Key;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use nostriphant\TranspherTests\Feature\Process;
-use nostriphant\NIP01Tests\Functions as NIP01TestFunctions;
 use nostriphant\NIP19\Bech32;
 
 
@@ -21,14 +21,14 @@ abstract class AcceptanceCase extends BaseTestCase
         return new Process('relay-' . substr(sha1($socket), 0, 6), $cmd, $env, fn(string $line) => str_contains($line, 'Listening on http:' . $uri . '/'));
     }
     
-    static function start_transpher(string $port, string $data_dir, array $whitelisted_npubs) {
+    static function start_transpher(string $port, string $data_dir, \nostriphant\NIP01\Key $owner, array $whitelisted_npubs) {
         (is_file($data_dir . '/transpher.sqlite') === false) ||  unlink($data_dir . '/transpher.sqlite');
         expect($data_dir . '/transpher.sqlite')->not()->toBeFile();
 
         $relay = AcceptanceCase::bootRelay(AcceptanceCase::relay_url('tcp://', $port), [
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => AcceptanceCase::relay_url(port:$port),
-            'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
+            'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
             'RELAY_NAME' => 'Really relay',
             'RELAY_DESCRIPTION' => 'This is my dev relay',
             'RELAY_CONTACT' => 'transpher@nostriphant.dev',
@@ -40,7 +40,7 @@ abstract class AcceptanceCase extends BaseTestCase
         ]);
         
         $agent = AcceptanceCase::bootAgent($port, [
-            'RELAY_OWNER_NPUB' => (string) Bech32::npub(NIP01TestFunctions::pubkey_recipient()),
+            'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => AcceptanceCase::relay_url(port: $port),
             'AGENT_LOG_LEVEL' => 'DEBUG',
@@ -137,6 +137,7 @@ abstract class AcceptanceCase extends BaseTestCase
 
             $alices_expected_messages = $remaining;
             $alice_log('Expected messages remaining ' . count($alices_expected_messages));
+            $alice_log(var_export($alices_expected_messages, true));
             if (count($alices_expected_messages) === 0) {
                 $stop();
             }

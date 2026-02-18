@@ -7,10 +7,8 @@ namespace {
 
     define('TRANSPHER_VERSION', file_get_contents(__DIR__ . '/VERSION'));
 
-    $dotenv_file = ROOT_DIR . '/.env';
-    is_file($dotenv_file) || touch($dotenv_file);
-    $dotenv = Dotenv\Dotenv::createMutable(dirname($dotenv_file));
-    $dotenv->load();
+    $dotenv = Dotenv\Dotenv::createMutable(ROOT_DIR);
+    $dotenv->safeLoad();
 
     use Monolog\Level;
 

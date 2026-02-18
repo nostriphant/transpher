@@ -24,9 +24,16 @@ $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument
     version: file_get_contents(__DIR__ . '/VERSION')
 ));
 
-$blossom = nostriphant\Blossom\Blossom::fromPath($files_dir);
+$blossom = nostriphant\Blossom\Blossom::fromPath(Key::fromHex($_SERVER['BLOSSOM_SERVER_KEY']), $files_dir);
 $server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, call_user_func(function() use ($blossom) {
-    foreach ($blossom() as $route_factory) {
+    
+    $constraints = new \nostriphant\Blossom\UploadConstraints(
+            [(new \nostriphant\NIP19\Bech32($_SERVER['RELAY_OWNER_NPUB']))(), Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public())],
+            100 * 1024 ^ 2,
+            []
+    );
+    
+    foreach ($blossom($constraints) as $route_factory) {
         yield function(callable $define) use ($route_factory) {
             
             $redefine = fn($method, $endoint, $handler) => $define($method, $endoint, function(array $attributes, array $amp_headers) use ($handler) {

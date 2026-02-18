@@ -27,6 +27,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
         'RELAY_DATA' => $data_dir,
         'RELAY_LOG_LEVEL' => 'DEBUG',
         'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness
+        'BLOSSOM_SERVER_KEY' => 'ae89403ee4f95cac13c9984f588ad92cee48c202f52c6f96d4d5c053d8332c85',
     ]);
     
     expect($relay)->toBeCallable('Relay is not callable');

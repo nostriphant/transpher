@@ -20,39 +20,7 @@ $relay = new \nostriphant\Relay\Relay(new \nostriphant\Relay\InformationDocument
     version: trim(file_get_contents(__DIR__ . '/VERSION'))
 ));
 
-$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger, call_user_func(function() use ($data_dir) {
-    
-    $blossom = new \nostriphant\Blossom\Blossom(Key::fromHex($_SERVER['BLOSSOM_SERVER_KEY']), $data_dir, str_replace('wss://', 'https://', str_replace('ws://', 'http://', $_SERVER['RELAY_URL'])), new \nostriphant\Blossom\UploadConstraints(
-        [(new \nostriphant\NIP19\Bech32($_SERVER['RELAY_OWNER_NPUB']))(), Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public())],
-        100 * 1024 ^ 2,
-        []
-    ));
-    
-    
-    foreach ($blossom as $route_factory) {
-        yield function(callable $define) use ($route_factory) {
-            
-            $redefine = fn($method, $endoint, $handler) => $define($method, $endoint, function(array $attributes, array $amp_headers, \Amp\Http\Server\RequestBody $body) use ($handler) {
-                
-                $headers = [];
-                foreach ($amp_headers as $header => $values) {
-                    $headers['HTTP_' . strtoupper($header)] = join(', ', $values);
-                }
-                
-                $temp = tmpfile();
-                while (($chunk = $body->read()) !== null) {
-                    fwrite($temp, $chunk);
-                }
-                fseek($temp, 0);
-                
-                return $handler(new nostriphant\Blossom\HTTP\ServerRequest($headers, $attributes, $temp));
-            });
-
-            return $route_factory($redefine);
-        };
-    }
-    
-}));
+$server = $relay($_SERVER['argv'][1], $_SERVER['RELAY_MAX_CONNECTIONS_PER_IP'] ?? 1000, $logger);
 
 $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transpher.sqlite'));
 

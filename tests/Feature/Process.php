@@ -57,9 +57,10 @@ readonly class Process {
             return [];
         }
         
-        $status = proc_get_status($this->process);
 
         proc_terminate($this->process, $signal);
+        
+        $status = proc_get_status($this->process);
         while ($status['running']) {
             $status = proc_get_status($this->process);
         }

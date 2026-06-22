@@ -38,15 +38,13 @@ readonly class Process {
         
         do {
             $line = fread($output, 512);
-            $errline = fread($error, 512);
-            
-            $result = $runtest($line) || $runtest($errline);
-            if (!empty($line) || !empty($errline)) {
-                fwrite($meta, 'SCANNING FOR  RUNNING EVIDENCE IN OUTPUT>> `' . $line . '` -- `'.$errline.'` >> ' . var_export($result, true) . PHP_EOL);
+            $result = $runtest($line);
+            if (!empty($line)) {
+                fwrite($meta, 'SCANNING FOR  RUNNING EVIDENCE IN OUTPUT>> `' . $line . '` >> ' . var_export($result, true) . PHP_EOL);
             }
             
         } while ($result === false);
-        fwrite($meta, 'FOUND RUNNING EVIDENCE IN OUPUT>> `' . $line . '` -- `'.$errline.'`' . PHP_EOL);
+        fwrite($meta, 'FOUND RUNNING EVIDENCE IN OUPUT>> `' . $line . '`' . PHP_EOL);
         fclose($output);
         fclose($error);
         fclose($meta);
@@ -61,7 +59,7 @@ readonly class Process {
         
         $status = proc_get_status($this->process);
 
-        proc_terminate($this->process, 15);
+        proc_terminate($this->process, $signal);
         while ($status['running']) {
             $status = proc_get_status($this->process);
         }

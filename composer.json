@@ -9,7 +9,7 @@
         "ext-sqlite3" : "*",
         "vlucas/phpdotenv": "^5.6",
         "monolog/monolog": "^3.7",
-        "nostriphant/client": "^0.3",
+        "nostriphant/client": "^2.0",
         "nostriphant/relay": "^2.0"
     },
     "license": "MIT",
@@ -54,7 +54,13 @@
         ],
         "test": [
             "@clearCache @no_additional_args",
+            "rm -rf ./logs/*",
             "./vendor/bin/pest"
+        ],
+        "test-db": [
+            "@clearCache @no_additional_args",
+            "rm -rf ./logs/*",
+            "./vendor/bin/pest --debug"
         ]
     }
 }

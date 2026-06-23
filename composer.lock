@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9f0e3bfabb3625a508c69d4a351d4c8b",
+    "content-hash": "e654e709e7aa9423684ac891bb6c44b7",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2314,16 +2314,16 @@
         },
         {
             "name": "nostriphant/client",
-            "version": "0.3.2",
+            "version": "2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/client.git",
-                "reference": "9f7d657cb0abb24dcd7047168ae383d6cad4b739"
+                "reference": "251380f181cad5fea51f81af014b27c9095481ee"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/client/zipball/9f7d657cb0abb24dcd7047168ae383d6cad4b739",
-                "reference": "9f7d657cb0abb24dcd7047168ae383d6cad4b739",
+                "url": "https://api.github.com/repos/nostriphant/client/zipball/251380f181cad5fea51f81af014b27c9095481ee",
+                "reference": "251380f181cad5fea51f81af014b27c9095481ee",
                 "shasum": ""
             },
             "require": {
@@ -2356,22 +2356,22 @@
             "description": "Simple Nostr client",
             "support": {
                 "issues": "https://github.com/nostriphant/client/issues",
-                "source": "https://github.com/nostriphant/client/tree/0.3.2"
+                "source": "https://github.com/nostriphant/client/tree/2.0.1"
             },
-            "time": "2025-12-11T07:38:45+00:00"
+            "time": "2026-06-23T12:04:25+00:00"
         },
         {
             "name": "nostriphant/functional",
-            "version": "2.7.3",
+            "version": "2.7.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/functional.git",
-                "reference": "8806842a93c0d3976c4844170a82ebb8de3861fd"
+                "reference": "28b9e29ffad28b0c854057344f4b45b07c73d5c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/functional/zipball/8806842a93c0d3976c4844170a82ebb8de3861fd",
-                "reference": "8806842a93c0d3976c4844170a82ebb8de3861fd",
+                "url": "https://api.github.com/repos/nostriphant/functional/zipball/28b9e29ffad28b0c854057344f4b45b07c73d5c2",
+                "reference": "28b9e29ffad28b0c854057344f4b45b07c73d5c2",
                 "shasum": ""
             },
             "require": {
@@ -2400,9 +2400,9 @@
             "description": "Functional helper classes for nostriphant projects",
             "support": {
                 "issues": "https://github.com/nostriphant/functional/issues",
-                "source": "https://github.com/nostriphant/functional/tree/2.7.3"
+                "source": "https://github.com/nostriphant/functional/tree/2.7.5"
             },
-            "time": "2026-06-22T12:10:15+00:00"
+            "time": "2026-06-22T15:01:42+00:00"
         },
         {
             "name": "nostriphant/nip-01",
@@ -2635,16 +2635,16 @@
         },
         {
             "name": "nostriphant/relay",
-            "version": "2.6.0",
+            "version": "2.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "1ef72e0304498305f3995da87b73aa9b54845cd4"
+                "reference": "e14f80b183a19fe4649fca3cfed89ce41febd791"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/1ef72e0304498305f3995da87b73aa9b54845cd4",
-                "reference": "1ef72e0304498305f3995da87b73aa9b54845cd4",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/e14f80b183a19fe4649fca3cfed89ce41febd791",
+                "reference": "e14f80b183a19fe4649fca3cfed89ce41febd791",
                 "shasum": ""
             },
             "require": {
@@ -2655,7 +2655,6 @@
                 "amphp/log": "^2.0",
                 "amphp/websocket-server": "^4.0",
                 "ext-pcntl": "*",
-                "nostriphant/client": "^0.3",
                 "nostriphant/functional": "^2.3",
                 "nostriphant/nip-01": "^2.0",
                 "nostriphant/nip-17": "^2.0",
@@ -2670,6 +2669,7 @@
                 "ext-curl": "*",
                 "mockery/mockery": "^1.6",
                 "monolog/monolog": "^3.7",
+                "nostriphant/client": "^1.0",
                 "pestphp/pest": "^4.0"
             },
             "type": "library",
@@ -2692,9 +2692,9 @@
             "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/2.6.0"
+                "source": "https://github.com/nostriphant/relay/tree/2.6.3"
             },
-            "time": "2026-05-19T09:00:44+00:00"
+            "time": "2026-06-23T12:01:04+00:00"
         },
         {
             "name": "nostriphant/secp256k1",

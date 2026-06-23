@@ -4,10 +4,8 @@ use nostriphant\NIP01\Key;
 use nostriphant\NIP19\Bech32;
 use nostriphant\TranspherTests\Listener;
 use nostriphant\TranspherTests\Transpher;
-use nostriphant\TranspherTests\Factory;
 
 use nostriphant\Client\Client;
-use nostriphant\NIP01\Message;
 
 describe('only events from whitelisted authors/recipients are stored', function () {
     it('only stores messages from owner and agent, but they are still being delivered', function (string $sender_hex, string $recipient_hex) {
@@ -17,60 +15,37 @@ describe('only events from whitelisted authors/recipients are stored', function 
         $transpher = new Transpher('8088', $recipient, []);
 
         try {
-            $alice = Client::connectToUrl($transpher->ws);
-            $bob = Client::connectToUrl($transpher->ws);
             
-            $subscriptionAlice = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
-
-            $bob_message = Factory::event($sender, 1, 'Hello!');
-            $subscriptionAliceOnBobsMessage = Factory::subscribe(['ids' => [$bob_message()[1]['id']]]);
+            $worker = Amp\Parallel\Worker\createWorker();
             
-            $alice_listener = new Listener('alice-8088', $recipient);
-            $bob_listener = new Listener('bob-8088', $sender);
-            $bob_listener->expected_messages[] = ['OK', $bob_message()[1]['id'], true, ''];
+            $bob_message = (new \nostriphant\NIP01\Rumor(
+                    pubkey: $sender(Key::public()),
+                    created_at: time(),
+                    kind: 1,
+                    content: 'Hello!',
+                    tags: []
+            ))($sender);
+
+            $executions = [
+                // Alice
+                $worker->submit(new nostriphant\TranspherTests\Acceptance\WhitelistedAuthorsTest\Alice($transpher->ws, $recipient_hex, $sender(Key::public()))),
+                        
+                // Bob
+                $worker->submit(new \nostriphant\TranspherTests\Acceptance\WhitelistedAuthorsTest\Bob($transpher->ws, $sender_hex, $bob_message))
+            ];
             
-            $bob_listen;
-            $alice_listen = $alice(function(callable $send) use ($alice_listener, $subscriptionAlice, $subscriptionAliceOnBobsMessage, $bob, $bob_message, &$bob_listen, $recipient, $transpher) {
-
-                $send($subscriptionAliceOnBobsMessage);
-                Listener::expect($alice_listener, ['EVENT', $subscriptionAliceOnBobsMessage()[1], 'Hello!']);
-                Listener::expect($alice_listener, ['EOSE', $subscriptionAliceOnBobsMessage()[1]]);
-                
-                $subscriptionId = $subscriptionAlice()[1];
-                $send($subscriptionAlice);
-
-                Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws]);
-                Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036']);
-                Listener::expect($alice_listener, ['EOSE', $subscriptionId]);
-
-                $request = $subscriptionAlice();
-                expect($request[2])->toBeArray();
-                expect($request[2]['#p'])->toContain($recipient(Key::public()));
-
-                $signed_message = Factory::event($recipient, 1, 'Hello!');
-                $send($signed_message);
-                
-                Listener::expect($alice_listener, ['OK', $signed_message()[1]['id'], true, ""]);
-                
-                sleep(1);
-                
-                $bob_listen = $bob(fn(callable $send) => $send($bob_message));
-                
-            });
+            $responses = Amp\Future\await(array_map(
+                fn (Amp\Parallel\Worker\Execution $e) => $e->getFuture(),
+                $executions,
+            ));
             
-
-            expect($bob_listener->expected_messages)->toHaveCount(1);
-            
-            $alice_listen($alice_listener);
-            $bob_listen($bob_listener);
-
             $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
 
             $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [$recipient(Key::public())], 'kinds' => [1]]));
             expect($notes_alice[0]->kind)->toBe(1);
             expect($notes_alice[0]->content)->toBe('Hello!');
 
-            $notes_bob = iterator_to_array(nostriphant\Stores\Store::query($events, ['ids' => [$bob_message()[1]['id']]]));
+            $notes_bob = iterator_to_array(nostriphant\Stores\Store::query($events, ['ids' => [$bob_message->id]]));
             expect($notes_bob)->toHaveLength(0);
         } catch (\Exception $e) {
             $transpher();
@@ -89,56 +64,51 @@ describe('only events from whitelisted authors/recipients are stored', function 
         
         $transpher = new Transpher('8090', $recipient, [(string) Bech32::npub($sender(Key::public()))]);
 
+        $bob_message = (new nostriphant\NIP01\Rumor(
+                        pubkey: $sender(Key::public()),
+                        created_at: time(),
+                        kind: 1,
+                        content: 'Hello!',
+                        tags: []
+                ))($sender);
+        
         try {
-            $alice = Client::connectToUrl($transpher->ws);
-            $bob = Client::connectToUrl($transpher->ws);
+            $alice = Client::connectToUrl(fn() => null, $transpher->ws);
+            $bob = Client::connectToUrl(fn() => null, $transpher->ws);
             
 
+            $bob_listener = new Listener('bob-8090', $recipient);
+            $bob(function(callable $send) use ($bob_listener, $bob_message) { 
+                Listener::expectOK($bob_listener, $send, $bob_message);
+            });
+            
             $alice_listener = new Listener('alice-8090', $recipient);
-            $alice_listen = $alice(function(callable $send) use ($alice_listener, $recipient, $transpher) {
-                $subscription = Factory::subscribe(['#p' => [$recipient(Key::public())]]);
-
-                $subscriptionId = $subscription()[1];
-                $send($subscription);
-
-                Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Hello, I am your agent! The URL of your relay is ' . $transpher->ws]);
-                Listener::expect($alice_listener, ['EVENT', $subscriptionId, 'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036']);
-                Listener::expect($alice_listener, ['EOSE', $subscriptionId]);
-
-                $request = $subscription();
-                expect($request[2])->toBeArray();
-                expect($request[2]['#p'])->toContain($recipient(Key::public()));
-
-                $signed_message = Factory::event($recipient, 1, 'Hello!');
-                $send($signed_message);
-                Listener::expect($alice_listener, ['OK', $signed_message()[1]['id'], true, ""]);
+            $alice(function(callable $send, callable $subscribe) use ($alice_listener, $recipient, $transpher) {
+                $subscription = $subscribe(...['#p' => [$recipient(Key::public())]]);
+                Listener::expectSubscription($alice_listener, $subscription, 
+                        'Hello, I am your agent! The URL of your relay is ' . $transpher->ws,
+                        'Running with public key npub15fs4wgrm7sllg4m0rqd3tljpf5u9a2g6443pzz4fpatnvc9u24qsnd6036');
+                
+                Listener::expectOK($alice_listener, $send, (new nostriphant\NIP01\Rumor(
+                                pubkey: $recipient(Key::public()),
+                                        created_at: time(),
+                                        kind: 1,
+                                        content: 'Hello!',
+                                        tags: []
+                                ))($recipient));
             });
 
-            $alice_listen($alice_listener);
-
-
-            $bob_message = Factory::event($sender, 1, 'Hello!');
-
-            $bobs_expected_messages = [];
-
-            $bob_listen = $bob(function(callable $send) use ($bob_message, &$bobs_expected_messages) {
-                $send($bob_message);
-                $bobs_expected_messages[] = ['OK', $bob_message()[1]['id'], true, ''];
-            });
-
-            expect($bobs_expected_messages)->toHaveCount(1);
-
-            $bob_listen(function (Message $message, callable $stop) use (&$bobs_expected_messages) {
-                $expected_message = array_shift($bobs_expected_messages);
-
-                $type = array_shift($expected_message);
-                expect($message->type)->toBe($type, 'Message type checks out');
-                expect($message->payload)->toBe($expected_message);
-
-                if (count($bobs_expected_messages) === 0) {
-                    $stop();
-                }
-            });
+//            $bob_listen(function (Message $message, callable $stop) use (&$bobs_expected_messages) {
+//                $expected_message = array_shift($bobs_expected_messages);
+//
+//                $type = array_shift($expected_message);
+//                expect($message->type)->toBe($type, 'Message type checks out');
+//                expect($message->payload)->toBe($expected_message);
+//
+//                if (count($bobs_expected_messages) === 0) {
+//                    $stop();
+//                }
+//            });
 
 
             $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
@@ -147,7 +117,7 @@ describe('only events from whitelisted authors/recipients are stored', function 
             expect($notes_alice[0]->kind)->toBe(1);
             expect($notes_alice[0]->content)->toBe('Hello!');
 
-            $notes_bob = iterator_to_array(nostriphant\Stores\Store::query($events, ['ids' => [$bob_message()[1]['id']]]));
+            $notes_bob = iterator_to_array(nostriphant\Stores\Store::query($events, ['ids' => [$bob_message->id]]));
 
 
             expect($notes_bob)->toHaveLength(1);

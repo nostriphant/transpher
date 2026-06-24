@@ -2635,16 +2635,16 @@
         },
         {
             "name": "nostriphant/relay",
-            "version": "2.6.3",
+            "version": "2.6.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "e14f80b183a19fe4649fca3cfed89ce41febd791"
+                "reference": "5a1310c775a63a4e3b5aae9379fa87de8d62fecb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/e14f80b183a19fe4649fca3cfed89ce41febd791",
-                "reference": "e14f80b183a19fe4649fca3cfed89ce41febd791",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/5a1310c775a63a4e3b5aae9379fa87de8d62fecb",
+                "reference": "5a1310c775a63a4e3b5aae9379fa87de8d62fecb",
                 "shasum": ""
             },
             "require": {
@@ -2692,9 +2692,9 @@
             "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/2.6.3"
+                "source": "https://github.com/nostriphant/relay/tree/2.6.4"
             },
-            "time": "2026-06-23T12:01:04+00:00"
+            "time": "2026-06-24T07:20:31+00:00"
         },
         {
             "name": "nostriphant/secp256k1",

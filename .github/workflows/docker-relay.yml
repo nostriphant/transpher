@@ -3,8 +3,9 @@ name: Generate & Push docker RELAY containers
 on:
   workflow_run:
     workflows: [Tests]
-    types:
-      - completed
+    types: [completed]
+    branches:
+      - 'releases/**'
 
 env:
   REGISTRY_IMAGE: nostriphant/transpher-relay

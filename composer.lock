@@ -2314,16 +2314,16 @@
         },
         {
             "name": "nostriphant/client",
-            "version": "2.0.1",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/client.git",
-                "reference": "251380f181cad5fea51f81af014b27c9095481ee"
+                "reference": "6fc5e01cb634f4483fe8670f3820070eeee0334c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/client/zipball/251380f181cad5fea51f81af014b27c9095481ee",
-                "reference": "251380f181cad5fea51f81af014b27c9095481ee",
+                "url": "https://api.github.com/repos/nostriphant/client/zipball/6fc5e01cb634f4483fe8670f3820070eeee0334c",
+                "reference": "6fc5e01cb634f4483fe8670f3820070eeee0334c",
                 "shasum": ""
             },
             "require": {
@@ -2356,9 +2356,9 @@
             "description": "Simple Nostr client",
             "support": {
                 "issues": "https://github.com/nostriphant/client/issues",
-                "source": "https://github.com/nostriphant/client/tree/2.0.1"
+                "source": "https://github.com/nostriphant/client/tree/2.0.2"
             },
-            "time": "2026-06-23T12:04:25+00:00"
+            "time": "2026-06-25T11:27:00+00:00"
         },
         {
             "name": "nostriphant/functional",

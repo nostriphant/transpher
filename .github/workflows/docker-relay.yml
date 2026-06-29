@@ -44,7 +44,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
-          platforms: linux/amd64,linux/arm64,linux/armv7,linux/armv6
+          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
           push: true
           file: ./docker/relay.Dockerfile
           tags: ${{ steps.meta.outputs.tags }}

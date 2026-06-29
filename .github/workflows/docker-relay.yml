@@ -9,7 +9,7 @@ on:
       - 'releases/**'
 
 jobs:
-  build:
+  call-docker-workflow:
     uses: ./.github/workflows/docker.yml
     with:
       registry_image: nostriphant/transpher-relay

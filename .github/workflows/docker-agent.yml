@@ -10,7 +10,7 @@ on:
 
 jobs:
   call-docker-workflow:
-    uses: ./.github/workflows/docker.yml
+    uses: nostriphant/.github/workflows/docker.yml
     with:
       registry_image: nostriphant/transpher-agent
       docker_file: ./docker/agent.Dockerfile

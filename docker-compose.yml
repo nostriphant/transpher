@@ -2,50 +2,25 @@ services:
   relay:
     image: nostriphant/transpher-relay
     ports:
-      - "${RELAY_PORT}:80"
+      - 8081:80
+    env_file:
+      - .env
     volumes:
       - logs:/app/logs
       - data:/app/data
-    networks:
-      local:
-        ipv4_address: 10.8.0.8
-    env_file:
-      - stack.env
     restart: unless-stopped
-      
+
+    
   agent:
     image: nostriphant/transpher-agent
     volumes:
       - logs:/app/logs
-    networks:
-      local:
-        ipv4_address: 10.8.0.6
     env_file:
-      - stack.env
+      - .env
     depends_on:
       - relay
     restart: unless-stopped
 
-networks:
-  local:
-    driver: bridge
-    driver_opts:
-      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
-    ipam:
-      config:
-        - subnet: 10.8.0.0/16
-          gateway: 10.8.0.1
-
 volumes:
   data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./data
   logs:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./logs

@@ -2,7 +2,6 @@
 
 $loglevel = $_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO';
 $logger = (require_once __DIR__ . '/bootstrap.php')('relay', $loglevel);
-$logger->info('Log level ' . $_SERVER['RELAY_LOG_LEVEL'] ?? 'INFO');
 
 use nostriphant\NIP19\Bech32;
 use nostriphant\NIP01\Key;
@@ -28,10 +27,10 @@ $whitelist = [];
 if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
     $agent_pubkey = Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public());
     $logger->debug('Whitelisting owner ('.$_SERVER['RELAY_OWNER_NPUB'].') and agent ('.$agent_pubkey.')');
-    
+
     $whitelisted_npubs = array_filter(explode(',', $_SERVER['RELAY_WHITELISTED_AUTHORS'] ?? ''));
     $whitelisted_npubs[] = $_SERVER['RELAY_OWNER_NPUB'];
-    
+
     $whitelisted_pubkeys = array_map(fn(string $npub) => (new Bech32($npub))(), $whitelisted_npubs);
     $whitelisted_pubkeys[] = $agent_pubkey;
 

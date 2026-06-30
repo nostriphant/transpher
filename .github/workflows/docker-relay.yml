@@ -10,7 +10,7 @@ on:
 
 jobs:
   call-docker-workflow:
-    uses: nostriphant/.github/.github/workflows/docker.yml@ab4900dee407f99393816a7dbbd0e84f997ed249
+    uses: nostriphant/.github/.github/workflows/docker.yml@cebbf7a6db054cceb80b653fcfc2ccb5585e1ff1
     with:
       registry_image: nostriphant/transpher-relay
       docker_file: ./docker/relay.Dockerfile

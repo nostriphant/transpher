@@ -11,16 +11,15 @@ use nostriphant\Client\Client;
 it('starts relay and sends private direct messsage to relay owner', function (string $sender_hex, string $recipient_hex) {
     $sender = Key::fromHex($sender_hex);
     $recipient = Key::fromHex($recipient_hex);
-    
+
     $transpher = new Transpher('8087', $recipient, null);
-    
+
     try {
-        
+
         $worker = Amp\Parallel\Worker\createWorker();
 
-        $bob_message = (new nostriphant\NIP01\Rumor(
-                            pubkey: $sender(Key::public()),
-                                    created_at: time(),
+        $bob_message = (new nostriphant\NIP01\Event\Unsigned(
+                        created_at: time(),
                                     kind: 1,
                                     content: 'Hello!',
                                     tags: []
@@ -28,8 +27,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
 
         $executions = [
             // Alice
-            $worker->submit(new nostriphant\TranspherTests\Acceptance\PrivateDirectMessagesTest\Alice($transpher->ws, $recipient_hex, $sender(Key::public()))),
-
+            $worker->submit(new nostriphant\TranspherTests\Acceptance\PrivateDirectMessagesTest\Alice($transpher->ws, $recipient_hex, Key::derivePublicKey($sender))),
             // Bob
             $worker->submit(new \nostriphant\TranspherTests\Acceptance\PrivateDirectMessagesTest\Bob($transpher->ws, $sender_hex, $bob_message))
         ];
@@ -38,11 +36,11 @@ it('starts relay and sends private direct messsage to relay owner', function (st
             fn (Amp\Parallel\Worker\Execution $e) => $e->getFuture(),
             $executions,
         ));
-                
+
 
         $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($transpher->data_directory . '/transpher.sqlite'), []);
 
-        $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [$recipient(Key::public())], 'kinds' => [1]]));
+        $notes_alice = iterator_to_array(nostriphant\Stores\Store::query($events, ['authors' => [Key::derivePublicKey($recipient)], 'kinds' => [1]]));
         expect($notes_alice[0]->kind)->toBe(1);
         expect($notes_alice[0]->content)->toBe('Hello from Alice!');
 
@@ -51,7 +49,7 @@ it('starts relay and sends private direct messsage to relay owner', function (st
         expect($notes_bob[0]->kind)->toBe(1);
         expect($notes_bob[0]->content)->toBe('Hello!');
 
-        $pdms = iterator_to_array(nostriphant\Stores\Store::query($events, ['#p' => [$recipient(Key::public())]]));
+        $pdms = iterator_to_array(nostriphant\Stores\Store::query($events, ['#p' => [Key::derivePublicKey($recipient)]]));
         expect($pdms[0]->kind)->toBe(1059);
 
         expect(file_get_contents(ROOT_DIR . '/logs/relay-8087-output.log'))->not()->toContain('ERROR');
@@ -59,9 +57,9 @@ it('starts relay and sends private direct messsage to relay owner', function (st
         $transpher();
         throw $e;
     }
-    
+
     $transpher();
-    
+
 })->with([
     ['a71a415936f2dd70b777e5204c57e0df9a6dffef91b3c78c1aa24e54772e33c3', '6eeb5ad99e47115467d096e07c1c9b8b41768ab53465703f78017204adc5b0cc']
 ]);

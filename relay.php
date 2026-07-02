@@ -25,7 +25,7 @@ $events = new nostriphant\Stores\Engine\SQLite(new SQLite3($data_dir . '/transph
 
 $whitelist = [];
 if (($_SERVER['RELAY_WHITELISTED_AUTHORS_ONLY'] ?? false)) {
-    $agent_pubkey = Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))())(Key::public());
+    $agent_pubkey = Key::derivePublicKey(Key::fromHex((new Bech32($_SERVER['AGENT_NSEC']))()));
     $logger->debug('Whitelisting owner ('.$_SERVER['RELAY_OWNER_NPUB'].') and agent ('.$agent_pubkey.')');
 
     $whitelisted_npubs = array_filter(explode(',', $_SERVER['RELAY_WHITELISTED_AUTHORS'] ?? ''));

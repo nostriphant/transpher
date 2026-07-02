@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e654e709e7aa9423684ac891bb6c44b7",
+    "content-hash": "4a5420fd248e400805bab8b1c1db2917",
     "packages": [
         {
             "name": "amphp/amp",
@@ -2314,22 +2314,22 @@
         },
         {
             "name": "nostriphant/client",
-            "version": "2.1.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/client.git",
-                "reference": "7ecf6a3eab4851ff03314619558207d7988ef769"
+                "reference": "14d6c1e6bbb7b12857f315c3b6d3c2cf10ccb475"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/client/zipball/7ecf6a3eab4851ff03314619558207d7988ef769",
-                "reference": "7ecf6a3eab4851ff03314619558207d7988ef769",
+                "url": "https://api.github.com/repos/nostriphant/client/zipball/14d6c1e6bbb7b12857f315c3b6d3c2cf10ccb475",
+                "reference": "14d6c1e6bbb7b12857f315c3b6d3c2cf10ccb475",
                 "shasum": ""
             },
             "require": {
                 "amphp/websocket-client": "^2.0",
                 "nostriphant/functional": "^2.2",
-                "nostriphant/nip-01": "^2.0",
+                "nostriphant/nip-01": "^3.0",
                 "php": "^8.4"
             },
             "require-dev": {
@@ -2356,9 +2356,9 @@
             "description": "Simple Nostr client",
             "support": {
                 "issues": "https://github.com/nostriphant/client/issues",
-                "source": "https://github.com/nostriphant/client/tree/2.1.0"
+                "source": "https://github.com/nostriphant/client/tree/3.0.0"
             },
-            "time": "2026-06-30T14:23:23+00:00"
+            "time": "2026-07-02T08:15:59+00:00"
         },
         {
             "name": "nostriphant/functional",
@@ -2406,16 +2406,16 @@
         },
         {
             "name": "nostriphant/nip-01",
-            "version": "2.4.1",
+            "version": "3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip-01.git",
-                "reference": "31b681ef7b9687372ac27ab79046fbe51f4877b9"
+                "reference": "d5248883edbe911326c46758f1c69d922fc90dc6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/31b681ef7b9687372ac27ab79046fbe51f4877b9",
-                "reference": "31b681ef7b9687372ac27ab79046fbe51f4877b9",
+                "url": "https://api.github.com/repos/nostriphant/nip-01/zipball/d5248883edbe911326c46758f1c69d922fc90dc6",
+                "reference": "d5248883edbe911326c46758f1c69d922fc90dc6",
                 "shasum": ""
             },
             "require": {
@@ -2426,6 +2426,9 @@
             "require-dev": {
                 "pestphp/pest": "^2.35"
             },
+            "bin": [
+                "bin/key"
+            ],
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -2445,26 +2448,26 @@
             "description": "Nostr NIP-01 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip-01/issues",
-                "source": "https://github.com/nostriphant/nip-01/tree/2.4.1"
+                "source": "https://github.com/nostriphant/nip-01/tree/3.3.1"
             },
-            "time": "2026-05-05T07:25:09+00:00"
+            "time": "2026-07-02T11:53:30+00:00"
         },
         {
             "name": "nostriphant/nip-17",
-            "version": "2.1.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip-17.git",
-                "reference": "c35d3e26d1e87216050e026c6f9123adfbee1a83"
+                "reference": "c54789707c8e2ffd9c0556ce91ee309e680a1dc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip-17/zipball/c35d3e26d1e87216050e026c6f9123adfbee1a83",
-                "reference": "c35d3e26d1e87216050e026c6f9123adfbee1a83",
+                "url": "https://api.github.com/repos/nostriphant/nip-17/zipball/c54789707c8e2ffd9c0556ce91ee309e680a1dc1",
+                "reference": "c54789707c8e2ffd9c0556ce91ee309e680a1dc1",
                 "shasum": ""
             },
             "require": {
-                "nostriphant/nip-59": "^2.0",
+                "nostriphant/nip-59": "^3.0",
                 "php": "^8.3"
             },
             "require-dev": {
@@ -2473,8 +2476,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "nostriphant\\NIP17\\": "src/",
-                    "nostriphant\\NIP17Tests\\": "tests/"
+                    "nostriphant\\NIP17\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2490,9 +2492,9 @@
             "description": "Nostr NIP-17 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip-17/issues",
-                "source": "https://github.com/nostriphant/nip-17/tree/2.1.0"
+                "source": "https://github.com/nostriphant/nip-17/tree/3.0.0"
             },
-            "time": "2026-02-16T13:52:49+00:00"
+            "time": "2026-07-02T11:55:18+00:00"
         },
         {
             "name": "nostriphant/nip-19",
@@ -2544,22 +2546,22 @@
         },
         {
             "name": "nostriphant/nip-44",
-            "version": "2.3.0",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip-44.git",
-                "reference": "578eb26a64d10ae81ef428b79e4b7cf466efe7c4"
+                "reference": "afb0ddf4ebbea8529085348e3218e0a33d40b142"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip-44/zipball/578eb26a64d10ae81ef428b79e4b7cf466efe7c4",
-                "reference": "578eb26a64d10ae81ef428b79e4b7cf466efe7c4",
+                "url": "https://api.github.com/repos/nostriphant/nip-44/zipball/afb0ddf4ebbea8529085348e3218e0a33d40b142",
+                "reference": "afb0ddf4ebbea8529085348e3218e0a33d40b142",
                 "shasum": ""
             },
             "require": {
                 "ext-sodium": "*",
-                "nostriphant/nip-01": "^2.4",
-                "php": "^8.3",
+                "nostriphant/nip-01": "^3.0",
+                "php": "^8.4",
                 "phpseclib/phpseclib": "^3.0"
             },
             "require-dev": {
@@ -2588,26 +2590,26 @@
             "description": "Nostr NIP-44 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip-44/issues",
-                "source": "https://github.com/nostriphant/nip-44/tree/2.3.0"
+                "source": "https://github.com/nostriphant/nip-44/tree/3.0.0"
             },
-            "time": "2026-05-29T12:55:00+00:00"
+            "time": "2026-06-17T14:23:08+00:00"
         },
         {
             "name": "nostriphant/nip-59",
-            "version": "2.1.0",
+            "version": "3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/nip-59.git",
-                "reference": "c056508bb139941c5b2c5a7ac5647c2c7af5de39"
+                "reference": "430a08ed4cfca49ca4e094a7ea814d58528ae483"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/nip-59/zipball/c056508bb139941c5b2c5a7ac5647c2c7af5de39",
-                "reference": "c056508bb139941c5b2c5a7ac5647c2c7af5de39",
+                "url": "https://api.github.com/repos/nostriphant/nip-59/zipball/430a08ed4cfca49ca4e094a7ea814d58528ae483",
+                "reference": "430a08ed4cfca49ca4e094a7ea814d58528ae483",
                 "shasum": ""
             },
             "require": {
-                "nostriphant/nip-44": "^2.0",
+                "nostriphant/nip-44": "^3.0",
                 "php": "^8.3"
             },
             "require-dev": {
@@ -2616,8 +2618,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "nostriphant\\NIP59\\": "src/",
-                    "nostriphant\\NIP59Tests\\": "tests/"
+                    "nostriphant\\NIP59\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -2633,22 +2634,22 @@
             "description": "Nostr NIP-59 implementation in PHP",
             "support": {
                 "issues": "https://github.com/nostriphant/nip-59/issues",
-                "source": "https://github.com/nostriphant/nip-59/tree/2.1.0"
+                "source": "https://github.com/nostriphant/nip-59/tree/3.0.1"
             },
-            "time": "2026-02-14T19:35:36+00:00"
+            "time": "2026-07-02T11:44:09+00:00"
         },
         {
             "name": "nostriphant/relay",
-            "version": "2.6.4",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/relay.git",
-                "reference": "5a1310c775a63a4e3b5aae9379fa87de8d62fecb"
+                "reference": "3cc2c69eeb5f455867179fd87c8e4917e5bfcb31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/relay/zipball/5a1310c775a63a4e3b5aae9379fa87de8d62fecb",
-                "reference": "5a1310c775a63a4e3b5aae9379fa87de8d62fecb",
+                "url": "https://api.github.com/repos/nostriphant/relay/zipball/3cc2c69eeb5f455867179fd87c8e4917e5bfcb31",
+                "reference": "3cc2c69eeb5f455867179fd87c8e4917e5bfcb31",
                 "shasum": ""
             },
             "require": {
@@ -2660,12 +2661,11 @@
                 "amphp/websocket-server": "^4.0",
                 "ext-pcntl": "*",
                 "nostriphant/functional": "^2.3",
-                "nostriphant/nip-01": "^2.0",
-                "nostriphant/nip-17": "^2.0",
+                "nostriphant/nip-01": "^3.0",
+                "nostriphant/nip-17": "^3.0",
                 "nostriphant/nip-19": "^2.0",
-                "nostriphant/nip-44": "^2.0",
-                "nostriphant/nip-59": "^2.0",
-                "nostriphant/stores": "^2.0",
+                "nostriphant/nip-44": "^3.0",
+                "nostriphant/stores": "^3.0",
                 "php": "^8.4",
                 "psr/log": "^3.0"
             },
@@ -2673,7 +2673,7 @@
                 "ext-curl": "*",
                 "mockery/mockery": "^1.6",
                 "monolog/monolog": "^3.7",
-                "nostriphant/client": "^1.0",
+                "nostriphant/client": "^3.0",
                 "pestphp/pest": "^4.0"
             },
             "type": "library",
@@ -2696,9 +2696,9 @@
             "homepage": "https://github.com/nostriphant/relay",
             "support": {
                 "issues": "https://github.com/nostriphant/relay/issues",
-                "source": "https://github.com/nostriphant/relay/tree/2.6.4"
+                "source": "https://github.com/nostriphant/relay/tree/3.0.0"
             },
-            "time": "2026-06-24T07:20:31+00:00"
+            "time": "2026-07-02T12:16:34+00:00"
         },
         {
             "name": "nostriphant/secp256k1",
@@ -2750,21 +2750,21 @@
         },
         {
             "name": "nostriphant/stores",
-            "version": "2.0.1",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/stores.git",
-                "reference": "8157720dea06a2d7a00383b5066357a020891835"
+                "reference": "417ec97e74e891dc55982d23cd9197fc8edb4235"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/stores/zipball/8157720dea06a2d7a00383b5066357a020891835",
-                "reference": "8157720dea06a2d7a00383b5066357a020891835",
+                "url": "https://api.github.com/repos/nostriphant/stores/zipball/417ec97e74e891dc55982d23cd9197fc8edb4235",
+                "reference": "417ec97e74e891dc55982d23cd9197fc8edb4235",
                 "shasum": ""
             },
             "require": {
                 "ext-pcntl": "*",
-                "nostriphant/nip-01": "^2.0",
+                "nostriphant/nip-01": "^3.0",
                 "php": "^8.3"
             },
             "require-dev": {
@@ -2791,9 +2791,9 @@
             "description": "Nostr storage back-ends: sql, memory and disk",
             "support": {
                 "issues": "https://github.com/nostriphant/stores/issues",
-                "source": "https://github.com/nostriphant/stores/tree/2.0.1"
+                "source": "https://github.com/nostriphant/stores/tree/3.0.0"
             },
-            "time": "2026-06-18T14:35:37+00:00"
+            "time": "2026-07-02T08:44:54+00:00"
         },
         {
             "name": "paragonie/constant_time_encoding",
@@ -4593,21 +4593,21 @@
         },
         {
             "name": "nostriphant/http",
-            "version": "0.1.1",
+            "version": "0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nostriphant/http.git",
-                "reference": "e84f03e5b555ad0d2b1479e268a7640d7e66526f"
+                "reference": "fbbca11be08656c26ee5da025c110cdc7352574b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nostriphant/http/zipball/e84f03e5b555ad0d2b1479e268a7640d7e66526f",
-                "reference": "e84f03e5b555ad0d2b1479e268a7640d7e66526f",
+                "url": "https://api.github.com/repos/nostriphant/http/zipball/fbbca11be08656c26ee5da025c110cdc7352574b",
+                "reference": "fbbca11be08656c26ee5da025c110cdc7352574b",
                 "shasum": ""
             },
             "require": {
                 "nostriphant/functional": "^2.3",
-                "nostriphant/nip-01": "^2.2",
+                "nostriphant/nip-01": "^3.0",
                 "php": "^8.4"
             },
             "require-dev": {
@@ -4637,9 +4637,9 @@
             "homepage": "https://github.com/nostriphant/http",
             "support": {
                 "issues": "https://github.com/nostriphant/http/issues",
-                "source": "https://github.com/nostriphant/http/tree/0.1.1"
+                "source": "https://github.com/nostriphant/http/tree/0.4.1"
             },
-            "time": "2026-05-19T10:09:37+00:00"
+            "time": "2026-06-22T07:45:00+00:00"
         },
         {
             "name": "nunomaduro/collision",

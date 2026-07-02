@@ -22,15 +22,15 @@ class Bob implements Task {
 
     public function run(Channel $channel, Cancellation $cancellation): string
     {
-        $bob = Client::connectToUrl(fn() => null, $this->ws);
+        $bob = new Client($this->ws);
         $bob_listener = new Listener('bob-8087', $this->key);
 
-        $bob(function(callable $send) use ($bob_listener) { 
+        $bob(function(callable $send) use ($bob_listener) {
             Listener::expectOK($bob_listener, $send, $this->message);
         });
-        
+
         expect($bob_listener->expected_messages)->toBeEmpty();
-        
+
         return 'done';
     }
 }

@@ -25,7 +25,7 @@ readonly class Transpher {
         $relay_env = [
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => $this->ws,
-            'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
+            'RELAY_OWNER_NPUB' => (string) Bech32::npub(Key::derivePublicKey($owner)),
             'RELAY_NAME' => 'Really relay',
             'RELAY_DESCRIPTION' => 'This is my dev relay',
             'RELAY_CONTACT' => 'transpher@nostriphant.dev',
@@ -43,7 +43,7 @@ readonly class Transpher {
         $this->relay = new Relay('tcp://127.0.0.1:' . $port, $relay_env);
 
         $this->agent = new Agent($port, [
-            'RELAY_OWNER_NPUB' => (string) Bech32::npub($owner(Key::public())),
+            'RELAY_OWNER_NPUB' => (string) Bech32::npub(Key::derivePublicKey($owner)),
             'AGENT_NSEC' => (string) 'nsec1ffqhqzhulzesndu4npay9rn85kvwyfn8qaww9vsz689pyf5sfz7smpc6mn',
             'RELAY_URL' => $relay_env['RELAY_URL'],
             'AGENT_LOG_LEVEL' => 'DEBUG',

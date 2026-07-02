@@ -30,7 +30,7 @@ namespace {
         $log = new Monolog\Logger($identifier);
         $log->pushHandler(new Monolog\Handler\StreamHandler(STDOUT, translate_loglevel($logfile_level)));
         Monolog\ErrorHandler::register($log);
-        $log->info('Log level ' . $loglevel);
+        $log->info('Log level ' . $logfile_level);
         return $log;
     };
 }

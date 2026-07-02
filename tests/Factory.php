@@ -13,9 +13,8 @@ class Factory {
     }
 
     static function eventAt(Key $sender_key, int $kind, string $content, int $at, array ...$tags): Message {
-        return Message::event((new Rumor(
-                                pubkey: $sender_key(Key::public()),
-                                        created_at: $at,
+        return Message::event((new \nostriphant\NIP01\Event\Unsigned(
+                                created_at: $at,
                                         kind: $kind,
                                         content: $content,
                                         tags: $tags

@@ -18,7 +18,7 @@ it('boots a relay instance, which responds with an NIP-11 information document o
         'name' => 'Really relay',
             'description' => 'This is my dev relay',
             'pubkey' => '2b0d6f7a9c30264fed56ab9759761a47ce155bb04eea5ab47ab00dc4b9cb61c0',
-            'contact' =>'transpher@nostriphant.dev',
+            'contact' =>'nostriphant@rikmeijer.nl',
             'supported_nips' => [1, 2, 9, 11, 12, 13, 16, 20, 22, 33, 45],
             'software' => "https://github.com/nostriphant/transpher",
             'version' => TRANSPHER_VERSION

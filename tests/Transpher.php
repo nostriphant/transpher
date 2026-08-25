@@ -28,7 +28,7 @@ readonly class Transpher {
             'RELAY_OWNER_NPUB' => (string) Bech32::npub(Key::derivePublicKey($owner)),
             'RELAY_NAME' => 'Really relay',
             'RELAY_DESCRIPTION' => 'This is my dev relay',
-            'RELAY_CONTACT' => 'transpher@nostriphant.dev',
+            'RELAY_CONTACT' => 'nostriphant@rikmeijer.nl',
             'RELAY_DATA' => $this->data_directory,
             'RELAY_LOG_LEVEL' => 'DEBUG',
             'LIMIT_EVENT_CREATED_AT_LOWER_DELTA' => 60 * 60 * 72, // to accept NIP17 pdm created_at randomness

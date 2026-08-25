@@ -2350,7 +2350,7 @@
             "authors": [
                 {
                     "name": "Rik Meijer",
-                    "email": "rik@nostriphant.dev"
+                    "email": "nostriphant@rikmeijer.nl"
                 }
             ],
             "description": "Simple Nostr client",
@@ -2486,7 +2486,7 @@
             "authors": [
                 {
                     "name": "Rik Meijer",
-                    "email": "rik@nostriphant.dev"
+                    "email": "nostriphant@rikmeijer.nl"
                 }
             ],
             "description": "Nostr NIP-17 implementation in PHP",
@@ -2534,7 +2534,7 @@
             "authors": [
                 {
                     "name": "Rik Meijer",
-                    "email": "rik@nostriphant.dev"
+                    "email": "nostriphant@rikmeijer.nl"
                 }
             ],
             "description": "Nostr NIP-19 bech32-encoded entities in PHP",
@@ -2628,7 +2628,7 @@
             "authors": [
                 {
                     "name": "Rik Meijer",
-                    "email": "rik@nostriphant.dev"
+                    "email": "nostriphant@rikmeijer.nl"
                 }
             ],
             "description": "Nostr NIP-59 implementation in PHP",
@@ -2785,7 +2785,7 @@
             "authors": [
                 {
                     "name": "Rik Meijer",
-                    "email": "rik@nostriphant.dev"
+                    "email": "nostriphant@rikmeijer.nl"
                 }
             ],
             "description": "Nostr storage back-ends: sql, memory and disk",
